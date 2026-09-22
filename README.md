@@ -1,7 +1,7 @@
 # Extended Navigation for Moodle
 
 [![Moodle Plugin CI](https://github.com/didactika/moodle-local_extendednav/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/didactika/moodle-local_extendednav/actions/workflows/ci.yml)
-[![Moodle 4.2 to 4.5](https://img.shields.io/badge/Moodle-4.2%20to%204.5-f98012.svg)](https://moodledev.io/general/releases)
+[![Moodle 4.2 to 4.5](https://img.shields.io/badge/Moodle-4.2%20to%205.2-f98012.svg)](https://moodledev.io/general/releases)
 [![Maturity: Stable](https://img.shields.io/badge/maturity-stable-2e7d32.svg)](version.php)
 [![License: GPL v3 or later](https://img.shields.io/badge/license-GPLv3%2B-blue.svg)](LICENSE)
 
@@ -21,7 +21,7 @@ experience for targeted cohorts.
 |---|---|
 | **Component** | `local_extendednav` |
 | **Plugin type** | Local plugin |
-| **Supported Moodle releases** | 4.2 through 4.5 |
+| **Supported Moodle releases** | 4.2 through 5.2 |
 | **Current maturity** | Stable |
 | **Languages** | English |
 | **License** | GNU GPL v3 or later |
@@ -48,7 +48,7 @@ experience for targeted cohorts.
 
 ## Requirements
 
-- Moodle 4.2 through 4.5.
+- Moodle 4.2 through 5.2.
 - A PHP version supported by the installed Moodle release.
 - The new `core\hook\navigation\primary_extend` API (introduced in Moodle 4.2).
 
