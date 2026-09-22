@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version metadata for the local_extendednav plugin.
+ * File definition for caches.php.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -25,9 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026092200;
-$plugin->requires  = 2023042400; // Moodle 4.2+
-$plugin->component = 'local_extendednav';
-$plugin->release   = '1.0.0';
-$plugin->supported = [402, 405];
-$plugin->maturity  = MATURITY_STABLE;
+$definitions = [
+    'nodes' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1
+    ]
+];
