@@ -28,6 +28,7 @@ namespace local_extendednav;
 use core\hook\navigation\primary_extend;
 
 class hooks {
+    public static $skip_hook = false;
     
     /**
      * Extends the primary navigation based on custom DB configuration.
@@ -37,7 +38,7 @@ class hooks {
     public static function extend_primary_navigation(primary_extend $hook): void {
         global $USER, $DB, $OUTPUT;
 
-        if (!get_config('local_extendednav', 'enable_plugin')) {
+        if (self::$skip_hook || !get_config('local_extendednav', 'enable_plugin')) {
             return;
         }
         
