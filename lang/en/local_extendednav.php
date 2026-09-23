@@ -88,3 +88,26 @@ $string['none'] = 'None';
 $string['fallbackurl'] = 'Fallback Redirect URL';
 $string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native fatal permission error screen instead (Recommended).';
 $string['err_duplicate_key'] = 'This Node Key is already in use. Please edit the existing rule instead to prevent duplicates and conflicts.';
+$string['coreoverridealert'] = '<strong>Notice:</strong> You are overriding a native Moodle core node. By doing so, the Title and URL fields become optional (if you leave them blank, Moodle will retain the original values for this node).';
+
+$string['opt_none_root'] = '- None / Main Root -';
+$string['opt_end_list'] = '- Default position / End of list -';
+$string['opt_native'] = 'Native: {$a->text} ({$a->key})';
+$string['opt_plugin'] = 'Plugin: {$a->title} ({$a->key})';
+$string['opt_invalid_has_submenus'] = '- Invalid: This element already contains sub-menus -';
+$string['opt_invalid_admin_submenu'] = '- Invalid: The admin panel cannot be a sub-menu -';
+$string['none_title'] = 'Untitled';
+
+$string['filters'] = 'Filters';
+$string['search_free'] = 'Global Search (Key or Title)';
+$string['search_parent'] = 'Hidden Parent Key (Hierarchy)';
+$string['apply'] = 'Apply';
+$string['reset'] = 'Reset';
+$string['positioning'] = 'Positioning';
+$string['filter_active'] = 'Active Filter';
+$string['native_string'] = 'native string';
+$string['native_route'] = 'native route';
+$string['inside'] = 'inside:';
+$string['before'] = 'before:';
+$string['err_restricted_page'] = 'This page is restricted by the navigation hierarchy and role rules set for your account.';
+$string['err_duplicate_key_alert'] = '<strong>Conflict:</strong> This Node Key is already in use by another custom rule. You cannot use duplicate keys.';

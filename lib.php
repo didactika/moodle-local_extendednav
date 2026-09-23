@@ -246,7 +246,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         } else if (!$front_blocked && strpos($current_path, 'redirect=0') === false && $current_path !== '/' && strpos($current_path, '/index.php') !== 0) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
-            throw new \moodle_exception('nopermissions', 'error', '', null, 'Esta página está restringida por la jerarquía de navegación y reglas de rol establecidas para tu cuenta.');
+            throw new \moodle_exception('nopermissions', 'error', '', null, get_string('err_restricted_page', 'local_extendednav'));
         }
     }
 }

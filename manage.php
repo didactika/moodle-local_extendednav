@@ -112,26 +112,26 @@ echo html_writer::link($addurl, get_string('add_node', 'local_extendednav'), ['c
 
 echo '<div class="dropdown extendednav-filters">';
 echo '<button class="btn ' . $filterbtnclass . ' dropdown-toggle" type="button" id="extendednav-manage-filters" data-toggle="dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">';
-echo $OUTPUT->pix_icon('i/filter', '') . ' Filtros ';
+echo $OUTPUT->pix_icon('i/filter', '') .  ' ' . get_string('filters', 'local_extendednav') . ' ';
 echo '</button>';
 
 echo '<div class="dropdown-menu dropdown-menu-right dropdown-menu-end p-3 shadow" aria-labelledby="extendednav-manage-filters" style="min-width: 320px;">';
 echo '<form method="get" action="manage.php">';
 
 echo '<div class="form-group mb-3">';
-echo '<label for="fsearch">Búsqueda libre (Llave o Título)</label>';
+echo '<label for="fsearch">'.get_string('search_free', 'local_extendednav').'</label>';
 echo '<input type="text" id="fsearch" name="search" value="'.s($search).'" class="form-control" autocomplete="off">';
 echo '</div>';
 
 echo '<div class="form-group mb-3">';
-echo '<label for="fparent">Llave Padre Oculto (Jerarquía)</label>';
+echo '<label for="fparent">'.get_string('search_parent', 'local_extendednav').'</label>';
 echo '<input type="text" id="fparent" name="parent" value="'.s($parent).'" class="form-control" autocomplete="off">';
 echo '</div>';
 
-echo '<button type="submit" class="btn btn-primary">Aplicar</button>';
+echo '<button type="submit" class="btn btn-primary">'.get_string('apply', 'local_extendednav').'</button>';
 
 if ($is_filtered) {
-    echo html_writer::tag('div', html_writer::link(new moodle_url('/local/extendednav/manage.php'), 'Restablecer'), ['class' => 'pt-3']);
+    echo html_writer::tag('div', html_writer::link(new moodle_url('/local/extendednav/manage.php'), get_string('reset', 'local_extendednav')), ['class' => 'pt-3']);
 }
 
 echo '</form>';
@@ -148,7 +148,7 @@ $table->define_headers([
     get_string('nodekey', 'local_extendednav'),
     get_string('title', 'local_extendednav'),
     get_string('url', 'local_extendednav'),
-    'Posicionamiento',
+    get_string('positioning', 'local_extendednav'),
     get_string('visibility', 'local_extendednav'),
     get_string('order', 'local_extendednav'),
     get_string('actions', 'local_extendednav')
@@ -166,11 +166,11 @@ foreach ($nodes as $n) {
 
     $tree_html = '';
     if (!empty($n->parentkey)) {
-        $tree_html .= html_writer::tag('span', '└─ inside: <b>' . s($n->parentkey) . '</b>', ['class' => 'text-info small']);
+        $tree_html .= html_writer::tag('span', get_string('inside', 'local_extendednav') . ' <b>' . s($n->parentkey) . '</b>', ['class' => 'text-info small']);
         $tree_html .= '<br>';
     }
     if (!empty($n->beforekey)) {
-        $tree_html .= html_writer::tag('span', '┌─ before: <b>' . s($n->beforekey) . '</b>', ['class' => 'text-muted small']);
+        $tree_html .= html_writer::tag('span', get_string('before', 'local_extendednav') . ' <b>' . s($n->beforekey) . '</b>', ['class' => 'text-muted small']);
     }
     if (empty($tree_html)) {
         $tree_html = '<span class="text-secondary">-</span>';
@@ -186,22 +186,22 @@ foreach ($nodes as $n) {
 
     $order = '';
     if ($is_filtered) {
-        $order = html_writer::tag('span', 'Filtro Activo', ['class' => 'text-secondary small font-italic']);
+        $order = html_writer::tag('span', get_string('filter_active', 'local_extendednav'), ['class' => 'text-secondary small font-italic']);
     } else {
         if ($i > 0) {
             $upurl = new moodle_url('/local/extendednav/manage.php', ['id' => $n->id, 'action' => 'moveup', 'sesskey' => sesskey()]);
-            $order .= html_writer::link($upurl, $OUTPUT->pix_icon('t/up', 'Move Up'));
+            $order .= html_writer::link($upurl, $OUTPUT->pix_icon('t/up', get_string('moveup')));
         }
         if ($i < $total - 1) {
             $downurl = new moodle_url('/local/extendednav/manage.php', ['id' => $n->id, 'action' => 'movedown', 'sesskey' => sesskey()]);
-            $order .= html_writer::link($downurl, $OUTPUT->pix_icon('t/down', 'Move Down'));
+            $order .= html_writer::link($downurl, $OUTPUT->pix_icon('t/down', get_string('movedown')));
         }
     }
 
     $table->add_data([
         '<b>'.s($n->nodekey).'</b>',
-        !empty($n->title) ? format_string($n->title) : '<i class="text-muted">native string</i>',
-        !empty($n->url) ? s($n->url) : '<i class="text-muted">native route</i>',
+        !empty($n->title) ? format_string($n->title) : '<i class="text-muted">'.get_string('native_string', 'local_extendednav').'</i>',
+        !empty($n->url) ? s($n->url) : '<i class="text-muted">'.get_string('native_route', 'local_extendednav').'</i>',
         $tree_html,
         $vis,
         $order,
