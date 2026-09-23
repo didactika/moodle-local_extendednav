@@ -54,10 +54,7 @@ class node_form extends \moodleform {
                     $core_keys[] = $child->key;
                 }
             }
-            \local_extendednav\hooks::$skip_hook = false;
-        } catch (\Exception $e) {
-            \local_extendednav\hooks::$skip_hook = false;
-        }
+            } catch (\Throwable $e) {} finally { \local_extendednav\hooks::$skip_hook = false; }
         
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -217,10 +214,7 @@ class node_form extends \moodleform {
                     break;
                 }
             }
-            \local_extendednav\hooks::$skip_hook = false;
-        } catch (\Exception $e) {
-            \local_extendednav\hooks::$skip_hook = false;
-        }
+            } catch (\Throwable $e) {} finally { \local_extendednav\hooks::$skip_hook = false; }
 
         if (!$is_core) {
             if (empty(trim((string)$data['title']))) {

@@ -68,7 +68,7 @@ if ($action === 'moveup' || $action === 'movedown') {
             foreach ($ordered as $index => $n) {
                 $DB->set_field('local_extendednav', 'sortorder', $index, ['id' => $n->id]);
             }
-            try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Exception $e) {}
+            try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
             redirect($baseurl);
         }
     }
@@ -77,7 +77,7 @@ if ($action === 'moveup' || $action === 'movedown') {
 if ($action === 'delete') {
     require_sesskey();
     $DB->delete_records('local_extendednav', ['id' => $id]);
-    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Exception $e) {}
+    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
     redirect($baseurl);
 }
 

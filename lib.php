@@ -47,16 +47,16 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         return;
     }
 
-    $cache = \cache::make('local_extendednav', 'nodes');
-    $nodes = $cache->get('allnodes');
-    
-    if ($nodes === false) {
-        try {
+    try {
+        $cache = \cache::make('local_extendednav', 'nodes');
+        $nodes = $cache->get('allnodes');
+        
+        if ($nodes === false) {
             $nodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
-        } catch (\moodle_exception $e) {
-            $nodes = [];
+            $cache->set('allnodes', $nodes);
         }
-        $cache->set('allnodes', $nodes);
+    } catch (\Throwable $e) {
+        return;
     }
 
     if (empty($nodes)) {
@@ -68,7 +68,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         if (is_object($PAGE) && is_object($PAGE->url)) {
             $current_url = $PAGE->url->out(false);
         }
-    } catch (\moodle_exception $e) {
+    } catch (\Throwable $e) {
     }
     
     if (empty($current_url)) {
@@ -140,40 +140,34 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             }
         }
         
-        $target_url = null;
-        if (!empty($cnode->url)) {
-            $target_url = $cnode->url;
-        } else if ($cnode->visibility != 1) { 
-            try {
-                $primary = new \core\navigation\views\primary($PAGE);
-                $primary->initialise();
-                $corenode = $primary->get($cnode->nodekey);
-                if ($corenode && $corenode->action instanceof \moodle_url) {
-                    $target_url = $corenode->action->out(false);
+        $node_paths = [];
+        if (!empty($cnode->blockedurls)) {
+            $split_urls = array_map('trim', explode(',', $cnode->blockedurls));
+            foreach ($split_urls as $s_url) {
+                if ($s_url !== '') {
+                    $node_paths[] = $s_url;
                 }
-            } catch (\moodle_exception $e) {
+            }
+        }
+        
+        if (!empty($cnode->url)) {
+            $p_url = parse_url($cnode->url);
+            $w_path = isset($p_url['path']) ? $p_url['path'] : '';
+            if (isset($p_url['query']) && $p_url['query'] !== '') {
+                $w_path .= '?' . $p_url['query'];
+            }
+            if ($w_path !== '' && !in_array($w_path, $node_paths)) {
+                $node_paths[] = $w_path;
             }
         }
 
         if ($allowed) {
-            if (!empty($target_url)) {
-                $p_url = parse_url($target_url);
-                $w_path = isset($p_url['path']) ? $p_url['path'] : '';
-                if (isset($p_url['query']) && $p_url['query'] !== '') {
-                    $w_path .= '?' . $p_url['query'];
-                }
-                if ($w_path !== '') {
-                    $all_whitelisted_paths[] = $w_path;
-                }
+            foreach ($node_paths as $w_path) {
+                $all_whitelisted_paths[] = $w_path;
             }
         } else {
-            if (!empty($cnode->blockedurls)) {
-                $split_urls = array_map('trim', explode(',', $cnode->blockedurls));
-                foreach ($split_urls as $s_url) {
-                    if ($s_url !== '') {
-                        $all_blocked_paths[] = $s_url;
-                    }
-                }
+            foreach ($node_paths as $b_path) {
+                $all_blocked_paths[] = $b_path;
             }
         }
     }
@@ -209,10 +203,6 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
     }
 
     if ($is_current_blocked) {
-        if ($fallback_custom !== '') {
-            redirect(new \moodle_url($fallback_custom));
-        }
-
         $fallback_my = '/my/index.php';
         $fallback_front = '/?redirect=0';
         
@@ -241,11 +231,14 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             }
         }
 
-        if (!$my_blocked && strpos($current_path, '/my/') === false) {
+        if (!$my_blocked) {
             redirect(new \moodle_url('/my/index.php'));
-        } else if (!$front_blocked && strpos($current_path, 'redirect=0') === false && $current_path !== '/' && strpos($current_path, '/index.php') !== 0) {
+        } else if (!$front_blocked) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
+            if ($fallback_custom !== '') {
+                redirect(new \moodle_url($fallback_custom));
+            }
             throw new \moodle_exception('nopermissions', 'error', '', null, get_string('err_restricted_page', 'local_extendednav'));
         }
     }

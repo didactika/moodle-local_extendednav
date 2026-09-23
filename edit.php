@@ -67,8 +67,12 @@ if ($mform->is_cancelled()) {
     $blockedurls = null;
     if ($record->visibility != 1) { 
         try {
-            $primary = new \core\navigation\views\primary($PAGE);
+            $temp_page = new \moodle_page();
+            $temp_page->set_context(\context_system::instance());
+            $temp_page->set_url($PAGE->url);
+            $primary = new \core\navigation\views\primary($temp_page);
             $primary->initialise();
+            
             $corenode = $primary->get($record->nodekey);
             if ($corenode && $corenode->action instanceof \moodle_url) {
                 $parsed_core = parse_url($corenode->action->out(false));
@@ -81,7 +85,7 @@ if ($mform->is_cancelled()) {
                     $blockedurls = $corepath;
                 }
             }
-        } catch (\Exception $e) {}
+        } catch (\Throwable $e) {}
     }
     
     if ($record->visibility != 1 && !empty($record->url)) {
@@ -119,7 +123,7 @@ if ($mform->is_cancelled()) {
     
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
-    } catch (\Exception $e) {}
+    } catch (\Throwable $e) {}
     theme_reset_all_caches();
 
     redirect(new moodle_url('/local/extendednav/manage.php'));
