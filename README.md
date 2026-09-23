@@ -85,6 +85,31 @@ Here, nodes can be defined by specifying:
 - **Icons**: Adding `fa-` syntax for FontAwesome assets.
 - **Target Blank**: Toggling the external link mode safely.
 
+### YAML Import / Export (Infrastructure & Deployments)
+
+This plugin includes native support for importing and exporting navigation rules (nodes) using standard YAML files. This approach mirrors modern Moodle configurations (like `theme_vle` or `local_serviceschema`) to allow Administrators/DevOps to seamlessly transfer node structures between Development, Staging, and Production environments safely.
+
+- **Export YAML:** Clicking `Export YAML Configuration` from your manage panel automatically generates a complete backup (`extendednav_config_YYYYMMDD_HHMM.yml`) containing mathematically precise definitions of your active nodes. You can export **All** configurations or only a select few.
+- **Import YAML:** Clicking `Import YAML` prompts the user for a configuration file. You can either **Overwrite** (which flushes your database and mounts only the nodes inside the file) or **Append** (to merge them).
+
+**Example YAML Format:**
+The expected structure strictly requires a top-level `nodes:` key containing a list of objects exactly matching the database schema. Ensure boolean flags like `visibility` are integers (0 = Hidden, 1 = Visible, 2 = Restricted by Role).
+
+```yaml
+nodes:
+  - nodekey: didactika_custom
+    title: "Didactika"
+    url: "https://www.didactika.org/"
+    icon: "i/world"
+    visibility: 1
+    roles: ""
+    parentkey: "myhome"
+    beforekey: ""
+    newwindow: 1
+    blockedurls: ""
+```
+*Note: Include an empty string for `roles` or `blockedurls` if not needed. Never leave them entirely blank to prevent YAML null interpretation issues.*
+
 Moodle will cache the resulting navigation tree heavily. When updating complex role assignments
 or adding a high amount of URL block rules, ensure the site cache for `local_extendednav` is cleared if changes do not appear immediately.
 

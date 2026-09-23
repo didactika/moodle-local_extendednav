@@ -111,3 +111,39 @@ $string['inside'] = 'inside:';
 $string['before'] = 'before:';
 $string['err_restricted_page'] = 'This page is restricted by the navigation hierarchy and role rules set for your account.';
 $string['err_duplicate_key_alert'] = '<strong>Conflict:</strong> This Node Key is already in use by another custom rule. You cannot use duplicate keys.';
+
+$string['yamlconfigfile'] = 'YAML Configuration File';
+$string['import_overwrite'] = 'Overwrite existing nodes (Delete all current)';
+$string['import_append'] = 'Append / Update (Merge with current)';
+$string['importmode'] = 'Import Action';
+$string['import_nodes'] = 'Import Nodes';
+$string['export'] = 'Export YAML';
+$string['import'] = 'Import YAML';
+$string['err_invalid_yaml_file'] = 'Invalid file uploaded. Please upload a valid .yml or .yaml file.';
+$string['err_invalid_yaml_format'] = 'The YAML file could not be parsed due to formatting errors.';
+$string['err_invalid_yaml_structure'] = 'The YAML structure is invalid. It must contain a "nodes" array.';
+$string['import_success'] = 'Nodes successfully imported from YAML.';
+
+$string['yamlconfigfile_help'] = 'Upload a valid extended navigation YAML file to import nodes into the database.';
+$string['importmode_help'] = 'Append will merge the YAML files with your existing entries. Overwrite will destroy all your existing links and replace them entirely with the YAML records.';
+
+$string['export_all'] = 'Export All Configurations (Full Schema)';
+$string['export_selected_mode'] = 'Export Selected Configurations Only';
+$string['exportmode_label'] = 'Export Mode';
+$string['select_nodes'] = 'Select Nodes';
+$string['select_nodes_export'] = 'Nodes to Export';
+$string['no_nodes_export'] = 'There are no nodes available to export.';
+$string['export_nodes'] = 'Export YAML Configuration';
+
+$string['nodes_selected'] = 'node(s) selected';
+
+$string['bulk_delete'] = 'Delete Selected';
+$string['bulk_delete_confirm'] = 'Are you sure you want to permanently delete these nodes? This action cannot be undone.';
+$string['bulk_deleted'] = 'Nodes successfully deleted.';
+
+$string['export_selected'] = 'Export Selected';
+$string['export_all_btn'] = 'Export All YAML';
+
+$string['import_instructions_title'] = 'YAML Structure Guidelines';
+$string['import_instructions_desc'] = 'To import nodes, your YAML file must contain a root <strong>nodes</strong> key followed by a list of navigation objects. You can safely download and edit the example template below.';
+$string['download_example'] = 'Download Example';

@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-23
+
 ### Added
 
 - Initial release of the Extended Navigation plugin.
 - Seamless Moodle 4.2 through 5.2 support via the PSR-14 Hooks API (`core\hook\navigation\primary_extend`).
+- Native YAML Configuration Export/Import architecture for smooth DevOps deployments across environments.
+- Moodle Standard Bulk Actions Interface directly built into the management dashboard (Mass delete and Mass export features).
+- Robust `simple_yaml` fallback parser engine to support dynamic multiline configurations safely across servers missing the native PECL YAML extension.
 - Management interface (`manage.php`) allowing Site Administrators to list, view and sort custom navigation nodes from the database.
 - Node editing capabilities (`edit.php`) to configure component keys, URLs, display text, and visual icons dynamically.
 - Core Moodle forms support to handle node hierarchy bindings (specifying exact `parentkey` and `beforekey` parameters).

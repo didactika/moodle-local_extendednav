@@ -81,6 +81,19 @@ if ($action === 'delete') {
     redirect($baseurl);
 }
 
+if ($action === 'bulkdelete') {
+    require_sesskey();
+    $nodeids = optional_param_array('nodeids', [], PARAM_INT);
+    if (!empty($nodeids)) {
+        list($insql, $inparams) = $DB->get_in_or_equal($nodeids);
+        $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
+        try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
+        redirect($baseurl, get_string('bulk_deleted', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
+    } else {
+        redirect($baseurl);
+    }
+}
+
 $where = [];
 $params = [];
 if ($search !== '') {
@@ -108,7 +121,14 @@ $filterbtnclass = $is_filtered ? 'btn-primary' : 'btn-primary';
 echo '<div class="reportbuilder-wrapper">';
 echo '<div class="d-flex flex-wrap justify-content-end mb-3">';
 
-echo html_writer::link($addurl, get_string('add_node', 'local_extendednav'), ['class' => 'btn btn-primary mr-2']);
+echo html_writer::link($addurl, '<i class="fa fa-plus mr-1"></i>' . get_string('add_node', 'local_extendednav'), ['class' => 'btn btn-primary mr-2']);
+
+// Import/Export buttons
+$importurl = new moodle_url('/local/extendednav/import.php');
+echo html_writer::link($importurl, '<i class="fa fa-upload mr-1"></i>' . get_string('import', 'local_extendednav'), ['class' => 'btn btn-secondary mr-2']);
+
+$exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1]);
+echo html_writer::link($exportallurl, '<i class="fa fa-download mr-1"></i>' . get_string('export_all_btn', 'local_extendednav'), ['class' => 'btn btn-info text-white mr-2']);
 
 echo '<div class="dropdown extendednav-filters">';
 echo '<button class="btn ' . $filterbtnclass . ' dropdown-toggle" type="button" id="extendednav-manage-filters" data-toggle="dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">';
@@ -140,11 +160,34 @@ echo '</div>'; // End dropdown
 echo '</div>'; // End d-flex wrapper
 echo '</div>'; // End reportbuilder-wrapper
 
+// Bulk Actions Bar (Moodle Standard Placement)
+echo '<div class="d-flex justify-content-between align-items-center mb-3">';
+echo '    <div class="d-flex align-items-center">';
+echo '        <div class="bulk-actions d-none" id="bulk-actions-bar">';
+echo '            <span class="selected-count font-weight-bold mr-3">';
+echo '                <span id="bulk-count">0</span> ' . get_string('nodes_selected', 'local_extendednav');
+echo '            </span>';
+echo '            <button type="submit" form="bulk-export-form" formaction="export.php" class="btn btn-sm btn-info mr-1">';
+echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_selected', 'local_extendednav');
+echo '            </button>';
+echo '            <button type="submit" form="bulk-export-form" formaction="manage.php" name="action" value="bulkdelete" class="btn btn-sm btn-danger mr-1" onclick="return confirm(\''.addslashes(get_string('bulk_delete_confirm', 'local_extendednav')).'\');">';
+echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
+echo '            </button>';
+
+echo '        </div>';
+echo '    </div>';
+echo '</div>';
+
+
+// Bulk actions form start
+echo '<form id="bulk-export-form" method="POST" action="export.php">
+<input type="hidden" name="sesskey" value="'.sesskey().'">';
 
 $table = new flexible_table('local-extendednav-manage');
 $table->define_baseurl($baseurl);
-$table->define_columns(['nodekey', 'title', 'url', 'tree', 'visibility', 'order', 'actions']);
+$table->define_columns(['select', 'nodekey', 'title', 'url', 'tree', 'visibility', 'order', 'actions']);
 $table->define_headers([
+    '<input type="checkbox" id="select-all-nodes">',
     get_string('nodekey', 'local_extendednav'),
     get_string('title', 'local_extendednav'),
     get_string('url', 'local_extendednav'),
@@ -154,6 +197,8 @@ $table->define_headers([
     get_string('actions', 'local_extendednav')
 ]);
 
+$table->column_class('select', 'text-center');
+$table->column_style('select', 'width', '40px');
 $table->setup();
 
 $nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder ASC, id ASC');
@@ -199,6 +244,7 @@ foreach ($nodes as $n) {
     }
 
     $table->add_data([
+        '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">',
         '<b>'.s($n->nodekey).'</b>',
         !empty($n->title) ? format_string($n->title) : '<i class="text-muted">'.get_string('native_string', 'local_extendednav').'</i>',
         !empty($n->url) ? s($n->url) : '<i class="text-muted">'.get_string('native_route', 'local_extendednav').'</i>',
@@ -212,4 +258,53 @@ foreach ($nodes as $n) {
 }
 
 $table->finish_output();
+
+echo '</form>';
+
+$js = "
+    var selectAll = document.getElementById('select-all-nodes');
+    var checkboxes = document.querySelectorAll('.node-checkbox');
+    var bulkBar = document.getElementById('bulk-actions-bar');
+    var bulkCount = document.getElementById('bulk-count');
+
+    function updateBulkBar() {
+        var count = 0;
+        var allChecked = true;
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                count++;
+            } else {
+                allChecked = false;
+            }
+        }
+
+        if (selectAll && checkboxes.length > 0) {
+            selectAll.checked = allChecked;
+        }
+
+        if (count > 0) {
+            bulkCount.textContent = count;
+            bulkBar.classList.remove('d-none');
+        } else {
+            bulkBar.classList.add('d-none');
+        }
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            var isChecked = this.checked;
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = isChecked;
+            }
+            updateBulkBar();
+        });
+    }
+
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener('change', updateBulkBar);
+    }
+";
+$PAGE->requires->js_amd_inline($js);
+
 echo $OUTPUT->footer();
