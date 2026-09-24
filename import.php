@@ -28,19 +28,7 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-if (optional_param('example', 0, PARAM_INT)) {
-    $example_path = __DIR__ . '/example.yml';
-    if (file_exists($example_path)) {
-        $example_content = file_get_contents($example_path);
-        header('Content-Type: application/x-yaml');
-        header('Content-Disposition: attachment; filename="extendednav_example.yml"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . strlen($example_content));
-        echo $example_content;
-        exit;
-    }
-}
+
 
 $url = new moodle_url('/local/extendednav/import.php');
 $PAGE->set_url($url);
@@ -81,9 +69,7 @@ if ($mform->is_cancelled()) {
         throw new \moodle_exception('err_invalid_yaml_structure', 'local_extendednav');
     }
 
-    if ($data->importmode === 'overwrite') {
-        $DB->delete_records('local_extendednav');
-    }
+
 
     $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav}');
     $sortorder = $max !== false ? $max + 1 : 0;
@@ -107,8 +93,13 @@ if ($mform->is_cancelled()) {
         
         $existing = $DB->get_record('local_extendednav', ['nodekey' => $record->nodekey], 'id');
         if ($existing) {
-            $record->id = $existing->id;
-            $DB->update_record('local_extendednav', $record);
+            if (isset($data->conflict_action) && $data->conflict_action === 'skip') {
+                continue;
+            } else {
+                // Default to overwrite if action is 'overwrite' or somehow omitted
+                $record->id = $existing->id;
+                $DB->update_record('local_extendednav', $record);
+            }
         } else {
             $record->sortorder = $sortorder++;
             $DB->insert_record('local_extendednav', $record);
@@ -129,24 +120,34 @@ if ($mform->is_cancelled()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($streditname);
 
-$example_url = new moodle_url('/local/extendednav/import.php', ['example' => 1]);
+$doc_url = new moodle_url('/local/extendednav/documentation.php');
 
-echo '<div class="alert alert-info border mb-4">';
-echo '    <div class="row align-items-center">';
-echo '        <div class="col-md-8">';
-echo '            <h4 class="alert-heading"><i class="fa fa-info-circle mr-2"></i>'.get_string('import_instructions_title', 'local_extendednav').'</h4>';
-echo '            <p class="mb-0">'.get_string('import_instructions_desc', 'local_extendednav').'</p>';
-echo '        </div>';
-echo '        <div class="col-md-4 text-right">';
-echo '            <a href="'.$example_url->out().'" class="btn btn-info text-white" download="extendednav_example.yml">';
-echo '                <i class="fa fa-download mr-1"></i>'.get_string('download_example', 'local_extendednav');
-echo '            </a>';
-echo '        </div>';
-echo '    </div>';
-echo '    <hr>';
-echo '    <pre class="bg-light p-3 border rounded mb-0" style="font-size: 0.85rem;"><code>'.s(file_get_contents(__DIR__.'/example.yml')).'</code></pre>';
+echo '<div class="extendednav-import-page">';
+
+$backurl = new moodle_url('/local/extendednav/manage.php');
+echo '<div class="mb-4">';
+echo '<a href="'.$backurl->out().'" class="btn btn-secondary">' . "\n";
+echo '    <i class="fa fa-arrow-left mr-2"></i>' . get_string('back', 'moodle') . "\n";
+echo '</a>';
 echo '</div>';
 
+echo '<div class="alert alert-info">';
+echo '    <h5><i class="fa fa-info-circle mr-2"></i>'.get_string('import_instructions_title', 'local_extendednav').'</h5>';
+echo '    <p>'.get_string('import_instructions_desc', 'local_extendednav').'</p>';
+echo '    <ul>';
+echo '        <li>'.get_string('yamlconfigfile', 'local_extendednav').' (<code>.yml</code>, <code>.yaml</code>)</li>';
+echo '    </ul>';
+echo '    <p>';
+echo '        <a href="'.$doc_url->out().'" class="text-info font-weight-bold">';
+echo '            <i class="fa fa-book mr-1"></i>'.get_string('view_documentation', 'local_extendednav');
+echo '        </a>';
+echo '    </p>';
+echo '</div>';
+
+echo '<div class="import-form-container card p-4 bg-light mb-4">';
 $mform->display();
+echo '</div>';
+
+echo '</div>';
 
 echo $OUTPUT->footer();

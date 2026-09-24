@@ -49,13 +49,12 @@ class import_form extends \moodleform {
         $mform->addRule('yamlfile', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('yamlfile', 'yamlconfigfile', 'local_extendednav');
 
-        $options = [
-            'overwrite' => get_string('import_overwrite', 'local_extendednav'),
-            'append'    => get_string('import_append', 'local_extendednav')
+        $conflictoptions = [
+            'skip' => get_string('conflict_skip', 'local_extendednav'),
+            'overwrite' => get_string('conflict_overwrite', 'local_extendednav'),
         ];
-        $mform->addElement('select', 'importmode', get_string('importmode', 'local_extendednav'), $options);
-        $mform->setDefault('importmode', 'append');
-        $mform->addHelpButton('importmode', 'importmode', 'local_extendednav');
+        $mform->addElement('select', 'conflict_action', get_string('conflict_handling', 'local_extendednav'), $conflictoptions);
+        $mform->setDefault('conflict_action', 'skip');
 
         $this->add_action_buttons(true, get_string('import', 'local_extendednav'));
     }

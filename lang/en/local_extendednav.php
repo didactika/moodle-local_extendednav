@@ -26,9 +26,9 @@
 $string['pluginname'] = 'Extended Navigation';
 $string['enable_plugin'] = 'Enable Plugin';
 $string['enable_plugin_desc'] = 'Master switch to completely enable or disable this plugin without uninstalling it.';
-$string['manage_nodes'] = 'Manage Navigation Nodes';
+$string['manage_nodes'] = 'Dashboard';
 $string['manage_nodes_desc'] = 'Add, edit, or remove custom navigation nodes, and override existing Moodle nodes. Rules are evaluated from top to bottom (Priority Hierarchy).';
-$string['add_node'] = 'Add new node overriding';
+$string['add_node'] = 'Add Node';
 $string['edit_node'] = 'Edit node';
 $string['delete_node'] = 'Delete node';
 $string['delete_node_confirm'] = 'Are you sure you want to delete this navigation rule?';
@@ -113,12 +113,15 @@ $string['err_restricted_page'] = 'This page is restricted by the navigation hier
 $string['err_duplicate_key_alert'] = '<strong>Conflict:</strong> This Node Key is already in use by another custom rule. You cannot use duplicate keys.';
 
 $string['yamlconfigfile'] = 'YAML Configuration File';
+$string['conflict_overwrite'] = 'Overwrite (Replace matching nodes)';
 $string['import_overwrite'] = 'Overwrite existing nodes (Delete all current)';
+$string['conflict_skip'] = 'Skip (Keep existing nodes)';
+$string['conflict_handling'] = 'Conflict Handling';
 $string['import_append'] = 'Append / Update (Merge with current)';
 $string['importmode'] = 'Import Action';
 $string['import_nodes'] = 'Import Nodes';
-$string['export'] = 'Export YAML';
-$string['import'] = 'Import YAML';
+$string['export'] = 'Export Nodes';
+$string['import'] = 'Import Nodes';
 $string['err_invalid_yaml_file'] = 'Invalid file uploaded. Please upload a valid .yml or .yaml file.';
 $string['err_invalid_yaml_format'] = 'The YAML file could not be parsed due to formatting errors.';
 $string['err_invalid_yaml_structure'] = 'The YAML structure is invalid. It must contain a "nodes" array.';
@@ -142,8 +145,34 @@ $string['bulk_delete_confirm'] = 'Are you sure you want to permanently delete th
 $string['bulk_deleted'] = 'Nodes successfully deleted.';
 
 $string['export_selected'] = 'Export Selected';
-$string['export_all_btn'] = 'Export All YAML';
+$string['export_all_btn'] = 'Export All';
 
 $string['import_instructions_title'] = 'YAML Structure Guidelines';
 $string['import_instructions_desc'] = 'To import nodes, your YAML file must contain a root <strong>nodes</strong> key followed by a list of navigation objects. You can safely download and edit the example template below.';
 $string['download_example'] = 'Download Example';
+
+$string['view_documentation'] = 'View Documentation';
+$string['documentation'] = 'Documentation';
+$string['doc_structure_title'] = 'YAML Configuration Structure';
+$string['doc_intro'] = 'The Extended Navigation plugin uses a strict YAML structure to manage navigation nodes. Below you can find the complete list of supported attributes and a functional template you can download and modify.';
+$string['doc_example_tip'] = 'You can leave optional fields empty or omit them entirely. Missing fields will default to their native Moodle values if overriding a core node, or standard defaults for new nodes.';
+$string['doc_example_format'] = 'Example Format';
+$string['doc_fields_title'] = 'Supported Fields Reference';
+$string['doc_field'] = 'Field';
+$string['doc_type'] = 'Type';
+$string['doc_desc'] = 'Description';
+$string['doc_f_nodekey'] = 'The unique identifier for the node (e.g. `myhome`, `custom_hub`).';
+$string['doc_f_title'] = 'Display text. If omitted on core nodes, the original language string is used.';
+$string['doc_f_url'] = 'Destination route (absolute or relative).';
+$string['doc_f_icon'] = 'FontAwesome or Moodle pix icon name (e.g. `block`, `book`).';
+$string['doc_f_visibility'] = '0 = Hidden, 1 = Public, 2 = Restricted by Role.';
+$string['doc_f_roles'] = 'Comma-separated list of Role IDs for Restricted visibility.';
+$string['doc_f_parentkey'] = 'Core Key of a parent node to nest this item.';
+$string['doc_f_beforekey'] = 'Core Key of a node to insert this item before.';
+$string['doc_f_newwindow'] = '1 = Open in new tab (`_blank`), 0 = Same window.';
+$string['doc_f_blockedurls'] = 'Comma-separated list of strict paths to actively block via URL redirection.';
+
+$string['quick_links'] = 'Quick Links';
+$string['doc_schema_reference'] = 'YAML Schema Reference';
+$string['doc_structure'] = 'Schema Structure';
+$string['doc_download_desc'] = 'Get a working sample YAML schema file';

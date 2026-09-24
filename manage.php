@@ -113,26 +113,26 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('manage_nodes', 'local_extendednav'));
 echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']); 
 
-// --- TOP ACTIONS BAR (Moodle 4 Report Builder Style) ---
+// --- TOP ACTIONS BAR (Matches theme_vle and local_servicemanager) ---
 $addurl = new moodle_url('/local/extendednav/edit.php');
+$importurl = new moodle_url('/local/extendednav/import.php');
+$exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1]);
 
-$filterbtnclass = $is_filtered ? 'btn-primary' : 'btn-primary';
+echo '<div class="d-flex flex-wrap justify-content-end mb-3">';
+echo '    <div class="btn-toolbar">';
+echo html_writer::link($addurl, '<i class="fa fa-plus mr-1"></i>' . get_string('add_node', 'local_extendednav'), ['class' => 'btn btn-primary']);
+echo html_writer::link($importurl, '<i class="fa fa-upload mr-1"></i>' . get_string('import', 'local_extendednav'), ['class' => 'btn btn-primary ml-2']);
+echo html_writer::link($exportallurl, '<i class="fa fa-file-code-o mr-1"></i>' . get_string('export_all_btn', 'local_extendednav'), ['class' => 'btn btn-outline-secondary ml-2']);
+echo '    </div>';
+echo '</div>';
+
+$filterbtnclass = $is_filtered ? 'btn-primary' : 'btn-outline-secondary';
 
 echo '<div class="reportbuilder-wrapper">';
-echo '<div class="d-flex flex-wrap justify-content-end mb-3">';
-
-echo html_writer::link($addurl, '<i class="fa fa-plus mr-1"></i>' . get_string('add_node', 'local_extendednav'), ['class' => 'btn btn-primary mr-2']);
-
-// Import/Export buttons
-$importurl = new moodle_url('/local/extendednav/import.php');
-echo html_writer::link($importurl, '<i class="fa fa-upload mr-1"></i>' . get_string('import', 'local_extendednav'), ['class' => 'btn btn-secondary mr-2']);
-
-$exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1]);
-echo html_writer::link($exportallurl, '<i class="fa fa-download mr-1"></i>' . get_string('export_all_btn', 'local_extendednav'), ['class' => 'btn btn-info text-white mr-2']);
-
+echo '<div class="d-flex justify-content-end mb-3">';
 echo '<div class="dropdown extendednav-filters">';
 echo '<button class="btn ' . $filterbtnclass . ' dropdown-toggle" type="button" id="extendednav-manage-filters" data-toggle="dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">';
-echo $OUTPUT->pix_icon('i/filter', '') .  ' ' . get_string('filters', 'local_extendednav') . ' ';
+echo '<i class="fa fa-filter mr-1"></i> ' . get_string('filters', 'local_extendednav') . ' ';
 echo '</button>';
 
 echo '<div class="dropdown-menu dropdown-menu-right dropdown-menu-end p-3 shadow" aria-labelledby="extendednav-manage-filters" style="min-width: 320px;">';
