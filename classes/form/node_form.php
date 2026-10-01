@@ -223,6 +223,9 @@ class node_form extends \moodleform {
             if (empty(trim((string)$data['url']))) {
                 $errors['url'] = get_string('required');
             }
+            if ((int)$data['visibility'] === 0) {
+                $errors['visibility'] = get_string('err_custom_hidden', 'local_extendednav');
+            }
         }
         
         $existing = $DB->get_record('local_extendednav', ['nodekey' => $data['nodekey']], '*', IGNORE_MULTIPLE);
@@ -257,7 +260,9 @@ class node_form extends \moodleform {
                     $errors['parentkey'] = get_string('err_parent_haschildren', 'local_extendednav');
                 }
             }
-        }
+        }//    if ((parse_url($PAGE->url->out(false), PHP_URL_PATH) === '/my/courses.php')) {
+//        redirect(new moodle_url('/my/index.php'));
+//    }
         
         return $errors;
     }
