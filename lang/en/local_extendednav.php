@@ -178,3 +178,5 @@ $string['doc_structure'] = 'Schema Structure';
 $string['doc_download_desc'] = 'Get a working sample YAML schema file';
 
 $string['err_custom_hidden'] = 'Completely hidden state is only available for core navigation nodes. For custom nodes, use role restrictions instead.';
+
+$string['privacy:metadata'] = 'The Extended Navigation plugin does not store any personal data.';
