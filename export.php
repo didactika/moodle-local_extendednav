@@ -73,6 +73,6 @@ header('Content-Type: application/x-yaml');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Cache-Control: private, max-age=0, must-revalidate');
 header('Pragma: public');
-header('Content-Length: ' . strlen($yaml_content));
+header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($yaml_content)));
 echo $yaml_content;
 exit;

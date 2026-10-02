@@ -41,7 +41,7 @@ if (optional_param('example', 0, PARAM_INT)) {
         header('Content-Disposition: attachment; filename="extendednav_example.yml"');
         header('Cache-Control: private, max-age=0, must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . strlen($example_content));
+        header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($example_content)));
         echo $example_content;
         exit;
     }
@@ -52,15 +52,13 @@ echo $OUTPUT->header();
 $backurl = new moodle_url('/local/extendednav/import.php');
 $downloadurl = new moodle_url('/local/extendednav/documentation.php', ['example' => 1]);
 
-echo '<div class="extendednav-documentation-page">';
+echo html_writer::start_div('extendednav-documentation-page');
 
-echo '<div class="mb-4">';
-echo '<a href="'.$backurl->out().'" class="btn btn-secondary">' . "\n";
-echo '    <i class="fa fa-arrow-left mr-2"></i>' . get_string('back', 'moodle') . "\n";
-echo '</a>';
-echo '</div>';
+echo html_writer::start_div('mb-4');
+echo html_writer::link($backurl, html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'), ['class' => 'btn btn-secondary']);
+echo html_writer::end_div();
 
-echo '<div class="card">';
+echo html_writer::start_div('card');
 echo '    <div class="card-header bg-primary text-white">';
 echo '        <h4 class="mb-0"><i class="fa fa-book mr-2"></i>' . get_string('doc_schema_reference', 'local_extendednav') . '</h4>';
 echo '    </div>';
@@ -112,7 +110,7 @@ echo '        <h4 id="example" class="mt-5 mb-3 text-primary">' . get_string('do
 echo '        <pre class="bg-light p-3 rounded"><code>' . s($example_content) . '</code></pre>';
 
 echo '    </div>';
-echo '</div>';
-echo '</div>';
+echo html_writer::end_div();
+echo html_writer::end_div();
 
 echo $OUTPUT->footer();

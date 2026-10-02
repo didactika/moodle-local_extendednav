@@ -228,9 +228,9 @@ class hooks {
                     $parent_node = $primarynav->get($state->parentkey);
                     
                     if (!$parent_node) {
-                        $killedByUs = isset($final_states[$state->parentkey]) && $final_states[$state->parentkey]->allowed === false;
+                        $killed_by_us = isset($final_states[$state->parentkey]) && $final_states[$state->parentkey]->allowed === false;
                         
-                        if ($killedByUs) {
+                        if ($killed_by_us) {
                             $node->remove();
                         }
                         continue;

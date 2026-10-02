@@ -31,7 +31,7 @@ admin_externalpage_setup('local_extendednav_manage');
 
 $action = optional_param('action', '', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
-$search = optional_param('search', '', PARAM_RAW);
+$search = optional_param('search', '', PARAM_TEXT);
 $parent = optional_param('parent', '', PARAM_ALPHANUMEXT);
 
 $baseparams = [];
@@ -86,50 +86,48 @@ $addurl = new moodle_url('/local/extendednav/edit.php');
 $importurl = new moodle_url('/local/extendednav/import.php');
 $exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1]);
 
-echo '<div class="d-flex flex-wrap justify-content-end mb-3">';
+echo html_writer::start_div('d-flex flex-wrap justify-content-end mb-3');
 echo '    <div class="btn-toolbar">';
 echo html_writer::link($addurl, '<i class="fa fa-plus mr-1"></i>' . get_string('add_node', 'local_extendednav'), ['class' => 'btn btn-primary']);
 echo html_writer::link($importurl, '<i class="fa fa-upload mr-1"></i>' . get_string('import', 'local_extendednav'), ['class' => 'btn btn-primary ml-2']);
 echo html_writer::link($exportallurl, '<i class="fa fa-file-code-o mr-1"></i>' . get_string('export_all_btn', 'local_extendednav'), ['class' => 'btn btn-outline-secondary ml-2']);
 echo '    </div>';
-echo '</div>';
+echo html_writer::end_div();
 
 $filterbtnclass = $is_filtered ? 'btn-primary' : 'btn-outline-secondary';
 
-echo '<div class="reportbuilder-wrapper">';
-echo '<div class="d-flex justify-content-end mb-3">';
-echo '<div class="dropdown extendednav-filters">';
-echo '<button class="btn ' . $filterbtnclass . ' dropdown-toggle" type="button" id="extendednav-manage-filters" data-toggle="dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false">';
-echo '<i class="fa fa-filter mr-1"></i> ' . get_string('filters', 'local_extendednav') . ' ';
-echo '</button>';
+echo html_writer::start_div('reportbuilder-wrapper');
+echo html_writer::start_div('d-flex justify-content-end mb-3');
+echo html_writer::start_div('dropdown extendednav-filters');
+echo html_writer::tag('button', html_writer::tag('i', '', ['class' => 'fa fa-filter mr-1']) . ' ' . get_string('filters', 'local_extendednav') . ' ', ['class' => 'btn ' . $filterbtnclass . ' dropdown-toggle', 'type' => 'button', 'id' => 'extendednav-manage-filters', 'data-toggle' => 'dropdown', 'data-bs-toggle' => 'dropdown', 'data-bs-auto-close' => 'outside', 'aria-haspopup' => 'true', 'aria-expanded' => 'false']);
 
-echo '<div class="dropdown-menu dropdown-menu-right dropdown-menu-end p-3 shadow" aria-labelledby="extendednav-manage-filters" style="min-width: 320px;">';
-echo '<form method="get" action="manage.php">';
+echo html_writer::start_div('dropdown-menu dropdown-menu-right dropdown-menu-end p-3 shadow', ['aria-labelledby' => 'extendednav-manage-filters', 'style' => 'min-width: 320px;']);
+echo html_writer::start_tag('form', ['method' => 'get', 'action' => 'manage.php']);
 
-echo '<div class="form-group mb-3">';
-echo '<label for="fsearch">'.get_string('search_free', 'local_extendednav').'</label>';
-echo '<input type="text" id="fsearch" name="search" value="'.s($search).'" class="form-control" autocomplete="off">';
-echo '</div>';
+echo html_writer::start_div('form-group mb-3');
+echo html_writer::tag('label', get_string('search_free', 'local_extendednav'), ['for' => 'fsearch']);
+echo html_writer::empty_tag('input', ['type' => 'text', 'id' => 'fsearch', 'name' => 'search', 'value' => s($search), 'class' => 'form-control', 'autocomplete' => 'off']);
+echo html_writer::end_div();
 
-echo '<div class="form-group mb-3">';
-echo '<label for="fparent">'.get_string('search_parent', 'local_extendednav').'</label>';
-echo '<input type="text" id="fparent" name="parent" value="'.s($parent).'" class="form-control" autocomplete="off">';
-echo '</div>';
+echo html_writer::start_div('form-group mb-3');
+echo html_writer::tag('label', get_string('search_parent', 'local_extendednav'), ['for' => 'fparent']);
+echo html_writer::empty_tag('input', ['type' => 'text', 'id' => 'fparent', 'name' => 'parent', 'value' => s($parent), 'class' => 'form-control', 'autocomplete' => 'off']);
+echo html_writer::end_div();
 
-echo '<button type="submit" class="btn btn-primary">'.get_string('apply', 'local_extendednav').'</button>';
+echo html_writer::tag('button', get_string('apply', 'local_extendednav'), ['type' => 'submit', 'class' => 'btn btn-primary']);
 
 if ($is_filtered) {
     echo html_writer::tag('div', html_writer::link(new moodle_url('/local/extendednav/manage.php'), get_string('reset', 'local_extendednav')), ['class' => 'pt-3']);
 }
 
-echo '</form>';
-echo '</div>'; // End dropdown-menu
-echo '</div>'; // End dropdown
-echo '</div>'; // End d-flex wrapper
-echo '</div>'; // End reportbuilder-wrapper
+echo html_writer::end_tag('form');
+echo html_writer::end_div(); // End dropdown-menu
+echo html_writer::end_div(); // End dropdown
+echo html_writer::end_div(); // End d-flex wrapper
+echo html_writer::end_div(); // End reportbuilder-wrapper
 
 // Bulk Actions Bar (Moodle Standard Placement)
-echo '<div class="d-flex justify-content-between align-items-center mb-3">';
+echo html_writer::start_div('d-flex justify-content-between align-items-center mb-3');
 echo '    <div class="d-flex align-items-center">';
 echo '        <div class="bulk-actions d-none" id="bulk-actions-bar">';
 echo '            <span class="selected-count font-weight-bold mr-3">';
@@ -144,12 +142,12 @@ echo '            </button>';
 
 echo '        </div>';
 echo '    </div>';
-echo '</div>';
+echo html_writer::end_div();
 
 
 // Bulk actions form start
-echo '<form id="bulk-export-form" method="POST" action="export.php">
-<input type="hidden" name="sesskey" value="'.sesskey().'">';
+echo html_writer::start_tag('form', ['id' => 'bulk-export-form', 'method' => 'POST', 'action' => 'export.php']);
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
 $table = new flexible_table('local-extendednav-manage');
 $table->define_baseurl($baseurl);
@@ -211,52 +209,8 @@ foreach ($nodes as $n) {
 
 $table->finish_output();
 
-echo '</form>';
+echo html_writer::end_tag('form');
 
-$js = "
-    var selectAll = document.getElementById('select-all-nodes');
-    var checkboxes = document.querySelectorAll('.node-checkbox');
-    var bulkBar = document.getElementById('bulk-actions-bar');
-    var bulkCount = document.getElementById('bulk-count');
-
-    function updateBulkBar() {
-        var count = 0;
-        var allChecked = true;
-
-        for (var i = 0; i < checkboxes.length; i++) {
-            if (checkboxes[i].checked) {
-                count++;
-            } else {
-                allChecked = false;
-            }
-        }
-
-        if (selectAll && checkboxes.length > 0) {
-            selectAll.checked = allChecked;
-        }
-
-        if (count > 0) {
-            bulkCount.textContent = count;
-            bulkBar.classList.remove('d-none');
-        } else {
-            bulkBar.classList.add('d-none');
-        }
-    }
-
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            var isChecked = this.checked;
-            for (var i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].checked = isChecked;
-            }
-            updateBulkBar();
-        });
-    }
-
-    for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].addEventListener('change', updateBulkBar);
-    }
-";
-$PAGE->requires->js_amd_inline($js);
+$PAGE->requires->js_call_amd('local_extendednav/manage', 'init');
 
 echo $OUTPUT->footer();
