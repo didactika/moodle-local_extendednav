@@ -35,9 +35,13 @@ const appendRequiredIcon = (labelContainer, reqStarHTML) => {
 
     const helpIcon = labelContainer.querySelector('.btn-link, [data-region="help-link"], .text-info');
     if (helpIcon) {
-        helpIcon.insertAdjacentHTML('beforebegin', reqStarHTML);
+        const range = document.createRange();
+        const frag = range.createContextualFragment(reqStarHTML);
+        helpIcon.parentNode.insertBefore(frag, helpIcon);
     } else {
-        labelContainer.insertAdjacentHTML('beforeend', reqStarHTML);
+        const range = document.createRange();
+        const frag = range.createContextualFragment(reqStarHTML);
+        labelContainer.appendChild(frag);
     }
 };
 
