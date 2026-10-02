@@ -40,39 +40,7 @@ if ($parent !== '') $baseparams['parent'] = $parent;
 
 $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 
-if ($action === 'moveup' || $action === 'movedown') {
-    require_sesskey();
-    if ($node = $DB->get_record('local_extendednav', ['id' => $id])) {
-        $nodes = $DB->get_records('local_extendednav', null, 'sortorder ASC, id ASC');
-        $ordered = array_values($nodes);
-        
-        $pos = -1;
-        foreach ($ordered as $i => $n) {
-            if ($n->id == $id) {
-                $pos = $i;
-                break;
-            }
-        }
-        
-        if ($pos !== -1) {
-            if ($action === 'moveup' && $pos > 0) {
-                $temp = $ordered[$pos];
-                $ordered[$pos] = $ordered[$pos - 1];
-                $ordered[$pos - 1] = $temp;
-            } else if ($action === 'movedown' && $pos < count($ordered) - 1) {
-                $temp = $ordered[$pos];
-                $ordered[$pos] = $ordered[$pos + 1];
-                $ordered[$pos + 1] = $temp;
-            }
-            
-            foreach ($ordered as $index => $n) {
-                $DB->set_field('local_extendednav', 'sortorder', $index, ['id' => $n->id]);
-            }
-            try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
-            redirect($baseurl);
-        }
-    }
-}
+
 
 if ($action === 'delete') {
     require_sesskey();
@@ -185,7 +153,7 @@ echo '<form id="bulk-export-form" method="POST" action="export.php">
 
 $table = new flexible_table('local-extendednav-manage');
 $table->define_baseurl($baseurl);
-$table->define_columns(['select', 'nodekey', 'title', 'url', 'tree', 'visibility', 'order', 'actions']);
+$table->define_columns(['select', 'nodekey', 'title', 'url', 'tree', 'visibility', 'actions']);
 $table->define_headers([
     '<input type="checkbox" id="select-all-nodes">',
     get_string('nodekey', 'local_extendednav'),
@@ -193,7 +161,6 @@ $table->define_headers([
     get_string('url', 'local_extendednav'),
     get_string('positioning', 'local_extendednav'),
     get_string('visibility', 'local_extendednav'),
-    get_string('order', 'local_extendednav'),
     get_string('actions', 'local_extendednav')
 ]);
 
@@ -229,20 +196,6 @@ foreach ($nodes as $n) {
     $actions .= '&nbsp;' . html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')),
         ['onclick' => "return confirm('".get_string('delete_node_confirm', 'local_extendednav')."');"]);
 
-    $order = '';
-    if ($is_filtered) {
-        $order = html_writer::tag('span', get_string('filter_active', 'local_extendednav'), ['class' => 'text-secondary small font-italic']);
-    } else {
-        if ($i > 0) {
-            $upurl = new moodle_url('/local/extendednav/manage.php', ['id' => $n->id, 'action' => 'moveup', 'sesskey' => sesskey()]);
-            $order .= html_writer::link($upurl, $OUTPUT->pix_icon('t/up', get_string('moveup')));
-        }
-        if ($i < $total - 1) {
-            $downurl = new moodle_url('/local/extendednav/manage.php', ['id' => $n->id, 'action' => 'movedown', 'sesskey' => sesskey()]);
-            $order .= html_writer::link($downurl, $OUTPUT->pix_icon('t/down', get_string('movedown')));
-        }
-    }
-
     $table->add_data([
         '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">',
         '<b>'.s($n->nodekey).'</b>',
@@ -250,7 +203,6 @@ foreach ($nodes as $n) {
         !empty($n->url) ? s($n->url) : '<i class="text-muted">'.get_string('native_route', 'local_extendednav').'</i>',
         $tree_html,
         $vis,
-        $order,
         $actions
     ]);
     
