@@ -57,7 +57,21 @@ if ($mform->is_cancelled()) {
     $record = new stdClass();
     $record->nodekey = $data->nodekey;
     $record->title = !empty($data->title) ? $data->title : null;
-    $record->url = !empty($data->url) ? $data->url : null;
+    
+    $rawurl = !empty($data->url) ? trim((string)$data->url) : null;
+    if ($rawurl !== null && $rawurl !== '') {
+        if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
+            if (strpos($rawurl, 'www.') === 0) {
+                $rawurl = 'http://' . $rawurl;
+            } else if (strpos($rawurl, '/') !== 0) {
+                $rawurl = '/' . $rawurl;
+            }
+        }
+    } else {
+        $rawurl = null;
+    }
+    $record->url = $rawurl;
+
     $record->icon = !empty($data->icon) ? $data->icon : null;
     $record->beforekey = !empty($data->beforekey) ? $data->beforekey : null;
     $record->parentkey = !empty($data->parentkey) ? $data->parentkey : null;

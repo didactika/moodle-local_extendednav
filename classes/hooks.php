@@ -84,7 +84,20 @@ class hooks {
                 
                 $state->allowed = $allowed;
                 $state->title = !empty($cnode->title) ? $cnode->title : null;
-                $state->url = !empty($cnode->url) ? $cnode->url : null;
+                
+                $rawurl = !empty($cnode->url) ? trim((string)$cnode->url) : null;
+                if ($rawurl !== null && $rawurl !== '') {
+                    if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
+                        if (strpos($rawurl, 'www.') === 0) {
+                            $rawurl = 'http://' . $rawurl;
+                        } else if (strpos($rawurl, '/') !== 0) {
+                            $rawurl = '/' . $rawurl;
+                        }
+                    }
+                } else {
+                    $rawurl = null;
+                }
+                $state->url = $rawurl;
                 
                 $state->icon = null;
                 $state->icon_set = false;

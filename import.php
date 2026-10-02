@@ -82,7 +82,21 @@ if ($mform->is_cancelled()) {
         $record = new stdClass();
         $record->nodekey = $node['nodekey'];
         $record->title = isset($node['title']) && $node['title'] !== '' && $node['title'] !== null ? $node['title'] : null;
-        $record->url = isset($node['url']) && $node['url'] !== '' && $node['url'] !== null ? $node['url'] : null;
+        
+        $rawurl = isset($node['url']) && $node['url'] !== '' && $node['url'] !== null ? trim((string)$node['url']) : null;
+        if ($rawurl !== null && $rawurl !== '') {
+            if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
+                if (strpos($rawurl, 'www.') === 0) {
+                    $rawurl = 'http://' . $rawurl;
+                } else if (strpos($rawurl, '/') !== 0) {
+                    $rawurl = '/' . $rawurl;
+                }
+            }
+        } else {
+            $rawurl = null;
+        }
+        $record->url = $rawurl;
+        
         $record->icon = isset($node['icon']) && $node['icon'] !== '' && $node['icon'] !== null ? $node['icon'] : null;
         $record->visibility = isset($node['visibility']) ? (int)$node['visibility'] : 1;
         $record->roles = isset($node['roles']) && $node['roles'] !== '' && $node['roles'] !== null ? $node['roles'] : null;
