@@ -34,15 +34,15 @@ $PAGE->set_title(get_string('documentation', 'local_extendednav'));
 $PAGE->set_heading(get_string('documentation', 'local_extendednav'));
 
 if (optional_param('example', 0, PARAM_INT)) {
-    $example_path = __DIR__ . '/example.yml';
-    if (file_exists($example_path)) {
-        $example_content = file_get_contents($example_path);
+    $examplepath = __DIR__ . '/example.yml';
+    if (file_exists($examplepath)) {
+        $examplecontent = file_get_contents($examplepath);
         header('Content-Type: application/x-yaml');
         header('Content-Disposition: attachment; filename="extendednav_example.yml"');
         header('Cache-Control: private, max-age=0, must-revalidate');
         header('Pragma: public');
-        header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($example_content)));
-        echo $example_content;
+        header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($examplecontent)));
+        echo $examplecontent;
         exit;
     }
 }
@@ -104,10 +104,10 @@ echo '                <tr><td><code>blockedurls</code></td><td><span class="badg
 echo '            </tbody>';
 echo '        </table>';
 
-$example_content = file_exists(__DIR__ . '/example.yml') ? file_get_contents(__DIR__ . '/example.yml') : '';
+$examplecontent = file_exists(__DIR__ . '/example.yml') ? file_get_contents(__DIR__ . '/example.yml') : '';
 
 echo '        <h4 id="example" class="mt-5 mb-3 text-primary">' . get_string('doc_example_format', 'local_extendednav') . '</h4>';
-echo '        <pre class="bg-light p-3 rounded"><code>' . s($example_content) . '</code></pre>';
+echo '        <pre class="bg-light p-3 rounded"><code>' . s($examplecontent) . '</code></pre>';
 
 echo '    </div>';
 echo html_writer::end_div();

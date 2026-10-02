@@ -27,8 +27,12 @@ namespace local_extendednav;
 
 use core\hook\navigation\primary_extend;
 
+/**
+ * Hooks for primary and user navigation.
+ */
 class hooks {
-    public static $skip_hook = false;
+        /** @var bool Skip hook loop barrier. */
+    public static $skiphook = false;
     
     /**
      * Extends the primary navigation based on custom DB configuration.
@@ -38,7 +42,7 @@ class hooks {
     public static function extend_primary_navigation(primary_extend $hook): void {
         global $USER, $DB, $OUTPUT;
 
-        if (self::$skip_hook || !get_config('local_extendednav', 'enable_plugin')) {
+        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
             return;
         }
         
@@ -53,12 +57,16 @@ class hooks {
                 try {
                     $customnodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
                 } catch (\moodle_exception $e) {
+            // Silently ignored.
+
+            // Expected exception
+
                     $customnodes = [];
                 }
                 $cache->set('allnodes', $customnodes);
             }
 
-            $final_states = [];
+            $finalstates = [];
 
             foreach ($customnodes as $cnode) {
                 
@@ -72,8 +80,8 @@ class hooks {
                 } else if ($cnode->visibility == 2) {
                     $allowed = false;
                     if (!empty($cnode->roles)) {
-                        $role_ids = explode(',', $cnode->roles);
-                        foreach ($role_ids as $rid) {
+                        $roleids = explode(',', $cnode->roles);
+                        foreach ($roleids as $rid) {
                             if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
                                 $allowed = true;
                                 break;
@@ -122,34 +130,38 @@ class hooks {
                     $state->parentkey = null;
                 }
 
-                $final_states[$nodekey] = $state;
+                $finalstates[$nodekey] = $state;
             }
 
-            $script_injected = false;
+            $scriptinjected = false;
 
-            foreach ($final_states as $nodekey => $state) {
+            foreach ($finalstates as $nodekey => $state) {
                 
-                $state_icon_html = '';
+                $stateiconhtml = '';
                 if ($state->icon_set && $state->icon !== 'null' && $state->icon !== 'none') {
                     if (strpos($state->icon, 'fa-') !== false || strpos($state->icon, 'fa ') !== false) {
-                        $state_icon_html = '<i class="icon fa ' . s($state->icon) . ' fa-fw" aria-hidden="true"></i> ';
+                        $stateiconhtml = '<i class="icon fa ' . s($state->icon) . ' fa-fw" aria-hidden="true"></i> ';
                     } else {
                         try {
                             if (is_object($OUTPUT) && method_exists($OUTPUT, 'pix_icon')) {
-                                $state_icon_html = $OUTPUT->pix_icon($state->icon, '') . ' ';
+                                $stateiconhtml = $OUTPUT->pix_icon($state->icon, '') . ' ';
                             }
-                        } catch (\moodle_exception $e) { 
+                        } catch (\moodle_exception $e) {
+            // Silently ignored.
+
+            // Expected exception
+ 
                         }
                     }
                 }
 
-                $newwindow_span = '';
-                $script_html = '';
+                $newwindowspan = '';
+                $scripthtml = '';
                 if ($state->newwindow) {
-                    $newwindow_span = '<span class="custom-target-blank" style="display:none;" aria-hidden="true"></span>';
+                    $newwindowspan = '<span class="custom-target-blank" style="display:none;" aria-hidden="true"></span>';
                     
-                    if (!$script_injected) {
-                        $script_html = '<script>
+                    if (!$scriptinjected) {
+                        $scripthtml = '<script>
                             if (!window.customNavScriptInjected) {
                                 window.customNavScriptInjected = true;
                                 var applyT = function() {
@@ -174,24 +186,24 @@ class hooks {
                                 });
                             }
                         </script>';
-                        $script_injected = true;
+                        $scriptinjected = true;
                     }
                 }
 
-                $existing_node = $primarynav->get($nodekey);
+                $existingnode = $primarynav->get($nodekey);
 
-                if ($existing_node) {
+                if ($existingnode) {
                     if (!$state->allowed) {
-                        $existing_node->remove();
+                        $existingnode->remove();
                     } else {
                         if (!empty($state->title)) {
-                            $existing_node->text = format_string($state->title);
+                            $existingnode->text = format_string($state->title);
                         }
                         if (!empty($state->url)) {
-                            $existing_node->action = new \moodle_url($state->url);
+                            $existingnode->action = new \moodle_url($state->url);
                         }
-                        $existing_node->text = $script_html . $state_icon_html . $existing_node->text . $newwindow_span;
-                        $existing_node->icon = null;
+                        $existingnode->text = $scripthtml . $stateiconhtml . $existingnode->text . $newwindowspan;
+                        $existingnode->icon = null;
                     }
                 } else if ($state->allowed) {
                     if (empty($state->title) || empty($state->url)) {
@@ -201,7 +213,7 @@ class hooks {
                     $url = new \moodle_url($state->url);
                     
                     $node = \navigation_node::create(
-                        $script_html . $state_icon_html . format_string($state->title) . $newwindow_span,
+                        $scripthtml . $stateiconhtml . format_string($state->title) . $newwindowspan,
                         $url,
                         \navigation_node::TYPE_SETTING,
                         null,
@@ -213,7 +225,7 @@ class hooks {
                 }
             }
             
-            foreach ($final_states as $nodekey => $state) {
+            foreach ($finalstates as $nodekey => $state) {
                 if (!$state->allowed) {
                     continue;
                 }
@@ -225,45 +237,49 @@ class hooks {
                 
                 if (!empty($state->parentkey) && $state->parentkey !== $nodekey) {
                     
-                    $parent_node = $primarynav->get($state->parentkey);
+                    $parentnode = $primarynav->get($state->parentkey);
                     
-                    if (!$parent_node) {
-                        $killed_by_us = isset($final_states[$state->parentkey]) && $final_states[$state->parentkey]->allowed === false;
+                    if (!$parentnode) {
+                        $killedbyus = isset($finalstates[$state->parentkey]) && $finalstates[$state->parentkey]->allowed === false;
                         
-                        if ($killed_by_us) {
+                        if ($killedbyus) {
                             $node->remove();
                         }
                         continue;
                     }
                     
-                    $grandpa = $parent_node->parent;
+                    $grandpa = $parentnode->parent;
                     if ($grandpa !== null && $grandpa->key !== $primarynav->key) {
                     } else {
                         $node->remove();
-                        $parent_node->add_node($node);
+                        $parentnode->add_node($node);
                     }
                     
                 }
                 
                 if (!empty($state->beforekey)) {
-                    $assigned_parent = $node->parent; 
-                    if ($assigned_parent) {
-                        $sibling_exists = false;
-                        if ($assigned_parent->children) {
-                            foreach ($assigned_parent->children as $child) {
+                    $assignedparent = $node->parent; 
+                    if ($assignedparent) {
+                        $siblingexists = false;
+                        if ($assignedparent->children) {
+                            foreach ($assignedparent->children as $child) {
                                 if ($child->key === $state->beforekey) {
-                                    $sibling_exists = true;
+                                    $siblingexists = true;
                                     break;
                                 }
                             }
                         }
                         
-                        if ($sibling_exists) {
+                        if ($siblingexists) {
                             $node->remove();
                             try {
-                                $assigned_parent->add_node($node, $state->beforekey);
+                                $assignedparent->add_node($node, $state->beforekey);
                             } catch (\moodle_exception $e) {
-                                $assigned_parent->add_node($node);
+            // Silently ignored.
+
+            // Expected exception
+
+                                $assignedparent->add_node($node);
                             }
                         }
                     }

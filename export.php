@@ -48,10 +48,10 @@ if (empty($nodes)) {
     redirect(new moodle_url('/local/extendednav/manage.php'), get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }
 
-$export_data = ['nodes' => []];
+$exportdata = ['nodes' => []];
 
 foreach ($nodes as $n) {
-    $node_data = [
+    $nodedata = [
         'nodekey'     => $n->nodekey,
         'title'       => $n->title,
         'url'         => $n->url,
@@ -63,16 +63,16 @@ foreach ($nodes as $n) {
         'newwindow'   => (int)$n->newwindow,
         'blockedurls' => $n->blockedurls
     ];
-    $export_data['nodes'][] = $node_data;
+    $exportdata['nodes'][] = $nodedata;
 }
 
-$yaml_content = \local_extendednav\yaml::dump($export_data);
+$yamlcontent = \local_extendednav\yaml::dump($exportdata);
 
 
 header('Content-Type: application/x-yaml');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Cache-Control: private, max-age=0, must-revalidate');
 header('Pragma: public');
-header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($yaml_content)));
-echo $yaml_content;
+header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($yamlcontent)));
+echo $yamlcontent;
 exit;

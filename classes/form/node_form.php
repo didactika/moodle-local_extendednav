@@ -25,8 +25,6 @@
 
 namespace local_extendednav\form;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -41,20 +39,24 @@ class node_form extends \moodleform {
         global $DB, $PAGE, $OUTPUT;
         $mform = $this->_form;
 
-        $core_keys = [];
+        $corekeys = [];
         try {
-            \local_extendednav\hooks::$skip_hook = true;
-            $temp_page = new \moodle_page();
-            $temp_page->set_context(\context_system::instance());
-            $temp_page->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temp_page);
+            \local_extendednav\hooks::$skiphook = true;
+            $temppage = new \moodle_page();
+            $temppage->set_context(\context_system::instance());
+            $temppage->set_url($PAGE->url);
+            $primary = new \core\navigation\views\primary($temppage);
             $primary->initialise();
             foreach ($primary->children as $child) {
                 if ($child->key) {
-                    $core_keys[] = $child->key;
+                    $corekeys[] = $child->key;
                 }
             }
-            } catch (\Throwable $e) {} finally { \local_extendednav\hooks::$skip_hook = false; }
+            } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+} finally { \local_extendednav\hooks::$skiphook = false; }
         
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -64,13 +66,13 @@ class node_form extends \moodleform {
         $mform->addRule('nodekey', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
 
-        $alert_html = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">' 
+        $alerthtml = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">' 
             . get_string('coreoverridealert', 'local_extendednav') . '</div>';
             
-        $alert_html .= '<div id="duplicate_node_alert" class="alert alert-danger mt-2 mb-0" style="display: none;">' 
+        $alerthtml .= '<div id="duplicate_node_alert" class="alert alert-danger mt-2 mb-0" style="display: none;">' 
             . get_string('err_duplicate_key_alert', 'local_extendednav') . '</div>';
             
-        $mform->addElement('static', 'corealert', '', $alert_html);
+        $mform->addElement('static', 'corealert', '', $alerthtml);
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => '50']);
         $mform->setType('title', PARAM_TEXT);
@@ -104,46 +106,46 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', 2);
 
-        $current_id = optional_param('id', 0, PARAM_INT);
-        $current_nodekey = '';
-        $is_parent = false;
+        $currentid = optional_param('id', 0, PARAM_INT);
+        $currentnodekey = '';
+        $isparent = false;
 
-        if ($current_id) {
-            $current_record = $DB->get_record('local_extendednav', ['id' => $current_id]);
-            if ($current_record) {
-                $current_nodekey = $current_record->nodekey;
-                $is_parent = $DB->record_exists('local_extendednav', ['parentkey' => $current_nodekey]);
+        if ($currentid) {
+            $currentrecord = $DB->get_record('local_extendednav', ['id' => $currentid]);
+            if ($currentrecord) {
+                $currentnodekey = $currentrecord->nodekey;
+                $isparent = $DB->record_exists('local_extendednav', ['parentkey' => $currentnodekey]);
             }
         }
 
-        $parent_options = ['' => get_string('opt_none_root', 'local_extendednav')];
-        $before_options = ['' => get_string('opt_end_list', 'local_extendednav')];
+        $parentoptions = ['' => get_string('opt_none_root', 'local_extendednav')];
+        $beforeoptions = ['' => get_string('opt_end_list', 'local_extendednav')];
         
-        foreach ($core_keys as $ckey) {
-            if ($ckey !== $current_nodekey) {
+        foreach ($corekeys as $ckey) {
+            if ($ckey !== $currentnodekey) {
                 $child = $primary->get($ckey);
                 if ($child) {
-                    $clean_text = strip_tags((string)$child->text);
+                    $cleantext = strip_tags((string)$child->text);
                     $a = new \stdClass();
-                    $a->text = $clean_text;
+                    $a->text = $cleantext;
                     $a->key = $ckey;
                     
                     if ($ckey !== 'siteadminnode') {
-                        $parent_options[$ckey] = get_string('opt_native', 'local_extendednav', $a);
+                        $parentoptions[$ckey] = get_string('opt_native', 'local_extendednav', $a);
                     }
-                    $before_options[$ckey] = get_string('opt_native', 'local_extendednav', $a);
+                    $beforeoptions[$ckey] = get_string('opt_native', 'local_extendednav', $a);
                 }
             }
         }
 
         $customs = $DB->get_records('local_extendednav', null, 'sortorder ASC', 'id, nodekey, title, parentkey');
-        $custom_keys = [];
+        $customkeys = [];
         foreach ($customs as $c) {
-            if ($c->nodekey === $current_nodekey) {
+            if ($c->nodekey === $currentnodekey) {
                 continue;
             }
 
-            $custom_keys[] = $c->nodekey;
+            $customkeys[] = $c->nodekey;
 
             $title = $c->title ? $c->title : get_string('none_title', 'local_extendednav');
             
@@ -152,37 +154,37 @@ class node_form extends \moodleform {
             $a->key = $c->nodekey;
             
             if (empty($c->parentkey)) {
-                $parent_options[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
+                $parentoptions[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
             }
-            $before_options[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
+            $beforeoptions[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
         }
 
-        if ($is_parent) {
-            $parent_options = ['' => get_string('opt_invalid_has_submenus', 'local_extendednav')];
+        if ($isparent) {
+            $parentoptions = ['' => get_string('opt_invalid_has_submenus', 'local_extendednav')];
         }
-        if ($current_nodekey === 'siteadminnode') {
-            $parent_options = ['' => get_string('opt_invalid_admin_submenu', 'local_extendednav')];
+        if ($currentnodekey === 'siteadminnode') {
+            $parentoptions = ['' => get_string('opt_invalid_admin_submenu', 'local_extendednav')];
         }
 
-        $mform->addElement('select', 'parentkey', get_string('parentkey', 'local_extendednav'), $parent_options);
+        $mform->addElement('select', 'parentkey', get_string('parentkey', 'local_extendednav'), $parentoptions);
         $mform->addHelpButton('parentkey', 'parentkey', 'local_extendednav');
-        if ($is_parent || $current_nodekey === 'siteadminnode') {
+        if ($isparent || $currentnodekey === 'siteadminnode') {
             $mform->freeze('parentkey');
         }
 
-        $mform->addElement('select', 'beforekey', get_string('beforekey', 'local_extendednav'), $before_options);
+        $mform->addElement('select', 'beforekey', get_string('beforekey', 'local_extendednav'), $beforeoptions);
         $mform->addHelpButton('beforekey', 'beforekey', 'local_extendednav');
 
         $this->add_action_buttons(true, get_string('savechanges'));
 
-        $req_string = get_string('requiredelement', 'form');
-        $req_icon_html = \html_writer::span(
-            $OUTPUT->pix_icon('req', $req_string) . ' ',
+        $reqstring = get_string('requiredelement', 'form');
+        $reqiconhtml = \html_writer::span(
+            $OUTPUT->pix_icon('req', $reqstring) . ' ',
             'req text-danger',
-            ['title' => $req_string]
+            ['title' => $reqstring]
         );
 
-        $PAGE->requires->js_call_amd('local_extendednav/node_form', 'init', [$core_keys, $req_icon_html, $custom_keys]);
+        $PAGE->requires->js_call_amd('local_extendednav/node_form', 'init', [$corekeys, $reqiconhtml, $customkeys]);
     }
 
     /**
@@ -200,23 +202,27 @@ class node_form extends \moodleform {
             $errors['roles'] = get_string('required');
         }
 
-        $is_core = false;
+        $iscore = false;
         try {
-            \local_extendednav\hooks::$skip_hook = true;
-            $temp_page = new \moodle_page();
-            $temp_page->set_context(\context_system::instance());
-            $temp_page->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temp_page);
+            \local_extendednav\hooks::$skiphook = true;
+            $temppage = new \moodle_page();
+            $temppage->set_context(\context_system::instance());
+            $temppage->set_url($PAGE->url);
+            $primary = new \core\navigation\views\primary($temppage);
             $primary->initialise();
             foreach ($primary->children as $child) {
                 if ($child->key === $data['nodekey']) {
-                    $is_core = true;
+                    $iscore = true;
                     break;
                 }
             }
-            } catch (\Throwable $e) {} finally { \local_extendednav\hooks::$skip_hook = false; }
+            } catch (\Throwable $e) {
+            // Silently ignored.
 
-        if (!$is_core) {
+            // Expected exception
+} finally { \local_extendednav\hooks::$skiphook = false; }
+
+        if (!$iscore) {
             if (empty(trim((string)$data['title']))) {
                 $errors['title'] = get_string('required');
             }
@@ -250,13 +256,13 @@ class node_form extends \moodleform {
             if ($data['parentkey'] === $data['nodekey']) {
                 $errors['parentkey'] = get_string('err_parent_self', 'local_extendednav');
             } else {
-                $parent_record = $DB->get_record('local_extendednav', ['nodekey' => $data['parentkey']]);
-                if ($parent_record && !empty($parent_record->parentkey)) {
+                $parentrecord = $DB->get_record('local_extendednav', ['nodekey' => $data['parentkey']]);
+                if ($parentrecord && !empty($parentrecord->parentkey)) {
                     $errors['parentkey'] = get_string('err_parent_thirdlevel', 'local_extendednav');
                 }
                 
-                $has_children = $DB->record_exists('local_extendednav', ['parentkey' => $data['nodekey']]);
-                if ($has_children) {
+                $haschildren = $DB->record_exists('local_extendednav', ['parentkey' => $data['nodekey']]);
+                if ($haschildren) {
                     $errors['parentkey'] = get_string('err_parent_haschildren', 'local_extendednav');
                 }
             }

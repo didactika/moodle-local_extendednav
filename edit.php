@@ -81,32 +81,36 @@ if ($mform->is_cancelled()) {
     $blockedurls = null;
     if ($record->visibility != 1) { 
         try {
-            $temp_page = new \moodle_page();
-            $temp_page->set_context(\context_system::instance());
-            $temp_page->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temp_page);
+            $temppage = new \moodle_page();
+            $temppage->set_context(\context_system::instance());
+            $temppage->set_url($PAGE->url);
+            $primary = new \core\navigation\views\primary($temppage);
             $primary->initialise();
             
             $corenode = $primary->get($record->nodekey);
             if ($corenode && $corenode->action instanceof \moodle_url) {
-                $parsed_core = parse_url($corenode->action->out(false));
-                $corepath = isset($parsed_core['path']) ? $parsed_core['path'] : '';
-                if (isset($parsed_core['query']) && $parsed_core['query'] !== '') {
-                    $corepath .= '?' . $parsed_core['query'];
+                $parsedcore = parse_url($corenode->action->out(false));
+                $corepath = isset($parsedcore['path']) ? $parsedcore['path'] : '';
+                if (isset($parsedcore['query']) && $parsedcore['query'] !== '') {
+                    $corepath .= '?' . $parsedcore['query'];
                 }
                 
                 if (!empty($corepath)) {
                     $blockedurls = $corepath;
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+}
     }
     
     if ($record->visibility != 1 && !empty($record->url)) {
-        $parsed_custom = parse_url($record->url);
-        $custompath = isset($parsed_custom['path']) ? $parsed_custom['path'] : '';
-        if (isset($parsed_custom['query']) && $parsed_custom['query'] !== '') {
-            $custompath .= '?' . $parsed_custom['query'];
+        $parsedcustom = parse_url($record->url);
+        $custompath = isset($parsedcustom['path']) ? $parsedcustom['path'] : '';
+        if (isset($parsedcustom['query']) && $parsedcustom['query'] !== '') {
+            $custompath .= '?' . $parsedcustom['query'];
         }
 
         if (!empty($custompath)) {
@@ -137,7 +141,11 @@ if ($mform->is_cancelled()) {
     
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
-    } catch (\Throwable $e) {}
+    } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+}
     theme_reset_all_caches();
 
     redirect(new moodle_url('/local/extendednav/manage.php'));

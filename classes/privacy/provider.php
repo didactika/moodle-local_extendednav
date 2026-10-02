@@ -27,8 +27,6 @@ namespace local_extendednav\privacy;
 
 use core_privacy\local\metadata\null_provider;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy API provider for local_extendednav.
  *

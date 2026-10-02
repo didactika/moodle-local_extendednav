@@ -16,8 +16,6 @@
 
 namespace local_extendednav;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Utility for parsing and dumping YAML for config import/export.
  *
@@ -79,21 +77,21 @@ class yaml {
         $prefix = str_repeat("  ", $indent);
         $out = "";
         
-        $is_list_item = is_int($key);
-        $k = $is_list_item ? "-" : $key . ":";
+        $islistitem = is_int($key);
+        $k = $islistitem ? "-" : $key . ":";
         
         if (is_array($val)) {
-            if ($is_list_item && !empty($val) && (array_keys($val) !== range(0, count($val) - 1))) {
+            if ($islistitem && !empty($val) && (array_keys($val) !== range(0, count($val) - 1))) {
                 // It's a map inside a list. Output first key on same line as the hyphen.
                 reset($val);
-                $first_key = key($val);
-                $first_val = current($val);
-                $out .= $prefix . "- " . $first_key . ":";
+                $firstkey = key($val);
+                $firstval = current($val);
+                $out .= $prefix . "- " . $firstkey . ":";
                 
-                if (is_array($first_val)) {
-                    $out .= "\n" . self::dump_node($first_key, $first_val, $indent + 1, true);
+                if (is_array($firstval)) {
+                    $out .= "\n" . self::dump_node($firstkey, $firstval, $indent + 1, true);
                 } else {
-                    $out .= " " . self::format_scalar($first_val) . "\n";
+                    $out .= " " . self::format_scalar($firstval) . "\n";
                 }
                 
                 array_shift($val);
@@ -109,8 +107,8 @@ class yaml {
                 }
             }
         } else {
-            $val_str = self::format_scalar($val, $prefix);
-            $out .= $prefix . $k . " " . $val_str . "\n";
+            $valstr = self::format_scalar($val, $prefix);
+            $out .= $prefix . $k . " " . $valstr . "\n";
         }
         return $out;
     }

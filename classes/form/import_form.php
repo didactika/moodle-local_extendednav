@@ -16,8 +16,6 @@
 
 namespace local_extendednav\form;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -30,6 +28,14 @@ require_once($CFG->libdir . '/formslib.php');
  */
 class import_form extends \moodleform {
 
+    /**
+     * Data validation.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK.
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $draftitemid = $data['yamlfile'];
@@ -42,6 +48,9 @@ class import_form extends \moodleform {
         return $errors;
     }
 
+    /**
+     * Form definition
+     */
     protected function definition() {
         $mform = $this->_form;
 

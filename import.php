@@ -62,6 +62,10 @@ if ($mform->is_cancelled()) {
     try {
         $parsed = \local_extendednav\yaml::parse($content);
     } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+
         throw new \moodle_exception('err_invalid_yaml_format', 'local_extendednav', '', $e->getMessage());
     }
 
@@ -75,11 +79,11 @@ if ($mform->is_cancelled()) {
     $sortorder = $max !== false ? $max + 1 : 0;
 
     // Load all existing nodes to avoid N+1 query performance hits in the loop
-        $existing_nodes = [];
+        $existingnodes = [];
     $rs = $DB->get_recordset('local_extendednav', null, '', 'nodekey, id');
     if ($rs->valid()) {
         foreach ($rs as $rek) {
-            $existing_nodes[$rek->nodekey] = clone $rek;
+            $existingnodes[$rek->nodekey] = clone $rek;
         }
     }
     $rs->close();
@@ -115,8 +119,8 @@ if ($mform->is_cancelled()) {
         $record->newwindow = isset($node['newwindow']) ? (int)$node['newwindow'] : 0;
         $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null ? $node['blockedurls'] : null;
         
-        if (array_key_exists($record->nodekey, $existing_nodes)) {
-            $existing = $existing_nodes[$record->nodekey];
+        if (array_key_exists($record->nodekey, $existingnodes)) {
+            $existing = $existingnodes[$record->nodekey];
             if (isset($data->conflict_action) && $data->conflict_action === 'skip') {
                 continue;
             } else {
@@ -130,7 +134,11 @@ if ($mform->is_cancelled()) {
         }
     }
 
-    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
+    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+}
     theme_reset_all_caches();
 
     redirect(
@@ -144,7 +152,7 @@ if ($mform->is_cancelled()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading($streditname);
 
-$doc_url = new moodle_url('/local/extendednav/documentation.php');
+$docurl = new moodle_url('/local/extendednav/documentation.php');
 
 echo html_writer::start_div('extendednav-import-page');
 
@@ -160,7 +168,7 @@ echo '    <ul>';
 echo '        <li>'.get_string('yamlconfigfile', 'local_extendednav').' (<code>.yml</code>, <code>.yaml</code>)</li>';
 echo '    </ul>';
 echo '    <p>';
-echo '        <a href="'.$doc_url->out().'" class="text-info font-weight-bold">';
+echo '        <a href="'.$docurl->out().'" class="text-info font-weight-bold">';
 echo '            <i class="fa fa-book mr-1"></i>'.get_string('view_documentation', 'local_extendednav');
 echo '        </a>';
 echo '    </p>';

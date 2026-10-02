@@ -56,6 +56,8 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             $cache->set('allnodes', $nodes);
         }
     } catch (\Throwable $e) {
+            // Silently ignored.
+
         return;
     }
 
@@ -63,32 +65,34 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         return;
     }
 
-    $current_url = '';
+    $currenturl = '';
     try {
         if (is_object($PAGE) && is_object($PAGE->url)) {
-            $current_url = $PAGE->url->out(false);
+            $currenturl = $PAGE->url->out(false);
         }
     } catch (\Throwable $e) {
+            // Silently ignored.
+
     }
     
-    if (empty($current_url)) {
+    if (empty($currenturl)) {
         return; 
     }
 
-    $parsed_current = parse_url($current_url);
-    $current_path = isset($parsed_current['path']) ? $parsed_current['path'] : '/';
-    if (isset($parsed_current['query']) && $parsed_current['query'] !== '') {
-        $current_path .= '?' . $parsed_current['query'];
+    $parsedcurrent = parse_url($currenturl);
+    $currentpath = isset($parsedcurrent['path']) ? $parsedcurrent['path'] : '/';
+    if (isset($parsedcurrent['query']) && $parsedcurrent['query'] !== '') {
+        $currentpath .= '?' . $parsedcurrent['query'];
     }
 
-    $immune_paths = [
+    $immunepaths = [
         '/local/extendednav/', 
         '/admin/',                  
         '/login/'                   
     ];
     
-    foreach ($immune_paths as $ipath) {
-        if (strpos($current_path, $ipath) !== false) {
+    foreach ($immunepaths as $ipath) {
+        if (strpos($currentpath, $ipath) !== false) {
             return;
         }
     }
@@ -97,30 +101,30 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         return;
     }
 
-    $fallback_custom = trim((string) get_config('local_extendednav', 'fallbackurl'));
-    $fallback_path = '';
+    $fallbackcustom = trim((string) get_config('local_extendednav', 'fallbackurl'));
+    $fallbackpath = '';
     
-    if ($fallback_custom !== '') {
-        $parsed_fallback = parse_url($fallback_custom);
-        $fallback_path = isset($parsed_fallback['path']) ? $parsed_fallback['path'] : '';
-        if (isset($parsed_fallback['query']) && $parsed_fallback['query'] !== '') {
-            $fallback_path .= '?' . $parsed_fallback['query'];
+    if ($fallbackcustom !== '') {
+        $parsedfallback = parse_url($fallbackcustom);
+        $fallbackpath = isset($parsedfallback['path']) ? $parsedfallback['path'] : '';
+        if (isset($parsedfallback['query']) && $parsedfallback['query'] !== '') {
+            $fallbackpath .= '?' . $parsedfallback['query'];
         }
-        if (!$fallback_path) {
-            $fallback_path = $fallback_custom; 
+        if (!$fallbackpath) {
+            $fallbackpath = $fallbackcustom; 
         }
 
-        if ($fallback_path === '/') {
-            if ($current_path === '/' || strpos($current_path, '/index.php') === 0) {
+        if ($fallbackpath === '/') {
+            if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0) {
                 return;
             }
-        } else if (strpos($current_path, $fallback_path) !== false) {
+        } else if (strpos($currentpath, $fallbackpath) !== false) {
             return;
         }
     }
 
-    $all_blocked_paths = [];
-    $all_whitelisted_paths = [];
+    $allblockedpaths = [];
+    $allwhitelistedpaths = [];
 
     foreach ($nodes as $cnode) {
         $allowed = true;
@@ -130,8 +134,8 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         } else if ($cnode->visibility == 2) {
             $allowed = false;
             if (!empty($cnode->roles)) {
-                $role_ids = explode(',', $cnode->roles);
-                foreach ($role_ids as $rid) {
+                $roleids = explode(',', $cnode->roles);
+                foreach ($roleids as $rid) {
                     if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
                         $allowed = true;
                         break;
@@ -140,104 +144,104 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             }
         }
         
-        $node_paths = [];
+        $nodepaths = [];
         if (!empty($cnode->blockedurls)) {
-            $split_urls = array_map('trim', explode(',', $cnode->blockedurls));
-            foreach ($split_urls as $s_url) {
-                if ($s_url !== '') {
-                    $node_paths[] = $s_url;
+            $spliturls = array_map('trim', explode(',', $cnode->blockedurls));
+            foreach ($spliturls as $surl) {
+                if ($surl !== '') {
+                    $nodepaths[] = $surl;
                 }
             }
         }
         
         if (!empty($cnode->url)) {
-            $p_url = parse_url($cnode->url);
-            $w_path = isset($p_url['path']) ? $p_url['path'] : '';
-            if (isset($p_url['query']) && $p_url['query'] !== '') {
-                $w_path .= '?' . $p_url['query'];
+            $purl = parse_url($cnode->url);
+            $wpath = isset($purl['path']) ? $purl['path'] : '';
+            if (isset($purl['query']) && $purl['query'] !== '') {
+                $wpath .= '?' . $purl['query'];
             }
-            if ($w_path !== '' && !in_array($w_path, $node_paths)) {
-                $node_paths[] = $w_path;
+            if ($wpath !== '' && !in_array($wpath, $nodepaths)) {
+                $nodepaths[] = $wpath;
             }
         }
 
         if ($allowed) {
-            foreach ($node_paths as $w_path) {
-                $all_whitelisted_paths[] = $w_path;
+            foreach ($nodepaths as $wpath) {
+                $allwhitelistedpaths[] = $wpath;
             }
         } else {
-            foreach ($node_paths as $b_path) {
-                $all_blocked_paths[] = $b_path;
+            foreach ($nodepaths as $bpath) {
+                $allblockedpaths[] = $bpath;
             }
         }
     }
 
-    $is_current_blocked = false;
-    foreach ($all_blocked_paths as $bpath) {
+    $iscurrentblocked = false;
+    foreach ($allblockedpaths as $bpath) {
         if ($bpath === '/') { 
-            if ($current_path === '/' || strpos($current_path, '/index.php') === 0) {
-                $is_current_blocked = true;
+            if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0) {
+                $iscurrentblocked = true;
                 break;
             }
             continue;
         }
 
-        if (strpos($current_path, $bpath) !== false) {
-            $is_current_blocked = true;
+        if (strpos($currentpath, $bpath) !== false) {
+            $iscurrentblocked = true;
             break;
         }
     }
 
-    if ($is_current_blocked) {
-        foreach ($all_whitelisted_paths as $wpath) {
+    if ($iscurrentblocked) {
+        foreach ($allwhitelistedpaths as $wpath) {
             if ($wpath === '/') {
-                if ($current_path === '/' || strpos($current_path, '/index.php') === 0) {
-                    $is_current_blocked = false;
+                if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0) {
+                    $iscurrentblocked = false;
                     break;
                 }
-            } else if (strpos($current_path, $wpath) !== false) {
-                $is_current_blocked = false;
+            } else if (strpos($currentpath, $wpath) !== false) {
+                $iscurrentblocked = false;
                 break;
             }
         }
     }
 
-    if ($is_current_blocked) {
-        $fallback_my = '/my/index.php';
-        $fallback_front = '/?redirect=0';
+    if ($iscurrentblocked) {
+        $fallbackmy = '/my/index.php';
+        $fallbackfront = '/?redirect=0';
         
-        $my_blocked = false;
-        $front_blocked = false;
+        $myblocked = false;
+        $frontblocked = false;
         
-        foreach ($all_blocked_paths as $bpath) {
+        foreach ($allblockedpaths as $bpath) {
             if ($bpath === '/') {
-                $front_blocked = true;
+                $frontblocked = true;
                 continue;
             }
-            if (strpos($fallback_my, $bpath) !== false || strpos('/my/', $bpath) !== false) {
-                $my_blocked = true;
+            if (strpos($fallbackmy, $bpath) !== false || strpos('/my/', $bpath) !== false) {
+                $myblocked = true;
             }
-            if (strpos($fallback_front, $bpath) !== false) {
-                $front_blocked = true;
-            }
-        }
-
-        foreach ($all_whitelisted_paths as $wpath) {
-            if (strpos($fallback_my, $wpath) !== false || strpos('/my/', $wpath) !== false) {
-                $my_blocked = false;
-            }
-            if (strpos($fallback_front, $wpath) !== false) {
-                $front_blocked = false;
+            if (strpos($fallbackfront, $bpath) !== false) {
+                $frontblocked = true;
             }
         }
 
-        if (!$my_blocked) {
+        foreach ($allwhitelistedpaths as $wpath) {
+            if (strpos($fallbackmy, $wpath) !== false || strpos('/my/', $wpath) !== false) {
+                $myblocked = false;
+            }
+            if (strpos($fallbackfront, $wpath) !== false) {
+                $frontblocked = false;
+            }
+        }
+
+        if (!$myblocked) {
             redirect(new \moodle_url('/my/index.php'));
-        } else if (!$front_blocked) {
+        } else if (!$frontblocked) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
-            if ($fallback_custom !== '') {
-                redirect(new \moodle_url($fallback_custom));
+            if ($fallbackcustom !== '') {
+                redirect(new \moodle_url($fallbackcustom));
             }
             throw new \moodle_exception('nopermissions', 'error', '', null, get_string('err_restricted_page', 'local_extendednav'));
         }

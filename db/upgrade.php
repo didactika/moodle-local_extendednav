@@ -23,8 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Upgrade script for the extendednav local plugin.
+ *
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
 function xmldb_local_extendednav_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();

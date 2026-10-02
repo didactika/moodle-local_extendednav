@@ -45,7 +45,11 @@ $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 if ($action === 'delete') {
     require_sesskey();
     $DB->delete_records('local_extendednav', ['id' => $id]);
-    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
+    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+}
     redirect($baseurl);
 }
 
@@ -55,7 +59,11 @@ if ($action === 'bulkdelete') {
     if (!empty($nodeids)) {
         list($insql, $inparams) = $DB->get_in_or_equal($nodeids);
         $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
-        try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {}
+        try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+            // Silently ignored.
+
+            // Expected exception
+}
         redirect($baseurl, get_string('bulk_deleted', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
     } else {
         redirect($baseurl);
@@ -75,7 +83,7 @@ if ($parent !== '') {
 }
 
 $wheresql = empty($where) ? '' : implode(' AND ', $where);
-$is_filtered = (!empty($wheresql));
+$isfiltered = (!empty($wheresql));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('manage_nodes', 'local_extendednav'));
@@ -94,7 +102,7 @@ echo html_writer::link($exportallurl, '<i class="fa fa-file-code-o mr-1"></i>' .
 echo '    </div>';
 echo html_writer::end_div();
 
-$filterbtnclass = $is_filtered ? 'btn-primary' : 'btn-outline-secondary';
+$filterbtnclass = $isfiltered ? 'btn-primary' : 'btn-outline-secondary';
 
 echo html_writer::start_div('reportbuilder-wrapper');
 echo html_writer::start_div('d-flex justify-content-end mb-3');
@@ -116,7 +124,7 @@ echo html_writer::end_div();
 
 echo html_writer::tag('button', get_string('apply', 'local_extendednav'), ['type' => 'submit', 'class' => 'btn btn-primary']);
 
-if ($is_filtered) {
+if ($isfiltered) {
     echo html_writer::tag('div', html_writer::link(new moodle_url('/local/extendednav/manage.php'), get_string('reset', 'local_extendednav')), ['class' => 'pt-3']);
 }
 
@@ -174,16 +182,16 @@ foreach ($nodes as $n) {
     elseif ($n->visibility == 2) $vis = '<span class="badge badge-warning">'.get_string('vis_roles', 'local_extendednav').'</span>';
     else $vis = '<span class="badge badge-success">'.get_string('vis_all', 'local_extendednav').'</span>';
 
-    $tree_html = '';
+    $treehtml = '';
     if (!empty($n->parentkey)) {
-        $tree_html .= html_writer::tag('span', get_string('inside', 'local_extendednav') . ' <b>' . s($n->parentkey) . '</b>', ['class' => 'text-info small']);
-        $tree_html .= '<br>';
+        $treehtml .= html_writer::tag('span', get_string('inside', 'local_extendednav') . ' <b>' . s($n->parentkey) . '</b>', ['class' => 'text-info small']);
+        $treehtml .= '<br>';
     }
     if (!empty($n->beforekey)) {
-        $tree_html .= html_writer::tag('span', get_string('before', 'local_extendednav') . ' <b>' . s($n->beforekey) . '</b>', ['class' => 'text-muted small']);
+        $treehtml .= html_writer::tag('span', get_string('before', 'local_extendednav') . ' <b>' . s($n->beforekey) . '</b>', ['class' => 'text-muted small']);
     }
-    if (empty($tree_html)) {
-        $tree_html = '<span class="text-secondary">-</span>';
+    if (empty($treehtml)) {
+        $treehtml = '<span class="text-secondary">-</span>';
     }
 
     $actions = '';
@@ -199,7 +207,7 @@ foreach ($nodes as $n) {
         '<b>'.s($n->nodekey).'</b>',
         !empty($n->title) ? format_string($n->title) : '<i class="text-muted">'.get_string('native_string', 'local_extendednav').'</i>',
         !empty($n->url) ? s($n->url) : '<i class="text-muted">'.get_string('native_route', 'local_extendednav').'</i>',
-        $tree_html,
+        $treehtml,
         $vis,
         $actions
     ]);
