@@ -15,19 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version metadata for the local_extendednav plugin.
+ * Privacy provider for local_extendednav
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika.org
+ * @copyright  2026 Didactika
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace local_extendednav\privacy;
 
-$plugin->version   = 2026092200;
-$plugin->requires  = 2023042400; // Moodle 4.2+
-$plugin->component = 'local_extendednav';
-$plugin->release   = '1.0.0';
-$plugin->supported = [402, 502];
-$plugin->maturity  = MATURITY_STABLE;
+use core_privacy\local\metadata\null_provider;
+
+/**
+ * Privacy API provider for local_extendednav.
+ *
+ * This plugin does not store any personal data.
+ *
+ * @copyright  2026 Didactika
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements null_provider {
+    /**
+     * Get the language string identifier to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason(): string {
+        return 'privacy:metadata';
+    }
+}

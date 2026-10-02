@@ -1,0 +1,11 @@
+nodes:
+  - nodekey: didactika
+    title: "Didactika"
+    url: "https://www.didactika.org/"
+    icon: "book"
+    visibility: 1
+    roles: ""
+    parentkey: ""
+    beforekey: ""
+    newwindow: 1
+    blockedurls: ""

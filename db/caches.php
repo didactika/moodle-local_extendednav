@@ -15,17 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language strings for PLUGINTYPE_PLUGINNAME
+ * File definition for caches.php.
  *
- * VERIFY: rename this file to match $plugin->component from version.php
- * (e.g. lang/en/local_servicemanager.php), and fill in @author.
- *
- * @package    PLUGINTYPE_PLUGINNAME
- * @copyright  YEAR YOUR ORGANISATION
+ * @package    local_extendednav
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Mandatory: moodle-plugin-ci validate fails without a pluginname string.
-$string['pluginname'] = 'PLUGINTYPE_PLUGINNAME'; // VERIFY: replace before first commit.
+$definitions = [
+    'nodes' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1
+    ]
+];
