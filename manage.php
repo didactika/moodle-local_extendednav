@@ -207,7 +207,7 @@ echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_
 echo '            </button>';
 echo '            <button type="submit" form="bulk-export-form" formaction="manage.php" ' .
     'name="action" value="bulkdelete" class="btn btn-sm btn-danger mr-1" ' .
-    'onclick="return confirm(\\'' . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . '\\');">';
+    'onclick="return confirm(\'' . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . '\');">';
 echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
 echo '            </button>';
 
