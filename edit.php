@@ -99,9 +99,10 @@ if ($mform->is_cancelled()) {
                 }
             }
         } catch (\Throwable $e) {
+            unset($e);
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
         }
     }
 
@@ -141,9 +142,10 @@ if ($mform->is_cancelled()) {
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
     } catch (\Throwable $e) {
+            unset($e);
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
     }
     theme_reset_all_caches();
 

@@ -32,7 +32,12 @@ $all = optional_param('all', 0, PARAM_INT);
 $nodeids = optional_param_array('nodeids', [], PARAM_INT);
 
 if (!$all && empty($nodeids)) {
-    redirect(new moodle_url('/local/extendednav/manage.php'), get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
+    redirect(
+        new moodle_url('/local/extendednav/manage.php'),
+        get_string('no_nodes_export', 'local_extendednav'),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
 }
 
 if ($all) {
@@ -45,7 +50,12 @@ if ($all) {
 }
 
 if (empty($nodes)) {
-    redirect(new moodle_url('/local/extendednav/manage.php'), get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
+    redirect(
+        new moodle_url('/local/extendednav/manage.php'),
+        get_string('no_nodes_export', 'local_extendednav'),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
 }
 
 $exportdata = ['nodes' => []];

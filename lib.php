@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Extends the global navigation to block overridden URLs manually if hidden.
@@ -58,7 +57,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             $cache->set('allnodes', $nodes);
         }
     } catch (\Throwable $e) {
-            // Silently ignored.
+        // Do nothing.
 
         return;
     }
@@ -73,7 +72,8 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             $currenturl = $PAGE->url->out(false);
         }
     } catch (\Throwable $e) {
-            // Silently ignored.
+        unset($e);
+        // Do nothing.
     }
 
     if (empty($currenturl)) {

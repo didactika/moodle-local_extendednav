@@ -58,7 +58,7 @@ class hooks {
                 } catch (\moodle_exception $e) {
                     // Silently ignored.
 
-                    // Expected exception
+                    // Expected exception.
 
                     $customnodes = [];
                 }
@@ -144,9 +144,10 @@ class hooks {
                                 $stateiconhtml = $OUTPUT->pix_icon($state->icon, '') . ' ';
                             }
                         } catch (\moodle_exception $e) {
+                            unset($e);
                             // Silently ignored.
 
-                            // Expected exception
+                            // Expected exception.
                         }
                     }
                 }
@@ -170,7 +171,10 @@ class hooks {
                                     }
                                 };
                                 if (document.readyState === "loading") {
-                                    document.addEventListener("DOMContentLoaded", function() { applyT(); setTimeout(applyT, 500); });
+                                    document.addEventListener("DOMContentLoaded", function() {
+                                        applyT();
+                                        setTimeout(applyT, 500);
+                                    });
                                 } else {
                                     applyT(); setTimeout(applyT, 500);
                                 }
@@ -244,8 +248,7 @@ class hooks {
                     }
 
                     $grandpa = $parentnode->parent;
-                    if ($grandpa !== null && $grandpa->key !== $primarynav->key) {
-                    } else {
+                    if ($grandpa === null || $grandpa->key === $primarynav->key) {
                         $node->remove();
                         $parentnode->add_node($node);
                     }
@@ -271,7 +274,7 @@ class hooks {
                             } catch (\moodle_exception $e) {
                                 // Silently ignored.
 
-                                // Expected exception
+                                // Expected exception.
 
                                 $assignedparent->add_node($node);
                             }

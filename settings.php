@@ -26,10 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    // Top category for local plugins
+    // Top category for local plugins.
     $ADMIN->add('localplugins', new admin_category('local_extendednav_cat', get_string('pluginname', 'local_extendednav')));
 
-    // General settings page
+    // General settings page.
     $settings = new admin_settingpage('local_extendednav_settings', get_string('pluginname', 'local_extendednav'));
 
     $setting = new admin_setting_configcheckbox(
@@ -40,19 +40,19 @@ if ($hassiteconfig) {
     );
     $settings->add($setting);
 
-    // Global fallback setting
+    // Global fallback setting.
     $setting = new admin_setting_configtext(
         'local_extendednav/fallbackurl',
         get_string('fallbackurl', 'local_extendednav'),
         get_string('fallbackurl_desc', 'local_extendednav'),
-        '', // Default empty
+        '', // The default value is empty.
         PARAM_RAW
     );
     $settings->add($setting);
 
     $ADMIN->add('local_extendednav_cat', $settings);
 
-    // Management page
+    // Management page.
     $ADMIN->add('local_extendednav_cat', new admin_externalpage(
         'local_extendednav_manage',
         get_string('manage_nodes', 'local_extendednav'),

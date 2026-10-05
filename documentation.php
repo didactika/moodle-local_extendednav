@@ -55,7 +55,11 @@ $downloadurl = new moodle_url('/local/extendednav/documentation.php', ['example'
 echo html_writer::start_div('extendednav-documentation-page');
 
 echo html_writer::start_div('mb-4');
-echo html_writer::link($backurl, html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'), ['class' => 'btn btn-secondary']);
+echo html_writer::link(
+    $backurl,
+    html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'),
+    ['class' => 'btn btn-secondary']
+);
 echo html_writer::end_div();
 
 echo html_writer::start_div('card');
@@ -66,20 +70,25 @@ echo '    <div class="card-body">';
 
 echo '        <h5 class="mb-3">' . get_string('quick_links', 'local_extendednav') . '</h5>';
 echo '        <ul class="list-unstyled mb-4">';
-echo '            <li><a href="#structure"><i class="fa fa-chevron-right mr-2"></i>' . get_string('doc_structure', 'local_extendednav') . '</a></li>';
-echo '            <li><a href="#fields"><i class="fa fa-chevron-right mr-2"></i>' . get_string('doc_fields_title', 'local_extendednav') . '</a></li>';
-echo '            <li><a href="#example"><i class="fa fa-chevron-right mr-2"></i>' . get_string('doc_example_format', 'local_extendednav') . '</a></li>';
+echo '            <li><a href="#structure"><i class="fa fa-chevron-right mr-2"></i>' .
+    get_string('doc_structure', 'local_extendednav') . '</a></li>';
+echo '            <li><a href="#fields"><i class="fa fa-chevron-right mr-2"></i>' .
+    get_string('doc_fields_title', 'local_extendednav') . '</a></li>';
+echo '            <li><a href="#example"><i class="fa fa-chevron-right mr-2"></i>' .
+    get_string('doc_example_format', 'local_extendednav') . '</a></li>';
 echo '        </ul>';
 
 echo '        <div class="alert alert-success mb-4">';
 echo '            <i class="fa fa-download mr-2"></i>';
-echo '            <a href="' . $downloadurl->out() . '" class="alert-link font-weight-bold">' . get_string('download_example', 'local_extendednav') . '</a>';
+echo '            <a href="' . $downloadurl->out() . '" class="alert-link font-weight-bold">' .
+    get_string('download_example', 'local_extendednav') . '</a>';
 echo '            - ' . get_string('doc_download_desc', 'local_extendednav');
 echo '        </div>';
 
 echo '        <h4 id="structure" class="mt-4 mb-3 text-primary">' . get_string('doc_structure', 'local_extendednav') . '</h4>';
 echo '        <p>' . get_string('doc_intro', 'local_extendednav') . '</p>';
-echo '        <p class="text-muted"><i class="fa fa-info-circle mr-1"></i> ' . get_string('doc_example_tip', 'local_extendednav') . '</p>';
+echo '        <p class="text-muted"><i class="fa fa-info-circle mr-1"></i> ' .
+    get_string('doc_example_tip', 'local_extendednav') . '</p>';
 
 echo '        <h4 id="fields" class="mt-4 mb-3 text-primary">' . get_string('doc_fields_title', 'local_extendednav') . '</h4>';
 echo '        <table class="table table-bordered table-striped">';
@@ -91,16 +100,36 @@ echo '                    <th>' . get_string('doc_desc', 'local_extendednav') . 
 echo '                </tr>';
 echo '            </thead>';
 echo '            <tbody>';
-echo '                <tr><td><code>nodekey</code></td><td><span class="badge badge-success">' . get_string('yes', 'moodle') . '</span></td><td>' . get_string('doc_f_nodekey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>title</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_title', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>url</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_url', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>icon</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_icon', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>visibility</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_visibility', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>roles</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_roles', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>parentkey</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_parentkey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>beforekey</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_beforekey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>newwindow</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_newwindow', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>blockedurls</code></td><td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td><td>' . get_string('doc_f_blockedurls', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>nodekey</code></td>' .
+     '<td><span class="badge badge-success">' . get_string('yes', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_nodekey', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>title</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_title', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>url</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_url', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>icon</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_icon', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>visibility</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_visibility', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>roles</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_roles', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>parentkey</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_parentkey', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>beforekey</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_beforekey', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>newwindow</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_newwindow', 'local_extendednav') . '</td></tr>';
+echo '                <tr><td><code>blockedurls</code></td>' .
+     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
+     '<td>' . get_string('doc_f_blockedurls', 'local_extendednav') . '</td></tr>';
 echo '            </tbody>';
 echo '        </table>';
 

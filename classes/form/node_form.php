@@ -25,6 +25,8 @@
 
 namespace local_extendednav\form;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -52,9 +54,10 @@ class node_form extends \moodleform {
                 }
             }
         } catch (\Throwable $e) {
+            unset($e);
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
         } finally {
             \local_extendednav\hooks::$skiphook = false;
         }
@@ -218,9 +221,10 @@ class node_form extends \moodleform {
                 }
             }
         } catch (\Throwable $e) {
+            unset($e);
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
         } finally {
             \local_extendednav\hooks::$skiphook = false;
         }
@@ -269,9 +273,7 @@ class node_form extends \moodleform {
                     $errors['parentkey'] = get_string('err_parent_haschildren', 'local_extendednav');
                 }
             }
-        }//    if ((parse_url($PAGE->url->out(false), PHP_URL_PATH) === '/my/courses.php')) {
-        // redirect(new moodle_url('/my/index.php'));
-        // }
+        }
 
         return $errors;
     }

@@ -123,9 +123,9 @@ class yaml {
      * @return array
      */
     public static function parse(string $content): array {
-        // Strip out UTF-8 BOM if present (Notepad issue)
+        // Strip out UTF-8 BOM if present (Notepad issue).
         $content = preg_replace('/^' . pack('H*', 'EFBBBF') . '/', '', $content);
-        // Normalize line endings to avoid \r weirdness
+        // Normalize line endings to avoid \r weirdness.
         $content = str_replace("\r\n", "\n", $content);
         $content = str_replace("\r", "\n", $content);
 

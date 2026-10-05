@@ -16,6 +16,8 @@
 
 namespace local_extendednav\form;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -53,7 +55,13 @@ class import_form extends \moodleform {
     protected function definition() {
         $mform = $this->_form;
 
-        $mform->addElement('filepicker', 'yamlfile', get_string('yamlconfigfile', 'local_extendednav'), null, ['maxfiles' => 1, 'accepted_types' => ['.yml', '.yaml']]);
+        $mform->addElement(
+            'filepicker',
+            'yamlfile',
+            get_string('yamlconfigfile', 'local_extendednav'),
+            null,
+            ['maxfiles' => 1, 'accepted_types' => ['.yml', '.yaml']]
+        );
         $mform->addRule('yamlfile', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('yamlfile', 'yamlconfigfile', 'local_extendednav');
 

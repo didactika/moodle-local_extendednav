@@ -63,7 +63,7 @@ if ($mform->is_cancelled()) {
     } catch (\Throwable $e) {
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
 
         throw new \moodle_exception('err_invalid_yaml_format', 'local_extendednav', '', $e->getMessage());
     }
@@ -77,7 +77,7 @@ if ($mform->is_cancelled()) {
     $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav}');
     $sortorder = $max !== false ? $max + 1 : 0;
 
-    // Load all existing nodes to avoid N+1 query performance hits in the loop
+    // Load all existing nodes to avoid N+1 query performance hits in the loop.
         $existingnodes = [];
     $rs = $DB->get_recordset('local_extendednav', null, '', 'nodekey, id');
     if ($rs->valid()) {
@@ -113,17 +113,20 @@ if ($mform->is_cancelled()) {
         $record->icon = isset($node['icon']) && $node['icon'] !== '' && $node['icon'] !== null ? $node['icon'] : null;
         $record->visibility = isset($node['visibility']) ? (int)$node['visibility'] : 1;
         $record->roles = isset($node['roles']) && $node['roles'] !== '' && $node['roles'] !== null ? $node['roles'] : null;
-        $record->parentkey = isset($node['parentkey']) && $node['parentkey'] !== '' && $node['parentkey'] !== null ? $node['parentkey'] : null;
-        $record->beforekey = isset($node['beforekey']) && $node['beforekey'] !== '' && $node['beforekey'] !== null ? $node['beforekey'] : null;
+        $record->parentkey = isset($node['parentkey']) && $node['parentkey'] !== '' && $node['parentkey'] !== null
+            ? $node['parentkey'] : null;
+        $record->beforekey = isset($node['beforekey']) && $node['beforekey'] !== '' && $node['beforekey'] !== null
+            ? $node['beforekey'] : null;
         $record->newwindow = isset($node['newwindow']) ? (int)$node['newwindow'] : 0;
-        $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null ? $node['blockedurls'] : null;
+        $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null
+            ? $node['blockedurls'] : null;
 
         if (array_key_exists($record->nodekey, $existingnodes)) {
             $existing = $existingnodes[$record->nodekey];
             if (isset($data->conflict_action) && $data->conflict_action === 'skip') {
                 continue;
             } else {
-                // Default to overwrite if action is 'overwrite' or somehow omitted
+                // Default to overwrite if action is 'overwrite' or somehow omitted.
                 $record->id = $existing->id;
                 $DB->update_record('local_extendednav', $record);
             }
@@ -136,9 +139,10 @@ if ($mform->is_cancelled()) {
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
     } catch (\Throwable $e) {
+        unset($e);
             // Silently ignored.
 
-            // Expected exception
+            // Expected exception.
     }
     theme_reset_all_caches();
 
@@ -159,7 +163,11 @@ echo html_writer::start_div('extendednav-import-page');
 
 $backurl = new moodle_url('/local/extendednav/manage.php');
 echo html_writer::start_div('mb-4');
-echo html_writer::link($backurl, html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'), ['class' => 'btn btn-secondary']);
+echo html_writer::link(
+    $backurl,
+    html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'),
+    ['class' => 'btn btn-secondary']
+);
 echo html_writer::end_div();
 
 echo html_writer::start_div('alert alert-info');
