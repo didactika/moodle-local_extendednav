@@ -39,7 +39,7 @@ if ($all) {
     $nodes = $DB->get_records('local_extendednav', null, 'sortorder ASC, id ASC');
     $filename = 'extendednav_config_all_' . date('Ymd_His') . '.yml';
 } else {
-    list($insql, $inparams) = $DB->get_in_or_equal($nodeids);
+    [$insql, $inparams] = $DB->get_in_or_equal($nodeids);
     $nodes = $DB->get_records_select('local_extendednav', "id $insql", $inparams, 'sortorder ASC, id ASC');
     $filename = 'extendednav_config_selected_' . date('Ymd_His') . '.yml';
 }
@@ -61,7 +61,7 @@ foreach ($nodes as $n) {
         'parentkey'   => $n->parentkey,
         'beforekey'   => $n->beforekey,
         'newwindow'   => (int)$n->newwindow,
-        'blockedurls' => $n->blockedurls
+        'blockedurls' => $n->blockedurls,
     ];
     $exportdata['nodes'][] = $nodedata;
 }

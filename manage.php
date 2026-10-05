@@ -35,8 +35,12 @@ $search = optional_param('search', '', PARAM_TEXT);
 $parent = optional_param('parent', '', PARAM_ALPHANUMEXT);
 
 $baseparams = [];
-if ($search !== '') $baseparams['search'] = $search;
-if ($parent !== '') $baseparams['parent'] = $parent;
+if ($search !== '') {
+    $baseparams['search'] = $search;
+}
+if ($parent !== '') {
+    $baseparams['parent'] = $parent;
+}
 
 $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 
@@ -45,11 +49,13 @@ $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 if ($action === 'delete') {
     require_sesskey();
     $DB->delete_records('local_extendednav', ['id' => $id]);
-    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+    try {
+        \cache::make('local_extendednav', 'nodes')->purge();
+    } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-}
+    }
     redirect($baseurl);
 }
 
@@ -57,13 +63,15 @@ if ($action === 'bulkdelete') {
     require_sesskey();
     $nodeids = optional_param_array('nodeids', [], PARAM_INT);
     if (!empty($nodeids)) {
-        list($insql, $inparams) = $DB->get_in_or_equal($nodeids);
+        [$insql, $inparams] = $DB->get_in_or_equal($nodeids);
         $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
-        try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+        try {
+            \cache::make('local_extendednav', 'nodes')->purge();
+        } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-}
+        }
         redirect($baseurl, get_string('bulk_deleted', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
     } else {
         redirect($baseurl);
@@ -87,7 +95,7 @@ $isfiltered = (!empty($wheresql));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('manage_nodes', 'local_extendednav'));
-echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']); 
+echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']);
 
 // --- TOP ACTIONS BAR (Matches theme_vle and local_servicemanager) ---
 $addurl = new moodle_url('/local/extendednav/edit.php');
@@ -144,7 +152,7 @@ echo '            </span>';
 echo '            <button type="submit" form="bulk-export-form" formaction="export.php" class="btn btn-sm btn-info mr-1">';
 echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_selected', 'local_extendednav');
 echo '            </button>';
-echo '            <button type="submit" form="bulk-export-form" formaction="manage.php" name="action" value="bulkdelete" class="btn btn-sm btn-danger mr-1" onclick="return confirm(\''.addslashes(get_string('bulk_delete_confirm', 'local_extendednav')).'\');">';
+echo '            <button type="submit" form="bulk-export-form" formaction="manage.php" name="action" value="bulkdelete" class="btn btn-sm btn-danger mr-1" onclick="return confirm(\'' . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . '\');">';
 echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
 echo '            </button>';
 
@@ -167,7 +175,7 @@ $table->define_headers([
     get_string('url', 'local_extendednav'),
     get_string('positioning', 'local_extendednav'),
     get_string('visibility', 'local_extendednav'),
-    get_string('actions', 'local_extendednav')
+    get_string('actions', 'local_extendednav'),
 ]);
 
 $table->column_class('select', 'text-center');
@@ -178,9 +186,13 @@ $nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sorto
 $total = count($nodes);
 $i = 0;
 foreach ($nodes as $n) {
-    if ($n->visibility == 0) $vis = '<span class="badge badge-danger">'.get_string('vis_hidden', 'local_extendednav').'</span>';
-    elseif ($n->visibility == 2) $vis = '<span class="badge badge-warning">'.get_string('vis_roles', 'local_extendednav').'</span>';
-    else $vis = '<span class="badge badge-success">'.get_string('vis_all', 'local_extendednav').'</span>';
+    if ($n->visibility == 0) {
+        $vis = '<span class="badge badge-danger">' . get_string('vis_hidden', 'local_extendednav') . '</span>';
+    } else if ($n->visibility == 2) {
+        $vis = '<span class="badge badge-warning">' . get_string('vis_roles', 'local_extendednav') . '</span>';
+    } else {
+        $vis = '<span class="badge badge-success">' . get_string('vis_all', 'local_extendednav') . '</span>';
+    }
 
     $treehtml = '';
     if (!empty($n->parentkey)) {
@@ -199,19 +211,22 @@ foreach ($nodes as $n) {
     $actions .= html_writer::link($editurl, $OUTPUT->pix_icon('t/edit', get_string('edit')));
 
     $delurl = new moodle_url('/local/extendednav/manage.php', array_merge(['id' => $n->id, 'action' => 'delete', 'sesskey' => sesskey()], $baseparams));
-    $actions .= '&nbsp;' . html_writer::link($delurl, $OUTPUT->pix_icon('t/delete', get_string('delete')),
-        ['onclick' => "return confirm('".get_string('delete_node_confirm', 'local_extendednav')."');"]);
+    $actions .= '&nbsp;' . html_writer::link(
+        $delurl,
+        $OUTPUT->pix_icon('t/delete', get_string('delete')),
+        ['onclick' => "return confirm('" . get_string('delete_node_confirm', 'local_extendednav') . "');"]
+    );
 
     $table->add_data([
         '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">',
-        '<b>'.s($n->nodekey).'</b>',
-        !empty($n->title) ? format_string($n->title) : '<i class="text-muted">'.get_string('native_string', 'local_extendednav').'</i>',
-        !empty($n->url) ? s($n->url) : '<i class="text-muted">'.get_string('native_route', 'local_extendednav').'</i>',
+        '<b>' . s($n->nodekey) . '</b>',
+        !empty($n->title) ? format_string($n->title) : '<i class="text-muted">' . get_string('native_string', 'local_extendednav') . '</i>',
+        !empty($n->url) ? s($n->url) : '<i class="text-muted">' . get_string('native_route', 'local_extendednav') . '</i>',
         $treehtml,
         $vis,
-        $actions
+        $actions,
     ]);
-    
+
     $i++;
 }
 

@@ -33,7 +33,7 @@ use core\hook\navigation\primary_extend;
 class hooks {
         /** @var bool Skip hook loop barrier. */
     public static $skiphook = false;
-    
+
     /**
      * Extends the primary navigation based on custom DB configuration.
      *
@@ -45,21 +45,20 @@ class hooks {
         if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
             return;
         }
-        
+
         $primarynav = $hook->get_primaryview();
 
         if (isloggedin() && !isguestuser()) {
-            
             $cache = \cache::make('local_extendednav', 'nodes');
             $customnodes = $cache->get('allnodes');
-            
+
             if ($customnodes === false) {
                 try {
                     $customnodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
                 } catch (\moodle_exception $e) {
-            // Silently ignored.
+                    // Silently ignored.
 
-            // Expected exception
+                    // Expected exception
 
                     $customnodes = [];
                 }
@@ -69,11 +68,10 @@ class hooks {
             $finalstates = [];
 
             foreach ($customnodes as $cnode) {
-                
                 $nodekey = $cnode->nodekey;
                 $state = new \stdClass();
                 $state->nodekey = $nodekey;
-                
+
                 $allowed = true;
                 if ($cnode->visibility == 0) {
                     $allowed = false;
@@ -89,10 +87,10 @@ class hooks {
                         }
                     }
                 }
-                
+
                 $state->allowed = $allowed;
                 $state->title = !empty($cnode->title) ? $cnode->title : null;
-                
+
                 $rawurl = !empty($cnode->url) ? trim((string)$cnode->url) : null;
                 if ($rawurl !== null && $rawurl !== '') {
                     if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
@@ -106,22 +104,22 @@ class hooks {
                     $rawurl = null;
                 }
                 $state->url = $rawurl;
-                
+
                 $state->icon = null;
                 $state->icon_set = false;
-                if ($cnode->icon !== '' && $cnode->icon !== null) { 
-                    $state->icon = $cnode->icon; 
+                if ($cnode->icon !== '' && $cnode->icon !== null) {
+                    $state->icon = $cnode->icon;
                     $state->icon_set = true;
                 }
-                
+
                 $state->beforekey = !empty($cnode->beforekey) ? $cnode->beforekey : null;
                 $state->parentkey = !empty($cnode->parentkey) ? $cnode->parentkey : null;
-                
+
                 $state->newwindow = false;
                 if (isset($cnode->newwindow)) {
                     $state->newwindow = (bool)$cnode->newwindow;
                 }
-                
+
                 if ($nodekey === 'siteadminnode') {
                     $state->allowed = true;
                     $state->parentkey = null;
@@ -136,7 +134,6 @@ class hooks {
             $scriptinjected = false;
 
             foreach ($finalstates as $nodekey => $state) {
-                
                 $stateiconhtml = '';
                 if ($state->icon_set && $state->icon !== 'null' && $state->icon !== 'none') {
                     if (strpos($state->icon, 'fa-') !== false || strpos($state->icon, 'fa ') !== false) {
@@ -147,10 +144,9 @@ class hooks {
                                 $stateiconhtml = $OUTPUT->pix_icon($state->icon, '') . ' ';
                             }
                         } catch (\moodle_exception $e) {
-            // Silently ignored.
+                            // Silently ignored.
 
-            // Expected exception
- 
+                            // Expected exception
                         }
                     }
                 }
@@ -159,7 +155,7 @@ class hooks {
                 $scripthtml = '';
                 if ($state->newwindow) {
                     $newwindowspan = '<span class="custom-target-blank" style="display:none;" aria-hidden="true"></span>';
-                    
+
                     if (!$scriptinjected) {
                         $scripthtml = '<script>
                             if (!window.customNavScriptInjected) {
@@ -211,7 +207,7 @@ class hooks {
                     }
 
                     $url = new \moodle_url($state->url);
-                    
+
                     $node = \navigation_node::create(
                         $scripthtml . $stateiconhtml . format_string($state->title) . $newwindowspan,
                         $url,
@@ -220,45 +216,43 @@ class hooks {
                         $nodekey,
                         null
                     );
-                    
+
                     $primarynav->add_node($node);
                 }
             }
-            
+
             foreach ($finalstates as $nodekey => $state) {
                 if (!$state->allowed) {
                     continue;
                 }
-                
+
                 $node = $primarynav->get($nodekey);
                 if (!$node) {
                     continue;
                 }
-                
+
                 if (!empty($state->parentkey) && $state->parentkey !== $nodekey) {
-                    
                     $parentnode = $primarynav->get($state->parentkey);
-                    
+
                     if (!$parentnode) {
                         $killedbyus = isset($finalstates[$state->parentkey]) && $finalstates[$state->parentkey]->allowed === false;
-                        
+
                         if ($killedbyus) {
                             $node->remove();
                         }
                         continue;
                     }
-                    
+
                     $grandpa = $parentnode->parent;
                     if ($grandpa !== null && $grandpa->key !== $primarynav->key) {
                     } else {
                         $node->remove();
                         $parentnode->add_node($node);
                     }
-                    
                 }
-                
+
                 if (!empty($state->beforekey)) {
-                    $assignedparent = $node->parent; 
+                    $assignedparent = $node->parent;
                     if ($assignedparent) {
                         $siblingexists = false;
                         if ($assignedparent->children) {
@@ -269,15 +263,15 @@ class hooks {
                                 }
                             }
                         }
-                        
+
                         if ($siblingexists) {
                             $node->remove();
                             try {
                                 $assignedparent->add_node($node, $state->beforekey);
                             } catch (\moodle_exception $e) {
-            // Silently ignored.
+                                // Silently ignored.
 
-            // Expected exception
+                                // Expected exception
 
                                 $assignedparent->add_node($node);
                             }

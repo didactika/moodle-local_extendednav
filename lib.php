@@ -32,10 +32,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_extendednav_extend_navigation(\global_navigation $navigation): void {
     global $PAGE, $DB, $USER;
-    
-    if ((defined('WS_SERVER') && WS_SERVER) || 
-        (defined('AJAX_SCRIPT') && AJAX_SCRIPT) || 
-        (defined('CLI_SCRIPT') && CLI_SCRIPT)) {
+
+    if (
+        (defined('WS_SERVER') && WS_SERVER) ||
+        (defined('AJAX_SCRIPT') && AJAX_SCRIPT) ||
+        (defined('CLI_SCRIPT') && CLI_SCRIPT)
+    ) {
         return;
     }
 
@@ -50,7 +52,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
     try {
         $cache = \cache::make('local_extendednav', 'nodes');
         $nodes = $cache->get('allnodes');
-        
+
         if ($nodes === false) {
             $nodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
             $cache->set('allnodes', $nodes);
@@ -72,11 +74,10 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         }
     } catch (\Throwable $e) {
             // Silently ignored.
-
     }
-    
+
     if (empty($currenturl)) {
-        return; 
+        return;
     }
 
     $parsedcurrent = parse_url($currenturl);
@@ -86,24 +87,24 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
     }
 
     $immunepaths = [
-        '/local/extendednav/', 
-        '/admin/',                  
-        '/login/'                   
+        '/local/extendednav/',
+        '/admin/',
+        '/login/',
     ];
-    
+
     foreach ($immunepaths as $ipath) {
         if (strpos($currentpath, $ipath) !== false) {
             return;
         }
     }
-    
+
     if (is_siteadmin()) {
         return;
     }
 
     $fallbackcustom = trim((string) get_config('local_extendednav', 'fallbackurl'));
     $fallbackpath = '';
-    
+
     if ($fallbackcustom !== '') {
         $parsedfallback = parse_url($fallbackcustom);
         $fallbackpath = isset($parsedfallback['path']) ? $parsedfallback['path'] : '';
@@ -111,7 +112,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             $fallbackpath .= '?' . $parsedfallback['query'];
         }
         if (!$fallbackpath) {
-            $fallbackpath = $fallbackcustom; 
+            $fallbackpath = $fallbackcustom;
         }
 
         if ($fallbackpath === '/') {
@@ -128,7 +129,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
 
     foreach ($nodes as $cnode) {
         $allowed = true;
-        
+
         if ($cnode->visibility == 0) {
             $allowed = false;
         } else if ($cnode->visibility == 2) {
@@ -143,7 +144,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
                 }
             }
         }
-        
+
         $nodepaths = [];
         if (!empty($cnode->blockedurls)) {
             $spliturls = array_map('trim', explode(',', $cnode->blockedurls));
@@ -153,7 +154,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
                 }
             }
         }
-        
+
         if (!empty($cnode->url)) {
             $purl = parse_url($cnode->url);
             $wpath = isset($purl['path']) ? $purl['path'] : '';
@@ -178,7 +179,7 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
 
     $iscurrentblocked = false;
     foreach ($allblockedpaths as $bpath) {
-        if ($bpath === '/') { 
+        if ($bpath === '/') {
             if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0) {
                 $iscurrentblocked = true;
                 break;
@@ -209,10 +210,10 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
     if ($iscurrentblocked) {
         $fallbackmy = '/my/index.php';
         $fallbackfront = '/?redirect=0';
-        
+
         $myblocked = false;
         $frontblocked = false;
-        
+
         foreach ($allblockedpaths as $bpath) {
             if ($bpath === '/') {
                 $frontblocked = true;

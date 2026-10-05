@@ -31,7 +31,6 @@ require_once($CFG->libdir . '/formslib.php');
  * Defines the form for adding or editing extended navigation nodes.
  */
 class node_form extends \moodleform {
-
     /**
      * Form definition.
      */
@@ -52,12 +51,14 @@ class node_form extends \moodleform {
                     $corekeys[] = $child->key;
                 }
             }
-            } catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-} finally { \local_extendednav\hooks::$skiphook = false; }
-        
+        } finally {
+            \local_extendednav\hooks::$skiphook = false;
+        }
+
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
@@ -66,12 +67,12 @@ class node_form extends \moodleform {
         $mform->addRule('nodekey', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
 
-        $alerthtml = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">' 
+        $alerthtml = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">'
             . get_string('coreoverridealert', 'local_extendednav') . '</div>';
-            
-        $alerthtml .= '<div id="duplicate_node_alert" class="alert alert-danger mt-2 mb-0" style="display: none;">' 
+
+        $alerthtml .= '<div id="duplicate_node_alert" class="alert alert-danger mt-2 mb-0" style="display: none;">'
             . get_string('err_duplicate_key_alert', 'local_extendednav') . '</div>';
-            
+
         $mform->addElement('static', 'corealert', '', $alerthtml);
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => '50']);
@@ -81,7 +82,7 @@ class node_form extends \moodleform {
         $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => '60']);
         $mform->setType('url', PARAM_RAW);
         $mform->addHelpButton('url', 'url', 'local_extendednav');
-        
+
         $mform->addElement('advcheckbox', 'newwindow', get_string('newwindow', 'local_extendednav'));
         $mform->addHelpButton('newwindow', 'newwindow', 'local_extendednav');
 
@@ -120,7 +121,7 @@ class node_form extends \moodleform {
 
         $parentoptions = ['' => get_string('opt_none_root', 'local_extendednav')];
         $beforeoptions = ['' => get_string('opt_end_list', 'local_extendednav')];
-        
+
         foreach ($corekeys as $ckey) {
             if ($ckey !== $currentnodekey) {
                 $child = $primary->get($ckey);
@@ -129,7 +130,7 @@ class node_form extends \moodleform {
                     $a = new \stdClass();
                     $a->text = $cleantext;
                     $a->key = $ckey;
-                    
+
                     if ($ckey !== 'siteadminnode') {
                         $parentoptions[$ckey] = get_string('opt_native', 'local_extendednav', $a);
                     }
@@ -148,11 +149,11 @@ class node_form extends \moodleform {
             $customkeys[] = $c->nodekey;
 
             $title = $c->title ? $c->title : get_string('none_title', 'local_extendednav');
-            
+
             $a = new \stdClass();
             $a->title = $title;
             $a->key = $c->nodekey;
-            
+
             if (empty($c->parentkey)) {
                 $parentoptions[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
             }
@@ -197,7 +198,7 @@ class node_form extends \moodleform {
     public function validation($data, $files) {
         global $DB, $PAGE;
         $errors = parent::validation($data, $files);
-        
+
         if ($data['visibility'] == 2 && empty($data['roles'])) {
             $errors['roles'] = get_string('required');
         }
@@ -216,11 +217,13 @@ class node_form extends \moodleform {
                     break;
                 }
             }
-            } catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-} finally { \local_extendednav\hooks::$skiphook = false; }
+        } finally {
+            \local_extendednav\hooks::$skiphook = false;
+        }
 
         if (!$iscore) {
             if (empty(trim((string)$data['title']))) {
@@ -233,12 +236,12 @@ class node_form extends \moodleform {
                 $errors['visibility'] = get_string('err_custom_hidden', 'local_extendednav');
             }
         }
-        
+
         $existing = $DB->get_record('local_extendednav', ['nodekey' => $data['nodekey']], '*', IGNORE_MULTIPLE);
         if ($existing && $existing->id != $data['id']) {
             $errors['nodekey'] = get_string('err_duplicate_key', 'local_extendednav');
         }
-        
+
         if ($data['nodekey'] === 'siteadminnode') {
             if ($data['visibility'] != 1) {
                 $errors['visibility'] = get_string('err_admin_hide', 'local_extendednav');
@@ -247,7 +250,7 @@ class node_form extends \moodleform {
                 $errors['parentkey'] = get_string('err_admin_child', 'local_extendednav');
             }
         }
-        
+
         if (!empty($data['parentkey']) && $data['parentkey'] === 'siteadminnode') {
             $errors['parentkey'] = get_string('err_admin_parent', 'local_extendednav');
         }
@@ -260,16 +263,16 @@ class node_form extends \moodleform {
                 if ($parentrecord && !empty($parentrecord->parentkey)) {
                     $errors['parentkey'] = get_string('err_parent_thirdlevel', 'local_extendednav');
                 }
-                
+
                 $haschildren = $DB->record_exists('local_extendednav', ['parentkey' => $data['nodekey']]);
                 if ($haschildren) {
                     $errors['parentkey'] = get_string('err_parent_haschildren', 'local_extendednav');
                 }
             }
         }//    if ((parse_url($PAGE->url->out(false), PHP_URL_PATH) === '/my/courses.php')) {
-//        redirect(new moodle_url('/my/index.php'));
-//    }
-        
+        // redirect(new moodle_url('/my/index.php'));
+        // }
+
         return $errors;
     }
 }

@@ -41,7 +41,6 @@ $mform = new \local_extendednav\form\import_form($url);
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/extendednav/manage.php'));
 } else if ($data = $mform->get_data()) {
-
     $draftitemid = $data->yamlfile;
     $fs = get_file_storage();
     $context = \context_user::instance($USER->id);
@@ -96,7 +95,7 @@ if ($mform->is_cancelled()) {
         $record = new stdClass();
         $record->nodekey = $node['nodekey'];
         $record->title = isset($node['title']) && $node['title'] !== '' && $node['title'] !== null ? $node['title'] : null;
-        
+
         $rawurl = isset($node['url']) && $node['url'] !== '' && $node['url'] !== null ? trim((string)$node['url']) : null;
         if ($rawurl !== null && $rawurl !== '') {
             if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
@@ -110,7 +109,7 @@ if ($mform->is_cancelled()) {
             $rawurl = null;
         }
         $record->url = $rawurl;
-        
+
         $record->icon = isset($node['icon']) && $node['icon'] !== '' && $node['icon'] !== null ? $node['icon'] : null;
         $record->visibility = isset($node['visibility']) ? (int)$node['visibility'] : 1;
         $record->roles = isset($node['roles']) && $node['roles'] !== '' && $node['roles'] !== null ? $node['roles'] : null;
@@ -118,7 +117,7 @@ if ($mform->is_cancelled()) {
         $record->beforekey = isset($node['beforekey']) && $node['beforekey'] !== '' && $node['beforekey'] !== null ? $node['beforekey'] : null;
         $record->newwindow = isset($node['newwindow']) ? (int)$node['newwindow'] : 0;
         $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null ? $node['blockedurls'] : null;
-        
+
         if (array_key_exists($record->nodekey, $existingnodes)) {
             $existing = $existingnodes[$record->nodekey];
             if (isset($data->conflict_action) && $data->conflict_action === 'skip') {
@@ -134,11 +133,13 @@ if ($mform->is_cancelled()) {
         }
     }
 
-    try { \cache::make('local_extendednav', 'nodes')->purge(); } catch (\Throwable $e) {
+    try {
+        \cache::make('local_extendednav', 'nodes')->purge();
+    } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-}
+    }
     theme_reset_all_caches();
 
     redirect(
@@ -162,14 +163,14 @@ echo html_writer::link($backurl, html_writer::tag('i', '', ['class' => 'fa fa-ar
 echo html_writer::end_div();
 
 echo html_writer::start_div('alert alert-info');
-echo '    <h5><i class="fa fa-info-circle mr-2"></i>'.get_string('import_instructions_title', 'local_extendednav').'</h5>';
-echo '    <p>'.get_string('import_instructions_desc', 'local_extendednav').'</p>';
+echo '    <h5><i class="fa fa-info-circle mr-2"></i>' . get_string('import_instructions_title', 'local_extendednav') . '</h5>';
+echo '    <p>' . get_string('import_instructions_desc', 'local_extendednav') . '</p>';
 echo '    <ul>';
-echo '        <li>'.get_string('yamlconfigfile', 'local_extendednav').' (<code>.yml</code>, <code>.yaml</code>)</li>';
+echo '        <li>' . get_string('yamlconfigfile', 'local_extendednav') . ' (<code>.yml</code>, <code>.yaml</code>)</li>';
 echo '    </ul>';
 echo '    <p>';
-echo '        <a href="'.$docurl->out().'" class="text-info font-weight-bold">';
-echo '            <i class="fa fa-book mr-1"></i>'.get_string('view_documentation', 'local_extendednav');
+echo '        <a href="' . $docurl->out() . '" class="text-info font-weight-bold">';
+echo '            <i class="fa fa-book mr-1"></i>' . get_string('view_documentation', 'local_extendednav');
 echo '        </a>';
 echo '    </p>';
 echo html_writer::end_div();

@@ -25,7 +25,6 @@ namespace local_extendednav;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class yaml {
-
     /**
      * Dumps an array to a YAML string.
      *
@@ -45,15 +44,19 @@ class yaml {
     }
 
         /**
-     * Formats a scalar value for YAML output.
-     *
-     * @param mixed $val The value to format.
-     * @param string $prefix Optional prefix for multiline.
-     * @return string Formatted value.
-     */
+         * Formats a scalar value for YAML output.
+         *
+         * @param mixed $val The value to format.
+         * @param string $prefix Optional prefix for multiline.
+         * @return string Formatted value.
+         */
     private static function format_scalar($val, $prefix = "") {
-        if ($val === null) { return 'null'; }
-        if (is_bool($val)) { return $val ? 'true' : 'false'; }
+        if ($val === null) {
+            return 'null';
+        }
+        if (is_bool($val)) {
+            return $val ? 'true' : 'false';
+        }
         if (is_string($val)) {
             if (strpos($val, "\n") !== false) {
                 return "|\n" . $prefix . "    " . str_replace("\n", "\n" . $prefix . "    ", trim($val));
@@ -76,10 +79,10 @@ class yaml {
     private static function dump_node($key, $val, $indent) {
         $prefix = str_repeat("  ", $indent);
         $out = "";
-        
+
         $islistitem = is_int($key);
         $k = $islistitem ? "-" : $key . ":";
-        
+
         if (is_array($val)) {
             if ($islistitem && !empty($val) && (array_keys($val) !== range(0, count($val) - 1))) {
                 // It's a map inside a list. Output first key on same line as the hyphen.
@@ -87,13 +90,13 @@ class yaml {
                 $firstkey = key($val);
                 $firstval = current($val);
                 $out .= $prefix . "- " . $firstkey . ":";
-                
+
                 if (is_array($firstval)) {
                     $out .= "\n" . self::dump_node($firstkey, $firstval, $indent + 1, true);
                 } else {
                     $out .= " " . self::format_scalar($firstval) . "\n";
                 }
-                
+
                 array_shift($val);
                 foreach ($val as $ck => $cv) {
                     $out .= self::dump_node($ck, $cv, $indent + 1);
@@ -121,7 +124,7 @@ class yaml {
      */
     public static function parse(string $content): array {
         // Strip out UTF-8 BOM if present (Notepad issue)
-        $content = preg_replace('/^' . pack('H*','EFBBBF') . '/', '', $content);
+        $content = preg_replace('/^' . pack('H*', 'EFBBBF') . '/', '', $content);
         // Normalize line endings to avoid \r weirdness
         $content = str_replace("\r\n", "\n", $content);
         $content = str_replace("\r", "\n", $content);
@@ -132,7 +135,7 @@ class yaml {
                 return (array)$parsed;
             }
         }
-        
+
         // Simple fallback parser for specific structure.
         $result = [];
         $stack = [&$result];
@@ -143,20 +146,20 @@ class yaml {
             if ($trimmed === '' || strpos($trimmed, '#') === 0) {
                 continue;
             }
-            
+
             $isseq = preg_match('/^\s*-(\s|$)/', $line) === 1;
             $iskey = !$isseq && preg_match('/^\s*[^\s:#][^:]*:(\s|$)/', $line) === 1;
             if (!$isseq && !$iskey) {
                 continue;
             }
-            
+
             $token = [
                 'line' => $line,
                 'isseq' => $isseq,
                 'iskey' => $iskey,
                 'indent' => strlen($line) - strlen(ltrim($line)),
             ];
-            
+
             $depth = count($frames);
             while ($depth > 1) {
                 $frame = $frames[$depth - 1];
@@ -172,7 +175,7 @@ class yaml {
                 } else if ($token['indent'] === $frame['childindent']) {
                     $belongs = ($token['isseq'] && $frame['type'] === 'seq') || ($token['iskey'] && $frame['type'] === 'map');
                 }
-                
+
                 if (!$belongs) {
                     array_pop($stack);
                     array_pop($frames);
@@ -181,29 +184,29 @@ class yaml {
                     break;
                 }
             }
-            
+
             $topidx = count($stack) - 1;
             $current = &$stack[$topidx];
             if (!is_array($current)) {
                 $current = [];
             }
-            
+
             if ($frames[$topidx]['childindent'] === null) {
                 $frames[$topidx]['childindent'] = $token['indent'];
                 $frames[$topidx]['type'] = $token['isseq'] ? 'seq' : 'map';
             }
-            
+
             if ($token['isseq']) {
                 preg_match('/^(\s*-\s*)(.*)$/', $token['line'], $sm);
                 $value = rtrim($sm[2] ?? '');
-                
+
                 if (!preg_match('/^([^\s:#][^:]*):(?:\s+(.*))?$/', $value, $om)) {
                     $current[] = self::parse_value($value);
                 } else {
                     $okey = rtrim($om[1]);
                     $oval = isset($om[2]) ? trim($om[2]) : '';
                     $innerindent = strlen($sm[1] ?? '');
-                    
+
                     $current[] = [$okey => self::parse_value($oval)];
                     $last = array_key_last($current);
                     $stack[] = &$current[$last];
@@ -213,7 +216,7 @@ class yaml {
                 preg_match('/^\s*([^\s:#][^:]*):(?:\s+(.*))?$/', $token['line'], $km);
                 $key = rtrim($km[1] ?? '');
                 $value = isset($km[2]) ? trim($km[2]) : '';
-                
+
                 if ($value === '[]') {
                     $current[$key] = [];
                 } else if ($value !== '' && !str_starts_with($value, '#')) {
@@ -226,7 +229,7 @@ class yaml {
             }
             unset($current);
         }
-        
+
         return $result;
     }
 
@@ -246,19 +249,29 @@ class yaml {
                 }
             }
         }
-        
+
         $commentpos = strpos($value, ' #');
         if ($commentpos !== false) {
             $value = trim(substr($value, 0, $commentpos));
         }
-        
+
         $lower = strtolower($value);
-        if ($lower === 'true' || $lower === 'yes') { return true; }
-        if ($lower === 'false' || $lower === 'no') { return false; }
-        if ($lower === 'null' || $lower === '~' || $value === '') { return null; }
-        if (str_starts_with($value, '#')) { return null; }
-        
-        if (is_numeric($value)) { return strpos($value, '.') !== false ? (float)$value : (int)$value; }
+        if ($lower === 'true' || $lower === 'yes') {
+            return true;
+        }
+        if ($lower === 'false' || $lower === 'no') {
+            return false;
+        }
+        if ($lower === 'null' || $lower === '~' || $value === '') {
+            return null;
+        }
+        if (str_starts_with($value, '#')) {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return strpos($value, '.') !== false ? (float)$value : (int)$value;
+        }
         return $value;
     }
 }

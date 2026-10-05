@@ -53,11 +53,10 @@ if ($id) {
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/extendednav/manage.php'));
 } else if ($data = $mform->get_data()) {
-    
     $record = new stdClass();
     $record->nodekey = $data->nodekey;
     $record->title = !empty($data->title) ? $data->title : null;
-    
+
     $rawurl = !empty($data->url) ? trim((string)$data->url) : null;
     if ($rawurl !== null && $rawurl !== '') {
         if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
@@ -77,16 +76,16 @@ if ($mform->is_cancelled()) {
     $record->parentkey = !empty($data->parentkey) ? $data->parentkey : null;
     $record->visibility = (int)$data->visibility;
     $record->newwindow = !empty($data->newwindow) ? 1 : 0;
-    
+
     $blockedurls = null;
-    if ($record->visibility != 1) { 
+    if ($record->visibility != 1) {
         try {
             $temppage = new \moodle_page();
             $temppage->set_context(\context_system::instance());
             $temppage->set_url($PAGE->url);
             $primary = new \core\navigation\views\primary($temppage);
             $primary->initialise();
-            
+
             $corenode = $primary->get($record->nodekey);
             if ($corenode && $corenode->action instanceof \moodle_url) {
                 $parsedcore = parse_url($corenode->action->out(false));
@@ -94,7 +93,7 @@ if ($mform->is_cancelled()) {
                 if (isset($parsedcore['query']) && $parsedcore['query'] !== '') {
                     $corepath .= '?' . $parsedcore['query'];
                 }
-                
+
                 if (!empty($corepath)) {
                     $blockedurls = $corepath;
                 }
@@ -103,9 +102,9 @@ if ($mform->is_cancelled()) {
             // Silently ignored.
 
             // Expected exception
-}
+        }
     }
-    
+
     if ($record->visibility != 1 && !empty($record->url)) {
         $parsedcustom = parse_url($record->url);
         $custompath = isset($parsedcustom['path']) ? $parsedcustom['path'] : '';
@@ -123,7 +122,7 @@ if ($mform->is_cancelled()) {
     }
 
     $record->blockedurls = $blockedurls;
-    
+
     if ($record->visibility == 2 && !empty($data->roles)) {
         $record->roles = implode(',', $data->roles);
     } else {
@@ -138,14 +137,14 @@ if ($mform->is_cancelled()) {
         $record->sortorder = $max !== false ? $max + 1 : 0;
         $DB->insert_record('local_extendednav', $record);
     }
-    
+
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
     } catch (\Throwable $e) {
             // Silently ignored.
 
             // Expected exception
-}
+    }
     theme_reset_all_caches();
 
     redirect(new moodle_url('/local/extendednav/manage.php'));

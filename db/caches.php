@@ -31,6 +31,6 @@ $definitions = [
         'simplekeys' => true,
         'simpledata' => true,
         'staticacceleration' => true,
-        'staticaccelerationsize' => 1
-    ]
+        'staticaccelerationsize' => 1,
+    ],
 ];

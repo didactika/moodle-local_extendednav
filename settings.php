@@ -39,7 +39,7 @@ if ($hassiteconfig) {
         1
     );
     $settings->add($setting);
-    
+
     // Global fallback setting
     $setting = new admin_setting_configtext(
         'local_extendednav/fallbackurl',

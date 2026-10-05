@@ -73,7 +73,7 @@ echo '        </ul>';
 
 echo '        <div class="alert alert-success mb-4">';
 echo '            <i class="fa fa-download mr-2"></i>';
-echo '            <a href="'.$downloadurl->out().'" class="alert-link font-weight-bold">' . get_string('download_example', 'local_extendednav') . '</a>';
+echo '            <a href="' . $downloadurl->out() . '" class="alert-link font-weight-bold">' . get_string('download_example', 'local_extendednav') . '</a>';
 echo '            - ' . get_string('doc_download_desc', 'local_extendednav');
 echo '        </div>';
 
