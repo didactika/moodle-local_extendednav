@@ -29,6 +29,38 @@ require_once($CFG->libdir . '/tablelib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
+// Sync core nodes into the DB if they are missing.
+\local_extendednav\hooks::$skiphook = true;
+$temppage = new \moodle_page();
+$temppage->set_context(\context_system::instance());
+$temppage->set_url(new \moodle_url('/'));
+$primary = new \core\navigation\views\primary($temppage);
+$primary->initialise();
+\local_extendednav\hooks::$skiphook = false;
+
+$dbnodes = $DB->get_records('local_extendednav');
+$dbnodesbykey = [];
+$maxsort = 0;
+foreach ($dbnodes as $n) {
+    $dbnodesbykey[$n->nodekey] = $n;
+    if ($n->sortorder > $maxsort) {
+        $maxsort = $n->sortorder;
+    }
+}
+
+foreach ($primary->children as $cnode) {
+    if ($cnode->key && !isset($dbnodesbykey[$cnode->key])) {
+        $maxsort++;
+        $rec = new stdClass();
+        $rec->nodekey = $cnode->key;
+        $rec->visibility = 1;
+        $rec->sortorder = $maxsort;
+        $rec->newwindow = 0;
+        $DB->insert_record('local_extendednav', $rec);
+    }
+}
+
+
 $action = optional_param('action', '', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
 $search = optional_param('search', '', PARAM_TEXT);
@@ -46,12 +78,54 @@ $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 
 
 
+if ($action === 'moveup' || $action === 'movedown') {
+    require_sesskey();
+    $current = $DB->get_record('local_extendednav', ['id' => $id]);
+    if ($current) {
+        $operator = $action === 'moveup' ? '>' : '<';
+        $sortdir = $action === 'moveup' ? 'ASC' : 'DESC';
+        $adjacents = $DB->get_records_select(
+            'local_extendednav',
+            "sortorder $operator ? OR (sortorder = ? AND id $operator ?)",
+            [$current->sortorder, $current->sortorder, $current->id],
+            "sortorder $sortdir, id $sortdir",
+            '*',
+            0,
+            1
+        );
+        if ($adjacents) {
+            $adjacent = reset($adjacents);
+            $tempsort = $current->sortorder;
+            $current->sortorder = $adjacent->sortorder;
+            $adjacent->sortorder = $tempsort;
+            // Also swap IDs slightly if sortorders were the same.
+            if ($current->sortorder === $adjacent->sortorder) {
+                if ($action === 'moveup') {
+                    $current->sortorder++;
+                } else {
+                    $current->sortorder--;
+                }
+            }
+            $DB->update_record('local_extendednav', $current);
+            $DB->update_record('local_extendednav', $adjacent);
+            try {
+                \cache::make('local_extendednav', 'nodes')->purge();
+            } catch (\Throwable $e) {
+                unset($e);
+                // Expected exception.
+            }
+        }
+    }
+    redirect($baseurl);
+}
+
 if ($action === 'delete') {
     require_sesskey();
     $DB->delete_records('local_extendednav', ['id' => $id]);
     try {
         \cache::make('local_extendednav', 'nodes')->purge();
-    } catch (\Throwable $e) { // Phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+    } catch (\Throwable $e) {
+            unset($e); // Phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
             // Silently ignored.
 
             // Expected exception.
@@ -63,16 +137,47 @@ if ($action === 'bulkdelete') {
     require_sesskey();
     $nodeids = optional_param_array('nodeids', [], PARAM_INT);
     if (!empty($nodeids)) {
-        [$insql, $inparams] = $DB->get_in_or_equal($nodeids);
-        $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
-        try {
-            \cache::make('local_extendednav', 'nodes')->purge();
-        } catch (\Throwable $e) { // Phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-            // Silently ignored.
-
-            // Expected exception.
+        $corekeys = [];
+        if (isset($primary)) {
+            foreach ($primary->children as $child) {
+                if ($child->key) {
+                    $corekeys[$child->key] = true;
+                }
+            }
         }
-        redirect($baseurl, get_string('bulk_deleted', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
+
+        $todelete = [];
+        $skipped = false;
+        foreach ($nodeids as $nid) {
+            $rec = $DB->get_record('local_extendednav', ['id' => $nid]);
+            if ($rec) {
+                if (isset($corekeys[$rec->nodekey])) {
+                    $skipped = true;
+                } else {
+                    $todelete[] = $nid;
+                }
+            }
+        }
+
+        if (!empty($todelete)) {
+            [$insql, $inparams] = $DB->get_in_or_equal($todelete);
+            $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
+            try {
+                \cache::make('local_extendednav', 'nodes')->purge();
+            } catch (\Throwable $e) {
+                unset($e);
+            }
+        }
+
+        if ($skipped) {
+            \core\notification::warning(get_string('native_cannot_delete', 'local_extendednav'));
+        }
+
+        if (!empty($todelete)) {
+            redirect($baseurl, get_string('bulk_deleted', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
+        } else {
+            redirect($baseurl);
+        }
     } else {
         redirect($baseurl);
     }
@@ -126,7 +231,25 @@ echo html_writer::end_div();
 $filterbtnclass = $isfiltered ? 'btn-primary' : 'btn-outline-secondary';
 
 echo html_writer::start_div('reportbuilder-wrapper');
-echo html_writer::start_div('d-flex justify-content-end mb-3');
+echo html_writer::start_div('d-flex justify-content-between align-items-center mb-3');
+
+// Bulk Actions Bar (Moodle Standard Placement).
+echo '    <div class="d-flex align-items-center" style="min-height: 38px;">';
+echo '        <div class="bulk-actions d-none" id="bulk-actions-bar">';
+echo '            <span class="selected-count font-weight-bold mr-3">';
+echo '                <span id="bulk-count">0</span> ' . get_string('nodes_selected', 'local_extendednav');
+echo '            </span>';
+echo '            <button type="submit" form="bulk-export-form" formaction="export.php" class="btn btn-sm btn-info mr-1">';
+echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_selected', 'local_extendednav');
+echo '            </button>';
+echo "            <button type=\"submit\" form=\"bulk-export-form\" formaction=\"manage.php\" " .
+    "name=\"action\" value=\"bulkdelete\" class=\"btn btn-sm btn-danger mr-1\" " .
+    "onclick=\"return confirm('" . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . "');\">";
+echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
+echo '            </button>';
+echo '        </div>';
+echo '    </div>';
+
 echo html_writer::start_div('dropdown extendednav-filters');
 echo html_writer::tag(
     'button',
@@ -195,52 +318,40 @@ echo html_writer::end_div(); // End dropdown.
 echo html_writer::end_div(); // End d-flex wrapper.
 echo html_writer::end_div(); // End reportbuilder-wrapper.
 
-// Bulk Actions Bar (Moodle Standard Placement).
-echo html_writer::start_div('d-flex justify-content-between align-items-center mb-3');
-echo '    <div class="d-flex align-items-center">';
-echo '        <div class="bulk-actions d-none" id="bulk-actions-bar">';
-echo '            <span class="selected-count font-weight-bold mr-3">';
-echo '                <span id="bulk-count">0</span> ' . get_string('nodes_selected', 'local_extendednav');
-echo '            </span>';
-echo '            <button type="submit" form="bulk-export-form" formaction="export.php" class="btn btn-sm btn-info mr-1">';
-echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_selected', 'local_extendednav');
-echo '            </button>';
-echo '            <button type="submit" form="bulk-export-form" formaction="manage.php" ' .
-    'name="action" value="bulkdelete" class="btn btn-sm btn-danger mr-1" ' .
-    'onclick="return confirm(\'' . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . '\');">';
-echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
-echo '            </button>';
-
-echo '        </div>';
-echo '    </div>';
-echo html_writer::end_div();
-
-
 // Bulk actions form start.
 echo html_writer::start_tag('form', ['id' => 'bulk-export-form', 'method' => 'POST', 'action' => 'export.php']);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
 $table = new flexible_table('local-extendednav-manage');
 $table->define_baseurl($baseurl);
-$table->define_columns(['select', 'nodekey', 'title', 'url', 'tree', 'visibility', 'actions']);
+$table->define_columns(['select', 'title', 'visibility', 'icon', 'nodekey', 'url', 'positioning']);
 $table->define_headers([
     '<input type="checkbox" id="select-all-nodes">',
-    get_string('nodekey', 'local_extendednav'),
     get_string('title', 'local_extendednav'),
+    '',
+    get_string('icon', 'local_extendednav'),
+    get_string('nodekey', 'local_extendednav'),
     get_string('url', 'local_extendednav'),
     get_string('positioning', 'local_extendednav'),
-    get_string('visibility', 'local_extendednav'),
-    get_string('actions', 'local_extendednav'),
 ]);
 
 $table->column_class('select', 'text-center');
 $table->column_style('select', 'width', '40px');
 $table->setup();
 
-$nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder ASC, id ASC');
+$nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder DESC, id DESC');
 $total = count($nodes);
 $i = 0;
+
+$primarynodes = [];
+if (isset($primary)) {
+    foreach ($primary->children as $child) {
+        $primarynodes[$child->key] = $child;
+    }
+}
+
 foreach ($nodes as $n) {
+    $corenode = $primarynodes[$n->nodekey] ?? null;
     if ($n->visibility == 0) {
         $vis = '<span class="badge badge-danger">' . get_string('vis_hidden', 'local_extendednav') . '</span>';
     } else if ($n->visibility == 2) {
@@ -249,48 +360,86 @@ foreach ($nodes as $n) {
         $vis = '<span class="badge badge-success">' . get_string('vis_all', 'local_extendednav') . '</span>';
     }
 
-    $treehtml = '';
-    if (!empty($n->parentkey)) {
-        $treehtml .= html_writer::tag(
-            'span',
-            get_string('inside', 'local_extendednav') . ' <b>' . s($n->parentkey) . '</b>',
-            ['class' => 'text-info small']
-        );
-        $treehtml .= '<br>';
-    }
-    if (!empty($n->beforekey)) {
-        $treehtml .= html_writer::tag(
-            'span',
-            get_string('before', 'local_extendednav') . ' <b>' . s($n->beforekey) . '</b>',
-            ['class' => 'text-muted small']
-        );
-    }
-    if (empty($treehtml)) {
-        $treehtml = '<span class="text-secondary">-</span>';
+    $iconhtml = '';
+    if (!empty($n->icon) && $n->icon !== 'none') {
+        if (strpos($n->icon, 'fa-') !== false || strpos($n->icon, 'fa ') !== false) {
+            $iconhtml = '<i class="icon fa ' . s($n->icon) . ' fa-fw" aria-hidden="true"></i>';
+        } else {
+            $iconhtml = $OUTPUT->pix_icon($n->icon, '');
+        }
+    } else {
+        $iconhtml = '<span class="text-secondary">-</span>';
     }
 
-    $actions = '';
+    $actions = '<div class="d-flex align-items-center justify-content-center">';
+
+    // Up arrow.
+    if ($i > 0 && empty($isfiltered)) {
+        $upurl = new moodle_url(
+            '/local/extendednav/manage.php',
+            array_merge(['id' => $n->id, 'action' => 'moveup', 'sesskey' => sesskey()], $baseparams)
+        );
+        $actions .= html_writer::link($upurl, $OUTPUT->pix_icon('t/up', get_string('moveup')));
+    } else {
+        $actions .= html_writer::tag('span', $OUTPUT->pix_icon('t/up', '', 'moodle', ['class' => 'invisible']));
+    }
+
+    // Down arrow.
+    if ($i < $total - 1 && empty($isfiltered)) {
+        $downurl = new moodle_url(
+            '/local/extendednav/manage.php',
+            array_merge(['id' => $n->id, 'action' => 'movedown', 'sesskey' => sesskey()], $baseparams)
+        );
+        $actions .= '&nbsp;' . html_writer::link($downurl, $OUTPUT->pix_icon('t/down', get_string('movedown')));
+    } else {
+        $actions .= '&nbsp;' . html_writer::tag('span', $OUTPUT->pix_icon('t/down', '', 'moodle', ['class' => 'invisible']));
+    }
+
     $editurl = new moodle_url('/local/extendednav/edit.php', ['id' => $n->id]);
-    $actions .= html_writer::link($editurl, $OUTPUT->pix_icon('t/edit', get_string('edit')));
 
-    $delurl = new moodle_url(
-        '/local/extendednav/manage.php',
-        array_merge(['id' => $n->id, 'action' => 'delete', 'sesskey' => sesskey()], $baseparams)
-    );
-    $actions .= '&nbsp;' . html_writer::link(
-        $delurl,
-        $OUTPUT->pix_icon('t/delete', get_string('delete')),
-        ['onclick' => "return confirm('" . get_string('delete_node_confirm', 'local_extendednav') . "');"]
-    );
+    $actions .= '</div>';
+
+    if (!empty($n->title)) {
+        $titletext = format_string($n->title);
+    } else if ($corenode) {
+        $titletext = format_string(strip_tags((string)$corenode->text));
+    } else {
+        $titletext = '<span class="font-italic text-muted">-</span>';
+    }
+
+    $titlehtml = html_writer::link($editurl, $titletext, ['class' => 'font-weight-bold']);
+
+    if ($corenode) {
+        $titlehtml .= ' ' . html_writer::tag('i', '', [
+            'class' => 'fa fa-info-circle text-warning',
+            'title' => get_string('nativenodeinfo', 'local_extendednav'),
+            'data-toggle' => 'tooltip',
+            'data-placement' => 'top',
+        ]);
+    }
+
+    $checkbox = '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">';
+
+    if (!empty($n->url)) {
+        $urltext = s($n->url);
+    } else if ($corenode && $corenode->action) {
+        if ($corenode->action instanceof \moodle_url) {
+            global $CFG;
+            $urltext = s(str_replace($CFG->wwwroot, '', $corenode->action->out(false)));
+        } else {
+            $urltext = s((string)$corenode->action);
+        }
+    } else {
+        $urltext = '<span class="font-italic text-muted">-</span>';
+    }
 
     $table->add_data([
-        '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">',
-        '<b>' . s($n->nodekey) . '</b>',
-        !empty($n->title) ? format_string($n->title) :
-            '<i class="text-muted">' . get_string('native_string', 'local_extendednav') . '</i>',
-        !empty($n->url) ? s($n->url) : '<i class="text-muted">' . get_string('native_route', 'local_extendednav') . '</i>',
-        $treehtml,
+        $checkbox,
+        $titlehtml,
         $vis,
+        $iconhtml,
+        '<b>' . s($n->nodekey) . '</b>',
+        $urltext,
         $actions,
     ]);
 

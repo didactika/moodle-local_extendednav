@@ -112,7 +112,6 @@ class hooks {
                     $state->icon_set = true;
                 }
 
-                $state->beforekey = !empty($cnode->beforekey) ? $cnode->beforekey : null;
                 $state->parentkey = !empty($cnode->parentkey) ? $cnode->parentkey : null;
 
                 $state->newwindow = false;
@@ -253,33 +252,34 @@ class hooks {
                         $parentnode->add_node($node);
                     }
                 }
+            }
+            // Now, completely reorder the primary navigation based on our sorted $customnodes.
+            $allnodes = [];
+            foreach ($primarynav->children as $child) {
+                $allnodes[$child->key] = $child;
+            }
 
-                if (!empty($state->beforekey)) {
-                    $assignedparent = $node->parent;
-                    if ($assignedparent) {
-                        $siblingexists = false;
-                        if ($assignedparent->children) {
-                            foreach ($assignedparent->children as $child) {
-                                if ($child->key === $state->beforekey) {
-                                    $siblingexists = true;
-                                    break;
-                                }
-                            }
-                        }
+            // Remove all nodes from the primary collection.
+            foreach ($allnodes as $child) {
+                $child->remove();
+            }
 
-                        if ($siblingexists) {
-                            $node->remove();
-                            try {
-                                $assignedparent->add_node($node, $state->beforekey);
-                            } catch (\moodle_exception $e) {
-                                // Silently ignored.
+            // Add them back in the exact order of $customnodes.
+            foreach ($customnodes as $dbnode) {
+                if (
+                    isset($allnodes[$dbnode->nodekey]) &&
+                    isset($finalstates[$dbnode->nodekey]) &&
+                    $finalstates[$dbnode->nodekey]->allowed
+                ) {
+                    $primarynav->add_node($allnodes[$dbnode->nodekey]);
+                    unset($allnodes[$dbnode->nodekey]);
+                }
+            }
 
-                                // Expected exception.
-
-                                $assignedparent->add_node($node);
-                            }
-                        }
-                    }
+            // Add any remaining core nodes that might not have been in the DB.
+            foreach ($allnodes as $child) {
+                if ($child->key && (!isset($finalstates[$child->key]) || $finalstates[$child->key]->allowed)) {
+                    $primarynav->add_node($child);
                 }
             }
 

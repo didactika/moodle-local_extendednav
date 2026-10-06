@@ -69,7 +69,7 @@ foreach ($nodes as $n) {
         'visibility'  => (int)$n->visibility,
         'roles'       => $n->roles,
         'parentkey'   => $n->parentkey,
-        'beforekey'   => $n->beforekey,
+
         'newwindow'   => (int)$n->newwindow,
         'blockedurls' => $n->blockedurls,
     ];

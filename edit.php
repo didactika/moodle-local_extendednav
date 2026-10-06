@@ -72,7 +72,7 @@ if ($mform->is_cancelled()) {
     $record->url = $rawurl;
 
     $record->icon = !empty($data->icon) ? $data->icon : null;
-    $record->beforekey = !empty($data->beforekey) ? $data->beforekey : null;
+
     $record->parentkey = !empty($data->parentkey) ? $data->parentkey : null;
     $record->visibility = (int)$data->visibility;
     $record->newwindow = !empty($data->newwindow) ? 1 : 0;

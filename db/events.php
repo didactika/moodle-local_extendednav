@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version metadata for the local_extendednav plugin.
+ * Events definition for extendednav.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika.org
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @copyright  2026 Didactika
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026100600;
-$plugin->requires  = 2023042400; // Moodle 4.2+.
-$plugin->component = 'local_extendednav';
-$plugin->release   = '1.0.0';
-$plugin->supported = [402, 502];
-$plugin->maturity  = MATURITY_STABLE;
+$observers = [
+    [
+        'eventname'   => '\core\event\config_updated',
+        'callback'    => '\local_extendednav\observer::config_updated',
+        'internal'    => false,
+    ],
+];

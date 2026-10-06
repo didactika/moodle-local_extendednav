@@ -115,8 +115,7 @@ if ($mform->is_cancelled()) {
         $record->roles = isset($node['roles']) && $node['roles'] !== '' && $node['roles'] !== null ? $node['roles'] : null;
         $record->parentkey = isset($node['parentkey']) && $node['parentkey'] !== '' && $node['parentkey'] !== null
             ? $node['parentkey'] : null;
-        $record->beforekey = isset($node['beforekey']) && $node['beforekey'] !== '' && $node['beforekey'] !== null
-            ? $node['beforekey'] : null;
+
         $record->newwindow = isset($node['newwindow']) ? (int)$node['newwindow'] : 0;
         $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null
             ? $node['blockedurls'] : null;

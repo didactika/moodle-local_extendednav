@@ -40,13 +40,11 @@ if ($hassiteconfig) {
     );
     $settings->add($setting);
 
-    // Global fallback setting.
-    $setting = new admin_setting_configtext(
-        'local_extendednav/fallbackurl',
-        get_string('fallbackurl', 'local_extendednav'),
-        get_string('fallbackurl_desc', 'local_extendednav'),
-        '', // The default value is empty.
-        PARAM_RAW
+    $setting = new admin_setting_configcheckbox(
+        'local_extendednav/allow_hide_myhome',
+        get_string('allow_hide_myhome', 'local_extendednav'),
+        get_string('allow_hide_myhome_desc', 'local_extendednav'),
+        1
     );
     $settings->add($setting);
 

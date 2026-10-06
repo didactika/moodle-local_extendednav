@@ -102,24 +102,9 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         return;
     }
 
-    $fallbackcustom = trim((string) get_config('local_extendednav', 'fallbackurl'));
-    $fallbackpath = '';
-
-    if ($fallbackcustom !== '') {
-        $parsedfallback = parse_url($fallbackcustom);
-        $fallbackpath = isset($parsedfallback['path']) ? $parsedfallback['path'] : '';
-        if (isset($parsedfallback['query']) && $parsedfallback['query'] !== '') {
-            $fallbackpath .= '?' . $parsedfallback['query'];
-        }
-        if (!$fallbackpath) {
-            $fallbackpath = $fallbackcustom;
-        }
-
-        if ($fallbackpath === '/') {
-            if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0) {
-                return;
-            }
-        } else if (strpos($currentpath, $fallbackpath) !== false) {
+    $allowhidemyhome = get_config('local_extendednav', 'allow_hide_myhome');
+    if (!$allowhidemyhome) {
+        if ($currentpath === '/' || strpos($currentpath, '/index.php') === 0 || strpos($currentpath, '/my/') === 0) {
             return;
         }
     }
@@ -241,9 +226,6 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         } else if (!$frontblocked) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
-            if ($fallbackcustom !== '') {
-                redirect(new \moodle_url($fallbackcustom));
-            }
             throw new \moodle_exception('nopermissions', 'error', '', null, get_string('err_restricted_page', 'local_extendednav'));
         }
     }

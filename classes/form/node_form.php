@@ -69,6 +69,21 @@ class node_form extends \moodleform {
         $mform->setType('nodekey', PARAM_ALPHANUMEXT);
         $mform->addRule('nodekey', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
+        // Freeze nodekey if editing an existing node.
+        $currentid = optional_param('id', 0, PARAM_INT);
+        $currentnodekey = '';
+        $isparent = false;
+
+        if ($currentid) {
+            $currentrecord = $DB->get_record('local_extendednav', ['id' => $currentid]);
+            if ($currentrecord) {
+                $currentnodekey = $currentrecord->nodekey;
+                $isparent = $DB->record_exists('local_extendednav', ['parentkey' => $currentnodekey]);
+                if (in_array($currentnodekey, $corekeys)) {
+                    $mform->freeze('nodekey');
+                }
+            }
+        }
 
         $alerthtml = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">'
             . get_string('coreoverridealert', 'local_extendednav') . '</div>';
@@ -110,20 +125,9 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', 2);
 
-        $currentid = optional_param('id', 0, PARAM_INT);
-        $currentnodekey = '';
-        $isparent = false;
-
-        if ($currentid) {
-            $currentrecord = $DB->get_record('local_extendednav', ['id' => $currentid]);
-            if ($currentrecord) {
-                $currentnodekey = $currentrecord->nodekey;
-                $isparent = $DB->record_exists('local_extendednav', ['parentkey' => $currentnodekey]);
-            }
-        }
+        // Already loaded $currentnodekey and $isparent above.
 
         $parentoptions = ['' => get_string('opt_none_root', 'local_extendednav')];
-        $beforeoptions = ['' => get_string('opt_end_list', 'local_extendednav')];
 
         foreach ($corekeys as $ckey) {
             if ($ckey !== $currentnodekey) {
@@ -137,7 +141,6 @@ class node_form extends \moodleform {
                     if ($ckey !== 'siteadminnode') {
                         $parentoptions[$ckey] = get_string('opt_native', 'local_extendednav', $a);
                     }
-                    $beforeoptions[$ckey] = get_string('opt_native', 'local_extendednav', $a);
                 }
             }
         }
@@ -151,7 +154,16 @@ class node_form extends \moodleform {
 
             $customkeys[] = $c->nodekey;
 
-            $title = $c->title ? $c->title : get_string('none_title', 'local_extendednav');
+            if (!empty($c->title)) {
+                $title = strip_tags(format_string($c->title));
+            } else {
+                $child = $primary->get($c->nodekey);
+                if ($child) {
+                    $title = strip_tags(format_string((string)$child->text));
+                } else {
+                    $title = get_string('none_title', 'local_extendednav');
+                }
+            }
 
             $a = new \stdClass();
             $a->title = $title;
@@ -160,7 +172,6 @@ class node_form extends \moodleform {
             if (empty($c->parentkey)) {
                 $parentoptions[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
             }
-            $beforeoptions[$c->nodekey] = get_string('opt_plugin', 'local_extendednav', $a);
         }
 
         if ($isparent) {
@@ -175,9 +186,6 @@ class node_form extends \moodleform {
         if ($isparent || $currentnodekey === 'siteadminnode') {
             $mform->freeze('parentkey');
         }
-
-        $mform->addElement('select', 'beforekey', get_string('beforekey', 'local_extendednav'), $beforeoptions);
-        $mform->addHelpButton('beforekey', 'beforekey', 'local_extendednav');
 
         $this->add_action_buttons(true, get_string('savechanges'));
 
@@ -235,9 +243,6 @@ class node_form extends \moodleform {
             }
             if (empty(trim((string)$data['url']))) {
                 $errors['url'] = get_string('required');
-            }
-            if ((int)$data['visibility'] === 0) {
-                $errors['visibility'] = get_string('err_custom_hidden', 'local_extendednav');
             }
         }
 

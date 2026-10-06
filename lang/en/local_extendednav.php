@@ -25,6 +25,8 @@
 
 $string['actions'] = 'Actions';
 $string['add_node'] = 'Add Node';
+$string['allow_hide_myhome'] = 'Allow hiding Dashboard / Home';
+$string['allow_hide_myhome_desc'] = 'If checked, you can completely restrict the Dashboard and Site Home. If a user hits a restricted URL and these fallbacks are also restricted, they will see Moodle\'s native fatal permission error screen (Recommended). If unchecked, the Dashboard and Home will always be accessible to serve as fallbacks.';
 $string['apply'] = 'Apply';
 $string['before'] = 'before:';
 $string['beforekey'] = 'Insert Before Key';
@@ -88,11 +90,10 @@ $string['export_nodes'] = 'Export YAML Configuration';
 $string['export_selected'] = 'Export Selected';
 $string['export_selected_mode'] = 'Export Selected Configurations Only';
 $string['exportmode_label'] = 'Export Mode';
-$string['fallbackurl'] = 'Fallback Redirect URL';
 $string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native fatal permission error screen instead (Recommended).';
 $string['filter_active'] = 'Active Filter';
 $string['filters'] = 'Filters';
-$string['icon'] = 'Icon Name';
+$string['icon'] = 'Icon';
 $string['icon_desc'] = 'Moodle pix icon name, e.g. "i/dashboard" or "i/home". Leave blank for none or to keep default.';
 $string['icon_help'] = 'The internal Moodle icon name (e.g., "i/home", "i/settings", "fa-book"). <br>• <b>Leave completely blank</b>: Retains the native icon (if it had one) or adds no icon.<br>• <b>Type "null" or "none"</b>: Explicitly removes and strips any icon from this menu, avoiding blank empty spaces in themes that force icons.';
 $string['import'] = 'Import Nodes';
@@ -107,8 +108,10 @@ $string['importmode_help'] = 'Append will merge the YAML files with your existin
 $string['inside'] = 'inside:';
 $string['manage_nodes'] = 'Dashboard';
 $string['manage_nodes_desc'] = 'Add, edit, or remove custom navigation nodes, and override existing Moodle nodes.';
+$string['native_cannot_delete'] = 'Native Moodle routes cannot be deleted.';
 $string['native_route'] = 'native route';
 $string['native_string'] = 'native string';
+$string['nativenodeinfo'] = 'Native Moodle node';
 $string['newwindow'] = 'Open in new window (target="_blank")';
 $string['newwindow_help'] = 'Check this box if you want the hyperlink to open in a new browser tab instead of navigating away from the current page.';
 $string['no_nodes_export'] = 'There are no nodes available to export.';
@@ -121,9 +124,9 @@ $string['none_title'] = 'Untitled';
 $string['opt_end_list'] = '- Default position / End of list -';
 $string['opt_invalid_admin_submenu'] = '- Invalid: The admin panel cannot be a sub-menu -';
 $string['opt_invalid_has_submenus'] = '- Invalid: This element already contains sub-menus -';
-$string['opt_native'] = 'Native: {$a->text} ({$a->key})';
+$string['opt_native'] = '{$a->text} ({$a->key})';
 $string['opt_none_root'] = '- None / Main Root -';
-$string['opt_plugin'] = 'Plugin: {$a->title} ({$a->key})';
+$string['opt_plugin'] = '{$a->title} ({$a->key})';
 $string['order'] = 'Priority / Order';
 $string['parentkey'] = 'Parent Node Key (Dropdown)';
 $string['parentkey_desc'] = 'If you want this node to be a sub-item in a dropdown, provide the key of the parent node here.';
@@ -154,8 +157,8 @@ $string['url_help'] = 'The web address where the menu will redirect. For native 
 
 $string['view_documentation'] = 'View Documentation';
 $string['vis_all'] = 'Visible to everyone';
-$string['vis_hidden'] = 'Completely hidden';
-$string['vis_roles'] = 'Restricted to specific roles';
+$string['vis_hidden'] = 'Not visible';
+$string['vis_roles'] = 'Restricted';
 $string['visibility'] = 'Visibility';
 $string['visibility_desc'] = 'Control who can see this node.';
 
