@@ -30,6 +30,10 @@
  * @param \global_navigation $navigation
  */
 function local_extendednav_extend_navigation(\global_navigation $navigation): void {
+    static $is_rendering_error = false;
+    if ($is_rendering_error) {
+        return;
+    }
     global $PAGE, $DB, $USER;
 
     if (
@@ -140,8 +144,22 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
             }
         }
 
-        if (!empty($cnode->url)) {
-            $purl = parse_url($cnode->url);
+        $evalurl = $cnode->url;
+        if (empty($evalurl)) {
+            $coreurls = [
+                'myhome' => '/my/',
+                'sitehome' => '/',
+                'mycourses' => '/my/courses.php',
+                'siteadminnode' => '/admin/',
+                'home' => '/',
+            ];
+            if (isset($coreurls[$cnode->nodekey])) {
+                $evalurl = $coreurls[$cnode->nodekey];
+            }
+        }
+
+        if (!empty($evalurl)) {
+            $purl = parse_url($evalurl);
             $wpath = isset($purl['path']) ? $purl['path'] : '';
             if (isset($purl['query']) && $purl['query'] !== '') {
                 $wpath .= '?' . $purl['query'];
@@ -226,7 +244,8 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         } else if (!$frontblocked) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
-            throw new \moodle_exception('nopermissions', 'error', '', null, get_string('err_restricted_page', 'local_extendednav'));
+            $is_rendering_error = true;
+            throw new \moodle_exception('err_restricted_page', 'local_extendednav');
         }
     }
 }

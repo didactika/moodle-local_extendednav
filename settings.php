@@ -44,7 +44,7 @@ if ($hassiteconfig) {
         'local_extendednav/allow_hide_myhome',
         get_string('allow_hide_myhome', 'local_extendednav'),
         get_string('allow_hide_myhome_desc', 'local_extendednav'),
-        1
+        0
     );
     $settings->add($setting);
 

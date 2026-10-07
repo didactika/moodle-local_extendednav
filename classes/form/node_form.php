@@ -67,12 +67,12 @@ class node_form extends \moodleform {
 
         $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => '30']);
         $mform->setType('nodekey', PARAM_ALPHANUMEXT);
-        $mform->addRule('nodekey', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
-        // Freeze nodekey if editing an existing node.
+
         $currentid = optional_param('id', 0, PARAM_INT);
         $currentnodekey = '';
         $isparent = false;
+        $shouldfreeze = false;
 
         if ($currentid) {
             $currentrecord = $DB->get_record('local_extendednav', ['id' => $currentid]);
@@ -80,9 +80,15 @@ class node_form extends \moodleform {
                 $currentnodekey = $currentrecord->nodekey;
                 $isparent = $DB->record_exists('local_extendednav', ['parentkey' => $currentnodekey]);
                 if (in_array($currentnodekey, $corekeys)) {
-                    $mform->freeze('nodekey');
+                    $shouldfreeze = true;
                 }
             }
+        }
+
+        if ($shouldfreeze) {
+            $mform->freeze('nodekey');
+        } else {
+            $mform->addRule('nodekey', get_string('required'), 'required', null, 'client');
         }
 
         $alerthtml = '<div id="core_node_alert" class="alert alert-warning mt-2 mb-0" style="display: none;">'

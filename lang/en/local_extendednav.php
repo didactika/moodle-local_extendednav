@@ -26,7 +26,7 @@
 $string['actions'] = 'Actions';
 $string['add_node'] = 'Add Node';
 $string['allow_hide_myhome'] = 'Allow hiding Dashboard / Home';
-$string['allow_hide_myhome_desc'] = 'If checked, you can completely restrict the Dashboard and Site Home. If a user hits a restricted URL and these fallbacks are also restricted, they will see Moodle\'s native fatal permission error screen (Recommended). If unchecked, the Dashboard and Home will always be accessible to serve as fallbacks.';
+$string['allow_hide_myhome_desc'] = 'If checked, you can completely restrict the Dashboard and Site Home. If a user hits a restricted URL and these fallbacks are also restricted, they will see Moodle\'s native permission error screen (Recommended). If unchecked, the Dashboard and Home will always be accessible to serve as fallbacks.';
 $string['apply'] = 'Apply';
 $string['before'] = 'before:';
 $string['beforekey'] = 'Insert Before Key';
@@ -90,7 +90,7 @@ $string['export_nodes'] = 'Export YAML Configuration';
 $string['export_selected'] = 'Export Selected';
 $string['export_selected_mode'] = 'Export Selected Configurations Only';
 $string['exportmode_label'] = 'Export Mode';
-$string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native fatal permission error screen instead (Recommended).';
+$string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native permission error screen instead (Recommended).';
 $string['filter_active'] = 'Active Filter';
 $string['filters'] = 'Filters';
 $string['icon'] = 'Icon';
