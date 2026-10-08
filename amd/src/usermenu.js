@@ -109,14 +109,8 @@ export const init = () => {
         trigger.classList.add('carousel-navigation-link');
         trigger.dataset.carouselTargetId = panelId;
 
-        // Restore Moodle's native structure for submenus
-        if (!trigger.querySelector('.carousel-navigation-link-arrow')) {
-            const originalContent = trigger.innerHTML;
-            trigger.innerHTML = `<div class="d-flex w-100 justify-content-between">` +
-                `<span class="d-flex align-items-center w-100">` + originalContent + `</span>` +
-                `<span class="carousel-navigation-link-arrow ml-auto">` +
-                `<i class="icon fa fa-chevron-right fa-fw" aria-hidden="true"></i></span></div>`;
-        }
+        // Moodle 4 handles the submenu arrow natively via CSS ::after on the .carousel-navigation-link class.
+        // We do not need to manually inject DOM elements for the arrow.
 
         carousel.append(source.content.cloneNode(true));
         source.remove();
@@ -134,5 +128,22 @@ export const init = () => {
                 openSubmenu(event);
             }
         });
+
+        // Add back button listener manually to avoid Moodle's right arrow CSS from .carousel-navigation-link
+        const backBtn = carousel.querySelector('#' + panelId + ' .local-extendednav-back-btn');
+        if (backBtn) {
+            const closeSubmenu = event => {
+                event.preventDefault();
+                event.stopPropagation();
+                const index = Array.from(carousel.children).indexOf(main);
+                $(carousel.closest('#usermenu-carousel')).carousel(index);
+            };
+            backBtn.addEventListener('click', closeSubmenu);
+            backBtn.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    closeSubmenu(event);
+                }
+            });
+        }
     });
 };
