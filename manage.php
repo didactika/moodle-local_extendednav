@@ -351,7 +351,7 @@ foreach ($nodes as $n) {
     }
 
     $iconhtml = '';
-    $icon = (!empty($n->icon) && $n->icon !== 'none') ? $n->icon : ($corenode->icon ?? null);
+    $icon = (!empty($n->icon) && $n->icon !== 'none') ? $n->icon : null;
     if (!empty($icon) && $icon !== 'none') {
         if (is_string($icon) && (strpos($icon, 'fa-') !== false || strpos($icon, 'fa ') !== false)) {
             $iconhtml = '<i class="icon fa ' . s($icon) . ' fa-fw" aria-hidden="true"></i>';
@@ -409,6 +409,12 @@ foreach ($nodes as $n) {
     }
 
     $titlehtml = html_writer::link($editurl, $titletext, ['class' => 'font-weight-bold']);
+
+    if (!empty($n->parentkey)) {
+        $parentstr = get_string('submenuof', 'local_extendednav', s($n->parentkey));
+        $titlehtml = '<span class="text-muted mr-2" title="' . $parentstr . '">↳</span>' . $titlehtml;
+        $titlehtml .= ' <span class="badge badge-light border ml-2">↳ ' . $parentstr . '</span>';
+    }
 
     if ($corenode) {
         $titlehtml .= ' ' . html_writer::tag('i', '', [

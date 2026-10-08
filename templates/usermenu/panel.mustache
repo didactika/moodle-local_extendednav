@@ -1,21 +1,24 @@
-<div id="{{panelid}}" class="carousel-item submenu" role="menu" tabindex="-1" aria-label="{{title}}">
-    <div class="d-flex flex-column bmd-custom-list">
-        <a href="#" class="dropdown-item text-break local-extendednav-back-btn" role="menuitem" tabindex="-1" data-carousel-target-id="carousel-item-main">
-            <span class="carousel-navigation-link-arrow">
-                <i class="icon fa fa-arrow-left fa-fw" aria-hidden="true"></i>
-            </span>
-            {{title}}
-        </a>
+<div id="{{panelid}}" role="menu" class="carousel-item submenu" tabindex="-1" aria-label="{{title}}">
+    <div class="d-flex flex-column h-100">
+        <div class="header">
+            <button type="button" class="btn btn-icon carousel-navigation-link text-decoration-none text-body local-extendednav-back-btn" data-carousel-target-id="carousel-item-main" aria-label="{{#str}}usermenugoback, core{{/str}}">
+                <span class="dir-rtl-hide">{{#pix}}i/arrow-left, core{{/pix}}</span>
+                <span class="dir-ltr-hide">{{#pix}}i/arrow-right, core{{/pix}}</span>
+            </button>
+            <span class="pl-2" id="carousel-item-title-{{panelid}}">{{title}}</span>
+        </div>
         <div class="dropdown-divider"></div>
-        {{#items}}
-        <a href="{{url}}" class="dropdown-item text-break" role="menuitem" tabindex="-1" {{#newwindow}}target="_blank"{{/newwindow}}>
-            {{#icon}}
-            <span class="carousel-navigation-link-icon">
-                <i class="icon fa {{icon}} fa-fw" aria-hidden="true"></i>
-            </span>
-            {{/icon}}
-            {{title}}
-        </a>
-        {{/items}}
+        <div class="items h-100 overflow-auto" role="menu" aria-labelledby="carousel-item-title-{{panelid}}">
+            {{#items}}
+            <a href="{{url}}" class="dropdown-item ps-5" role="menuitem" tabindex="-1" {{#newwindow}}target="_blank"{{/newwindow}}>
+                {{#icon}}
+                <span class="carousel-navigation-link-icon">
+                    <i class="icon fa {{icon}} fa-fw" aria-hidden="true"></i>
+                </span>
+                {{/icon}}
+                {{title}}
+            </a>
+            {{/items}}
+        </div>
     </div>
 </div>

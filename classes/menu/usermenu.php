@@ -150,9 +150,7 @@ class usermenu extends base {
                     $line .= '|' . $icon;
                 }
 
-                if ($native) {
-                    $newcustomusermenu[] = $line;
-                }
+                $newcustomusermenu[] = $line;
             }
         }
         $CFG->customusermenuitems = implode("\n", $newcustomusermenu);
@@ -164,64 +162,6 @@ class usermenu extends base {
      * @param mixed $hook
      */
     public function inject_nodes_via_hook(array $customnodes, $hook): void {
-        global $USER;
-
-        $nativenodes = $this->get_native_nodes();
-
-        foreach ($customnodes as $umnode) {
-            if (isset($nativenodes[$umnode->nodekey])) {
-                continue;
-            }
-
-            if (!empty($umnode->parentkey)) {
-                continue;
-            }
-
-            $allowed = true;
-            if ($umnode->visibility == 0) {
-                $allowed = false;
-            } else if ($umnode->visibility == 2) {
-                $allowed = false;
-                if (!empty($umnode->roles)) {
-                    $roleids = explode(',', $umnode->roles);
-                    foreach ($roleids as $rid) {
-                        if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
-                            $allowed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ($allowed) {
-                $title = trim((string)$umnode->title);
-                $url = trim((string)$umnode->url);
-                $icon = trim((string)$umnode->icon);
-
-                if ($title === '') {
-                    continue;
-                }
-
-                try {
-                    $moodleurl = new \moodle_url($url);
-                } catch (\Exception $e) {
-                    $moodleurl = new \moodle_url('/');
-                }
-
-                $navitem = [
-                    'itemtype' => 'link',
-                    'url' => $moodleurl,
-                    'title' => $title,
-                ];
-
-                if (!empty($icon) && $icon !== 'none') {
-                    if (strpos($icon, 'fa-') === false && strpos($icon, 'fa ') === false) {
-                        $navitem['pix'] = $icon;
-                    }
-                }
-
-                $hook->add_navitem((object) $navitem);
-            }
-        }
+        // Do nothing. Custom nodes are now injected via customusermenuitems so they obey sortorder natively.
     }
 }

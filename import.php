@@ -79,13 +79,11 @@ if ($mform->is_cancelled()) {
     $sortorder = $max !== false ? $max + 1 : 0;
 
     // Load all existing nodes to avoid N+1 query performance hits in the loop.
-        $existingnodes = [];
-    $rs = $DB->get_recordset('local_extendednav', null, '', 'nodekey, id');
+    $existingnodes = [];
+    $rs = $DB->get_recordset('local_extendednav', null, '', 'id, menu, nodekey');
     if ($rs->valid()) {
         foreach ($rs as $rek) {
-            if ($rek->menu === $menu) {
-                $existingnodes[$rek->nodekey] = clone $rek;
-            }
+            $existingnodes[$rek->menu . '_' . $rek->nodekey] = clone $rek;
         }
     }
     $rs->close();
@@ -96,7 +94,8 @@ if ($mform->is_cancelled()) {
         }
 
         $record = new stdClass();
-        $record->menu = $menu;
+        // Respect the menu specified in the YAML file, or fallback to the current tab menu.
+        $record->menu = isset($node['menu']) && $node['menu'] !== '' ? $node['menu'] : $menu;
         $record->nodekey = $node['nodekey'];
         $record->title = isset($node['title']) && $node['title'] !== '' && $node['title'] !== null ? $node['title'] : null;
 
@@ -124,8 +123,9 @@ if ($mform->is_cancelled()) {
         $record->blockedurls = isset($node['blockedurls']) && $node['blockedurls'] !== '' && $node['blockedurls'] !== null
             ? $node['blockedurls'] : null;
 
-        if (array_key_exists($record->nodekey, $existingnodes)) {
-            $existing = $existingnodes[$record->nodekey];
+        $compositekey = $record->menu . '_' . $record->nodekey;
+        if (array_key_exists($compositekey, $existingnodes)) {
+            $existing = $existingnodes[$compositekey];
             if (isset($data->conflict_action) && $data->conflict_action === 'skip') {
                 continue;
             } else {

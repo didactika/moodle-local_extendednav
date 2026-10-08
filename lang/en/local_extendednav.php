@@ -104,7 +104,7 @@ $string['import_nodes'] = 'Import Nodes';
 $string['import_overwrite'] = 'Overwrite existing nodes (Delete all current)';
 $string['import_success'] = 'Nodes successfully imported from YAML.';
 $string['importmode'] = 'Import Action';
-$string['importmode_help'] = 'Append will merge the YAML files with your existing entries. Overwrite will destroy all your existing links and replace them entirely with the YAML records.';
+$string['importmode_help'] = 'Skip will ignore nodes that already exist. Overwrite will replace any existing nodes that share the same Node Key with the data from the YAML file. Nodes not present in the YAML file will be left untouched.';
 $string['inside'] = 'inside:';
 $string['manage_nodes'] = 'Dashboard';
 $string['manage_nodes_desc'] = 'Add, edit, or remove custom navigation nodes, and override existing Moodle nodes.';
@@ -132,6 +132,7 @@ $string['parentkey'] = 'Parent Node Key (Dropdown)';
 $string['parentkey_desc'] = 'If you want this node to be a sub-item in a dropdown, provide the key of the parent node here.';
 $string['parentkey_help'] = 'Nested menus feature. Form a dropdown menu by typing the unique Core Key of a parent menu here. (e.g. create a main node called "resources", then create a second node and type "resources" in this field to nest it inside). Leave blank for normal top-level navigation.';
 $string['pluginname'] = 'Extended Navigation';
+$string['submenuof'] = 'Submenu of: {$a}';
 
 
 $string['positioning'] = 'Positioning';
