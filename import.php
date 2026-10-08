@@ -30,7 +30,8 @@ admin_externalpage_setup('local_extendednav_manage');
 
 
 
-$url = new moodle_url('/local/extendednav/import.php');
+$menu = optional_param('menu', 'primary', PARAM_ALPHA);
+$url = new moodle_url('/local/extendednav/import.php', ['menu' => $menu]);
 $PAGE->set_url($url);
 $streditname = get_string('import_nodes', 'local_extendednav');
 $PAGE->set_title($streditname);
@@ -39,7 +40,7 @@ $PAGE->set_heading($streditname);
 $mform = new \local_extendednav\form\import_form($url);
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/local/extendednav/manage.php'));
+    redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
 } else if ($data = $mform->get_data()) {
     $draftitemid = $data->yamlfile;
     $fs = get_file_storage();
@@ -82,7 +83,9 @@ if ($mform->is_cancelled()) {
     $rs = $DB->get_recordset('local_extendednav', null, '', 'nodekey, id');
     if ($rs->valid()) {
         foreach ($rs as $rek) {
-            $existingnodes[$rek->nodekey] = clone $rek;
+            if ($rek->menu === $menu) {
+                $existingnodes[$rek->nodekey] = clone $rek;
+            }
         }
     }
     $rs->close();
@@ -93,6 +96,7 @@ if ($mform->is_cancelled()) {
         }
 
         $record = new stdClass();
+        $record->menu = $menu;
         $record->nodekey = $node['nodekey'];
         $record->title = isset($node['title']) && $node['title'] !== '' && $node['title'] !== null ? $node['title'] : null;
 
@@ -146,7 +150,7 @@ if ($mform->is_cancelled()) {
     theme_reset_all_caches();
 
     redirect(
-        new moodle_url('/local/extendednav/manage.php'),
+        new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]),
         get_string('import_success', 'local_extendednav'),
         null,
         \core\output\notification::NOTIFY_SUCCESS
@@ -160,7 +164,7 @@ $docurl = new moodle_url('/local/extendednav/documentation.php');
 
 echo html_writer::start_div('extendednav-import-page');
 
-$backurl = new moodle_url('/local/extendednav/manage.php');
+$backurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]);
 echo html_writer::start_div('mb-4');
 echo html_writer::link(
     $backurl,

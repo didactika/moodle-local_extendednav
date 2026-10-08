@@ -30,8 +30,8 @@
  * @param \global_navigation $navigation
  */
 function local_extendednav_extend_navigation(\global_navigation $navigation): void {
-    static $is_rendering_error = false;
-    if ($is_rendering_error) {
+    static $isrenderingerror = false;
+    if ($isrenderingerror) {
         return;
     }
     global $PAGE, $DB, $USER;
@@ -57,17 +57,27 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         $nodes = $cache->get('allnodes');
 
         if ($nodes === false) {
-            $nodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
+            $nodes = $DB->get_records('local_extendednav', null, 'sortorder ASC, id ASC');
             $cache->set('allnodes', $nodes);
         }
     } catch (\Throwable $e) {
         // Do nothing.
-
         return;
     }
 
     if (empty($nodes)) {
         return;
+    }
+
+    // Delegate injection to the scalable menu handler.
+    $menus = \local_extendednav\menu_manager::get_menus();
+    foreach ($menus as $menu) {
+        if ($menu->get_key() !== 'primary') {
+            $menunodes = array_filter($nodes, function ($n) use ($menu) {
+                return $n->menu === $menu->get_key();
+            });
+            $menu->inject_nodes($menunodes);
+        }
     }
 
     $currenturl = '';
@@ -244,8 +254,14 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         } else if (!$frontblocked) {
             redirect(new \moodle_url('/?redirect=0'));
         } else {
-            $is_rendering_error = true;
+            $isrenderingerror = true;
             throw new \moodle_exception('err_restricted_page', 'local_extendednav');
         }
     }
 }
+
+/**
+ * Executes before the standard HTML head is rendered.
+ * This is early enough to modify $CFG variables before the theme renders the header.
+ */
+

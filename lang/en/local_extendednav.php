@@ -135,6 +135,7 @@ $string['pluginname'] = 'Extended Navigation';
 
 
 $string['positioning'] = 'Positioning';
+$string['primary_nav'] = 'Primary Navigation';
 $string['privacy:metadata'] = 'The Extended Navigation plugin does not store any personal data.';
 $string['quick_links'] = 'Quick Links';
 $string['reset'] = 'Reset';
@@ -155,6 +156,7 @@ $string['url_help'] = 'The web address where the menu will redirect. For native 
 
 
 
+$string['user_menu'] = 'User Menu';
 $string['view_documentation'] = 'View Documentation';
 $string['vis_all'] = 'Visible to everyone';
 $string['vis_hidden'] = 'Not visible';
@@ -174,3 +176,5 @@ $string['visibility_desc'] = 'Control who can see this node.';
 $string['yamlconfigfile'] = 'YAML Configuration File';
 
 $string['yamlconfigfile_help'] = 'Upload a valid extended navigation YAML file to import nodes into the database.';
+
+$string['menu_type'] = 'Target Menu / Tab';

@@ -11,6 +11,7 @@
     <TABLE NAME="local_extendednav" COMMENT="Stores custom primary navigation nodes">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="menu" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="primary" SEQUENCE="false" COMMENT="Which menu this node belongs to (e.g. primary, usermenu)"/>
         <FIELD NAME="nodekey" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="url" TYPE="text" NOTNULL="false" SEQUENCE="false"/>

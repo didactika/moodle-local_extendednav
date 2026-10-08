@@ -29,11 +29,12 @@ require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('local_extendednav_manage');
 
 $all = optional_param('all', 0, PARAM_INT);
+$menu = optional_param('menu', 'primary', PARAM_ALPHA);
 $nodeids = optional_param_array('nodeids', [], PARAM_INT);
 
 if (!$all && empty($nodeids)) {
     redirect(
-        new moodle_url('/local/extendednav/manage.php'),
+        new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]),
         get_string('no_nodes_export', 'local_extendednav'),
         null,
         \core\output\notification::NOTIFY_ERROR
@@ -41,17 +42,18 @@ if (!$all && empty($nodeids)) {
 }
 
 if ($all) {
-    $nodes = $DB->get_records('local_extendednav', null, 'sortorder ASC, id ASC');
+    $nodes = $DB->get_records('local_extendednav', ['menu' => $menu], 'sortorder ASC, id ASC');
     $filename = 'extendednav_config_all_' . date('Ymd_His') . '.yml';
 } else {
     [$insql, $inparams] = $DB->get_in_or_equal($nodeids);
-    $nodes = $DB->get_records_select('local_extendednav', "id $insql", $inparams, 'sortorder ASC, id ASC');
+    $inparams[] = $menu;
+    $nodes = $DB->get_records_select('local_extendednav', "id $insql AND menu = ?", $inparams, 'sortorder ASC, id ASC');
     $filename = 'extendednav_config_selected_' . date('Ymd_His') . '.yml';
 }
 
 if (empty($nodes)) {
     redirect(
-        new moodle_url('/local/extendednav/manage.php'),
+        new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]),
         get_string('no_nodes_export', 'local_extendednav'),
         null,
         \core\output\notification::NOTIFY_ERROR
@@ -63,6 +65,7 @@ $exportdata = ['nodes' => []];
 foreach ($nodes as $n) {
     $nodedata = [
         'nodekey'     => $n->nodekey,
+        'menu'        => $n->menu,
         'title'       => $n->title,
         'url'         => $n->url,
         'icon'        => $n->icon,

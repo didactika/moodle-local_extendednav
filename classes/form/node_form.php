@@ -40,31 +40,23 @@ class node_form extends \moodleform {
         global $DB, $PAGE, $OUTPUT;
         $mform = $this->_form;
 
-        $corekeys = [];
-        try {
-            \local_extendednav\hooks::$skiphook = true;
-            $temppage = new \moodle_page();
-            $temppage->set_context(\context_system::instance());
-            $temppage->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temppage);
-            $primary->initialise();
-            foreach ($primary->children as $child) {
-                if ($child->key) {
-                    $corekeys[] = $child->key;
-                }
-            }
-        } catch (\Throwable $e) {
-            unset($e);
-            // Silently ignored.
+                $menutype = $this->_customdata['menu'] ?? 'primary';
 
-            // Expected exception.
-        } finally {
-            \local_extendednav\hooks::$skiphook = false;
+        $corekeys = [];
+        $corenodes = [];
+        $menuhandler = \local_extendednav\menu_manager::get_menu($menutype);
+        if ($menuhandler) {
+            $corenodes = $menuhandler->get_native_nodes();
+            $corekeys = array_keys($corenodes);
         }
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        if ($menuhandler) {
+            $menutitle = '<strong>' . $menuhandler->get_name() . '</strong>';
+            $mform->addElement('static', 'menudisplay', get_string('menu_type', 'local_extendednav'), $menutitle);
+        }
         $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => '30']);
         $mform->setType('nodekey', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
@@ -137,7 +129,7 @@ class node_form extends \moodleform {
 
         foreach ($corekeys as $ckey) {
             if ($ckey !== $currentnodekey) {
-                $child = $primary->get($ckey);
+                $child = $corenodes[$ckey] ?? null;
                 if ($child) {
                     $cleantext = strip_tags((string)$child->text);
                     $a = new \stdClass();
@@ -151,7 +143,7 @@ class node_form extends \moodleform {
             }
         }
 
-        $customs = $DB->get_records('local_extendednav', null, 'sortorder ASC', 'id, nodekey, title, parentkey');
+        $customs = $DB->get_records('local_extendednav', ['menu' => $menutype], 'sortorder ASC', 'id, nodekey, title, parentkey');
         $customkeys = [];
         foreach ($customs as $c) {
             if ($c->nodekey === $currentnodekey) {
@@ -163,7 +155,7 @@ class node_form extends \moodleform {
             if (!empty($c->title)) {
                 $title = strip_tags(format_string($c->title));
             } else {
-                $child = $primary->get($c->nodekey);
+                $child = $corenodes[$c->nodekey] ?? null;
                 if ($child) {
                     $title = strip_tags(format_string((string)$child->text));
                 } else {
@@ -220,27 +212,15 @@ class node_form extends \moodleform {
             $errors['roles'] = get_string('required');
         }
 
+                $menutype = $this->_customdata['menu'] ?? 'primary';
         $iscore = false;
-        try {
-            \local_extendednav\hooks::$skiphook = true;
-            $temppage = new \moodle_page();
-            $temppage->set_context(\context_system::instance());
-            $temppage->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temppage);
-            $primary->initialise();
-            foreach ($primary->children as $child) {
-                if ($child->key === $data['nodekey']) {
-                    $iscore = true;
-                    break;
-                }
-            }
-        } catch (\Throwable $e) {
-            unset($e);
-            // Silently ignored.
 
-            // Expected exception.
-        } finally {
-            \local_extendednav\hooks::$skiphook = false;
+        $menuhandler = \local_extendednav\menu_manager::get_menu($menutype);
+        if ($menuhandler) {
+            $corenodes = $menuhandler->get_native_nodes();
+            if (isset($corenodes[$data['nodekey']])) {
+                $iscore = true;
+            }
         }
 
         if (!$iscore) {
@@ -252,7 +232,8 @@ class node_form extends \moodleform {
             }
         }
 
-        $existing = $DB->get_record('local_extendednav', ['nodekey' => $data['nodekey']], '*', IGNORE_MULTIPLE);
+        $existing = $DB->get_record('local_extendednav',
+            ['nodekey' => $data['nodekey'], 'menu' => $menutype], '*', IGNORE_MULTIPLE);
         if ($existing && $existing->id != $data['id']) {
             $errors['nodekey'] = get_string('err_duplicate_key', 'local_extendednav');
         }

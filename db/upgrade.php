@@ -55,5 +55,16 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023101007, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026100700) {
+        $table = new xmldb_table('local_extendednav');
+        $field = new xmldb_field('menu', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'primary', 'id');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100700, 'local', 'extendednav');
+    }
+
     return true;
 }

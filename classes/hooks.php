@@ -26,6 +26,8 @@
 namespace local_extendednav;
 
 use core\hook\navigation\primary_extend;
+use core_user\hook\extend_user_menu;
+use core\hook\output\before_standard_top_of_body_html_generation;
 
 /**
  * Hooks for primary and user navigation.
@@ -40,252 +42,265 @@ class hooks {
      * @param primary_extend $hook The navigation extension hook.
      */
     public static function extend_primary_navigation(primary_extend $hook): void {
-        global $USER, $DB, $OUTPUT;
+        global $DB;
 
         if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
             return;
         }
 
-        $primarynav = $hook->get_primaryview();
-
         if (isloggedin() && !isguestuser()) {
             $cache = \cache::make('local_extendednav', 'nodes');
-            $customnodes = $cache->get('allnodes');
+            $customnodes = $cache->get('primarynodes');
 
             if ($customnodes === false) {
                 try {
-                    $customnodes = $DB->get_records('local_extendednav', null, 'sortorder DESC, id DESC');
+                    $customnodes = $DB->get_records('local_extendednav', ['menu' => 'primary'], 'sortorder ASC, id ASC');
                 } catch (\moodle_exception $e) {
-                    // Silently ignored.
-
-                    // Expected exception.
-
                     $customnodes = [];
                 }
-                $cache->set('allnodes', $customnodes);
+                $cache->set('primarynodes', $customnodes);
             }
 
-            $finalstates = [];
+            $primarymenu = \local_extendednav\menu_manager::get_menu('primary');
+            if ($primarymenu) {
+                $primarymenu->inject_nodes($customnodes, $hook);
+            }
+        }
+    }
 
-            foreach ($customnodes as $cnode) {
-                $nodekey = $cnode->nodekey;
-                $state = new \stdClass();
-                $state->nodekey = $nodekey;
+    /**
+     * Extends the user menu based on custom DB configuration.
+     *
+     * @param extend_user_menu $hook The user menu extension hook.
+     */
+    public static function extend_user_menu(extend_user_menu $hook): void {
+        global $DB;
 
-                $allowed = true;
-                if ($cnode->visibility == 0) {
-                    $allowed = false;
-                } else if ($cnode->visibility == 2) {
-                    $allowed = false;
-                    if (!empty($cnode->roles)) {
-                        $roleids = explode(',', $cnode->roles);
-                        foreach ($roleids as $rid) {
-                            if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
-                                $allowed = true;
-                                break;
-                            }
+        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
+            return;
+        }
+
+        if (isloggedin() && !isguestuser()) {
+            $cache = \cache::make('local_extendednav', 'nodes');
+            $customnodes = $cache->get('usermenunodes');
+
+            if ($customnodes === false) {
+                try {
+                    $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
+                } catch (\moodle_exception $e) {
+                    $customnodes = [];
+                }
+                $cache->set('usermenunodes', $customnodes);
+            }
+
+            $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
+            if ($usermenu) {
+                $usermenu->inject_nodes_via_hook($customnodes, $hook);
+            }
+        }
+    }
+
+    /**
+     * Injects JS and submenu templates into the user menu carousel.
+     *
+     * @param before_standard_top_of_body_html_generation $hook
+     */
+    public static function before_top_of_body(\core\hook\output\before_standard_top_of_body_html_generation $hook): void {
+        global $PAGE, $USER, $DB;
+
+        if (!isloggedin() || isguestuser() || !get_config('local_extendednav', 'enable_plugin')) {
+            return;
+        }
+
+        $cache = \cache::make('local_extendednav', 'nodes');
+        $customnodes = $cache->get('usermenunodes');
+
+        if ($customnodes === false) {
+            try {
+                $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
+            } catch (\moodle_exception $e) {
+                $customnodes = [];
+            }
+            $cache->set('usermenunodes', $customnodes);
+        }
+
+        if (empty($customnodes)) {
+            return;
+        }
+
+        // Group nodes by parent.
+        $childrenbyparent = [];
+        $allowedparents = [];
+        foreach ($customnodes as $umnode) {
+            $allowed = true;
+            if ($umnode->visibility == 0) {
+                $allowed = false;
+            } else if ($umnode->visibility == 2) {
+                $allowed = false;
+                if (!empty($umnode->roles)) {
+                    $roleids = explode(',', $umnode->roles);
+                    foreach ($roleids as $rid) {
+                        if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
+                            $allowed = true;
+                            break;
                         }
                     }
                 }
+            }
 
-                $state->allowed = $allowed;
-                $state->title = !empty($cnode->title) ? $cnode->title : null;
-
-                $rawurl = !empty($cnode->url) ? trim((string)$cnode->url) : null;
-                if ($rawurl !== null && $rawurl !== '') {
-                    if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
-                        if (strpos($rawurl, 'www.') === 0) {
-                            $rawurl = 'http://' . $rawurl;
-                        } else if (strpos($rawurl, '/') !== 0) {
-                            $rawurl = '/' . $rawurl;
-                        }
-                    }
+            if ($allowed) {
+                if (empty($umnode->parentkey)) {
+                    $allowedparents[$umnode->nodekey] = $umnode;
                 } else {
-                    $rawurl = null;
-                }
-                $state->url = $rawurl;
-
-                $state->icon = null;
-                $state->icon_set = false;
-                if ($cnode->icon !== '' && $cnode->icon !== null) {
-                    $state->icon = $cnode->icon;
-                    $state->icon_set = true;
-                }
-
-                $state->parentkey = !empty($cnode->parentkey) ? $cnode->parentkey : null;
-
-                $state->newwindow = false;
-                if (isset($cnode->newwindow)) {
-                    $state->newwindow = (bool)$cnode->newwindow;
-                }
-
-                if ($nodekey === 'siteadminnode') {
-                    $state->allowed = true;
-                    $state->parentkey = null;
-                }
-                if ($state->parentkey === 'siteadminnode') {
-                    $state->parentkey = null;
-                }
-
-                $finalstates[$nodekey] = $state;
-            }
-
-            $scriptinjected = false;
-
-            foreach ($finalstates as $nodekey => $state) {
-                $stateiconhtml = '';
-                if ($state->icon_set && $state->icon !== 'null' && $state->icon !== 'none') {
-                    if (strpos($state->icon, 'fa-') !== false || strpos($state->icon, 'fa ') !== false) {
-                        $stateiconhtml = '<i class="icon fa ' . s($state->icon) . ' fa-fw" aria-hidden="true"></i> ';
-                    } else {
-                        try {
-                            if (is_object($OUTPUT) && method_exists($OUTPUT, 'pix_icon')) {
-                                $stateiconhtml = $OUTPUT->pix_icon($state->icon, '') . ' ';
-                            }
-                        } catch (\moodle_exception $e) {
-                            unset($e);
-                            // Silently ignored.
-
-                            // Expected exception.
-                        }
-                    }
-                }
-
-                $newwindowspan = '';
-                $scripthtml = '';
-                if ($state->newwindow) {
-                    $newwindowspan = '<span class="custom-target-blank" style="display:none;" aria-hidden="true"></span>';
-
-                    if (!$scriptinjected) {
-                        $scripthtml = '<script>
-                            if (!window.customNavScriptInjected) {
-                                window.customNavScriptInjected = true;
-                                var applyT = function() {
-                                    var els = document.querySelectorAll(".custom-target-blank");
-                                    for (var i = 0; i < els.length; i++) {
-                                        var a = els[i].closest("a");
-                                        if (a && a.getAttribute("target") !== "_blank") {
-                                            a.setAttribute("target", "_blank");
-                                        }
-                                    }
-                                };
-                                if (document.readyState === "loading") {
-                                    document.addEventListener("DOMContentLoaded", function() {
-                                        applyT();
-                                        setTimeout(applyT, 500);
-                                    });
-                                } else {
-                                    applyT(); setTimeout(applyT, 500);
-                                }
-                                document.addEventListener("click", function(e) {
-                                    var t = e.target.closest("a");
-                                    if (t && t.querySelector(".custom-target-blank") && t.getAttribute("target") !== "_blank") {
-                                        t.setAttribute("target", "_blank");
-                                    }
-                                });
-                            }
-                        </script>';
-                        $scriptinjected = true;
-                    }
-                }
-
-                $existingnode = $primarynav->get($nodekey);
-
-                if ($existingnode) {
-                    if (!$state->allowed) {
-                        $existingnode->remove();
-                    } else {
-                        if (!empty($state->title)) {
-                            $existingnode->text = format_string($state->title);
-                        }
-                        if (!empty($state->url)) {
-                            $existingnode->action = new \moodle_url($state->url);
-                        }
-                        $existingnode->text = $scripthtml . $stateiconhtml . $existingnode->text . $newwindowspan;
-                        $existingnode->icon = null;
-                    }
-                } else if ($state->allowed) {
-                    if (empty($state->title) || empty($state->url)) {
-                        continue;
-                    }
-
-                    $url = new \moodle_url($state->url);
-
-                    $node = \navigation_node::create(
-                        $scripthtml . $stateiconhtml . format_string($state->title) . $newwindowspan,
-                        $url,
-                        \navigation_node::TYPE_SETTING,
-                        null,
-                        $nodekey,
-                        null
-                    );
-
-                    $primarynav->add_node($node);
+                    $childrenbyparent[$umnode->parentkey][] = $umnode;
                 }
             }
+        }
 
-            foreach ($finalstates as $nodekey => $state) {
-                if (!$state->allowed) {
+        $templates = '';
+        $hastemplates = false;
+
+        $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
+        $nativenodes = $usermenu ? $usermenu->get_native_nodes() : [];
+
+        // GENERATE TEMPLATES FOR ROOT NODE FIXES (ICONS AND NEW WINDOW)
+        foreach ($allowedparents as $nodekey => $node) {
+            $icon = trim((string)$node->icon);
+            // If it has children, it's a submenu trigger, so newwindow shouldn't apply to it.
+            $haschildren = isset($childrenbyparent[$nodekey]) && !empty($childrenbyparent[$nodekey]);
+            $newwindow = (!empty($node->newwindow) && !$haschildren) ? 1 : 0;
+            
+            $needsicon = (!empty($icon) && $icon !== 'none' && (strpos($icon, 'fa-') !== false || strpos($icon, 'fa ') !== false));
+            $needsnewwindow = ($newwindow === 1);
+            
+            if ($needsicon || $needsnewwindow) {
+                $url = trim((string)$node->url);
+                $title = trim((string)$node->title) ?: (isset($nativenodes[$nodekey]) ? $nativenodes[$nodekey]->text : '');
+                if ($title !== '') {
+                    $titlebits = explode(',', $title, 2);
+                    if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                        $title = get_string($titlebits[0], $titlebits[1]);
+                    }
+                }
+
+                $urlAttr = !empty($url) ? 'data-url="' . s($url) . '"' : '';
+                $titleAttr = !empty($title) ? 'data-title="' . s($title) . '"' : '';
+                
+                $iconAttr = $needsicon ? 'data-icon="' . s($icon) . '"' : '';
+                $windowAttr = $needsnewwindow ? 'data-newwindow="1"' : '';
+                
+                $templates .= '<template data-region="local-extendednav-node-fix" ' . $iconAttr . ' ' . $windowAttr . ' ' . $urlAttr . ' ' . $titleAttr . '></template>';
+                $hastemplates = true;
+            }
+        }
+
+        foreach ($childrenbyparent as $parentkey => $children) {
+            // Find parent title and url for JS trigger matching.
+            $ptitle = '';
+            $purl = '';
+            if (isset($allowedparents[$parentkey])) {
+                $p = $allowedparents[$parentkey];
+                $ptitle = trim((string)$p->title);
+                $purl = trim((string)$p->url);
+                if ($ptitle === '' && isset($nativenodes[$parentkey])) {
+                    $ptitle = $nativenodes[$parentkey]->text;
+                }
+                if ($purl === '' && isset($nativenodes[$parentkey])) {
+                    $purl = $nativenodes[$parentkey]->action;
+                }
+            } else if (isset($nativenodes[$parentkey])) {
+                $ptitle = $nativenodes[$parentkey]->text;
+                $purl = $nativenodes[$parentkey]->action;
+            }
+
+            if (empty($ptitle)) {
+                continue;
+            }
+
+            $titlebits = explode(',', $ptitle, 2);
+            if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                $ptitle = get_string($titlebits[0], $titlebits[1]);
+            }
+
+            $items = [];
+            foreach ($children as $child) {
+                $ctitle = trim((string)$child->title);
+                $curl = trim((string)$child->url);
+                $cicon = trim((string)$child->icon);
+
+                if ($ctitle === '' && isset($nativenodes[$child->nodekey])) {
+                    $ctitle = $nativenodes[$child->nodekey]->text;
+                }
+                if ($curl === '' && isset($nativenodes[$child->nodekey])) {
+                    $curl = $nativenodes[$child->nodekey]->action;
+                }
+                if ($ctitle === '') {
                     continue;
                 }
-
-                $node = $primarynav->get($nodekey);
-                if (!$node) {
-                    continue;
+                $titlebits = explode(',', $ctitle, 2);
+                if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                    $ctitle = get_string($titlebits[0], $titlebits[1]);
                 }
 
-                if (!empty($state->parentkey) && $state->parentkey !== $nodekey) {
-                    $parentnode = $primarynav->get($state->parentkey);
-
-                    if (!$parentnode) {
-                        $killedbyus = isset($finalstates[$state->parentkey]) && $finalstates[$state->parentkey]->allowed === false;
-
-                        if ($killedbyus) {
-                            $node->remove();
-                        }
-                        continue;
-                    }
-
-                    $grandpa = $parentnode->parent;
-                    if ($grandpa === null || $grandpa->key === $primarynav->key) {
-                        $node->remove();
-                        $parentnode->add_node($node);
-                    }
-                }
-            }
-            // Now, completely reorder the primary navigation based on our sorted $customnodes.
-            $allnodes = [];
-            foreach ($primarynav->children as $child) {
-                $allnodes[$child->key] = $child;
+                $items[] = [
+                    'url' => $curl,
+                    'title' => $ctitle,
+                    'icon' => (!empty($cicon) && $cicon !== 'none') ? $cicon : false,
+                    'newwindow' => !empty($child->newwindow),
+                ];
             }
 
-            // Remove all nodes from the primary collection.
-            foreach ($allnodes as $child) {
-                $child->remove();
+            if (!empty($items)) {
+                $panelid = 'carousel-item-extnav-' . preg_replace('/[^a-zA-Z0-9]/', '', $parentkey);
+                $html = $hook->renderer->render_from_template('local_extendednav/usermenu/panel', [
+                    'panelid' => $panelid,
+                    'title' => $ptitle,
+                    'items' => $items,
+                ]);
+                $triggerAttr = !empty($purl) ? 'data-trigger-url="' . s($purl) . '"' : 'data-trigger-title="' . s($ptitle) . '"';
+                $templates .= '<template data-region="local-extendednav-submenu" data-panel-id="' . s($panelid) . '" ' . $triggerAttr . '>' . $html . '</template>';
+                $hastemplates = true;
             }
+        }
 
-            // Add them back in the exact order of $customnodes.
-            foreach ($customnodes as $dbnode) {
-                if (
-                    isset($allnodes[$dbnode->nodekey]) &&
-                    isset($finalstates[$dbnode->nodekey]) &&
-                    $finalstates[$dbnode->nodekey]->allowed
-                ) {
-                    $primarynav->add_node($allnodes[$dbnode->nodekey]);
-                    unset($allnodes[$dbnode->nodekey]);
-                }
-            }
+        if ($hastemplates) {
+            $hook->add_html($templates);
+            $PAGE->requires->js_call_amd('local_extendednav/usermenu', 'init');
+        }
+    }
 
-            // Add any remaining core nodes that might not have been in the DB.
-            foreach ($allnodes as $child) {
-                if ($child->key && (!isset($finalstates[$child->key]) || $finalstates[$child->key]->allowed)) {
-                    $primarynav->add_node($child);
-                }
-            }
+    /**
+     * Executes before the standard HTML head is rendered.
+     * This is early enough to modify $CFG variables before the theme renders the header.
+     *
+     * @param \core\hook\output\before_standard_head_html_generation $hook
+     */
+    public static function before_standard_head(\core\hook\output\before_standard_head_html_generation $hook): void {
+        global $DB, $USER;
 
-            foreach ($primarynav->children as $child) {
-                $child->icon = null;
+        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
+            return;
+        }
+
+        if (!isloggedin() || isguestuser()) {
+            return;
+        }
+
+        $cache = \cache::make('local_extendednav', 'nodes');
+        $customnodes = $cache->get('usermenunodes');
+
+        if ($customnodes === false) {
+            try {
+                $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
+            } catch (\moodle_exception $e) {
+                $customnodes = [];
             }
+            $cache->set('usermenunodes', $customnodes);
+        }
+
+        $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
+        if ($usermenu) {
+            $usermenu->inject_nodes($customnodes);
         }
     }
 }

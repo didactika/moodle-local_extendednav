@@ -29,18 +29,23 @@ require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('local_extendednav_manage');
 
 $id = optional_param('id', 0, PARAM_INT);
+$menu = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 
 $url = new moodle_url('/local/extendednav/edit.php');
 if ($id) {
     $url->param('id', $id);
 }
+$url->param('menu', $menu);
 
 $PAGE->set_url($url);
-$streditname = $id ? get_string('edit_node', 'local_extendednav') : get_string('add_node', 'local_extendednav');
+$handler = \local_extendednav\menu_manager::get_menu($menu);
+$menuname = $handler ? $handler->get_name() : $menu;
+$basestr = $id ? get_string('edit_node', 'local_extendednav') : get_string('add_node', 'local_extendednav');
+$streditname = $basestr . ' (' . $menuname . ')';
 $PAGE->set_title($streditname);
 $PAGE->set_heading($streditname);
 
-$mform = new \local_extendednav\form\node_form($url);
+$mform = new \local_extendednav\form\node_form($url, ['menu' => $menu]);
 
 if ($id) {
     $node = $DB->get_record('local_extendednav', ['id' => $id], '*', MUST_EXIST);
@@ -51,7 +56,7 @@ if ($id) {
 }
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/local/extendednav/manage.php'));
+    redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
 } else if ($data = $mform->get_data()) {
     $record = new stdClass();
     $record->nodekey = $data->nodekey;
@@ -134,7 +139,8 @@ if ($mform->is_cancelled()) {
         $record->id = $id;
         $DB->update_record('local_extendednav', $record);
     } else {
-        $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav}');
+        $record->menu = $menu;
+        $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menu]);
         $record->sortorder = $max !== false ? $max + 1 : 0;
         $DB->insert_record('local_extendednav', $record);
     }
@@ -149,7 +155,7 @@ if ($mform->is_cancelled()) {
     }
     theme_reset_all_caches();
 
-    redirect(new moodle_url('/local/extendednav/manage.php'));
+    redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
 }
 
 echo $OUTPUT->header();

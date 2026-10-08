@@ -30,4 +30,16 @@ $callbacks = [
         'hook' => \core\hook\navigation\primary_extend::class,
         'callback' => 'local_extendednav\hooks::extend_primary_navigation',
     ],
+    [
+        'hook' => \core_user\hook\extend_user_menu::class,
+        'callback' => 'local_extendednav\hooks::extend_user_menu',
+    ],
+    [
+        'hook' => \core\hook\output\before_standard_top_of_body_html_generation::class,
+        'callback' => 'local_extendednav\hooks::before_top_of_body',
+    ],
+    [
+        'hook' => \core\hook\output\before_standard_head_html_generation::class,
+        'callback' => 'local_extendednav\hooks::before_standard_head',
+    ],
 ];

@@ -30,43 +30,15 @@ require_once($CFG->libdir . '/tablelib.php');
 admin_externalpage_setup('local_extendednav_manage');
 
 // Sync core nodes into the DB if they are missing.
-\local_extendednav\hooks::$skiphook = true;
-$temppage = new \moodle_page();
-$temppage->set_context(\context_system::instance());
-$temppage->set_url(new \moodle_url('/'));
-$primary = new \core\navigation\views\primary($temppage);
-$primary->initialise();
-\local_extendednav\hooks::$skiphook = false;
-
-$dbnodes = $DB->get_records('local_extendednav');
-$dbnodesbykey = [];
-$maxsort = 0;
-foreach ($dbnodes as $n) {
-    $dbnodesbykey[$n->nodekey] = $n;
-    if ($n->sortorder > $maxsort) {
-        $maxsort = $n->sortorder;
-    }
-}
-
-foreach ($primary->children as $cnode) {
-    if ($cnode->key && !isset($dbnodesbykey[$cnode->key])) {
-        $maxsort++;
-        $rec = new stdClass();
-        $rec->nodekey = $cnode->key;
-        $rec->visibility = 1;
-        $rec->sortorder = $maxsort;
-        $rec->newwindow = 0;
-        $DB->insert_record('local_extendednav', $rec);
-    }
-}
 
 
 $action = optional_param('action', '', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
 $search = optional_param('search', '', PARAM_TEXT);
 $parent = optional_param('parent', '', PARAM_ALPHANUMEXT);
+$activemenu = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 
-$baseparams = [];
+$baseparams = ['menu' => $activemenu];
 if ($search !== '') {
     $baseparams['search'] = $search;
 }
@@ -76,14 +48,22 @@ if ($parent !== '') {
 
 $baseurl = new moodle_url('/local/extendednav/manage.php', $baseparams);
 
+$menuhandler = \local_extendednav\menu_manager::get_menu($activemenu);
+if (!$menuhandler) {
+    $activemenu = 'primary';
+    $menuhandler = \local_extendednav\menu_manager::get_menu('primary');
+}
+$menuhandler->sync_native_nodes();
+$primarynodes = $menuhandler->get_native_nodes();
+
 
 
 if ($action === 'moveup' || $action === 'movedown') {
     require_sesskey();
     $current = $DB->get_record('local_extendednav', ['id' => $id]);
     if ($current) {
-        $operator = $action === 'moveup' ? '>' : '<';
-        $sortdir = $action === 'moveup' ? 'ASC' : 'DESC';
+        $operator = $action === 'moveup' ? '<' : '>';
+        $sortdir = $action === 'moveup' ? 'DESC' : 'ASC';
         $adjacents = $DB->get_records_select(
             'local_extendednav',
             "sortorder $operator ? OR (sortorder = ? AND id $operator ?)",
@@ -101,9 +81,9 @@ if ($action === 'moveup' || $action === 'movedown') {
             // Also swap IDs slightly if sortorders were the same.
             if ($current->sortorder === $adjacent->sortorder) {
                 if ($action === 'moveup') {
-                    $current->sortorder++;
-                } else {
                     $current->sortorder--;
+                } else {
+                    $current->sortorder++;
                 }
             }
             $DB->update_record('local_extendednav', $current);
@@ -185,6 +165,9 @@ if ($action === 'bulkdelete') {
 
 $where = [];
 $params = [];
+
+$where[] = 'menu = :menu';
+$params['menu'] = $activemenu;
 if ($search !== '') {
     $where[] = '(' . $DB->sql_like('nodekey', ':search1', false, false) .
     ' OR ' . $DB->sql_like('title', ':search2', false, false) . ')';
@@ -197,16 +180,29 @@ if ($parent !== '') {
 }
 
 $wheresql = empty($where) ? '' : implode(' AND ', $where);
-$isfiltered = (!empty($wheresql));
+$isfiltered = ($search !== '' || $parent !== '');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('manage_nodes', 'local_extendednav'));
 echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']);
 
+// Scalable tabs generation.
+$menus = \local_extendednav\menu_manager::get_menus();
+echo html_writer::start_div('nav nav-tabs mb-4');
+foreach ($menus as $key => $menu) {
+    $name = $menu->get_name();
+    $class = 'nav-link';
+    if ($key === $activemenu) {
+        $class .= ' active font-weight-bold';
+    }
+    echo html_writer::link(new moodle_url('/local/extendednav/manage.php', ['menu' => $key]), $name, ['class' => $class]);
+}
+echo html_writer::end_div();
+
 // Top actions bar (matches theme_vle and local_servicemanager).
-$addurl = new moodle_url('/local/extendednav/edit.php');
-$importurl = new moodle_url('/local/extendednav/import.php');
-$exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1]);
+$addurl = new moodle_url('/local/extendednav/edit.php', ['menu' => $activemenu]);
+$importurl = new moodle_url('/local/extendednav/import.php', ['menu' => $activemenu]);
+$exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1, 'menu' => $activemenu]);
 
 echo html_writer::start_div('d-flex flex-wrap justify-content-end mb-3');
 echo '    <div class="btn-toolbar">';
@@ -319,7 +315,8 @@ echo html_writer::end_div(); // End d-flex wrapper.
 echo html_writer::end_div(); // End reportbuilder-wrapper.
 
 // Bulk actions form start.
-echo html_writer::start_tag('form', ['id' => 'bulk-export-form', 'method' => 'POST', 'action' => 'export.php']);
+$exporturl = new moodle_url('/local/extendednav/export.php', ['menu' => $activemenu]);
+echo html_writer::start_tag('form', ['id' => 'bulk-export-form', 'method' => 'POST', 'action' => $exporturl]);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
 $table = new flexible_table('local-extendednav-manage');
@@ -339,16 +336,9 @@ $table->column_class('select', 'text-center');
 $table->column_style('select', 'width', '40px');
 $table->setup();
 
-$nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder DESC, id DESC');
+$nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder ASC, id ASC');
 $total = count($nodes);
 $i = 0;
-
-$primarynodes = [];
-if (isset($primary)) {
-    foreach ($primary->children as $child) {
-        $primarynodes[$child->key] = $child;
-    }
-}
 
 foreach ($nodes as $n) {
     $corenode = $primarynodes[$n->nodekey] ?? null;
@@ -361,11 +351,22 @@ foreach ($nodes as $n) {
     }
 
     $iconhtml = '';
-    if (!empty($n->icon) && $n->icon !== 'none') {
-        if (strpos($n->icon, 'fa-') !== false || strpos($n->icon, 'fa ') !== false) {
-            $iconhtml = '<i class="icon fa ' . s($n->icon) . ' fa-fw" aria-hidden="true"></i>';
-        } else {
-            $iconhtml = $OUTPUT->pix_icon($n->icon, '');
+    $icon = (!empty($n->icon) && $n->icon !== 'none') ? $n->icon : ($corenode->icon ?? null);
+    if (!empty($icon) && $icon !== 'none') {
+        if (is_string($icon) && (strpos($icon, 'fa-') !== false || strpos($icon, 'fa ') !== false)) {
+            $iconhtml = '<i class="icon fa ' . s($icon) . ' fa-fw" aria-hidden="true"></i>';
+        } else if (is_string($icon)) {
+            try {
+                $iconhtml = $OUTPUT->pix_icon($icon, '');
+            } catch (\moodle_exception $e) {
+                $iconhtml = '<span class="text-secondary">-</span>';
+            }
+        } else if ($icon instanceof \pix_icon) {
+            try {
+                $iconhtml = $OUTPUT->render($icon);
+            } catch (\moodle_exception $e) {
+                $iconhtml = '<span class="text-secondary">-</span>';
+            }
         }
     } else {
         $iconhtml = '<span class="text-secondary">-</span>';
@@ -395,7 +396,7 @@ foreach ($nodes as $n) {
         $actions .= '&nbsp;' . html_writer::tag('span', $OUTPUT->pix_icon('t/down', '', 'moodle', ['class' => 'invisible']));
     }
 
-    $editurl = new moodle_url('/local/extendednav/edit.php', ['id' => $n->id]);
+    $editurl = new moodle_url('/local/extendednav/edit.php', ['id' => $n->id, 'menu' => $activemenu]);
 
     $actions .= '</div>';
 
