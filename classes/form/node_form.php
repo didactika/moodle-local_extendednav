@@ -40,7 +40,7 @@ class node_form extends \moodleform {
         global $DB, $PAGE, $OUTPUT;
         $mform = $this->_form;
 
-                $menutype = $this->_customdata['menu'] ?? 'primary';
+        $menutype = $this->_customdata['menu'] ?? 'primary';
 
         $corekeys = [];
         $corenodes = [];
@@ -57,9 +57,10 @@ class node_form extends \moodleform {
             $menutitle = '<strong>' . $menuhandler->get_name() . '</strong>';
             $mform->addElement('static', 'menudisplay', get_string('menu_type', 'local_extendednav'), $menutitle);
         }
-        $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => '30']);
+        $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => '30', 'maxlength' => 50]);
         $mform->setType('nodekey', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('nodekey', 'nodekey', 'local_extendednav');
+        $mform->addRule('nodekey', get_string('maximumchars', '', 50), 'maxlength', 50, 'client');
 
         $currentid = optional_param('id', 0, PARAM_INT);
         $currentnodekey = '';
@@ -91,9 +92,10 @@ class node_form extends \moodleform {
 
         $mform->addElement('static', 'corealert', '', $alerthtml);
 
-        $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => '50']);
+        $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => '40', 'maxlength' => 150]);
         $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'title', 'local_extendednav');
+        $mform->addRule('title', get_string('maximumchars', '', 150), 'maxlength', 150, 'client');
 
         $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => '60']);
         $mform->setType('url', PARAM_RAW);
@@ -102,9 +104,10 @@ class node_form extends \moodleform {
         $mform->addElement('advcheckbox', 'newwindow', get_string('newwindow', 'local_extendednav'));
         $mform->addHelpButton('newwindow', 'newwindow', 'local_extendednav');
 
-        $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => '30']);
+        $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => '30', 'maxlength' => 100]);
         $mform->setType('icon', PARAM_RAW);
         $mform->addHelpButton('icon', 'icon', 'local_extendednav');
+        $mform->addRule('icon', get_string('maximumchars', '', 100), 'maxlength', 100, 'client');
 
         $visoptions = [
             1 => get_string('vis_all', 'local_extendednav'),
@@ -152,15 +155,19 @@ class node_form extends \moodleform {
 
             $customkeys[] = $c->nodekey;
 
-            if (!empty($c->title)) {
-                $title = strip_tags(format_string($c->title));
-            } else {
-                $child = $corenodes[$c->nodekey] ?? null;
-                if ($child) {
-                    $title = strip_tags(format_string((string)$child->text));
-                } else {
-                    $title = get_string('none_title', 'local_extendednav');
+            $titlecandidate = !empty($c->title) ? $c->title : ($corenodes[$c->nodekey]->text ?? '');
+            if (!empty($titlecandidate)) {
+                $titlebits = explode(',', $titlecandidate, 2);
+                if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                    try {
+                        $titlecandidate = get_string($titlebits[0], $titlebits[1]);
+                    } catch (\moodle_exception $e) {
+                        // Keep raw.
+                    }
                 }
+                $title = strip_tags(format_string($titlecandidate));
+            } else {
+                $title = get_string('none_title', 'local_extendednav');
             }
 
             $a = new \stdClass();
@@ -208,11 +215,22 @@ class node_form extends \moodleform {
         global $DB, $PAGE;
         $errors = parent::validation($data, $files);
 
+        // Maximum character validations matching DB column definitions.
+        if (!empty($data['nodekey']) && \core_text::strlen($data['nodekey']) > 50) {
+            $errors['nodekey'] = get_string('maximumchars', '', 50);
+        }
+        if (!empty($data['title']) && \core_text::strlen($data['title']) > 150) {
+            $errors['title'] = get_string('maximumchars', '', 150);
+        }
+        if (!empty($data['icon']) && \core_text::strlen($data['icon']) > 100) {
+            $errors['icon'] = get_string('maximumchars', '', 100);
+        }
+
         if ($data['visibility'] == 2 && empty($data['roles'])) {
             $errors['roles'] = get_string('required');
         }
 
-                $menutype = $this->_customdata['menu'] ?? 'primary';
+        $menutype = $this->_customdata['menu'] ?? 'primary';
         $iscore = false;
 
         $menuhandler = \local_extendednav\menu_manager::get_menu($menutype);

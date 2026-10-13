@@ -332,8 +332,31 @@ $table->define_headers([
     get_string('positioning', 'local_extendednav'),
 ]);
 
-$table->column_class('select', 'text-center');
-$table->column_style('select', 'width', '40px');
+$table->set_attribute('style', 'min-width: 780px;');
+
+$table->column_class('select', 'text-center align-middle text-nowrap');
+$table->column_style('select', 'width', '45px');
+
+$table->column_class('title', 'align-middle text-break');
+$table->column_style('title', 'min-width', '130px');
+$table->column_style('title', 'max-width', '160px');
+
+$table->column_class('visibility', 'text-center align-middle text-nowrap');
+$table->column_style('visibility', 'width', '125px');
+
+$table->column_class('icon', 'text-center align-middle text-nowrap');
+$table->column_style('icon', 'width', '60px');
+
+$table->column_class('nodekey', 'align-middle text-nowrap');
+$table->column_style('nodekey', 'min-width', '130px');
+$table->column_style('nodekey', 'max-width', '180px');
+
+$table->column_class('url', 'align-middle text-break');
+$table->column_style('url', 'min-width', '160px');
+$table->column_style('url', 'max-width', '250px');
+
+$table->column_class('positioning', 'text-center align-middle text-nowrap');
+$table->column_style('positioning', 'width', '90px');
 $table->setup();
 
 $nodes = $DB->get_records_select('local_extendednav', $wheresql, $params, 'sortorder ASC, id ASC');
@@ -400,10 +423,17 @@ foreach ($nodes as $n) {
 
     $actions .= '</div>';
 
-    if (!empty($n->title)) {
-        $titletext = format_string($n->title);
-    } else if ($corenode) {
-        $titletext = format_string(strip_tags((string)$corenode->text));
+    $displaytitle = !empty($n->title) ? $n->title : ($corenode ? strip_tags((string)$corenode->text) : '');
+    if (!empty($displaytitle)) {
+        $titlebits = explode(',', $displaytitle, 2);
+        if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+            try {
+                $displaytitle = get_string($titlebits[0], $titlebits[1]);
+            } catch (\moodle_exception $e) {
+                // Keep raw title.
+            }
+        }
+        $titletext = format_string($displaytitle);
     } else {
         $titletext = '<span class="font-italic text-muted">-</span>';
     }
@@ -418,12 +448,14 @@ foreach ($nodes as $n) {
 
     if ($corenode) {
         $titlehtml .= ' ' . html_writer::tag('i', '', [
-            'class' => 'fa fa-info-circle text-warning',
+            'class' => 'fa fa-info-circle text-warning ml-1',
             'title' => get_string('nativenodeinfo', 'local_extendednav'),
             'data-toggle' => 'tooltip',
             'data-placement' => 'top',
         ]);
     }
+
+    $titlecell = html_writer::div($titlehtml, 'text-break', ['style' => 'max-width: 160px; word-break: break-word;']);
 
     $checkbox = '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">';
 
@@ -440,13 +472,16 @@ foreach ($nodes as $n) {
         $urltext = '<span class="font-italic text-muted">-</span>';
     }
 
+    $nodekeycell = html_writer::div('<b>' . s($n->nodekey) . '</b>', 'text-nowrap');
+    $urlcell = html_writer::div($urltext, 'text-break', ['style' => 'max-width: 250px; min-width: 160px; word-break: break-all;']);
+
     $table->add_data([
         $checkbox,
-        $titlehtml,
+        $titlecell,
         $vis,
         $iconhtml,
-        '<b>' . s($n->nodekey) . '</b>',
-        $urltext,
+        $nodekeycell,
+        $urlcell,
         $actions,
     ]);
 

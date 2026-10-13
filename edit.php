@@ -135,14 +135,19 @@ if ($mform->is_cancelled()) {
         $record->roles = null;
     }
 
-    if ($id) {
-        $record->id = $id;
-        $DB->update_record('local_extendednav', $record);
-    } else {
-        $record->menu = $menu;
-        $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menu]);
-        $record->sortorder = $max !== false ? $max + 1 : 0;
-        $DB->insert_record('local_extendednav', $record);
+    try {
+        if ($id) {
+            $record->id = $id;
+            $DB->update_record('local_extendednav', $record);
+        } else {
+            $record->menu = $menu;
+            $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menu]);
+            $record->sortorder = ($max !== false && $max !== null) ? ((int)$max + 1) : 0;
+            $DB->insert_record('local_extendednav', $record);
+        }
+    } catch (\dml_exception $e) {
+        \core\notification::error($e->getMessage());
+        redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
     }
 
     try {
