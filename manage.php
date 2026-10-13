@@ -53,6 +53,7 @@ if (!$menuhandler) {
     $menuhandler = \local_extendednav\menu_manager::get_menu('primary');
 }
 $menuhandler->sync_native_nodes();
+$menuhandler->sync_from_config();
 $activenativenodes = $menuhandler->get_native_nodes();
 
 if ($action === 'moveup' || $action === 'movedown') {
@@ -86,6 +87,7 @@ if ($action === 'moveup' || $action === 'movedown') {
                     }
                 }
 
+
                 try {
                     \cache::make('local_extendednav', 'nodes')->purge();
                 } catch (\Throwable $e) {
@@ -108,6 +110,7 @@ if ($action === 'delete') {
             redirect($baseurl);
         }
         $DB->delete_records('local_extendednav', ['id' => $id]);
+        \local_extendednav\event\node_deleted::create_from_record($rec)->trigger();
         if ($handler) {
             $handler->remove_nodes_from_config([$rec]);
         }
@@ -144,6 +147,10 @@ if ($action === 'bulkdelete') {
         if (!empty($todelete)) {
             [$insql, $inparams] = $DB->get_in_or_equal($todelete);
             $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
+
+            foreach ($deletedrecs as $drec) {
+                \local_extendednav\event\node_deleted::create_from_record($drec)->trigger();
+            }
 
             $bymenu = [];
             foreach ($deletedrecs as $drec) {
@@ -217,6 +224,7 @@ echo html_writer::end_div();
 $addurl = new moodle_url('/local/extendednav/edit.php', ['menu' => $activemenu]);
 $importurl = new moodle_url('/local/extendednav/import.php', ['menu' => $activemenu]);
 $exportallurl = new moodle_url('/local/extendednav/export.php', ['all' => 1, 'menu' => $activemenu]);
+$logsurl = new moodle_url('/local/extendednav/activity.php', ['menu' => $activemenu]);
 
 echo html_writer::start_div('d-flex flex-wrap justify-content-end mb-3');
 echo '    <div class="btn-toolbar">';
@@ -233,6 +241,11 @@ echo html_writer::link(
 echo html_writer::link(
     $exportallurl,
     '<i class="fa fa-file-code-o mr-1"></i>' . get_string('export_all_btn', 'local_extendednav'),
+    ['class' => 'btn btn-outline-secondary ml-2']
+);
+echo html_writer::link(
+    $logsurl,
+    '<i class="fa fa-history mr-1"></i>' . get_string('activity_log', 'local_extendednav'),
     ['class' => 'btn btn-outline-secondary ml-2']
 );
 echo '    </div>';

@@ -28,8 +28,6 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-
-
 $menu = optional_param('menu', 'primary', PARAM_ALPHA);
 $url = new moodle_url('/local/extendednav/import.php', ['menu' => $menu]);
 $PAGE->set_url($url);
@@ -62,18 +60,12 @@ if ($mform->is_cancelled()) {
     try {
         $parsed = \local_extendednav\yaml::parse($content);
     } catch (\Throwable $e) {
-            // Silently ignored.
-
-            // Expected exception.
-
         throw new \moodle_exception('err_invalid_yaml_format', 'local_extendednav', '', $e->getMessage());
     }
 
     if (!is_array($parsed) || !isset($parsed['nodes']) || !is_array($parsed['nodes'])) {
         throw new \moodle_exception('err_invalid_yaml_structure', 'local_extendednav');
     }
-
-
 
     $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav}');
     $sortorder = $max !== false ? $max + 1 : 0;
@@ -132,12 +124,15 @@ if ($mform->is_cancelled()) {
                 // Default to overwrite if action is 'overwrite' or somehow omitted.
                 $record->id = $existing->id;
                 $DB->update_record('local_extendednav', $record);
+                \local_extendednav\event\node_updated::create_from_record($record)->trigger();
             }
         } else {
             $record->sortorder = $sortorder++;
-            $DB->insert_record('local_extendednav', $record);
+            $record->id = (int)$DB->insert_record('local_extendednav', $record);
+            \local_extendednav\event\node_created::create_from_record($record)->trigger();
         }
     }
+
 
     try {
         \cache::make('local_extendednav', 'nodes')->purge();

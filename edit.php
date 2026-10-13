@@ -138,12 +138,15 @@ if ($mform->is_cancelled()) {
     try {
         if ($id) {
             $record->id = $id;
+            $record->menu = $menu;
             $DB->update_record('local_extendednav', $record);
+            \local_extendednav\event\node_updated::create_from_record($record)->trigger();
         } else {
             $record->menu = $menu;
             $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menu]);
             $record->sortorder = ($max !== false && $max !== null) ? ((int)$max + 1) : 0;
-            $DB->insert_record('local_extendednav', $record);
+            $record->id = (int)$DB->insert_record('local_extendednav', $record);
+            \local_extendednav\event\node_created::create_from_record($record)->trigger();
         }
     } catch (\dml_exception $e) {
         \core\notification::error($e->getMessage());

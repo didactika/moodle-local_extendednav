@@ -43,6 +43,7 @@ $string['conflict_overwrite'] = 'Overwrite (Replace matching nodes)';
 $string['conflict_skip'] = 'Skip (Keep existing nodes)';
 $string['coreoverridealert'] = '<strong>Notice:</strong> You are overriding a native Moodle core node. By doing so, the Title and URL fields become optional (if you leave them blank, Moodle will retain the original values for this node).';
 $string['delete_node'] = 'Delete node';
+$string['description'] = 'Description';
 $string['delete_node_confirm'] = 'Are you sure you want to delete this navigation rule?';
 $string['doc_desc'] = 'Description';
 $string['doc_download_desc'] = 'Get a working sample YAML schema file';
@@ -179,3 +180,12 @@ $string['yamlconfigfile'] = 'YAML Configuration File';
 $string['yamlconfigfile_help'] = 'Upload a valid extended navigation YAML file to import nodes into the database.';
 
 $string['menu_type'] = 'Target Menu / Tab';
+$string['eventnodecreated'] = 'Navigation node created';
+$string['eventnodeupdated'] = 'Navigation node updated';
+$string['eventnodedeleted'] = 'Navigation node deleted';
+$string['activity_log'] = 'Activity Log';
+
+$string['filter_datefrom'] = 'From';
+$string['filter_dateto'] = 'Until';
+$string['filter_action'] = 'Action contains';
+$string['filter_invalidperiod'] = 'The end date cannot be earlier than the start date.';

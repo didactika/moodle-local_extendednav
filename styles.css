@@ -1,0 +1,130 @@
+/*
+ * Extended Navigation activity report styles.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.local-extendednav-filters .local-extendednav-filter-menu {
+    box-sizing: border-box;
+    left: auto;
+    right: 0;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    width: 24rem;
+    max-width: calc(100vw - 2rem);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+.local-extendednav-filter-menu .local-extendednav-filter-content {
+    width: 100%;
+    min-width: 0;
+}
+
+.local-extendednav-filter-menu .mform,
+.local-extendednav-filter-menu .mform > div {
+    margin: 0;
+    min-height: 0;
+}
+
+.local-extendednav-filter-menu .fitem {
+    display: block;
+    margin-bottom: .625rem;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.local-extendednav-filter-menu .fitem .col-form-label,
+.local-extendednav-filter-menu .fitem .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.local-extendednav-filter-menu .fitem .col-form-label {
+    box-sizing: border-box;
+    float: none;
+    margin-bottom: .25rem;
+    padding-top: 0;
+}
+
+.local-extendednav-filter-menu .fitem .col-form-label label,
+.local-extendednav-filter-menu .fitem .col-form-label p {
+    max-width: 100%;
+    white-space: normal;
+    word-break: normal;
+    font-weight: 600;
+    font-size: .875rem;
+}
+
+.local-extendednav-filter-menu .fitem.femptylabel {
+    border-top: 0;
+    margin-bottom: 0;
+    margin-top: .5rem;
+    padding-top: 0;
+}
+
+.local-extendednav-filter-menu .fitem.femptylabel::before {
+    content: "";
+    display: block;
+    width: auto;
+    margin: 0 -1rem .75rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.local-extendednav-filter-menu .fitem.femptylabel > .felement {
+    margin-left: 0;
+}
+
+.local-extendednav-filter-menu .fitem.femptylabel .fitem {
+    margin-bottom: 0;
+}
+
+.local-extendednav-filter-menu .fitem.femptylabel .d-flex {
+    min-height: 0;
+}
+
+.local-extendednav-filter-menu .fitem input.form-control,
+.local-extendednav-filter-menu .fitem textarea.form-control {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.local-extendednav-filter-menu .fdate_selector {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    column-gap: .25rem !important;
+    row-gap: .375rem !important;
+}
+
+.local-extendednav-filter-menu .fdate_selector > .fitem {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.local-extendednav-filter-menu .fdate_selector select {
+    width: auto !important;
+    max-width: 100% !important;
+}
+
+@media (max-width: 575.98px) {
+    .local-extendednav-filters .local-extendednav-filter-menu {
+        width: calc(100vw - 2rem);
+        max-height: calc(100vh - 6rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}

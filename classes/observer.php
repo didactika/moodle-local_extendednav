@@ -180,16 +180,22 @@ class observer {
      */
     public static function sync_custom_menu(string $configname, string $prefix, string $menutype): void {
         global $CFG, $DB;
+
+        $menuhandler = menu_manager::get_menu($menutype);
+        $nativenodes = $menuhandler ? $menuhandler->get_native_nodes() : [];
+
         $text = get_config('core', $configname);
         if ($text === false || $text === null) {
             $text = $CFG->{$configname} ?? '';
         }
         $lines = explode("\n", (string)$text);
 
+        $existingrecords = $DB->get_records('local_extendednav', ['menu' => $menutype], 'sortorder ASC, id ASC');
+        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menutype]);
+
         $depthkeys = [];
         $seenkeys = [];
-
-        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menutype]);
+        $matchedids = [];
 
         foreach ($lines as $linenumber => $line) {
             $line = trim($line);
@@ -227,39 +233,67 @@ class observer {
             }
             $seenkeys[$nodekey] = true;
 
-            $parentkey = '';
+            $parentkey = null;
             if ($depth > 0 && isset($depthkeys[$depth - 1])) {
                 $parentkey = $depthkeys[$depth - 1];
             }
 
             $depthkeys[$depth] = $nodekey;
 
-            $existing = $DB->get_record('local_extendednav', ['nodekey' => $nodekey, 'menu' => $menutype]);
+            // 1. Direct match by nodekey on an existing record that hasn't been matched yet.
+            $existing = null;
+            foreach ($existingrecords as $rec) {
+                if (!isset($matchedids[$rec->id]) && $rec->nodekey === $nodekey) {
+                    $existing = $rec;
+                    break;
+                }
+            }
+
+            // 2. Match by URL for records belonging to this config ($prefix) to detect edited titles.
             if (!$existing && !empty($itemurl)) {
-                $sql = 'menu = :menu AND nodekey NOT LIKE :prefix AND ' . $DB->sql_compare_text('url') . ' = ' . $DB->sql_compare_text(':url');
-                $existing = $DB->get_record_select('local_extendednav', $sql, ['menu' => $menutype, 'prefix' => $prefix . '%', 'url' => $itemurl], '*', IGNORE_MULTIPLE);
+                foreach ($existingrecords as $rec) {
+                    if (!isset($matchedids[$rec->id]) && strpos($rec->nodekey, $prefix) === 0 && !empty($rec->url) && $rec->url === $itemurl) {
+                        $existing = $rec;
+                        break;
+                    }
+                }
+            }
+
+            // 3. Fallback match by (title + url).
+            if (!$existing) {
+                foreach ($existingrecords as $rec) {
+                    if (!isset($matchedids[$rec->id]) && $rec->title === $itemtext && (empty($itemurl) ? empty($rec->url) : $rec->url === $itemurl)) {
+                        $existing = $rec;
+                        break;
+                    }
+                }
             }
 
             if ($existing) {
+                $matchedids[$existing->id] = true;
                 $changed = false;
-                if ($existing->title !== $itemtext && !empty($itemtext)) {
+
+                if ($existing->title !== $itemtext) {
                     $existing->title = $itemtext;
                     $changed = true;
                 }
-                if ($existing->url !== $itemurl && !empty($itemurl)) {
-                    $existing->url = $itemurl;
+                $normalizedurl = ($itemurl !== '') ? $itemurl : null;
+                if ($existing->url !== $normalizedurl) {
+                    $existing->url = $normalizedurl;
                     $changed = true;
                 }
-                if (!empty($parentkey) && empty($existing->parentkey)) {
+                if ($existing->parentkey !== $parentkey) {
                     $existing->parentkey = $parentkey;
                     $changed = true;
                 }
-                if ($itemicon !== null && empty($existing->icon)) {
+                if ($existing->icon !== $itemicon) {
                     $existing->icon = $itemicon;
                     $changed = true;
                 }
+
                 if ($changed) {
                     $DB->update_record('local_extendednav', $existing);
+                    \local_extendednav\event\node_updated::create_from_record($existing)->trigger();
                 }
             } else {
                 $maxsort++;
@@ -267,13 +301,25 @@ class observer {
                 $newnode->nodekey = $nodekey;
                 $newnode->menu = $menutype;
                 $newnode->title = $itemtext;
-                $newnode->url = $itemurl;
+                $newnode->url = ($itemurl !== '') ? $itemurl : null;
                 $newnode->parentkey = $parentkey;
                 $newnode->icon = $itemicon;
                 $newnode->visibility = 1;
                 $newnode->newwindow = 0;
                 $newnode->sortorder = $maxsort;
-                $DB->insert_record('local_extendednav', $newnode);
+                $newnode->id = (int)$DB->insert_record('local_extendednav', $newnode);
+                \local_extendednav\event\node_created::create_from_record($newnode)->trigger();
+                $matchedids[$newnode->id] = true;
+            }
+        }
+
+        // Delete records that were removed from the Moodle config (excluding native core nodes).
+        foreach ($existingrecords as $rec) {
+            if (!isset($matchedids[$rec->id])) {
+                if (strpos($rec->nodekey, $prefix) === 0 && !isset($nativenodes[$rec->nodekey])) {
+                    $DB->delete_records('local_extendednav', ['id' => $rec->id]);
+                    \local_extendednav\event\node_deleted::create_from_record($rec)->trigger();
+                }
             }
         }
 
