@@ -51,7 +51,8 @@ final class node_deleted extends \core\event\base {
     public function get_description(): string {
         $menu = $this->other['menu'] ?? 'unknown';
         $nodekey = $this->other['nodekey'] ?? 'unknown';
-        return "The user with id '{$this->userid}' deleted navigation node '{$nodekey}' (id '{$this->objectid}') from menu '{$menu}'.";
+        return "The user with id '{$this->userid}' deleted navigation node '{$nodekey}' " .
+            "(id '{$this->objectid}') in menu '{$menu}'.";
     }
 
     /**
@@ -83,6 +84,8 @@ final class node_deleted extends \core\event\base {
                 'nodekey' => $record->nodekey ?? '',
                 'title' => (string)($record->title ?? ''),
                 'url' => (string)($record->url ?? ''),
+                'visibility' => (int)($record->visibility ?? 1),
+                'parentkey' => (string)($record->parentkey ?? ''),
             ],
         ]);
     }

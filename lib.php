@@ -22,8 +22,6 @@
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 /**
  * Extends the global navigation to block overridden URLs manually if hidden.
  *
@@ -259,9 +257,3 @@ function local_extendednav_extend_navigation(\global_navigation $navigation): vo
         }
     }
 }
-
-/**
- * Executes before the standard HTML head is rendered.
- * This is early enough to modify $CFG variables before the theme renders the header.
- */
-

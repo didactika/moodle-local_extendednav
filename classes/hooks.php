@@ -236,33 +236,36 @@ class hooks {
         $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
         $nativenodes = $usermenu ? $usermenu->get_native_nodes() : [];
 
-        // GENERATE TEMPLATES FOR ROOT NODE FIXES (ICONS AND NEW WINDOW)
+        // Generate templates for root node fixes (icons and new window).
         foreach ($allowedparents as $nodekey => $node) {
             $icon = trim((string)$node->icon);
             // If it has children, it's a submenu trigger, so newwindow shouldn't apply to it.
             $haschildren = isset($childrenbyparent[$nodekey]) && !empty($childrenbyparent[$nodekey]);
             $newwindow = (!empty($node->newwindow) && !$haschildren) ? 1 : 0;
-            
+
             $needsicon = (!empty($icon) && $icon !== 'none' && (strpos($icon, 'fa-') !== false || strpos($icon, 'fa ') !== false));
             $needsnewwindow = ($newwindow === 1);
-            
+
             if ($needsicon || $needsnewwindow) {
                 $url = trim((string)$node->url);
                 $title = trim((string)$node->title) ?: (isset($nativenodes[$nodekey]) ? $nativenodes[$nodekey]->text : '');
                 if ($title !== '') {
                     $titlebits = explode(',', $title, 2);
-                    if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                    if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
                         $title = get_string($titlebits[0], $titlebits[1]);
                     }
                 }
 
-                $urlAttr = !empty($url) ? 'data-url="' . s($url) . '"' : '';
-                $titleAttr = !empty($title) ? 'data-title="' . s($title) . '"' : '';
-                
-                $iconAttr = $needsicon ? 'data-icon="' . s($icon) . '"' : '';
-                $windowAttr = $needsnewwindow ? 'data-newwindow="1"' : '';
-                
-                $templates .= '<template data-region="local-extendednav-node-fix" ' . $iconAttr . ' ' . $windowAttr . ' ' . $urlAttr . ' ' . $titleAttr . '></template>';
+                $urlattr = !empty($url) ? 'data-url="' . s($url) . '"' : '';
+                $titleattr = !empty($title) ? 'data-title="' . s($title) . '"' : '';
+
+                $iconattr = $needsicon ? 'data-icon="' . s($icon) . '"' : '';
+                $windowattr = $needsnewwindow ? 'data-newwindow="1"' : '';
+
+                $templates .= '<template data-region="local-extendednav-node-fix" ' .
+                    $iconattr . ' ' . $windowattr . ' ' . $urlattr . ' ' . $titleattr . '></template>';
                 $hastemplates = true;
             }
         }
@@ -291,7 +294,9 @@ class hooks {
             }
 
             $titlebits = explode(',', $ptitle, 2);
-            if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+            $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+            $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+            if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
                 $ptitle = get_string($titlebits[0], $titlebits[1]);
             }
 
@@ -311,7 +316,9 @@ class hooks {
                     continue;
                 }
                 $titlebits = explode(',', $ctitle, 2);
-                if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
                     $ctitle = get_string($titlebits[0], $titlebits[1]);
                 }
 
@@ -330,8 +337,9 @@ class hooks {
                     'title' => $ptitle,
                     'items' => $items,
                 ]);
-                $triggerAttr = !empty($purl) ? 'data-trigger-url="' . s($purl) . '"' : 'data-trigger-title="' . s($ptitle) . '"';
-                $templates .= '<template data-region="local-extendednav-submenu" data-panel-id="' . s($panelid) . '" ' . $triggerAttr . '>' . $html . '</template>';
+                $triggerattr = !empty($purl) ? 'data-trigger-url="' . s($purl) . '"' : 'data-trigger-title="' . s($ptitle) . '"';
+                $templates .= '<template data-region="local-extendednav-submenu" data-panel-id="' .
+                    s($panelid) . '" ' . $triggerattr . '>' . $html . '</template>';
                 $hastemplates = true;
             }
         }

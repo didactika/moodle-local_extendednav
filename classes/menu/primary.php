@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,27 +14,64 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Primary navigation menu handler.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_extendednav\menu;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Primary navigation menu implementation.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class primary extends base {
+    /**
+     * Gets the unique string key for this menu type.
+     *
+     * @return string
+     */
     public function get_key(): string {
         return 'primary';
     }
 
+    /**
+     * Gets the human-readable localized name of this menu.
+     *
+     * @return string
+     */
     public function get_name(): string {
         return get_string('primary_nav', 'local_extendednav');
     }
 
+    /**
+     * Gets the associated core config setting name.
+     *
+     * @return string|null
+     */
     public function get_config_name(): ?string {
         return 'custommenuitems';
     }
 
+    /**
+     * Gets the prefix used when storing items from this config.
+     *
+     * @return string
+     */
     public function get_config_prefix(): string {
         return 'cmenu_';
     }
 
+    /**
+     * Synchronizes native core nodes into the database.
+     */
     public function sync_native_nodes(): void {
         global $DB;
         $dbnodesbykey = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
@@ -57,10 +94,16 @@ class primary extends base {
         }
     }
 
+    /**
+     * Gets all native nodes belonging to this menu.
+     *
+     * @return array
+     */
     public function get_native_nodes(): array {
         $nodes = [];
 
-        $coreitems = [            'home' => [
+        $coreitems = [
+            'home' => [
                 'text' => get_string('home'),
                 'action' => new \moodle_url('/'),
                 'icon' => 'i/home',
@@ -94,9 +137,15 @@ class primary extends base {
         return $nodes;
     }
 
+    /**
+     * Injects custom nodes into the primary navigation.
+     *
+     * @param array $customnodes Array of database nodes for this menu
+     * @param mixed $context Optional context (primary_extend hook)
+     */
     public function inject_nodes(array $customnodes, $context = null): void {
         global $USER, $OUTPUT;
-        // $context is the primary_extend hook
+        // The $context parameter is the primary_extend hook.
         if (!$context) {
             return;
         }
@@ -297,7 +346,10 @@ class primary extends base {
         }
 
         foreach ($customnodes as $dbnode) {
-            if (isset($allnodes[$dbnode->nodekey]) && isset($finalstates[$dbnode->nodekey]) && $finalstates[$dbnode->nodekey]->allowed) {
+            $isnodevalid = isset($allnodes[$dbnode->nodekey]) &&
+                isset($finalstates[$dbnode->nodekey]) &&
+                $finalstates[$dbnode->nodekey]->allowed;
+            if ($isnodevalid) {
                 $primarynav->add_node($allnodes[$dbnode->nodekey]);
                 unset($allnodes[$dbnode->nodekey]);
             }

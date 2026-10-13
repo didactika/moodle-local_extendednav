@@ -158,11 +158,13 @@ class node_form extends \moodleform {
             $titlecandidate = !empty($c->title) ? $c->title : ($corenodes[$c->nodekey]->text ?? '');
             if (!empty($titlecandidate)) {
                 $titlebits = explode(',', $titlecandidate, 2);
-                if (count($titlebits) == 2 && clean_param($titlebits[0], PARAM_STRINGID) !== '' && clean_param($titlebits[1], PARAM_COMPONENT) !== '') {
+                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
                     try {
                         $titlecandidate = get_string($titlebits[0], $titlebits[1]);
                     } catch (\moodle_exception $e) {
-                        // Keep raw.
+                        unset($e);
                     }
                 }
                 $title = strip_tags(format_string($titlecandidate));
@@ -250,8 +252,12 @@ class node_form extends \moodleform {
             }
         }
 
-        $existing = $DB->get_record('local_extendednav',
-            ['nodekey' => $data['nodekey'], 'menu' => $menutype], '*', IGNORE_MULTIPLE);
+        $existing = $DB->get_record(
+            'local_extendednav',
+            ['nodekey' => $data['nodekey'], 'menu' => $menutype],
+            '*',
+            IGNORE_MULTIPLE
+        );
         if ($existing && $existing->id != $data['id']) {
             $errors['nodekey'] = get_string('err_duplicate_key', 'local_extendednav');
         }

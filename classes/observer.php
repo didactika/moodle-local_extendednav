@@ -21,6 +21,7 @@ namespace local_extendednav;
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observer {
@@ -216,7 +217,7 @@ class observer {
                 $itemicon = null;
             }
 
-            preg_match('/^(\-*)/', $rawtext, $match);
+            preg_match('/^(\\-*)/', $rawtext, $match);
             $depth = strlen($match[1] ?? '');
 
             $slug = preg_replace('/[^a-z0-9]/', '', strtolower($itemtext));
@@ -252,7 +253,11 @@ class observer {
             // 2. Match by URL for records belonging to this config ($prefix) to detect edited titles.
             if (!$existing && !empty($itemurl)) {
                 foreach ($existingrecords as $rec) {
-                    if (!isset($matchedids[$rec->id]) && strpos($rec->nodekey, $prefix) === 0 && !empty($rec->url) && $rec->url === $itemurl) {
+                    $isvalidmatch = !isset($matchedids[$rec->id]) &&
+                        strpos($rec->nodekey, $prefix) === 0 &&
+                        !empty($rec->url) &&
+                        $rec->url === $itemurl;
+                    if ($isvalidmatch) {
                         $existing = $rec;
                         break;
                     }
@@ -262,7 +267,11 @@ class observer {
             // 3. Fallback match by (title + url).
             if (!$existing) {
                 foreach ($existingrecords as $rec) {
-                    if (!isset($matchedids[$rec->id]) && $rec->title === $itemtext && (empty($itemurl) ? empty($rec->url) : $rec->url === $itemurl)) {
+                    $hasmatchingurl = empty($itemurl) ? empty($rec->url) : $rec->url === $itemurl;
+                    $isvalidfallback = !isset($matchedids[$rec->id]) &&
+                        $rec->title === $itemtext &&
+                        $hasmatchingurl;
+                    if ($isvalidfallback) {
                         $existing = $rec;
                         break;
                     }

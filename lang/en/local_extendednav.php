@@ -24,6 +24,7 @@
  */
 
 $string['actions'] = 'Actions';
+$string['activity_log'] = 'Activity Log';
 $string['add_node'] = 'Add Node';
 $string['allow_hide_myhome'] = 'Allow hiding Dashboard / Home';
 $string['allow_hide_myhome_desc'] = 'If checked, you can completely restrict the Dashboard and Site Home. If a user hits a restricted URL and these fallbacks are also restricted, they will see Moodle\'s native permission error screen (Recommended). If unchecked, the Dashboard and Home will always be accessible to serve as fallbacks.';
@@ -43,8 +44,8 @@ $string['conflict_overwrite'] = 'Overwrite (Replace matching nodes)';
 $string['conflict_skip'] = 'Skip (Keep existing nodes)';
 $string['coreoverridealert'] = '<strong>Notice:</strong> You are overriding a native Moodle core node. By doing so, the Title and URL fields become optional (if you leave them blank, Moodle will retain the original values for this node).';
 $string['delete_node'] = 'Delete node';
-$string['description'] = 'Description';
 $string['delete_node_confirm'] = 'Are you sure you want to delete this navigation rule?';
+$string['description'] = 'Description';
 $string['doc_desc'] = 'Description';
 $string['doc_download_desc'] = 'Get a working sample YAML schema file';
 $string['doc_example_format'] = 'Example Format';
@@ -84,6 +85,9 @@ $string['err_parent_haschildren'] = 'This node already contains sub-menus. You c
 $string['err_parent_self'] = 'A node cannot be its own parent.';
 $string['err_parent_thirdlevel'] = 'Moodle Top-Bar UI only supports 1 level of dropdowns. The parent you chose is already inside another menu.';
 $string['err_restricted_page'] = 'This page is restricted by the navigation hierarchy and role rules set for your account.';
+$string['eventnodecreated'] = 'Navigation node created';
+$string['eventnodedeleted'] = 'Navigation node deleted';
+$string['eventnodeupdated'] = 'Navigation node updated';
 $string['export'] = 'Export Nodes';
 $string['export_all'] = 'Export All Configurations (Full Schema)';
 $string['export_all_btn'] = 'Export All';
@@ -92,7 +96,11 @@ $string['export_selected'] = 'Export Selected';
 $string['export_selected_mode'] = 'Export Selected Configurations Only';
 $string['exportmode_label'] = 'Export Mode';
 $string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native permission error screen instead (Recommended).';
+$string['filter_action'] = 'Action contains';
 $string['filter_active'] = 'Active Filter';
+$string['filter_datefrom'] = 'From';
+$string['filter_dateto'] = 'Until';
+$string['filter_invalidperiod'] = 'The end date cannot be earlier than the start date.';
 $string['filters'] = 'Filters';
 $string['icon'] = 'Icon';
 $string['icon_desc'] = 'Moodle pix icon name, e.g. "i/dashboard" or "i/home". Leave blank for none or to keep default.';
@@ -109,6 +117,7 @@ $string['importmode_help'] = 'Skip will ignore nodes that already exist. Overwri
 $string['inside'] = 'inside:';
 $string['manage_nodes'] = 'Dashboard';
 $string['manage_nodes_desc'] = 'Add, edit, or remove custom navigation nodes, and override existing Moodle nodes.';
+$string['menu_type'] = 'Target Menu / Tab';
 $string['native_cannot_delete'] = 'Native Moodle nodes cannot be deleted. You can hide them instead by setting their visibility to "Not visible".';
 $string['native_route'] = 'native route';
 $string['native_string'] = 'native string';
@@ -133,9 +142,6 @@ $string['parentkey'] = 'Parent Node Key (Dropdown)';
 $string['parentkey_desc'] = 'If you want this node to be a sub-item in a dropdown, provide the key of the parent node here.';
 $string['parentkey_help'] = 'Nested menus feature. Form a dropdown menu by typing the unique Core Key of a parent menu here. (e.g. create a main node called "resources", then create a second node and type "resources" in this field to nest it inside). Leave blank for normal top-level navigation.';
 $string['pluginname'] = 'Extended Navigation';
-$string['submenuof'] = 'Submenu of: {$a}';
-
-
 $string['positioning'] = 'Positioning';
 $string['primary_nav'] = 'Primary Navigation';
 $string['privacy:metadata'] = 'The Extended Navigation plugin does not store any personal data.';
@@ -148,6 +154,9 @@ $string['search_free'] = 'Global Search (Key or Title)';
 $string['search_parent'] = 'Hidden Parent Key (Hierarchy)';
 $string['select_nodes'] = 'Select Nodes';
 $string['select_nodes_export'] = 'Nodes to Export';
+$string['submenuof'] = 'Submenu of: {$a}';
+
+
 $string['title'] = 'Display Title';
 $string['title_desc'] = 'The text that will be displayed. Leave blank if overriding an existing node to keep defaults.';
 $string['title_help'] = 'The name displayed in the navigation bar. If you are modifying a native Moodle menu (like "mycourses") and want to keep its original translated name, leave this completely blank. Multilanguage filters (MLANG) are fully supported here.';
@@ -178,14 +187,3 @@ $string['visibility_desc'] = 'Control who can see this node.';
 $string['yamlconfigfile'] = 'YAML Configuration File';
 
 $string['yamlconfigfile_help'] = 'Upload a valid extended navigation YAML file to import nodes into the database.';
-
-$string['menu_type'] = 'Target Menu / Tab';
-$string['eventnodecreated'] = 'Navigation node created';
-$string['eventnodeupdated'] = 'Navigation node updated';
-$string['eventnodedeleted'] = 'Navigation node deleted';
-$string['activity_log'] = 'Activity Log';
-
-$string['filter_datefrom'] = 'From';
-$string['filter_dateto'] = 'Until';
-$string['filter_action'] = 'Action contains';
-$string['filter_invalidperiod'] = 'The end date cannot be earlier than the start date.';

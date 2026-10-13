@@ -1,4 +1,41 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Usermenu enhancements for extended navigation.
+ *
+ * @module     local_extendednav/usermenu
+ * @copyright  2026 Didactika
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import $ from 'jquery';
+
+/**
+ * Helper to build an icon element without innerHTML string templates.
+ *
+ * @param {string} iconClass FontAwesome icon class name.
+ * @returns {HTMLElement} The created icon element.
+ */
+const createIconElement = (iconClass) => {
+    const iconEl = document.createElement('i');
+    iconEl.className = `icon fa ${iconClass} fa-fw`;
+    iconEl.setAttribute('aria-hidden', 'true');
+    return iconEl;
+};
 
 export const init = () => {
     if (!window.customUsermenuTargetBlankInjected) {
@@ -55,19 +92,21 @@ export const init = () => {
             const existingIcon = link.querySelector('.icon');
             if (existingIcon) {
                 if (existingIcon.tagName === 'IMG') {
+                    const iconEl = createIconElement(icon);
                     const wrapper = existingIcon.closest('.carousel-navigation-link-icon');
                     if (wrapper) {
-                        wrapper.innerHTML = `<i class="icon fa ${icon} fa-fw" aria-hidden="true"></i>`;
+                        wrapper.replaceChildren(iconEl);
                     } else {
-                        existingIcon.outerHTML = `<i class="icon fa ${icon} fa-fw" aria-hidden="true"></i>`;
+                        existingIcon.replaceWith(iconEl);
                     }
                 } else if (existingIcon.tagName === 'I') {
                     existingIcon.className = `icon fa ${icon} fa-fw`;
                 }
             } else {
-                const iconHtml = `<span class="carousel-navigation-link-icon">` +
-                    `<i class="icon fa ${icon} fa-fw" aria-hidden="true"></i></span>`;
-                link.innerHTML = iconHtml + link.innerHTML;
+                const spanWrapper = document.createElement('span');
+                spanWrapper.className = 'carousel-navigation-link-icon';
+                spanWrapper.appendChild(createIconElement(icon));
+                link.prepend(spanWrapper);
             }
         }
     });
@@ -109,9 +148,6 @@ export const init = () => {
         trigger.classList.add('carousel-navigation-link');
         trigger.dataset.carouselTargetId = panelId;
 
-        // Moodle 4 handles the submenu arrow natively via CSS ::after on the .carousel-navigation-link class.
-        // We do not need to manually inject DOM elements for the arrow.
-
         carousel.append(source.content.cloneNode(true));
         source.remove();
 
@@ -129,7 +165,7 @@ export const init = () => {
             }
         });
 
-        // Add back button listener manually to avoid Moodle's right arrow CSS from .carousel-navigation-link
+        // Add back button listener manually to avoid Moodle's right arrow CSS from .carousel-navigation-link.
         const backBtn = carousel.querySelector('#' + panelId + ' .local-extendednav-back-btn');
         if (backBtn) {
             const closeSubmenu = event => {

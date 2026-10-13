@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,12 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Usermenu navigation handler.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_extendednav\menu;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Usermenu class
+ * Usermenu navigation implementation.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika
@@ -27,6 +34,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class usermenu extends base {
     /**
+     * Gets the unique string key for this menu type.
+     *
      * @return string
      */
     public function get_key(): string {
@@ -34,6 +43,8 @@ class usermenu extends base {
     }
 
     /**
+     * Gets the human-readable localized name of this menu.
+     *
      * @return string
      */
     public function get_name(): string {
@@ -41,6 +52,8 @@ class usermenu extends base {
     }
 
     /**
+     * Gets the associated core config setting name.
+     *
      * @return string|null
      */
     public function get_config_name(): ?string {
@@ -48,6 +61,8 @@ class usermenu extends base {
     }
 
     /**
+     * Gets the prefix used when storing items from this config.
+     *
      * @return string
      */
     public function get_config_prefix(): string {
@@ -113,9 +128,10 @@ class usermenu extends base {
     }
 
     /**
-     * Injects
-     * @param array $customnodes
-     * @param mixed $context
+     * Injects custom nodes into the user menu configuration.
+     *
+     * @param array $customnodes Array of custom nodes to inject
+     * @param mixed $context Optional context
      */
     public function inject_nodes(array $customnodes, $context = null): void {
         global $CFG, $USER;
@@ -149,7 +165,7 @@ class usermenu extends base {
             if ($allowed) {
                 $line = trim((string)$umnode->title);
 
-                // If it is empty, fallback to the native node
+                // If it is empty, fallback to the native node.
                 if ($line === '') {
                     $nativenodes = $this->get_native_nodes();
                     if (isset($nativenodes[$umnode->nodekey])) {
@@ -184,11 +200,12 @@ class usermenu extends base {
     }
 
     /**
-     * Injects
-     * @param array $customnodes
-     * @param mixed $hook
+     * Injects custom nodes via the user menu extension hook.
+     *
+     * @param array $customnodes Array of custom nodes
+     * @param mixed $hook The user menu hook
      */
     public function inject_nodes_via_hook(array $customnodes, $hook): void {
-        // Do nothing. Custom nodes are now injected via customusermenuitems so they obey sortorder natively.
+        // Do nothing. Custom nodes are injected via customusermenuitems so they obey sortorder natively.
     }
 }

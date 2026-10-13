@@ -51,7 +51,8 @@ final class node_created extends \core\event\base {
     public function get_description(): string {
         $menu = $this->other['menu'] ?? 'unknown';
         $nodekey = $this->other['nodekey'] ?? 'unknown';
-        return "The user with id '{$this->userid}' created navigation node '{$nodekey}' (id '{$this->objectid}') in menu '{$menu}'.";
+        return "The user with id '{$this->userid}' created navigation node '{$nodekey}' " .
+            "(id '{$this->objectid}') in menu '{$menu}'.";
     }
 
     /**
