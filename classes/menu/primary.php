@@ -27,25 +27,28 @@ class primary extends base {
         return get_string('primary_nav', 'local_extendednav');
     }
 
+    public function get_config_name(): ?string {
+        return 'custommenuitems';
+    }
+
+    public function get_config_prefix(): string {
+        return 'cmenu_';
+    }
+
     public function sync_native_nodes(): void {
         global $DB;
         $dbnodesbykey = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
         $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$this->get_key()]);
 
-        \local_extendednav\hooks::$skiphook = true;
-        $temppage = new \moodle_page();
-        $temppage->set_context(\context_system::instance());
-        $temppage->set_url(new \moodle_url('/'));
-        $primary = new \core\navigation\views\primary($temppage);
-        $primary->initialise();
-        \local_extendednav\hooks::$skiphook = false;
-
-        foreach ($primary->children as $cnode) {
-            if ($cnode->key && !isset($dbnodesbykey[$cnode->key])) {
+        $nativenodes = $this->get_native_nodes();
+        foreach ($nativenodes as $key => $node) {
+            if (!isset($dbnodesbykey[$key])) {
                 $maxsort++;
                 $rec = new \stdClass();
                 $rec->menu = $this->get_key();
-                $rec->nodekey = $cnode->key;
+                $rec->nodekey = $key;
+                $rec->title = $node->text;
+                $rec->url = ($node->action instanceof \moodle_url) ? $node->action->out(false) : (string)$node->action;
                 $rec->visibility = 1;
                 $rec->sortorder = $maxsort;
                 $rec->newwindow = 0;
@@ -56,23 +59,38 @@ class primary extends base {
 
     public function get_native_nodes(): array {
         $nodes = [];
-        try {
-            \local_extendednav\hooks::$skiphook = true;
-            $temppage = new \moodle_page();
-            $temppage->set_context(\context_system::instance());
-            $temppage->set_url(new \moodle_url('/'));
-            $primary = new \core\navigation\views\primary($temppage);
-            $primary->initialise();
-            foreach ($primary->children as $child) {
-                if ($child->key) {
-                    $nodes[$child->key] = $child;
-                }
-            }
-        } catch (\Throwable $e) {
-            unset($e);
-        } finally {
-            \local_extendednav\hooks::$skiphook = false;
+
+        $coreitems = [            'home' => [
+                'text' => get_string('home'),
+                'action' => new \moodle_url('/'),
+                'icon' => 'i/home',
+            ],
+            'myhome' => [
+                'text' => get_string('myhome'),
+                'action' => new \moodle_url('/my/'),
+                'icon' => 'i/dashboard',
+            ],
+            'mycourses' => [
+                'text' => get_string('mycourses'),
+                'action' => new \moodle_url('/my/courses.php'),
+                'icon' => null,
+            ],
+            'siteadminnode' => [
+                'text' => get_string('administrationsite'),
+                'action' => new \moodle_url('/admin/search.php'),
+                'icon' => 'i/settings',
+            ],
+        ];
+
+        foreach ($coreitems as $key => $info) {
+            $std = new \stdClass();
+            $std->key = $key;
+            $std->text = $info['text'];
+            $std->action = $info['action'];
+            $std->icon = $info['icon'];
+            $nodes[$key] = $std;
         }
+
         return $nodes;
     }
 

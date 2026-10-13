@@ -31,7 +31,6 @@ admin_externalpage_setup('local_extendednav_manage');
 
 // Sync core nodes into the DB if they are missing.
 
-
 $action = optional_param('action', '', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
 $search = optional_param('search', '', PARAM_TEXT);
@@ -54,45 +53,44 @@ if (!$menuhandler) {
     $menuhandler = \local_extendednav\menu_manager::get_menu('primary');
 }
 $menuhandler->sync_native_nodes();
-$primarynodes = $menuhandler->get_native_nodes();
-
-
+$activenativenodes = $menuhandler->get_native_nodes();
 
 if ($action === 'moveup' || $action === 'movedown') {
     require_sesskey();
     $current = $DB->get_record('local_extendednav', ['id' => $id]);
     if ($current) {
-        $operator = $action === 'moveup' ? '<' : '>';
-        $sortdir = $action === 'moveup' ? 'DESC' : 'ASC';
-        $adjacents = $DB->get_records_select(
+        $allnodes = array_values($DB->get_records(
             'local_extendednav',
-            "sortorder $operator ? OR (sortorder = ? AND id $operator ?)",
-            [$current->sortorder, $current->sortorder, $current->id],
-            "sortorder $sortdir, id $sortdir",
-            '*',
-            0,
-            1
-        );
-        if ($adjacents) {
-            $adjacent = reset($adjacents);
-            $tempsort = $current->sortorder;
-            $current->sortorder = $adjacent->sortorder;
-            $adjacent->sortorder = $tempsort;
-            // Also swap IDs slightly if sortorders were the same.
-            if ($current->sortorder === $adjacent->sortorder) {
-                if ($action === 'moveup') {
-                    $current->sortorder--;
-                } else {
-                    $current->sortorder++;
-                }
+            ['menu' => $current->menu],
+            'sortorder ASC, id ASC'
+        ));
+
+        $currentindex = null;
+        foreach ($allnodes as $idx => $node) {
+            if ((int)$node->id === (int)$current->id) {
+                $currentindex = $idx;
+                break;
             }
-            $DB->update_record('local_extendednav', $current);
-            $DB->update_record('local_extendednav', $adjacent);
-            try {
-                \cache::make('local_extendednav', 'nodes')->purge();
-            } catch (\Throwable $e) {
-                unset($e);
-                // Expected exception.
+        }
+
+        if ($currentindex !== null) {
+            $targetindex = $action === 'moveup' ? $currentindex - 1 : $currentindex + 1;
+            if ($targetindex >= 0 && $targetindex < count($allnodes)) {
+                $temp = $allnodes[$currentindex];
+                $allnodes[$currentindex] = $allnodes[$targetindex];
+                $allnodes[$targetindex] = $temp;
+
+                foreach ($allnodes as $newsort => $node) {
+                    if ((int)$node->sortorder !== $newsort) {
+                        $DB->set_field('local_extendednav', 'sortorder', $newsort, ['id' => $node->id]);
+                    }
+                }
+
+                try {
+                    \cache::make('local_extendednav', 'nodes')->purge();
+                } catch (\Throwable $e) {
+                    unset($e);
+                }
             }
         }
     }
@@ -101,14 +99,23 @@ if ($action === 'moveup' || $action === 'movedown') {
 
 if ($action === 'delete') {
     require_sesskey();
-    $DB->delete_records('local_extendednav', ['id' => $id]);
-    try {
-        \cache::make('local_extendednav', 'nodes')->purge();
-    } catch (\Throwable $e) {
-            unset($e); // Phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-            // Silently ignored.
-
-            // Expected exception.
+    $rec = $DB->get_record('local_extendednav', ['id' => $id]);
+    if ($rec) {
+        $handler = ($rec->menu === $activemenu) ? $menuhandler : \local_extendednav\menu_manager::get_menu($rec->menu);
+        $nativenodes = ($rec->menu === $activemenu) ? $activenativenodes : ($handler ? $handler->get_native_nodes() : []);
+        if (isset($nativenodes[$rec->nodekey])) {
+            \core\notification::warning(get_string('native_cannot_delete', 'local_extendednav'));
+            redirect($baseurl);
+        }
+        $DB->delete_records('local_extendednav', ['id' => $id]);
+        if ($handler) {
+            $handler->remove_nodes_from_config([$rec]);
+        }
+        try {
+            \cache::make('local_extendednav', 'nodes')->purge();
+        } catch (\Throwable $e) {
+            unset($e);
+        }
     }
     redirect($baseurl);
 }
@@ -117,24 +124,19 @@ if ($action === 'bulkdelete') {
     require_sesskey();
     $nodeids = optional_param_array('nodeids', [], PARAM_INT);
     if (!empty($nodeids)) {
-        $corekeys = [];
-        if (isset($primary)) {
-            foreach ($primary->children as $child) {
-                if ($child->key) {
-                    $corekeys[$child->key] = true;
-                }
-            }
-        }
-
         $todelete = [];
+        $deletedrecs = [];
         $skipped = false;
         foreach ($nodeids as $nid) {
             $rec = $DB->get_record('local_extendednav', ['id' => $nid]);
             if ($rec) {
-                if (isset($corekeys[$rec->nodekey])) {
+                $handler = ($rec->menu === $activemenu) ? $menuhandler : \local_extendednav\menu_manager::get_menu($rec->menu);
+                $nativenodes = ($rec->menu === $activemenu) ? $activenativenodes : ($handler ? $handler->get_native_nodes() : []);
+                if (isset($nativenodes[$rec->nodekey])) {
                     $skipped = true;
                 } else {
                     $todelete[] = $nid;
+                    $deletedrecs[] = $rec;
                 }
             }
         }
@@ -142,6 +144,18 @@ if ($action === 'bulkdelete') {
         if (!empty($todelete)) {
             [$insql, $inparams] = $DB->get_in_or_equal($todelete);
             $DB->delete_records_select('local_extendednav', "id $insql", $inparams);
+
+            $bymenu = [];
+            foreach ($deletedrecs as $drec) {
+                $bymenu[$drec->menu][] = $drec;
+            }
+            foreach ($bymenu as $menukey => $mrecs) {
+                $handler = ($menukey === $activemenu) ? $menuhandler : \local_extendednav\menu_manager::get_menu($menukey);
+                if ($handler) {
+                    $handler->remove_nodes_from_config($mrecs);
+                }
+            }
+
             try {
                 \cache::make('local_extendednav', 'nodes')->purge();
             } catch (\Throwable $e) {
@@ -238,11 +252,17 @@ echo '            </span>';
 echo '            <button type="submit" form="bulk-export-form" formaction="export.php" class="btn btn-sm btn-info mr-1">';
 echo '                <i class="fa fa-download mr-1"></i>' . get_string('export_selected', 'local_extendednav');
 echo '            </button>';
-echo "            <button type=\"submit\" form=\"bulk-export-form\" formaction=\"manage.php\" " .
-    "name=\"action\" value=\"bulkdelete\" class=\"btn btn-sm btn-danger mr-1\" " .
-    "onclick=\"return confirm('" . addslashes(get_string('bulk_delete_confirm', 'local_extendednav')) . "');\">";
-echo '                <i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav');
-echo '            </button>';
+            $confirmmsg = s(get_string('bulk_delete_confirm', 'local_extendednav'));
+            echo html_writer::tag('button', '<i class="fa fa-trash mr-1"></i>' . get_string('bulk_delete', 'local_extendednav'), [
+                'type' => 'submit',
+                'form' => 'bulk-export-form',
+                'formaction' => 'manage.php',
+                'name' => 'action',
+                'value' => 'bulkdelete',
+                'class' => 'btn btn-sm btn-danger mr-1',
+                'data-native-warning' => s(get_string('native_cannot_delete', 'local_extendednav')),
+                'onclick' => 'return confirm("' . $confirmmsg . '");',
+            ]);
 echo '        </div>';
 echo '    </div>';
 
@@ -364,7 +384,7 @@ $total = count($nodes);
 $i = 0;
 
 foreach ($nodes as $n) {
-    $corenode = $primarynodes[$n->nodekey] ?? null;
+    $corenode = $activenativenodes[$n->nodekey] ?? null;
     if ($n->visibility == 0) {
         $vis = '<span class="badge badge-danger">' . get_string('vis_hidden', 'local_extendednav') . '</span>';
     } else if ($n->visibility == 2) {
@@ -457,7 +477,7 @@ foreach ($nodes as $n) {
 
     $titlecell = html_writer::div($titlehtml, 'text-break', ['style' => 'max-width: 160px; word-break: break-word;']);
 
-    $checkbox = '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox">';
+    $checkbox = '<input type="checkbox" name="nodeids[]" value="' . $n->id . '" class="node-checkbox" data-native="' . ($corenode ? '1' : '0') . '">';
 
     if (!empty($n->url)) {
         $urltext = s($n->url);

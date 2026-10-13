@@ -41,38 +41,65 @@ class usermenu extends base {
     }
 
     /**
-     * Syncs
+     * @return string|null
+     */
+    public function get_config_name(): ?string {
+        return 'customusermenuitems';
+    }
+
+    /**
+     * @return string
+     */
+    public function get_config_prefix(): string {
+        return 'umenu_';
+    }
+
+    /**
+     * Syncs core native user menu nodes.
      */
     public function sync_native_nodes(): void {
         global $DB;
-        $dbusermenus = $DB->get_records('local_extendednav', ['menu' => $this->get_key()]);
-        if (empty($dbusermenus)) {
-            \local_extendednav\observer::sync_custom_menu('customusermenuitems', 'umenu_', $this->get_key());
+        $dbnodesbykey = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
+        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$this->get_key()]);
+
+        $nativenodes = $this->get_native_nodes();
+        foreach ($nativenodes as $key => $node) {
+            if (!isset($dbnodesbykey[$key])) {
+                $maxsort++;
+                $rec = new \stdClass();
+                $rec->menu = $this->get_key();
+                $rec->nodekey = $key;
+                $rec->title = $node->text;
+                $rec->url = $node->action;
+                $rec->visibility = 1;
+                $rec->sortorder = $maxsort;
+                $rec->newwindow = 0;
+                $DB->insert_record('local_extendednav', $rec);
+            }
         }
     }
 
     /**
+     * Returns default core Moodle user menu nodes.
+     *
      * @return array
      */
     public function get_native_nodes(): array {
-        global $CFG;
+        $defaultitems = [
+            'profile,moodle|/user/profile.php',
+            'grades,grades|/grade/report/mygrades.php',
+            'calendar,core_calendar|/calendar/view.php?view=month',
+            'privatefiles,moodle|/user/files.php',
+            'reports,core_reportbuilder|/reportbuilder/index.php',
+        ];
         $nodes = [];
-        $text = $CFG->customusermenuitems ?? '';
-        $lines = explode("\n", $text);
-        foreach ($lines as $linenumber => $line) {
-            $line = trim($line);
-            if (strlen($line) == 0) {
-                continue;
-            }
+        foreach ($defaultitems as $linenumber => $line) {
             $settings = explode('|', $line);
             $rawtext = trim($settings[0]);
             $itemtext = ltrim($rawtext, '-');
             $itemurl = isset($settings[1]) ? trim($settings[1]) : '';
             $itemicon = isset($settings[2]) ? trim($settings[2]) : '';
             $slug = preg_replace('/[^a-z0-9]/', '', strtolower($itemtext));
-            if (empty($slug)) {
-                $slug = 'item' . $linenumber;
-            }
             $nodekey = 'umenu_' . substr($slug, 0, 15);
 
             $std = new \stdClass();
@@ -90,7 +117,7 @@ class usermenu extends base {
      * @param array $customnodes
      * @param mixed $context
      */
-        public function inject_nodes(array $customnodes, $context = null): void {
+    public function inject_nodes(array $customnodes, $context = null): void {
         global $CFG, $USER;
 
         if (empty($customnodes)) {

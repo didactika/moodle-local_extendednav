@@ -20,17 +20,20 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Base abstract class for scalable menu management.
+ *
  * @package local_extendednav
  */
 abstract class base {
     /**
      * Gets the unique string key for this menu type (e.g. 'primary').
+     *
      * @return string
      */
     abstract public function get_key(): string;
 
     /**
      * Gets the human-readable localized name of this menu.
+     *
      * @return string
      */
     abstract public function get_name(): string;
@@ -42,14 +45,60 @@ abstract class base {
 
     /**
      * Gets all native nodes belonging to this menu as an array of objects.
+     *
      * @return array Associative array of nodekey => object
      */
     abstract public function get_native_nodes(): array;
 
     /**
      * Injects the custom database nodes back into Moodle's native navigation structure.
+     *
      * @param array $nodes Array of database nodes for this menu
      * @param mixed $context Optional context (like a hook object)
      */
     abstract public function inject_nodes(array $nodes, $context = null): void;
+
+    /**
+     * Gets the associated core config setting name (e.g. 'custommenuitems', 'customusermenuitems'), if any.
+     *
+     * @return string|null
+     */
+    public function get_config_name(): ?string {
+        return null;
+    }
+
+    /**
+     * Gets the prefix used when storing items from this config (e.g. 'cmenu_', 'umenu_').
+     *
+     * @return string
+     */
+    public function get_config_prefix(): string {
+        return '';
+    }
+
+    /**
+     * Synchronizes this menu's associated Moodle configuration into the database.
+     */
+    public function sync_from_config(): void {
+        $configname = $this->get_config_name();
+        $prefix = $this->get_config_prefix();
+        if (empty($configname)) {
+            return;
+        }
+        \local_extendednav\observer::sync_custom_menu($configname, $prefix, $this->get_key());
+    }
+
+    /**
+     * Removes specified deleted node records from this menu's associated Moodle configuration.
+     *
+     * @param array $deletedrecords Array of record objects deleted from {local_extendednav}
+     */
+    public function remove_nodes_from_config(array $deletedrecords): void {
+        $configname = $this->get_config_name();
+        $prefix = $this->get_config_prefix();
+        if (empty($configname) || empty($deletedrecords)) {
+            return;
+        }
+        \local_extendednav\observer::remove_from_config_by_definition($configname, $prefix, $deletedrecords);
+    }
 }

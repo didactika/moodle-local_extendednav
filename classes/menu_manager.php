@@ -20,11 +20,13 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Manager class for handling scalable menus.
+ *
  * @package local_extendednav
  */
 class menu_manager {
     /**
      * Returns an array of all registered menu handler instances.
+     *
      * @return \local_extendednav\menu\base[]
      */
     public static function get_menus(): array {
@@ -43,5 +45,20 @@ class menu_manager {
     public static function get_menu(string $key): ?\local_extendednav\menu\base {
         $menus = self::get_menus();
         return $menus[$key] ?? null;
+    }
+
+    /**
+     * Finds a menu handler by its associated Moodle configuration name.
+     *
+     * @param string $configname
+     * @return \local_extendednav\menu\base|null
+     */
+    public static function get_menu_by_config(string $configname): ?\local_extendednav\menu\base {
+        foreach (self::get_menus() as $menu) {
+            if ($menu->get_config_name() === $configname) {
+                return $menu;
+            }
+        }
+        return null;
     }
 }

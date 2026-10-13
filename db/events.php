@@ -26,8 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname'   => '\core\event\config_updated',
-        'callback'    => '\local_extendednav\observer::config_updated',
+        'eventname'   => '\core\event\config_log_created',
+        'callback'    => '\local_extendednav\observer::config_log_created',
         'internal'    => false,
     ],
 ];
