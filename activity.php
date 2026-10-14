@@ -101,9 +101,10 @@ echo \html_writer::link(
 
 // Right: Filter dropdown matching local_delegateaccount.
 echo \html_writer::start_div('dropdown local-extendednav-filters', ['data-region' => 'local-extendednav-filters']);
+$filterbtnicon = $OUTPUT->pix_icon('i/filter', get_string('filters', 'local_extendednav'), 'core');
 echo \html_writer::tag(
     'button',
-    $OUTPUT->pix_icon('i/filter', get_string('filters', 'local_extendednav'), 'core') . ' ' . get_string('filters', 'local_extendednav') . ' ',
+    $filterbtnicon . ' ' . get_string('filters', 'local_extendednav') . ' ',
     [
         'class' => 'btn ' . $filterbtnclass . ' dropdown-toggle',
         'type' => 'button',
