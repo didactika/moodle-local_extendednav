@@ -37,10 +37,10 @@ class hooks {
     public static $skiphook = false;
 
     /** @var string|null Original custommenuitems before temporary clearance. */
-    public static $origcustommenuitems = null;
+    public static $origcustommenu = null;
 
     /** @var string|null Original customusermenuitems before temporary replacement. */
-    public static $origcustomusermenuitems = null;
+    public static $origcustomusermenu = null;
 
     /**
      * Checks whether the current request is an admin settings page.
@@ -101,11 +101,11 @@ class hooks {
             // Backup original configs on admin settings pages so we can restore them
             // before $settingspage->output_html() renders the settings form textareas.
             if (self::is_admin_settings_page()) {
-                if (self::$origcustommenuitems === null && isset($CFG->custommenuitems)) {
-                    self::$origcustommenuitems = $CFG->custommenuitems;
+                if (self::$origcustommenu === null && isset($CFG->custommenuitems)) {
+                    self::$origcustommenu = $CFG->custommenuitems;
                 }
-                if (self::$origcustomusermenuitems === null && isset($CFG->customusermenuitems)) {
-                    self::$origcustomusermenuitems = $CFG->customusermenuitems;
+                if (self::$origcustomusermenu === null && isset($CFG->customusermenuitems)) {
+                    self::$origcustomusermenu = $CFG->customusermenuitems;
                 }
             }
 
@@ -173,11 +173,11 @@ class hooks {
 
         // Restore original configs on admin settings page before form textareas render.
         if (self::is_admin_settings_page()) {
-            if (self::$origcustommenuitems !== null) {
-                $CFG->custommenuitems = self::$origcustommenuitems;
+            if (self::$origcustommenu !== null) {
+                $CFG->custommenuitems = self::$origcustommenu;
             }
-            if (self::$origcustomusermenuitems !== null) {
-                $CFG->customusermenuitems = self::$origcustomusermenuitems;
+            if (self::$origcustomusermenu !== null) {
+                $CFG->customusermenuitems = self::$origcustomusermenu;
             }
         }
 
@@ -375,7 +375,8 @@ class hooks {
      * @param \core\hook\output\before_standard_head_html_generation $hook
      */
     public static function before_standard_head(\core\hook\output\before_standard_head_html_generation $hook): void {
-        global $DB, $USER, $CFG;
+        global $DB, $CFG;
+        unset($hook);
 
         if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
             return;
@@ -386,8 +387,8 @@ class hooks {
         }
 
         if (self::is_admin_settings_page()) {
-            if (self::$origcustomusermenuitems === null && isset($CFG->customusermenuitems)) {
-                self::$origcustomusermenuitems = $CFG->customusermenuitems;
+            if (self::$origcustomusermenu === null && isset($CFG->customusermenuitems)) {
+                self::$origcustomusermenu = $CFG->customusermenuitems;
             }
         }
 

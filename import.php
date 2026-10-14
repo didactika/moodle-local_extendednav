@@ -153,7 +153,6 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($streditname);
 
 $docurl = new moodle_url('/local/extendednav/documentation.php');
 

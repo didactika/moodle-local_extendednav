@@ -75,7 +75,6 @@ $PAGE->set_title(get_string('activity_log', 'local_extendednav') . ' - ' . $menu
 $PAGE->set_heading($headingtext);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($headingtext);
 
 if ($submittedfilters || array_filter($filters, static fn($value): bool => $value !== '' && $value !== 0)) {
     $filterform->set_data($filters);

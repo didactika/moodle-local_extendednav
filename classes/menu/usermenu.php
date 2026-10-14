@@ -12,21 +12,12 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
-
-/**
- * Usermenu navigation handler.
- *
- * @package    local_extendednav
- * @copyright  2026 Didactika
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_extendednav\menu;
 
 /**
- * Usermenu navigation implementation.
+ * Scalable menu implementation for the Moodle User Menu.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika
@@ -34,7 +25,7 @@ namespace local_extendednav\menu;
  */
 class usermenu extends base {
     /**
-     * Gets the unique string key for this menu type.
+     * Gets the key identifying the user menu.
      *
      * @return string
      */
@@ -52,7 +43,7 @@ class usermenu extends base {
     }
 
     /**
-     * Gets the associated core config setting name.
+     * Associated core configuration name for user menu items.
      *
      * @return string|null
      */
@@ -61,7 +52,7 @@ class usermenu extends base {
     }
 
     /**
-     * Gets the prefix used when storing items from this config.
+     * Key prefix for items imported/synced from customusermenuitems.
      *
      * @return string
      */
@@ -70,32 +61,49 @@ class usermenu extends base {
     }
 
     /**
-     * Syncs core native user menu nodes.
+     * Synchronizes native core nodes into the plugin database.
      */
     public function sync_native_nodes(): void {
         global $DB;
-        $dbnodesbykey = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
-        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$this->get_key()]);
 
-        $nativenodes = $this->get_native_nodes();
-        foreach ($nativenodes as $key => $node) {
-            if (!isset($dbnodesbykey[$key])) {
+        $nodes = $this->get_native_nodes();
+        $existing = $DB->get_records('local_extendednav', ['menu' => 'usermenu']);
+        $existingbykey = [];
+        foreach ($existing as $e) {
+            $existingbykey[$e->nodekey] = $e;
+        }
+
+        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', ['usermenu']);
+
+        foreach ($nodes as $key => $node) {
+            if (!isset($existingbykey[$key])) {
                 $maxsort++;
-                $rec = new \stdClass();
-                $rec->menu = $this->get_key();
-                $rec->nodekey = $key;
-                $rec->title = $node->text;
-                $rec->url = $node->action;
-                $rec->visibility = 1;
-                $rec->sortorder = $maxsort;
-                $rec->newwindow = 0;
-                $DB->insert_record('local_extendednav', $rec);
+                $record = new \stdClass();
+                $record->nodekey = $key;
+                $record->menu = 'usermenu';
+                $record->title = $node->text;
+                $record->url = $node->action;
+                $record->parentkey = null;
+                $record->icon = $node->icon;
+                $record->visibility = 1;
+                $record->roles = null;
+                $record->newwindow = 0;
+                $record->sortorder = $maxsort;
+                $record->id = (int)$DB->insert_record('local_extendednav', $record);
+                \local_extendednav\event\node_created::create_from_record($record)->trigger();
+            } else {
+                $rec = $existingbykey[$key];
+                if ($rec->url !== $node->action) {
+                    $rec->url = $node->action;
+                    $DB->update_record('local_extendednav', $rec);
+                    \local_extendednav\event\node_updated::create_from_record($rec)->trigger();
+                }
             }
         }
     }
 
     /**
-     * Returns default core Moodle user menu nodes.
+     * Gets all native nodes belonging to this menu as an array of objects.
      *
      * @return array
      */
@@ -108,7 +116,7 @@ class usermenu extends base {
             'reports,core_reportbuilder|/reportbuilder/index.php',
         ];
         $nodes = [];
-        foreach ($defaultitems as $linenumber => $line) {
+        foreach ($defaultitems as $line) {
             $settings = explode('|', $line);
             $rawtext = trim($settings[0]);
             $itemtext = ltrim($rawtext, '-');
@@ -140,19 +148,17 @@ class usermenu extends base {
             return;
         }
 
-        $newcustomusermenu = [];
-        foreach ($customnodes as $umnode) {
-            if (!empty($umnode->parentkey)) {
-                continue;
-            }
-
+        // Group nodes by parent.
+        $childrenbyparent = [];
+        $rootnodes = [];
+        foreach ($customnodes as $n) {
             $allowed = true;
-            if ($umnode->visibility == 0) {
+            if ($n->visibility == 0) {
                 $allowed = false;
-            } else if ($umnode->visibility == 2) {
+            } else if ($n->visibility == 2) {
                 $allowed = false;
-                if (!empty($umnode->roles)) {
-                    $roleids = explode(',', $umnode->roles);
+                if (!empty($n->roles)) {
+                    $roleids = explode(',', $n->roles);
                     foreach ($roleids as $rid) {
                         if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
                             $allowed = true;
@@ -163,38 +169,37 @@ class usermenu extends base {
             }
 
             if ($allowed) {
-                $line = trim((string)$umnode->title);
-
-                // If it is empty, fallback to the native node.
-                if ($line === '') {
-                    $nativenodes = $this->get_native_nodes();
-                    if (isset($nativenodes[$umnode->nodekey])) {
-                        $native = $nativenodes[$umnode->nodekey];
-                        $line = $native->text;
-                        if (empty($umnode->url)) {
-                            $umnode->url = $native->action;
-                        }
-                    }
+                if (empty($n->parentkey)) {
+                    $rootnodes[] = $n;
+                } else {
+                    $childrenbyparent[$n->parentkey][] = $n;
                 }
-
-                $nativenodes = $this->get_native_nodes();
-                $native = isset($nativenodes[$umnode->nodekey]) ? $nativenodes[$umnode->nodekey] : null;
-
-                $urlpart = !empty($umnode->url) ? trim((string)$umnode->url) : ($native ? trim((string)$native->action) : '');
-                if ($urlpart !== '') {
-                    $line .= '|' . $urlpart;
-                }
-
-                $icon = trim((string)$umnode->icon);
-                if (!empty($icon) && $icon !== 'none' && strpos($icon, 'fa-') === false && strpos($icon, 'fa ') === false) {
-                    if ($urlpart === '') {
-                        $line .= '|';
-                    }
-                    $line .= '|' . $icon;
-                }
-
-                $newcustomusermenu[] = $line;
             }
+        }
+
+        $newcustomusermenu = [];
+        $nativenodes = $this->get_native_nodes();
+
+        foreach ($rootnodes as $node) {
+            $title = !empty($node->title) ? $node->title : ($nativenodes[$node->nodekey]->text ?? '');
+            $url = !empty($node->url) ? $node->url : ($nativenodes[$node->nodekey]->action ?? '');
+            $icon = (!empty($node->icon) && $node->icon !== 'none') ? $node->icon : '';
+
+            if (empty($title) && empty($url)) {
+                continue;
+            }
+
+            if (!empty($url)) {
+                $line = $title . '|' . $url;
+            } else {
+                $line = $title;
+            }
+
+            if (!empty($icon)) {
+                $line .= '|' . $icon;
+            }
+
+            $newcustomusermenu[] = $line;
         }
         $CFG->customusermenuitems = implode("\n", $newcustomusermenu);
     }
@@ -206,6 +211,6 @@ class usermenu extends base {
      * @param mixed $hook The user menu hook
      */
     public function inject_nodes_via_hook(array $customnodes, $hook): void {
-        // Do nothing. Custom nodes are injected via customusermenuitems so they obey sortorder natively.
+        unset($customnodes, $hook);
     }
 }

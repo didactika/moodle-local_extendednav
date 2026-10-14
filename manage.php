@@ -201,7 +201,6 @@ $wheresql = empty($where) ? '' : implode(' AND ', $where);
 $isfiltered = ($search !== '' || $parent !== '');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('manage_nodes', 'local_extendednav'));
 echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']);
 
 // Scalable tabs generation.

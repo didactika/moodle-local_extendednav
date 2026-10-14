@@ -167,7 +167,6 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($streditname);
 
 $mform->display();
 

@@ -216,7 +216,7 @@ class node_form extends \moodleform {
      * @return array Array of errors.
      */
     public function validation($data, $files) {
-        global $DB, $PAGE;
+        global $DB;
         $errors = parent::validation($data, $files);
 
         // Maximum character validations matching DB column definitions.
