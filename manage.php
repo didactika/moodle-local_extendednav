@@ -465,13 +465,15 @@ echo '            </button>';
                 }
                 if (!empty($displaytitle)) {
                     $titlebits = explode(',', $displaytitle, 2);
-                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                    if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
-                        try {
-                            $displaytitle = get_string($titlebits[0], $titlebits[1]);
-                        } catch (\moodle_exception $e) {
-                            unset($e);
+                    if (count($titlebits) === 2) {
+                        $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                        $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                        if ($isvalidstr && $isvalidcomp) {
+                            try {
+                                $displaytitle = get_string($titlebits[0], $titlebits[1]);
+                            } catch (\moodle_exception $e) {
+                                unset($e);
+                            }
                         }
                     }
                     $titletext = format_string($displaytitle);

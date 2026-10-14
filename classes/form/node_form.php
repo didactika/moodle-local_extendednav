@@ -158,13 +158,15 @@ class node_form extends \moodleform {
             $titlecandidate = !empty($c->title) ? $c->title : ($corenodes[$c->nodekey]->text ?? '');
             if (!empty($titlecandidate)) {
                 $titlebits = explode(',', $titlecandidate, 2);
-                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
-                    try {
-                        $titlecandidate = get_string($titlebits[0], $titlebits[1]);
-                    } catch (\moodle_exception $e) {
-                        unset($e);
+                if (count($titlebits) === 2) {
+                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                    if ($isvalidstr && $isvalidcomp) {
+                        try {
+                            $titlecandidate = get_string($titlebits[0], $titlebits[1]);
+                        } catch (\moodle_exception $e) {
+                            unset($e);
+                        }
                     }
                 }
                 $title = strip_tags(format_string($titlecandidate));
@@ -252,42 +254,32 @@ class node_form extends \moodleform {
             }
         }
 
-        $existing = $DB->get_record(
-            'local_extendednav',
-            ['nodekey' => $data['nodekey'], 'menu' => $menutype],
-            '*',
-            IGNORE_MULTIPLE
-        );
-        if ($existing && $existing->id != $data['id']) {
-            $errors['nodekey'] = get_string('err_duplicate_key', 'local_extendednav');
-        }
-
-        if ($data['nodekey'] === 'siteadminnode') {
-            if ($data['visibility'] != 1) {
-                $errors['visibility'] = get_string('err_admin_hide', 'local_extendednav');
-            }
-            if (!empty($data['parentkey'])) {
-                $errors['parentkey'] = get_string('err_admin_child', 'local_extendednav');
+        if (!empty($data['icon'])) {
+            $rawicon = trim($data['icon']);
+            if (preg_match('/<[^>]*>/', $rawicon)) {
+                $errors['icon'] = get_string('err_icon_no_html', 'local_extendednav');
+            } else if (preg_match('/[;\'"()]/', $rawicon)) {
+                $errors['icon'] = get_string('err_icon_invalid_chars', 'local_extendednav');
             }
         }
 
-        if (!empty($data['parentkey']) && $data['parentkey'] === 'siteadminnode') {
-            $errors['parentkey'] = get_string('err_admin_parent', 'local_extendednav');
+        if (!empty($data['url'])) {
+            $rawurl = trim($data['url']);
+            $lowerurl = strtolower($rawurl);
+            if (strpos($lowerurl, 'javascript:') !== false || strpos($lowerurl, 'data:') !== false) {
+                $errors['url'] = get_string('err_url_forbidden', 'local_extendednav');
+            }
         }
 
-        if (!empty($data['parentkey'])) {
-            if ($data['parentkey'] === $data['nodekey']) {
-                $errors['parentkey'] = get_string('err_parent_self', 'local_extendednav');
-            } else {
-                $parentrecord = $DB->get_record('local_extendednav', ['nodekey' => $data['parentkey']]);
-                if ($parentrecord && !empty($parentrecord->parentkey)) {
-                    $errors['parentkey'] = get_string('err_parent_thirdlevel', 'local_extendednav');
-                }
-
-                $haschildren = $DB->record_exists('local_extendednav', ['parentkey' => $data['nodekey']]);
-                if ($haschildren) {
-                    $errors['parentkey'] = get_string('err_parent_haschildren', 'local_extendednav');
-                }
+        $currentid = !empty($data['id']) ? (int)$data['id'] : 0;
+        if (!empty($data['nodekey'])) {
+            $keyexists = $DB->record_exists_select(
+                'local_extendednav',
+                'nodekey = :nodekey AND menu = :menu AND id != :id',
+                ['nodekey' => $data['nodekey'], 'menu' => $menutype, 'id' => $currentid]
+            );
+            if ($keyexists) {
+                $errors['nodekey'] = get_string('duplicatekey', 'local_extendednav');
             }
         }
 

@@ -251,10 +251,16 @@ class hooks {
                 $title = trim((string)$node->title) ?: (isset($nativenodes[$nodekey]) ? $nativenodes[$nodekey]->text : '');
                 if ($title !== '') {
                     $titlebits = explode(',', $title, 2);
-                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                    if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
-                        $title = get_string($titlebits[0], $titlebits[1]);
+                    if (count($titlebits) === 2) {
+                        $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                        $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                        if ($isvalidstr && $isvalidcomp) {
+                            try {
+                                $title = get_string($titlebits[0], $titlebits[1]);
+                            } catch (\moodle_exception $e) {
+                                unset($e);
+                            }
+                        }
                     }
                 }
 
@@ -294,10 +300,16 @@ class hooks {
             }
 
             $titlebits = explode(',', $ptitle, 2);
-            $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-            $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-            if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
-                $ptitle = get_string($titlebits[0], $titlebits[1]);
+            if (count($titlebits) === 2) {
+                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                if ($isvalidstr && $isvalidcomp) {
+                    try {
+                        $ptitle = get_string($titlebits[0], $titlebits[1]);
+                    } catch (\moodle_exception $e) {
+                        unset($e);
+                    }
+                }
             }
 
             $items = [];
@@ -316,10 +328,16 @@ class hooks {
                     continue;
                 }
                 $titlebits = explode(',', $ctitle, 2);
-                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                if (count($titlebits) == 2 && $isvalidstr && $isvalidcomp) {
-                    $ctitle = get_string($titlebits[0], $titlebits[1]);
+                if (count($titlebits) === 2) {
+                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
+                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
+                    if ($isvalidstr && $isvalidcomp) {
+                        try {
+                            $ctitle = get_string($titlebits[0], $titlebits[1]);
+                        } catch (\moodle_exception $e) {
+                            unset($e);
+                        }
+                    }
                 }
 
                 $items[] = [

@@ -38,6 +38,11 @@ class observer {
             return;
         }
 
+        $plugin = $event->other['plugin'] ?? '';
+        if (!empty($plugin) && $plugin !== 'core') {
+            return;
+        }
+
         $name = $event->other['name'] ?? '';
         $menu = menu_manager::get_menu_by_config($name);
         if ($menu) {
@@ -52,6 +57,11 @@ class observer {
      */
     public static function config_updated(\core\event\base $event): void {
         if (self::$issyncing) {
+            return;
+        }
+
+        $plugin = $event->other['plugin'] ?? '';
+        if (!empty($plugin) && $plugin !== 'core') {
             return;
         }
 
@@ -93,11 +103,12 @@ class observer {
         if ($text === false || $text === null) {
             $text = $CFG->{$configname} ?? '';
         }
-        if (trim((string)$text) === '') {
+        $text = str_replace(["\r\n", "\r"], "\n", (string)$text);
+        if (trim($text) === '') {
             return;
         }
 
-        $lines = explode("\n", (string)$text);
+        $lines = explode("\n", $text);
         $newlines = [];
         $seenkeys = [];
         $changed = false;
@@ -189,7 +200,8 @@ class observer {
         if ($text === false || $text === null) {
             $text = $CFG->{$configname} ?? '';
         }
-        $lines = explode("\n", (string)$text);
+        $text = str_replace(["\r\n", "\r"], "\n", (string)$text);
+        $lines = explode("\n", $text);
 
         $existingrecords = $DB->get_records('local_extendednav', ['menu' => $menutype], 'sortorder ASC, id ASC');
         $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menutype]);
@@ -217,7 +229,7 @@ class observer {
                 $itemicon = null;
             }
 
-            preg_match('/^(\\-*)/', $rawtext, $match);
+            preg_match('/^(-*)/', $rawtext, $match);
             $depth = strlen($match[1] ?? '');
 
             $slug = preg_replace('/[^a-z0-9]/', '', strtolower($itemtext));
@@ -239,6 +251,7 @@ class observer {
                 $parentkey = $depthkeys[$depth - 1];
             }
 
+            $depthkeys = array_slice($depthkeys, 0, $depth, true);
             $depthkeys[$depth] = $nodekey;
 
             // 1. Direct match by nodekey on an existing record that hasn't been matched yet.
@@ -323,12 +336,22 @@ class observer {
         }
 
         // Delete records that were removed from the Moodle config (excluding native core nodes).
+        $todeleteids = [];
+        $todeleterecs = [];
         foreach ($existingrecords as $rec) {
             if (!isset($matchedids[$rec->id])) {
                 if (strpos($rec->nodekey, $prefix) === 0 && !isset($nativenodes[$rec->nodekey])) {
-                    $DB->delete_records('local_extendednav', ['id' => $rec->id]);
-                    \local_extendednav\event\node_deleted::create_from_record($rec)->trigger();
+                    $todeleteids[] = (int)$rec->id;
+                    $todeleterecs[] = $rec;
                 }
+            }
+        }
+
+        if (!empty($todeleteids)) {
+            [$insql, $params] = $DB->get_in_or_equal($todeleteids);
+            $DB->delete_records_select('local_extendednav', "id $insql", $params);
+            foreach ($todeleterecs as $rec) {
+                \local_extendednav\event\node_deleted::create_from_record($rec)->trigger();
             }
         }
 
