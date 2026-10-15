@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Events definition for extendednav.
+ * Event observers for local_extendednav.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,8 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname'   => '\core\event\config_log_created',
-        'callback'    => '\local_extendednav\observer::config_log_created',
-        'internal'    => false,
+        'eventname' => '\core\event\config_log_created',
+        'callback' => '\local_extendednav\observer::config_log_created',
+        'internal' => false,
+    ],
+    [
+        'eventname' => '\core\event\role_deleted',
+        'callback' => '\local_extendednav\observer::role_deleted',
     ],
 ];
