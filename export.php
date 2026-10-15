@@ -15,77 +15,50 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Export customized navigation nodes to YAML.
+ * Exports navigation nodes as a YAML file.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use local_extendednav\local\node_importer;
+use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-$all = optional_param('all', 0, PARAM_INT);
-$menu = optional_param('menu', 'primary', PARAM_ALPHA);
+$all = optional_param('all', 0, PARAM_BOOL);
+$menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 $nodeids = optional_param_array('nodeids', [], PARAM_INT);
-
-if (!$all && empty($nodeids)) {
-    redirect(
-        new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]),
-        get_string('no_nodes_export', 'local_extendednav'),
-        null,
-        \core\output\notification::NOTIFY_ERROR
-    );
+if (menu_manager::get_menu($menukey) === null) {
+    $menukey = 'primary';
 }
+$manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
 if ($all) {
-    $nodes = $DB->get_records('local_extendednav', ['menu' => $menu], 'sortorder ASC, id ASC');
-    $filename = 'extendednav_config_all_' . date('Ymd_His') . '.yml';
+    $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey], 'sortorder ASC, id ASC');
+    $filename = 'extendednav_' . $menukey . '_all_' . date('Ymd_His') . '.yaml';
 } else {
-    [$insql, $inparams] = $DB->get_in_or_equal($nodeids);
-    $inparams[] = $menu;
-    $nodes = $DB->get_records_select('local_extendednav', "id $insql AND menu = ?", $inparams, 'sortorder ASC, id ASC');
-    $filename = 'extendednav_config_selected_' . date('Ymd_His') . '.yml';
+    require_sesskey();
+    $nodes = empty($nodeids) ? [] : $DB->get_records_list('local_extendednav', 'id', $nodeids, 'sortorder ASC, id ASC');
+    $nodes = array_filter($nodes, static fn(\stdClass $node): bool => $node->menu === $menukey);
+    $filename = 'extendednav_' . $menukey . '_selected_' . date('Ymd_His') . '.yaml';
 }
 
 if (empty($nodes)) {
-    redirect(
-        new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]),
-        get_string('no_nodes_export', 'local_extendednav'),
-        null,
-        \core\output\notification::NOTIFY_ERROR
-    );
+    redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }
 
-$exportdata = ['nodes' => []];
+$content = \local_extendednav\yaml::dump(['nodes' => array_values(array_map([node_importer::class, 'export_node'], $nodes))]);
 
-foreach ($nodes as $n) {
-    $nodedata = [
-        'nodekey'     => $n->nodekey,
-        'menu'        => $n->menu,
-        'title'       => $n->title,
-        'url'         => $n->url,
-        'icon'        => $n->icon,
-        'visibility'  => (int)$n->visibility,
-        'roles'       => $n->roles,
-        'parentkey'   => $n->parentkey,
-
-        'newwindow'   => (int)$n->newwindow,
-        'blockedurls' => $n->blockedurls,
-    ];
-    $exportdata['nodes'][] = $nodedata;
-}
-
-$yamlcontent = \local_extendednav\yaml::dump($exportdata);
-
-
-header('Content-Type: application/x-yaml');
+header('Content-Type: application/yaml; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Cache-Control: private, max-age=0, must-revalidate');
 header('Pragma: public');
-header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($yamlcontent)));
-echo $yamlcontent;
+header('Content-Length: ' . strlen($content));
+echo $content;
 exit;

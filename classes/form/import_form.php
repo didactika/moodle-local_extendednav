@@ -21,36 +21,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
 /**
- * Form for importing navigation nodes from YAML.
+ * Form to upload a YAML file of nodes.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_form extends \moodleform {
     /**
-     * Data validation.
-     *
-     * @param array $data array of ("fieldname"=>value) of submitted data
-     * @param array $files array of uploaded files "element_name"=>tmp_file_path
-     * @return array of "element_name"=>"error_description" if there are errors,
-     *         or an empty array if everything is OK.
-     */
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $draftitemid = $data['yamlfile'];
-        $fs = get_file_storage();
-        $context = \context_user::instance($GLOBALS['USER']->id);
-        $draftfiles = $fs->get_area_files($context->id, 'user', 'draft', $draftitemid, '', false);
-        if (empty($draftfiles)) {
-            $errors['yamlfile'] = get_string('required');
-        }
-        return $errors;
-    }
-
-    /**
-     * Form definition
+     * Form definition.
      */
     protected function definition() {
         $mform = $this->_form;
@@ -60,17 +40,17 @@ class import_form extends \moodleform {
             'yamlfile',
             get_string('yamlconfigfile', 'local_extendednav'),
             null,
-            ['maxfiles' => 1, 'accepted_types' => ['.yml', '.yaml']]
+            ['maxfiles' => 1, 'accepted_types' => ['.yaml', '.yml']]
         );
         $mform->addRule('yamlfile', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('yamlfile', 'yamlconfigfile', 'local_extendednav');
 
-        $conflictoptions = [
+        $mform->addElement('select', 'conflict_action', get_string('conflict_handling', 'local_extendednav'), [
             'skip' => get_string('conflict_skip', 'local_extendednav'),
             'overwrite' => get_string('conflict_overwrite', 'local_extendednav'),
-        ];
-        $mform->addElement('select', 'conflict_action', get_string('conflict_handling', 'local_extendednav'), $conflictoptions);
+        ]);
         $mform->setDefault('conflict_action', 'skip');
+        $mform->addHelpButton('conflict_action', 'conflict_handling', 'local_extendednav');
 
         $this->add_action_buttons(true, get_string('import', 'local_extendednav'));
     }

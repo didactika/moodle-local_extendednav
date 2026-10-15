@@ -17,126 +17,59 @@
 namespace local_extendednav;
 
 /**
- * Utility for parsing and dumping YAML for config import/export.
+ * Reads and writes the YAML used by the import and export.
+ *
+ * The PHP yaml extension is used when it is installed. Otherwise a small
+ * built-in reader and writer handle the structure this plugin uses: a "nodes"
+ * list of maps with scalar values.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class yaml {
-    /**
-     * Dumps an array to a YAML string.
-     *
-     * @param array $data Data to dump.
-     * @return string YAML string.
-     */
-    public static function dump(array $data): string {
-        if (function_exists('yaml_emit')) {
-            return yaml_emit($data);
-        }
-
-        $out = "";
-        foreach ($data as $key => $val) {
-            $out .= self::dump_node($key, $val, 0);
-        }
-        return $out;
-    }
-
-        /**
-         * Formats a scalar value for YAML output.
-         *
-         * @param mixed $val The value to format.
-         * @param string $prefix Optional prefix for multiline.
-         * @return string Formatted value.
-         */
-    private static function format_scalar($val, $prefix = "") {
-        if ($val === null) {
-            return 'null';
-        }
-        if (is_bool($val)) {
-            return $val ? 'true' : 'false';
-        }
-        if (is_string($val)) {
-            if (strpos($val, "\n") !== false) {
-                return "|\n" . $prefix . "    " . str_replace("\n", "\n" . $prefix . "    ", trim($val));
-            } else if ($val === '' || strpos($val, ' ') !== false || strpos($val, ':') !== false || strpos($val, '-') === 0) {
-                return '"' . str_replace('"', '\"', $val) . '"';
-            }
-            return $val;
-        }
-        return $val;
-    }
+    /** @var string[] Plain values YAML would read as something other than a string. */
+    private const RESERVED = ['true', 'false', 'yes', 'no', 'on', 'off', 'null', '~', 'y', 'n'];
 
     /**
-     * Recursively dumps a YAML node.
+     * Converts data to YAML.
      *
-     * @param string|int $key Node key.
-     * @param mixed $val Node value.
-     * @param int $indent Current indentation level.
-     * @return string YAML fragment.
+     * @param array $data Data to write.
+     * @param bool $usenative Whether to use the PHP yaml extension when it is installed.
+     * @return string
      */
-    private static function dump_node($key, $val, $indent) {
-        $prefix = str_repeat("  ", $indent);
-        $out = "";
+    public static function dump(array $data, bool $usenative = true): string {
+        if ($usenative && function_exists('yaml_emit')) {
+            return yaml_emit($data, YAML_UTF8_ENCODING);
+        }
 
-        $islistitem = is_int($key);
-        $k = $islistitem ? "-" : $key . ":";
-
-        if (is_array($val)) {
-            if ($islistitem && !empty($val) && (array_keys($val) !== range(0, count($val) - 1))) {
-                // It's a map inside a list. Output first key on same line as the hyphen.
-                reset($val);
-                $firstkey = key($val);
-                $firstval = current($val);
-                $out .= $prefix . "- " . $firstkey . ":";
-
-                if (is_array($firstval)) {
-                    $out .= "\n" . self::dump_node($firstkey, $firstval, $indent + 1, true);
-                } else {
-                    $out .= " " . self::format_scalar($firstval) . "\n";
-                }
-
-                array_shift($val);
-                foreach ($val as $ck => $cv) {
-                    $out .= self::dump_node($ck, $cv, $indent + 1);
-                }
-            } else {
-                $out .= $prefix . $k . (!empty($val) ? "\n" : " []\n");
-                if (!empty($val)) {
-                    foreach ($val as $ck => $cv) {
-                        $out .= self::dump_node($ck, $cv, $indent + 1);
-                    }
-                }
-            }
-        } else {
-            $valstr = self::format_scalar($val, $prefix);
-            $out .= $prefix . $k . " " . $valstr . "\n";
+        $out = '';
+        foreach ($data as $key => $value) {
+            $out .= self::dump_node($key, $value, 0);
         }
         return $out;
     }
 
     /**
-     * Parses a YAML string into an array.
+     * Reads YAML.
      *
-     * @param string $content YAML content.
+     * @param string $content YAML text.
+     * @param bool $usenative Whether to use the PHP yaml extension when it is installed.
      * @return array
      */
-    public static function parse(string $content): array {
-        // Strip out UTF-8 BOM if present (Notepad issue).
-        $content = preg_replace('/^' . pack('H*', 'EFBBBF') . '/', '', $content);
-        // Normalize line endings to avoid \r weirdness.
-        $content = str_replace("\r\n", "\n", $content);
-        $content = str_replace("\r", "\n", $content);
+    public static function parse(string $content, bool $usenative = true): array {
+        // Remove a UTF-8 byte order mark and normalise line endings.
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
 
-        if (function_exists('yaml_parse')) {
+        if ($usenative && function_exists('yaml_parse')) {
             $parsed = @yaml_parse($content);
             if ($parsed !== false) {
                 return (array)$parsed;
             }
         }
 
-        // Simple fallback parser for specific structure.
         $result = [];
         $stack = [&$result];
         $frames = [['type' => 'map', 'childindent' => 0, 'keyindent' => -1]];
@@ -152,79 +85,63 @@ class yaml {
             if (!$isseq && !$iskey) {
                 continue;
             }
+            $indent = strlen($line) - strlen(ltrim($line));
 
-            $token = [
-                'line' => $line,
-                'isseq' => $isseq,
-                'iskey' => $iskey,
-                'indent' => strlen($line) - strlen(ltrim($line)),
-            ];
-
+            // Close the frames this line does not belong to.
             $depth = count($frames);
             while ($depth > 1) {
                 $frame = $frames[$depth - 1];
-                $belongs = false;
                 if ($frame['childindent'] === null) {
-                    if ($token['isseq']) {
-                        $belongs = $token['indent'] >= $frame['keyindent'];
-                    } else {
-                        $belongs = $token['iskey'] && $token['indent'] > $frame['keyindent'];
-                    }
-                } else if ($token['indent'] > $frame['childindent']) {
+                    $belongs = $isseq ? $indent >= $frame['keyindent'] : ($iskey && $indent > $frame['keyindent']);
+                } else if ($indent > $frame['childindent']) {
                     $belongs = true;
-                } else if ($token['indent'] === $frame['childindent']) {
-                    $belongs = ($token['isseq'] && $frame['type'] === 'seq') || ($token['iskey'] && $frame['type'] === 'map');
-                }
-
-                if (!$belongs) {
-                    array_pop($stack);
-                    array_pop($frames);
-                    $depth--;
+                } else if ($indent === $frame['childindent']) {
+                    $belongs = ($isseq && $frame['type'] === 'seq') || ($iskey && $frame['type'] === 'map');
                 } else {
+                    $belongs = false;
+                }
+                if ($belongs) {
                     break;
                 }
+                array_pop($stack);
+                array_pop($frames);
+                $depth--;
             }
 
-            $topidx = count($stack) - 1;
-            $current = &$stack[$topidx];
+            $top = count($stack) - 1;
+            $current = &$stack[$top];
             if (!is_array($current)) {
                 $current = [];
             }
-
-            if ($frames[$topidx]['childindent'] === null) {
-                $frames[$topidx]['childindent'] = $token['indent'];
-                $frames[$topidx]['type'] = $token['isseq'] ? 'seq' : 'map';
+            if ($frames[$top]['childindent'] === null) {
+                $frames[$top]['childindent'] = $indent;
+                $frames[$top]['type'] = $isseq ? 'seq' : 'map';
             }
 
-            if ($token['isseq']) {
-                preg_match('/^(\s*-\s*)(.*)$/', $token['line'], $sm);
+            if ($isseq) {
+                preg_match('/^(\s*-\s*)(.*)$/', $line, $sm);
                 $value = rtrim($sm[2] ?? '');
-
-                if (!preg_match('/^([^\s:#][^:]*):(?:\s+(.*))?$/', $value, $om)) {
+                if (!preg_match('/^([^\s:#"\'][^:]*):(?:\s+(.*))?$/', $value, $om)) {
                     $current[] = self::parse_value($value);
                 } else {
-                    $okey = rtrim($om[1]);
-                    $oval = isset($om[2]) ? trim($om[2]) : '';
                     $innerindent = strlen($sm[1] ?? '');
-
-                    $current[] = [$okey => self::parse_value($oval)];
+                    $current[] = [rtrim($om[1]) => self::parse_value(isset($om[2]) ? trim($om[2]) : '')];
                     $last = array_key_last($current);
                     $stack[] = &$current[$last];
                     $frames[] = ['type' => 'map', 'childindent' => $innerindent, 'keyindent' => $innerindent];
                 }
             } else {
-                preg_match('/^\s*([^\s:#][^:]*):(?:\s+(.*))?$/', $token['line'], $km);
+                preg_match('/^\s*([^\s:#][^:]*):(?:\s+(.*))?$/', $line, $km);
                 $key = rtrim($km[1] ?? '');
                 $value = isset($km[2]) ? trim($km[2]) : '';
-
                 if ($value === '[]') {
                     $current[$key] = [];
-                } else if ($value !== '' && !str_starts_with($value, '#')) {
+                } else if ($value !== '' && strpos($value, '#') !== 0) {
                     $current[$key] = self::parse_value($value);
                 } else {
                     $current[$key] = [];
                     $stack[] = &$current[$key];
-                    $frames[] = ['type' => null, 'childindent' => null, 'keyindent' => $token['indent']];
+                    $frames[] = ['type' => null, 'childindent' => null, 'keyindent' => $indent];
                 }
             }
             unset($current);
@@ -234,20 +151,99 @@ class yaml {
     }
 
     /**
-     * Parses a scalar string value from YAML.
+     * Writes one node of the YAML tree.
      *
-     * @param string $value Raw value string.
-     * @return mixed Parsed value typed.
+     * @param string|int $key Node key; integers are list items.
+     * @param mixed $value Node value.
+     * @param int $indent Indentation level.
+     * @return string
+     */
+    private static function dump_node($key, $value, int $indent): string {
+        $prefix = str_repeat('  ', $indent);
+
+        if (!is_array($value)) {
+            $label = is_int($key) ? '-' : $key . ':';
+            return $prefix . $label . ' ' . self::format_scalar($value) . "\n";
+        }
+
+        $isassoc = !empty($value) && array_keys($value) !== range(0, count($value) - 1);
+        if (is_int($key) && $isassoc) {
+            // A map inside a list: the first key goes on the dash line.
+            $out = '';
+            $first = true;
+            foreach ($value as $childkey => $childvalue) {
+                if ($first) {
+                    $first = false;
+                    if (is_array($childvalue)) {
+                        $out .= $prefix . '- ' . $childkey . ":\n";
+                        foreach ($childvalue as $k => $v) {
+                            $out .= self::dump_node($k, $v, $indent + 2);
+                        }
+                    } else {
+                        $out .= $prefix . '- ' . $childkey . ': ' . self::format_scalar($childvalue) . "\n";
+                    }
+                    continue;
+                }
+                $out .= self::dump_node($childkey, $childvalue, $indent + 1);
+            }
+            return $out;
+        }
+
+        $label = is_int($key) ? '-' : $key . ':';
+        if (empty($value)) {
+            return $prefix . $label . " []\n";
+        }
+        $out = $prefix . $label . "\n";
+        foreach ($value as $childkey => $childvalue) {
+            $out .= self::dump_node($childkey, $childvalue, $indent + 1);
+        }
+        return $out;
+    }
+
+    /**
+     * Writes a scalar, quoting it whenever YAML could read it differently.
+     *
+     * @param mixed $value Scalar value.
+     * @return string
+     */
+    private static function format_scalar($value): string {
+        if ($value === null) {
+            return 'null';
+        }
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_int($value) || is_float($value)) {
+            return (string)$value;
+        }
+
+        $value = (string)$value;
+        $needsquotes = $value === ''
+            || in_array(strtolower($value), self::RESERVED, true)
+            || is_numeric($value)
+            || preg_match('/^[\s\-?:,\[\]{}#&*!|>\'"%@\x60]/', $value)
+            || preg_match('/\s$/', $value)
+            || strpos($value, ': ') !== false
+            || strpos($value, ' #') !== false
+            || substr($value, -1) === ':'
+            || preg_match('/[\x00-\x1f\\\\]/', $value);
+        if (!$needsquotes) {
+            return $value;
+        }
+        $escaped = str_replace(['\\', '"', "\n", "\t", "\r"], ['\\\\', '\\"', '\\n', '\\t', '\\r'], $value);
+        return '"' . $escaped . '"';
+    }
+
+    /**
+     * Reads a scalar value.
+     *
+     * @param string $value Raw value.
+     * @return mixed
      */
     private static function parse_value(string $value) {
         $value = trim($value);
-        foreach (['"', "'"] as $quote) {
-            if (str_starts_with($value, $quote)) {
-                $endquote = strrpos($value, $quote);
-                if ($endquote > 0) {
-                    return substr($value, 1, $endquote - 1);
-                }
-            }
+        if ($value !== '' && ($value[0] === '"' || $value[0] === "'")) {
+            return self::parse_quoted($value);
         }
 
         $commentpos = strpos($value, ' #');
@@ -265,13 +261,40 @@ class yaml {
         if ($lower === 'null' || $lower === '~' || $value === '') {
             return null;
         }
-        if (str_starts_with($value, '#')) {
-            return null;
-        }
-
         if (is_numeric($value)) {
             return strpos($value, '.') !== false ? (float)$value : (int)$value;
         }
         return $value;
+    }
+
+    /**
+     * Reads a single- or double-quoted string.
+     *
+     * @param string $value Value starting with a quote.
+     * @return string
+     */
+    private static function parse_quoted(string $value): string {
+        $quote = $value[0];
+        $escapes = ['n' => "\n", 't' => "\t", 'r' => "\r", '"' => '"', '\\' => '\\', '/' => '/', '0' => "\0"];
+        $out = '';
+        $length = strlen($value);
+        for ($i = 1; $i < $length; $i++) {
+            $char = $value[$i];
+            if ($quote === '"' && $char === '\\' && $i + 1 < $length) {
+                $next = $value[++$i];
+                $out .= $escapes[$next] ?? '\\' . $next;
+                continue;
+            }
+            if ($char === $quote) {
+                if ($quote === "'" && ($value[$i + 1] ?? '') === "'") {
+                    $out .= "'";
+                    $i++;
+                    continue;
+                }
+                return $out;
+            }
+            $out .= $char;
+        }
+        return $out;
     }
 }

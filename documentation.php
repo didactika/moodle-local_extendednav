@@ -15,131 +15,52 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extended Navigation documentation page.
+ * Reference of the YAML format used by the import and export.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use local_extendednav\local\node_importer;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-$url = new moodle_url('/local/extendednav/documentation.php');
-$PAGE->set_url($url);
+$menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
+$PAGE->set_url(new moodle_url('/local/extendednav/documentation.php', ['menu' => $menukey]));
 $PAGE->set_title(get_string('documentation', 'local_extendednav'));
 $PAGE->set_heading(get_string('documentation', 'local_extendednav'));
 
-if (optional_param('example', 0, PARAM_INT)) {
-    $examplepath = __DIR__ . '/example.yml';
-    if (file_exists($examplepath)) {
-        $examplecontent = file_get_contents($examplepath);
-        header('Content-Type: application/x-yaml');
-        header('Content-Disposition: attachment; filename="extendednav_example.yml"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-        header(sprintf('%s-%s: %d', 'Content', 'Length', strlen($examplecontent)));
-        echo $examplecontent;
-        exit;
-    }
+$examplepath = __DIR__ . '/example.yaml';
+$example = file_exists($examplepath) ? file_get_contents($examplepath) : '';
+
+if (optional_param('example', 0, PARAM_BOOL) && $example !== '') {
+    header('Content-Type: application/yaml; charset=utf-8');
+    header('Content-Disposition: attachment; filename="extendednav_example.yaml"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Content-Length: ' . strlen($example));
+    echo $example;
+    exit;
+}
+
+$fields = [];
+foreach (node_importer::EXPORT_FIELDS as $field) {
+    $fields[] = [
+        'name' => $field,
+        'required' => $field === 'nodekey',
+        'description' => get_string('doc_f_' . $field, 'local_extendednav'),
+    ];
 }
 
 echo $OUTPUT->header();
-
-$backurl = new moodle_url('/local/extendednav/import.php');
-$downloadurl = new moodle_url('/local/extendednav/documentation.php', ['example' => 1]);
-
-echo html_writer::start_div('extendednav-documentation-page');
-
-echo html_writer::start_div('mb-4');
-echo html_writer::link(
-    $backurl,
-    html_writer::tag('i', '', ['class' => 'fa fa-arrow-left mr-2']) . get_string('back', 'moodle'),
-    ['class' => 'btn btn-secondary']
-);
-echo html_writer::end_div();
-
-echo html_writer::start_div('card');
-echo '    <div class="card-header bg-primary text-white">';
-echo '        <h4 class="mb-0"><i class="fa fa-book mr-2"></i>' . get_string('doc_schema_reference', 'local_extendednav') . '</h4>';
-echo '    </div>';
-echo '    <div class="card-body">';
-
-echo '        <h5 class="mb-3">' . get_string('quick_links', 'local_extendednav') . '</h5>';
-echo '        <ul class="list-unstyled mb-4">';
-echo '            <li><a href="#structure"><i class="fa fa-chevron-right mr-2"></i>' .
-    get_string('doc_structure', 'local_extendednav') . '</a></li>';
-echo '            <li><a href="#fields"><i class="fa fa-chevron-right mr-2"></i>' .
-    get_string('doc_fields_title', 'local_extendednav') . '</a></li>';
-echo '            <li><a href="#example"><i class="fa fa-chevron-right mr-2"></i>' .
-    get_string('doc_example_format', 'local_extendednav') . '</a></li>';
-echo '        </ul>';
-
-echo '        <div class="alert alert-success mb-4">';
-echo '            <i class="fa fa-download mr-2"></i>';
-echo '            <a href="' . $downloadurl->out() . '" class="alert-link font-weight-bold">' .
-    get_string('download_example', 'local_extendednav') . '</a>';
-echo '            - ' . get_string('doc_download_desc', 'local_extendednav');
-echo '        </div>';
-
-echo '        <h4 id="structure" class="mt-4 mb-3 text-primary">' . get_string('doc_structure', 'local_extendednav') . '</h4>';
-echo '        <p>' . get_string('doc_intro', 'local_extendednav') . '</p>';
-echo '        <p class="text-muted"><i class="fa fa-info-circle mr-1"></i> ' .
-    get_string('doc_example_tip', 'local_extendednav') . '</p>';
-
-echo '        <h4 id="fields" class="mt-4 mb-3 text-primary">' . get_string('doc_fields_title', 'local_extendednav') . '</h4>';
-echo '        <table class="table table-bordered table-striped">';
-echo '            <thead class="thead-light">';
-echo '                <tr>';
-echo '                    <th>' . get_string('doc_field', 'local_extendednav') . '</th>';
-echo '                    <th>' . get_string('doc_type', 'local_extendednav') . '</th>';
-echo '                    <th>' . get_string('doc_desc', 'local_extendednav') . '</th>';
-echo '                </tr>';
-echo '            </thead>';
-echo '            <tbody>';
-echo '                <tr><td><code>nodekey</code></td>' .
-     '<td><span class="badge badge-success">' . get_string('yes', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_nodekey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>title</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_title', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>url</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_url', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>icon</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_icon', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>visibility</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_visibility', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>roles</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_roles', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>parentkey</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_parentkey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>beforekey</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_beforekey', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>newwindow</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_newwindow', 'local_extendednav') . '</td></tr>';
-echo '                <tr><td><code>blockedurls</code></td>' .
-     '<td><span class="badge badge-secondary">' . get_string('no', 'moodle') . '</span></td>' .
-     '<td>' . get_string('doc_f_blockedurls', 'local_extendednav') . '</td></tr>';
-echo '            </tbody>';
-echo '        </table>';
-
-$examplecontent = file_exists(__DIR__ . '/example.yml') ? file_get_contents(__DIR__ . '/example.yml') : '';
-
-echo '        <h4 id="example" class="mt-5 mb-3 text-primary">' . get_string('doc_example_format', 'local_extendednav') . '</h4>';
-echo '        <pre class="bg-light p-3 rounded"><code>' . s($examplecontent) . '</code></pre>';
-
-echo '    </div>';
-echo html_writer::end_div();
-echo html_writer::end_div();
-
+echo $OUTPUT->render_from_template('local_extendednav/documentation', [
+    'backurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
+    'downloadurl' => (new moodle_url('/local/extendednav/documentation.php', ['example' => 1]))->out(false),
+    'fields' => $fields,
+    'example' => $example,
+]);
 echo $OUTPUT->footer();

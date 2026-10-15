@@ -1,0 +1,70 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/documentation
+
+    Reference of the YAML import and export format.
+
+    Context variables required for this template:
+    * backurl - URL of the import page
+    * downloadurl - URL that downloads the example file
+    * fields - List of fields, each with name, required and description
+    * example - Content of the example file
+
+    Example context (json):
+    {
+        "backurl": "https://example.com/local/extendednav/import.php",
+        "downloadurl": "https://example.com/local/extendednav/documentation.php?example=1",
+        "fields": [
+            {"name": "nodekey", "required": true, "description": "Unique key of the node."},
+            {"name": "title", "required": false, "description": "Display text."}
+        ],
+        "example": "nodes:\n  - nodekey: help"
+    }
+}}
+<div class="mb-3">
+    <a href="{{backurl}}" class="btn btn-outline-secondary">{{#pix}} t/left, core {{/pix}}{{#str}} back, core {{/str}}</a>
+</div>
+<p>{{#str}} doc_intro, local_extendednav {{/str}}</p>
+<p class="text-muted">{{#str}} doc_example_tip, local_extendednav {{/str}}</p>
+<p><a href="{{downloadurl}}" class="btn btn-outline-secondary">{{#pix}} t/download, core {{/pix}}{{#str}} download_example, local_extendednav {{/str}}</a></p>
+
+<h3 class="mt-4 mb-3">{{#str}} doc_fields_title, local_extendednav {{/str}}</h3>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th scope="col">{{#str}} doc_field, local_extendednav {{/str}}</th>
+            <th scope="col">{{#str}} required, core {{/str}}</th>
+            <th scope="col">{{#str}} description, core {{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#fields}}
+            <tr>
+                <td><code>{{name}}</code></td>
+                <td>
+                    {{#required}}<span class="badge badge-success text-bg-success">{{#str}} yes, core {{/str}}</span>{{/required}}
+                    {{^required}}<span class="badge badge-secondary text-bg-secondary">{{#str}} no, core {{/str}}</span>{{/required}}
+                </td>
+                <td>{{{description}}}</td>
+            </tr>
+        {{/fields}}
+    </tbody>
+</table>
+
+<h3 class="mt-5 mb-3">{{#str}} doc_example_format, local_extendednav {{/str}}</h3>
+<pre class="bg-light p-3 rounded"><code>{{example}}</code></pre>
