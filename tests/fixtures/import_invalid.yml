@@ -1,0 +1,7 @@
+nodes:
+  - nodekey: good_node
+    title: "Good"
+    url: "/good.php"
+  - nodekey: bad_node
+    title: "Bad"
+    url: "javascript:alert(1)"
