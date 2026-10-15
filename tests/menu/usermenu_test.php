@@ -20,6 +20,7 @@ use local_extendednav\local\node_access;
 use local_extendednav\local\node_repository;
 use local_extendednav\menu_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\usermenu::class)]
 /**
  * Tests for the user menu.
  *

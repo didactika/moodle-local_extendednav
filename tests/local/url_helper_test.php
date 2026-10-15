@@ -16,6 +16,7 @@
 
 namespace local_extendednav\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\url_helper::class)]
 /**
  * Tests for the URL helper.
  *
@@ -27,6 +28,7 @@ namespace local_extendednav\local;
  * @covers     \local_extendednav\local\url_helper
  */
 final class url_helper_test extends \advanced_testcase {
+    #[\PHPUnit\Framework\Attributes\DataProvider('normalise_provider')]
     /**
      * Typed URLs are normalised.
      *
@@ -88,6 +90,7 @@ final class url_helper_test extends \advanced_testcase {
         $this->assertSame('/my/', url_helper::to_site_path('/my/'));
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('matches_provider')]
     /**
      * Rules match the same page, with the rule's query parameters.
      *

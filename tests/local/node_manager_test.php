@@ -16,6 +16,7 @@
 
 namespace local_extendednav\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_manager::class)]
 /**
  * Tests for saving, deleting and ordering nodes.
  *

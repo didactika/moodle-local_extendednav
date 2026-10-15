@@ -16,6 +16,7 @@
 
 namespace local_extendednav;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\yaml::class)]
 /**
  * Tests for the built-in YAML reader and writer.
  *
@@ -27,6 +28,7 @@ namespace local_extendednav;
  * @covers     \local_extendednav\yaml
  */
 final class yaml_test extends \basic_testcase {
+    #[\PHPUnit\Framework\Attributes\DataProvider('string_provider')]
     /**
      * Strings survive a write and read unchanged.
      *

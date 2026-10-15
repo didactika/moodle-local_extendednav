@@ -16,6 +16,7 @@
 
 namespace local_extendednav\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\access_guard::class)]
 /**
  * Tests for URL blocking and fallback pages.
  *

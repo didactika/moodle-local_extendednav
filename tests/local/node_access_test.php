@@ -16,6 +16,7 @@
 
 namespace local_extendednav\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_access::class)]
 /**
  * Tests for node visibility, roles and languages.
  *

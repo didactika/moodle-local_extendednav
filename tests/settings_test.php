@@ -16,6 +16,7 @@
 
 namespace local_extendednav;
 
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 /**
  * Tests for the admin pages of the plugin.
  *

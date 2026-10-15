@@ -16,6 +16,7 @@
 
 namespace local_extendednav\external;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\external\reorder_nodes::class)]
 /**
  * Tests for the reorder web service.
  *

@@ -18,6 +18,7 @@ namespace local_extendednav\local;
 
 use local_extendednav\yaml;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_importer::class)]
 /**
  * Tests for the YAML import and export of nodes.
  *

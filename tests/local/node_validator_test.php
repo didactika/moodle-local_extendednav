@@ -16,6 +16,7 @@
 
 namespace local_extendednav\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_validator::class)]
 /**
  * Tests for the shared validation rules.
  *
@@ -108,6 +109,7 @@ final class node_validator_test extends \advanced_testcase {
      */
     public function test_icon(string $icon, bool $valid): void {
         $this->assertSame($valid, node_validator::is_valid_icon($icon));
+    #[\PHPUnit\Framework\Attributes\DataProvider('icon_provider')]
     }
 
     /**

@@ -18,6 +18,7 @@ namespace local_extendednav;
 
 use local_extendednav\local\node_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\observer::class)]
 /**
  * Tests for the synchronisation with Moodle's menu settings and the role observer.
  *

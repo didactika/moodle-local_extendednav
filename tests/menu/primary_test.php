@@ -19,6 +19,8 @@ namespace local_extendednav\menu;
 use local_extendednav\hooks;
 use local_extendednav\local\node_access;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\primary::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\hooks::class)]
 /**
  * Tests for the primary navigation.
  *
