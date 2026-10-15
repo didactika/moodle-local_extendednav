@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Primary navigation hooks.
+ * Hook callbacks for local_extendednav.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -27,19 +27,21 @@ defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [
+        'hook' => \core\hook\output\before_http_headers::class,
+        'callback' => [\local_extendednav\hooks::class, 'before_http_headers'],
+    ],
+    [
         'hook' => \core\hook\navigation\primary_extend::class,
-        'callback' => 'local_extendednav\hooks::extend_primary_navigation',
-    ],
-    [
-        'hook' => \core_user\hook\extend_user_menu::class,
-        'callback' => 'local_extendednav\hooks::extend_user_menu',
-    ],
-    [
-        'hook' => \core\hook\output\before_standard_top_of_body_html_generation::class,
-        'callback' => 'local_extendednav\hooks::before_top_of_body',
+        'callback' => [\local_extendednav\hooks::class, 'extend_primary_navigation'],
+        // Run after other plugins have added their items, so they can be ordered and hidden too.
+        'priority' => 0,
     ],
     [
         'hook' => \core\hook\output\before_standard_head_html_generation::class,
-        'callback' => 'local_extendednav\hooks::before_standard_head',
+        'callback' => [\local_extendednav\hooks::class, 'before_standard_head'],
+    ],
+    [
+        'hook' => \core\hook\output\before_standard_top_of_body_html_generation::class,
+        'callback' => [\local_extendednav\hooks::class, 'before_top_of_body'],
     ],
 ];

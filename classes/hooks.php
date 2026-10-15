@@ -14,164 +14,98 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Primary navigation hooks.
- *
- * @package    local_extendednav
- * @copyright  2026 Didactika
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_extendednav;
 
 use core\hook\navigation\primary_extend;
-use core_user\hook\extend_user_menu;
+use core\hook\output\before_http_headers;
+use core\hook\output\before_standard_head_html_generation;
 use core\hook\output\before_standard_top_of_body_html_generation;
+use local_extendednav\local\access_guard;
+use local_extendednav\local\node_repository;
 
 /**
- * Hooks for primary and user navigation.
+ * Hook callbacks.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hooks {
-    /** @var bool Skip hook loop barrier. */
-    public static $skiphook = false;
+    /** @var bool Whether the user menu setting has been rewritten in this request. */
+    private static bool $usermenuapplied = false;
 
-    /** @var string|null Original custommenuitems before temporary clearance. */
-    public static $origcustommenu = null;
+    /** @var string|null Value of custommenuitems before the plugin emptied it. */
+    private static ?string $origcustommenu = null;
 
-    /** @var string|null Original customusermenuitems before temporary replacement. */
-    public static $origcustomusermenu = null;
+    /** @var string|null Value of customusermenuitems before the plugin rewrote it. */
+    private static ?string $origcustomusermenu = null;
 
     /**
-     * Checks whether the current request is an admin settings page.
-     *
-     * @return bool
+     * Resets the request state.
      */
-    public static function is_admin_settings_page(): bool {
-        global $PAGE;
-        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
-            return false;
-        }
-        if (isset($_SERVER['SCRIPT_NAME']) && strpos($_SERVER['SCRIPT_NAME'], '/admin/settings.php') !== false) {
-            return true;
-        }
-        if (isset($PAGE) && $PAGE->has_set_url()) {
-            try {
-                $path = $PAGE->url->get_path();
-                if (strpos($path, '/admin/settings.php') !== false) {
-                    return true;
-                }
-            } catch (\Throwable $e) {
-                unset($e);
-            }
-        }
-        return false;
+    public static function reset(): void {
+        self::$usermenuapplied = false;
+        self::$origcustommenu = null;
+        self::$origcustomusermenu = null;
     }
 
     /**
-     * Extends the primary navigation based on custom DB configuration.
+     * Blocks the page about to be printed when the user is not allowed it.
      *
-     * @param primary_extend $hook The navigation extension hook.
+     * @param before_http_headers $hook The hook.
+     */
+    public static function before_http_headers(before_http_headers $hook): void {
+        global $PAGE;
+        access_guard::check($PAGE);
+    }
+
+    /**
+     * Applies the plugin nodes to the primary navigation and the user menu.
+     *
+     * Boost-based themes build the user menu right after the primary navigation and
+     * before the page head, so the user menu is rewritten here too.
+     *
+     * @param primary_extend $hook The hook.
      */
     public static function extend_primary_navigation(primary_extend $hook): void {
-        global $DB, $CFG;
+        global $CFG;
 
-        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
+        if (!self::is_active()) {
             return;
         }
+        self::backup_core_menus();
 
-        if (isloggedin() && !isguestuser()) {
-            $cache = \cache::make('local_extendednav', 'nodes');
-            $customnodes = $cache->get('primarynodes');
+        $primary = menu_manager::get_menu('primary');
+        $primary->inject_nodes(node_repository::get_menu_nodes('primary'), $hook->get_primaryview());
 
-            if ($customnodes === false) {
-                try {
-                    $customnodes = $DB->get_records('local_extendednav', ['menu' => 'primary'], 'sortorder ASC, id ASC');
-                } catch (\moodle_exception $e) {
-                    $customnodes = [];
-                }
-                $cache->set('primarynodes', $customnodes);
-            }
+        // The custom menu items are plugin nodes now; stop Moodle from adding them a second time.
+        $CFG->custommenuitems = '';
 
-            $primarymenu = \local_extendednav\menu_manager::get_menu('primary');
-            if ($primarymenu) {
-                $primarymenu->inject_nodes($customnodes, $hook);
-            }
+        self::apply_user_menu();
+    }
 
-            // Backup original configs on admin settings pages so we can restore them
-            // before $settingspage->output_html() renders the settings form textareas.
-            if (self::is_admin_settings_page()) {
-                if (self::$origcustommenu === null && isset($CFG->custommenuitems)) {
-                    self::$origcustommenu = $CFG->custommenuitems;
-                }
-                if (self::$origcustomusermenu === null && isset($CFG->customusermenuitems)) {
-                    self::$origcustomusermenu = $CFG->customusermenuitems;
-                }
-            }
-
-            // Always clear $CFG->custommenuitems during header output so Moodle's
-            // native custom menu doesn't duplicate primary navigation nodes.
-            $CFG->custommenuitems = '';
-
-            // In Moodle 4.x, this hook is the most reliable place to intercept and overwrite
-            // $CFG->customusermenuitems before the user menu is generated by the layout.
-            $usermenunodes = $cache->get('usermenunodes');
-            if ($usermenunodes === false) {
-                try {
-                    $usermenunodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
-                } catch (\moodle_exception $e) {
-                    $usermenunodes = [];
-                }
-                $cache->set('usermenunodes', $usermenunodes);
-            }
-            $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
-            if ($usermenu) {
-                $usermenu->inject_nodes($usermenunodes);
-            }
+    /**
+     * Rewrites the user menu for themes that build it after the page head.
+     *
+     * @param before_standard_head_html_generation $hook The hook.
+     */
+    public static function before_standard_head(before_standard_head_html_generation $hook): void {
+        if (self::is_active()) {
+            self::backup_core_menus();
+            self::apply_user_menu();
         }
     }
 
     /**
-     * Extends the user menu based on custom DB configuration.
+     * Restores the real menu settings on admin settings pages and adds the user menu extras.
      *
-     * @param extend_user_menu $hook The user menu extension hook.
+     * @param before_standard_top_of_body_html_generation $hook The hook.
      */
-    public static function extend_user_menu(extend_user_menu $hook): void {
-        global $DB;
+    public static function before_top_of_body(before_standard_top_of_body_html_generation $hook): void {
+        global $CFG, $PAGE;
 
-        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
-            return;
-        }
-
-        if (isloggedin() && !isguestuser()) {
-            $cache = \cache::make('local_extendednav', 'nodes');
-            $customnodes = $cache->get('usermenunodes');
-
-            if ($customnodes === false) {
-                try {
-                    $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
-                } catch (\moodle_exception $e) {
-                    $customnodes = [];
-                }
-                $cache->set('usermenunodes', $customnodes);
-            }
-
-            $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
-            if ($usermenu) {
-                $usermenu->inject_nodes_via_hook($customnodes, $hook);
-            }
-        }
-    }
-
-    /**
-     * Injects JS and submenu templates into the user menu carousel.
-     *
-     * @param before_standard_top_of_body_html_generation $hook
-     */
-    public static function before_top_of_body(\core\hook\output\before_standard_top_of_body_html_generation $hook): void {
-        global $PAGE, $USER, $DB, $CFG;
-
-        // Restore original configs on admin settings page before form textareas render.
+        // The admin settings form must show the real settings, not the per-request copies.
         if (self::is_admin_settings_page()) {
             if (self::$origcustommenu !== null) {
                 $CFG->custommenuitems = self::$origcustommenu;
@@ -181,232 +115,68 @@ class hooks {
             }
         }
 
-        if (!isloggedin() || isguestuser() || !get_config('local_extendednav', 'enable_plugin')) {
+        if (!self::is_active()) {
             return;
         }
-
-        $cache = \cache::make('local_extendednav', 'nodes');
-        $customnodes = $cache->get('usermenunodes');
-
-        if ($customnodes === false) {
-            try {
-                $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
-            } catch (\moodle_exception $e) {
-                $customnodes = [];
-            }
-            $cache->set('usermenunodes', $customnodes);
-        }
-
-        if (empty($customnodes)) {
-            return;
-        }
-
-        // Group nodes by parent.
-        $childrenbyparent = [];
-        $allowedparents = [];
-        foreach ($customnodes as $umnode) {
-            $allowed = true;
-            if ($umnode->visibility == 0) {
-                $allowed = false;
-            } else if ($umnode->visibility == 2) {
-                $allowed = false;
-                if (!empty($umnode->roles)) {
-                    $roleids = explode(',', $umnode->roles);
-                    foreach ($roleids as $rid) {
-                        if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
-                            $allowed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ($allowed) {
-                if (empty($umnode->parentkey)) {
-                    $allowedparents[$umnode->nodekey] = $umnode;
-                } else {
-                    $childrenbyparent[$umnode->parentkey][] = $umnode;
-                }
-            }
-        }
-
-        $templates = '';
-        $hastemplates = false;
-
-        $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
-        $nativenodes = $usermenu ? $usermenu->get_native_nodes() : [];
-
-        // Generate templates for root node fixes (icons and new window).
-        foreach ($allowedparents as $nodekey => $node) {
-            $icon = trim((string)$node->icon);
-            // If it has children, it's a submenu trigger, so newwindow shouldn't apply to it.
-            $haschildren = isset($childrenbyparent[$nodekey]) && !empty($childrenbyparent[$nodekey]);
-            $newwindow = (!empty($node->newwindow) && !$haschildren) ? 1 : 0;
-
-            $needsicon = (!empty($icon) && $icon !== 'none' && (strpos($icon, 'fa-') !== false || strpos($icon, 'fa ') !== false));
-            $needsnewwindow = ($newwindow === 1);
-
-            if ($needsicon || $needsnewwindow) {
-                $url = trim((string)$node->url);
-                $title = trim((string)$node->title) ?: (isset($nativenodes[$nodekey]) ? $nativenodes[$nodekey]->text : '');
-                if ($title !== '') {
-                    $titlebits = explode(',', $title, 2);
-                    if (count($titlebits) === 2) {
-                        $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                        $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                        if ($isvalidstr && $isvalidcomp) {
-                            try {
-                                $title = get_string($titlebits[0], $titlebits[1]);
-                            } catch (\moodle_exception $e) {
-                                unset($e);
-                            }
-                        }
-                    }
-                }
-
-                $urlattr = !empty($url) ? 'data-url="' . s($url) . '"' : '';
-                $titleattr = !empty($title) ? 'data-title="' . s($title) . '"' : '';
-
-                $iconattr = $needsicon ? 'data-icon="' . s($icon) . '"' : '';
-                $windowattr = $needsnewwindow ? 'data-newwindow="1"' : '';
-
-                $templates .= '<template data-region="local-extendednav-node-fix" ' .
-                    $iconattr . ' ' . $windowattr . ' ' . $urlattr . ' ' . $titleattr . '></template>';
-                $hastemplates = true;
-            }
-        }
-
-        foreach ($childrenbyparent as $parentkey => $children) {
-            // Find parent title and url for JS trigger matching.
-            $ptitle = '';
-            $purl = '';
-            if (isset($allowedparents[$parentkey])) {
-                $p = $allowedparents[$parentkey];
-                $ptitle = trim((string)$p->title);
-                $purl = trim((string)$p->url);
-                if ($ptitle === '' && isset($nativenodes[$parentkey])) {
-                    $ptitle = $nativenodes[$parentkey]->text;
-                }
-                if ($purl === '' && isset($nativenodes[$parentkey])) {
-                    $purl = $nativenodes[$parentkey]->action;
-                }
-            } else if (isset($nativenodes[$parentkey])) {
-                $ptitle = $nativenodes[$parentkey]->text;
-                $purl = $nativenodes[$parentkey]->action;
-            }
-
-            if (empty($ptitle)) {
-                continue;
-            }
-
-            $titlebits = explode(',', $ptitle, 2);
-            if (count($titlebits) === 2) {
-                $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                if ($isvalidstr && $isvalidcomp) {
-                    try {
-                        $ptitle = get_string($titlebits[0], $titlebits[1]);
-                    } catch (\moodle_exception $e) {
-                        unset($e);
-                    }
-                }
-            }
-
-            $items = [];
-            foreach ($children as $child) {
-                $ctitle = trim((string)$child->title);
-                $curl = trim((string)$child->url);
-                $cicon = trim((string)$child->icon);
-
-                if ($ctitle === '' && isset($nativenodes[$child->nodekey])) {
-                    $ctitle = $nativenodes[$child->nodekey]->text;
-                }
-                if ($curl === '' && isset($nativenodes[$child->nodekey])) {
-                    $curl = $nativenodes[$child->nodekey]->action;
-                }
-                if ($ctitle === '') {
-                    continue;
-                }
-                $titlebits = explode(',', $ctitle, 2);
-                if (count($titlebits) === 2) {
-                    $isvalidstr = clean_param($titlebits[0], PARAM_STRINGID) !== '';
-                    $isvalidcomp = clean_param($titlebits[1], PARAM_COMPONENT) !== '';
-                    if ($isvalidstr && $isvalidcomp) {
-                        try {
-                            $ctitle = get_string($titlebits[0], $titlebits[1]);
-                        } catch (\moodle_exception $e) {
-                            unset($e);
-                        }
-                    }
-                }
-
-                $items[] = [
-                    'url' => $curl,
-                    'title' => $ctitle,
-                    'icon' => (!empty($cicon) && $cicon !== 'none') ? $cicon : false,
-                    'newwindow' => !empty($child->newwindow),
-                ];
-            }
-
-            if (!empty($items)) {
-                $panelid = 'carousel-item-extnav-' . preg_replace('/[^a-zA-Z0-9]/', '', $parentkey);
-                $html = $hook->renderer->render_from_template('local_extendednav/usermenu/panel', [
-                    'panelid' => $panelid,
-                    'title' => $ptitle,
-                    'items' => $items,
-                ]);
-                $triggerattr = !empty($purl) ? 'data-trigger-url="' . s($purl) . '"' : 'data-trigger-title="' . s($ptitle) . '"';
-                $templates .= '<template data-region="local-extendednav-submenu" data-panel-id="' .
-                    s($panelid) . '" ' . $triggerattr . '>' . $html . '</template>';
-                $hastemplates = true;
-            }
-        }
-
-        if ($hastemplates) {
-            $hook->add_html($templates);
+        $usermenu = menu_manager::get_menu('usermenu');
+        $html = $usermenu->build_browser_templates(node_repository::get_menu_nodes('usermenu'), $hook->renderer);
+        if ($html !== '') {
+            $hook->add_html($html);
             $PAGE->requires->js_call_amd('local_extendednav/usermenu', 'init');
         }
     }
 
     /**
-     * Executes before the standard HTML head is rendered.
-     * This is early enough to modify $CFG variables before the theme renders the header.
+     * Whether the plugin changes the navigation in this request.
      *
-     * @param \core\hook\output\before_standard_head_html_generation $hook
+     * @return bool
      */
-    public static function before_standard_head(\core\hook\output\before_standard_head_html_generation $hook): void {
-        global $DB, $CFG;
-        unset($hook);
+    private static function is_active(): bool {
+        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin')) {
+            return false;
+        }
+        return isloggedin() && !isguestuser();
+    }
 
-        if (self::$skiphook || !get_config('local_extendednav', 'enable_plugin')) {
+    /**
+     * Rewrites customusermenuitems for the current user, once per request.
+     */
+    private static function apply_user_menu(): void {
+        global $CFG;
+
+        if (self::$usermenuapplied) {
             return;
         }
+        self::$usermenuapplied = true;
+        $usermenu = menu_manager::get_menu('usermenu');
+        $CFG->customusermenuitems = $usermenu->build_config_value(node_repository::get_menu_nodes('usermenu'));
+    }
 
-        if (!isloggedin() || isguestuser()) {
-            return;
+    /**
+     * Keeps the real menu settings, so admin settings pages can show them.
+     */
+    private static function backup_core_menus(): void {
+        global $CFG;
+
+        if (self::$origcustommenu === null && isset($CFG->custommenuitems)) {
+            self::$origcustommenu = (string)$CFG->custommenuitems;
         }
-
-        if (self::is_admin_settings_page()) {
-            if (self::$origcustomusermenu === null && isset($CFG->customusermenuitems)) {
-                self::$origcustomusermenu = $CFG->customusermenuitems;
-            }
+        if (self::$origcustomusermenu === null && isset($CFG->customusermenuitems) && !self::$usermenuapplied) {
+            self::$origcustomusermenu = (string)$CFG->customusermenuitems;
         }
+    }
 
-        $cache = \cache::make('local_extendednav', 'nodes');
-        $customnodes = $cache->get('usermenunodes');
+    /**
+     * Whether the current request is an admin settings page.
+     *
+     * @return bool
+     */
+    private static function is_admin_settings_page(): bool {
+        global $PAGE;
 
-        if ($customnodes === false) {
-            try {
-                $customnodes = $DB->get_records('local_extendednav', ['menu' => 'usermenu'], 'sortorder ASC, id ASC');
-            } catch (\moodle_exception $e) {
-                $customnodes = [];
-            }
-            $cache->set('usermenunodes', $customnodes);
+        if (!$PAGE->has_set_url()) {
+            return false;
         }
-
-        $usermenu = \local_extendednav\menu_manager::get_menu('usermenu');
-        if ($usermenu) {
-            $usermenu->inject_nodes($customnodes);
-        }
+        return strpos($PAGE->url->get_path(), '/admin/settings.php') !== false;
     }
 }
