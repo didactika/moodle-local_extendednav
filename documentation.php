@@ -27,6 +27,7 @@ use local_extendednav\local\node_importer;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
@@ -39,12 +40,7 @@ $examplepath = __DIR__ . '/example.yaml';
 $example = file_exists($examplepath) ? file_get_contents($examplepath) : '';
 
 if (optional_param('example', 0, PARAM_BOOL) && $example !== '') {
-    header('Content-Type: application/yaml; charset=utf-8');
-    header('Content-Disposition: attachment; filename="extendednav_example.yaml"');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Content-Length: ' . strlen($example));
-    echo $example;
-    exit;
+    send_file($example, 'extendednav_example.yaml', 0, 0, true, true, 'application/yaml');
 }
 
 $fields = [];

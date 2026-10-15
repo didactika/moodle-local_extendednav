@@ -28,6 +28,7 @@ use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
@@ -55,10 +56,4 @@ if (empty($nodes)) {
 
 $content = \local_extendednav\yaml::dump(['nodes' => array_values(array_map([node_importer::class, 'export_node'], $nodes))]);
 
-header('Content-Type: application/yaml; charset=utf-8');
-header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Cache-Control: private, max-age=0, must-revalidate');
-header('Pragma: public');
-header('Content-Length: ' . strlen($content));
-echo $content;
-exit;
+send_file($content, $filename, 0, 0, true, true, 'application/yaml');
