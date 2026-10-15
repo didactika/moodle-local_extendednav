@@ -5,24 +5,32 @@ All notable changes to this plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!--
+.github/workflows/release.yml reads this file: when $plugin->release changes in version.php on `main` or on a
+MOODLE_XXX_STABLE branch, it uses everything under the "## [<that release>]" heading as the GitHub Release body.
+Keep an "## [Unreleased]" section above the latest release and rename it when the next release is cut.
+-->
+
 ## [Unreleased]
 
-## [1.0.0] - 2026-09-23
+## [1.0.0-m405] - 2026-10-15
 
 ### Added
 
-- Initial release of the Extended Navigation plugin.
-- Seamless Moodle 4.2 through 5.2 support via the PSR-14 Hooks API (`core\hook\navigation\primary_extend`).
-- Native YAML Configuration Export/Import architecture for smooth DevOps deployments across environments.
-- Moodle Standard Bulk Actions Interface directly built into the management dashboard (Mass delete and Mass export features).
-- Robust `simple_yaml` fallback parser engine to support dynamic multiline configurations safely across servers missing the native PECL YAML extension.
-- Management interface (`manage.php`) allowing Site Administrators to list, view and sort custom navigation nodes from the database.
-- Node editing capabilities (`edit.php`) to configure component keys, URLs, display text, and visual icons dynamically.
-- Core Moodle forms support to handle node hierarchy bindings (specifying exact `parentkey` and `beforekey` parameters).
-- Advanced visibility engine enabling three explicit states: Visible to all, Hidden entirely, or Visible only to mapped roles.
-- `target="_blank"` javascript and HTML injection framework ensuring external navigation links open in new tabs securely.
-- Strict URL blocking rules in `lib.php` (`local_extendednav_extend_navigation`) ensuring users without the necessary permissions are intercepted before page rendering.
-- Intelligent automatic fallbacks ensuring unauthorized route access redirects to `/my/index.php`, `/?redirect=0` or a manually defined custom `fallbackurl`.
-- Cache structures (`\cache::make('local_extendednav', 'nodes')`) established to prevent redundant database querying on every page load.
-- Exclusions and bypass rules preventing AJAX queries (`AJAX_SCRIPT`), console executions (`CLI_SCRIPT`) and Site Administrators from being affected by URL navigation limits.
-- Core English language support (`lang/en/local_extendednav.php`).
+- First public release.
+- Management page (Site administration > Appearance > Extended navigation > Manage navigation) for the primary
+  navigation and the user menu: add items, and rename, re-link, reorder, nest or hide Moodle's own items.
+- Moodle's own items keep Moodle's translated title and URL until they are overridden; the form shows them as
+  placeholders.
+- Visibility per item: visible to everyone, restricted to roles (by role shortname), or not visible.
+- "Block URL access": users who cannot see an item are sent away from its URL, to the Dashboard, the Site home,
+  My courses or the default home page, or to an explanation page when all of them are blocked.
+- Languages per item: show an item only to users of some languages. Languages never affect URL blocking.
+- Tooltips, FontAwesome or Moodle icons, and opening in a new window for every item.
+- One level of submenus in the primary navigation and the user menu.
+- Drag-and-drop ordering that keeps submenu items with their parent.
+- Synchronisation with Moodle's "Custom menu items" and "User menu items" settings, including tooltips and
+  language codes.
+- YAML import and export (`.yaml`, also `.yml` on import), validating the whole file before anything is saved.
+- Activity log of item changes, based on the standard log.
+- Capability `local/extendednav:manage`, so roles such as Manager can manage the navigation.
