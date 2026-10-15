@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Navigation node creation/editing interface.
+ * Adds or edits a navigation node.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -23,151 +23,88 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_extendednav\local\access_guard;
+use local_extendednav\local\node_access;
+use local_extendednav\local\node_manager;
+use local_extendednav\local\node_repository;
+use local_extendednav\menu_manager;
+
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
 $id = optional_param('id', 0, PARAM_INT);
-$menu = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
+$menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 
-$url = new moodle_url('/local/extendednav/edit.php');
+$node = $id ? $DB->get_record('local_extendednav', ['id' => $id], '*', MUST_EXIST) : null;
+if ($node) {
+    $menukey = $node->menu;
+}
+$menu = menu_manager::get_menu($menukey);
+if ($menu === null) {
+    $menukey = 'primary';
+    $menu = menu_manager::get_menu($menukey);
+}
+
+$url = new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey]);
 if ($id) {
     $url->param('id', $id);
 }
-$url->param('menu', $menu);
-
 $PAGE->set_url($url);
-$handler = \local_extendednav\menu_manager::get_menu($menu);
-$menuname = $handler ? $handler->get_name() : $menu;
-$basestr = $id ? get_string('edit_node', 'local_extendednav') : get_string('add_node', 'local_extendednav');
-$streditname = $basestr . ' (' . $menuname . ')';
-$PAGE->set_title($streditname);
-$PAGE->set_heading($streditname);
+$heading = get_string($id ? 'edit_node' : 'add_node', 'local_extendednav') . ' (' . $menu->get_name() . ')';
+$PAGE->set_title($heading);
+$PAGE->set_heading($heading);
 
-$mform = new \local_extendednav\form\node_form($url, ['menu' => $menu]);
+$manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
+$form = new \local_extendednav\form\node_form($url, ['menu' => $menukey, 'node' => $node]);
 
-if ($id) {
-    $node = $DB->get_record('local_extendednav', ['id' => $id], '*', MUST_EXIST);
-    if (!empty($node->roles)) {
-        $node->roles = explode(',', $node->roles);
-    }
-    $mform->set_data($node);
+if ($node) {
+    $formdata = clone $node;
+    $formdata->roles = node_access::split_list($node->roles);
+    $formdata->langs = node_access::split_list($node->langs);
+    $form->set_data($formdata);
 }
 
-if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
-} else if ($data = $mform->get_data()) {
-    $record = new stdClass();
-    $record->nodekey = $data->nodekey;
-    $record->title = !empty($data->title) ? $data->title : null;
+if ($form->is_cancelled()) {
+    redirect($manageurl);
+} else if ($data = $form->get_data()) {
+    if ($node && $menu->is_native($node->nodekey)) {
+        $data->nodekey = $node->nodekey;
+    }
+    $record = node_manager::prepare($data, $menukey);
 
-    $rawurl = !empty($data->url) ? trim((string)$data->url) : null;
-    if ($rawurl !== null && $rawurl !== '') {
-        if (!preg_match('/^[a-zA-Z0-9-]+:/', $rawurl)) {
-            if (strpos($rawurl, 'www.') === 0) {
-                $rawurl = 'http://' . $rawurl;
-            } else if (strpos($rawurl, '/') !== 0) {
-                $rawurl = '/' . $rawurl;
+    if ($node) {
+        $record->id = $node->id;
+        node_manager::update($record);
+        if ((string)($record->parentkey ?? '') !== (string)($node->parentkey ?? '')) {
+            node_manager::place_after_parent_change($node, (string)($record->parentkey ?? ''));
+        }
+        // Keep submenu items attached when a parent is renamed.
+        if ($record->nodekey !== $node->nodekey) {
+            $children = $DB->get_records('local_extendednav', ['menu' => $menukey, 'parentkey' => $node->nodekey]);
+            foreach ($children as $child) {
+                node_manager::update((object)['id' => $child->id, 'parentkey' => $record->nodekey]);
             }
         }
     } else {
-        $rawurl = null;
-    }
-    $record->url = $rawurl;
-
-    $record->icon = !empty($data->icon) ? $data->icon : null;
-
-    $record->parentkey = !empty($data->parentkey) ? $data->parentkey : null;
-    $record->visibility = (int)$data->visibility;
-    $record->newwindow = !empty($data->newwindow) ? 1 : 0;
-
-    $blockedurls = null;
-    if ($record->visibility != 1) {
-        try {
-            $temppage = new \moodle_page();
-            $temppage->set_context(\context_system::instance());
-            $temppage->set_url($PAGE->url);
-            $primary = new \core\navigation\views\primary($temppage);
-            $primary->initialise();
-
-            $corenode = $primary->get($record->nodekey);
-            if ($corenode && $corenode->action instanceof \moodle_url) {
-                $parsedcore = parse_url($corenode->action->out(false));
-                $corepath = isset($parsedcore['path']) ? $parsedcore['path'] : '';
-                if (isset($parsedcore['query']) && $parsedcore['query'] !== '') {
-                    $corepath .= '?' . $parsedcore['query'];
-                }
-
-                if (!empty($corepath)) {
-                    $blockedurls = $corepath;
-                }
-            }
-        } catch (\Throwable $e) {
-            unset($e);
-            // Silently ignored.
-
-            // Expected exception.
-        }
+        node_manager::create($record);
     }
 
-    if ($record->visibility != 1 && !empty($record->url)) {
-        $parsedcustom = parse_url($record->url);
-        $custompath = isset($parsedcustom['path']) ? $parsedcustom['path'] : '';
-        if (isset($parsedcustom['query']) && $parsedcustom['query'] !== '') {
-            $custompath .= '?' . $parsedcustom['query'];
-        }
-
-        if (!empty($custompath)) {
-            if ($blockedurls && $blockedurls !== $custompath) {
-                $blockedurls .= ',' . $custompath;
-            } else {
-                $blockedurls = $custompath;
-            }
-        }
+    if (
+        access_guard::check_fallbacks(node_repository::get_all())
+            === access_guard::FALLBACKS_BLOCKED_FOR_SOME
+    ) {
+        \core\notification::warning(get_string('warn_fallbacks_blocked_for_some', 'local_extendednav'));
     }
-
-    $record->blockedurls = $blockedurls;
-
-    if ($record->visibility == 2 && !empty($data->roles)) {
-        $record->roles = implode(',', $data->roles);
-    } else {
-        $record->roles = null;
-    }
-
-    try {
-        if ($id) {
-            $record->id = $id;
-            $record->menu = $menu;
-            $DB->update_record('local_extendednav', $record);
-            \local_extendednav\event\node_updated::create_from_record($record)->trigger();
-        } else {
-            $record->menu = $menu;
-            $max = $DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [$menu]);
-            $record->sortorder = ($max !== false && $max !== null) ? ((int)$max + 1) : 0;
-            $record->id = (int)$DB->insert_record('local_extendednav', $record);
-            \local_extendednav\event\node_created::create_from_record($record)->trigger();
-        }
-    } catch (\dml_exception $e) {
-        \core\notification::error($e->getMessage());
-        redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
-    }
-
-    try {
-        \cache::make('local_extendednav', 'nodes')->purge();
-    } catch (\Throwable $e) {
-            unset($e);
-            // Silently ignored.
-
-            // Expected exception.
-    }
-    theme_reset_all_caches();
-
-    redirect(new moodle_url('/local/extendednav/manage.php', ['menu' => $menu]));
+    redirect($manageurl, get_string('node_saved', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 echo $OUTPUT->header();
-
-$mform->display();
-
+echo html_writer::div(html_writer::link(
+    $manageurl,
+    $OUTPUT->pix_icon('t/left', '') . get_string('back_to_nodes', 'local_extendednav'),
+    ['class' => 'btn btn-outline-secondary']
+), 'mb-3');
+$form->display();
 echo $OUTPUT->footer();
