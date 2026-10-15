@@ -21,6 +21,7 @@ use local_extendednav\local\node_repository;
 use local_extendednav\local\node_text;
 use local_extendednav\local\node_validator;
 use local_extendednav\menu\base;
+use local_extendednav\menu\primary;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -219,6 +220,17 @@ class nodes_table extends \flexible_table {
             $badges = [$this->badge(get_string('vis_roles', 'local_extendednav'), 'warning')];
         } else {
             $badges = [$this->badge(get_string('vis_all', 'local_extendednav'), 'success')];
+        }
+        // An item Moodle normally adds that it does not add on this site, for example because it is turned off.
+        if (
+            $this->menu instanceof primary && $this->menu->is_native($node->nodekey)
+                && !$this->menu->is_shown_by_moodle($node->nodekey)
+        ) {
+            $badges[] = \html_writer::span(
+                get_string('badge_notadded', 'local_extendednav'),
+                'badge badge-pill rounded-pill badge-secondary text-bg-secondary',
+                ['title' => get_string('badge_notadded_help', 'local_extendednav')]
+            );
         }
         if (!empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL) {
             $badges[] = $this->badge(get_string('badge_blocked', 'local_extendednav'), 'dark');

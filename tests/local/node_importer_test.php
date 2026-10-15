@@ -31,6 +31,15 @@ use local_extendednav\yaml;
  */
 final class node_importer_test extends \advanced_testcase {
     /**
+     * Finds Moodle's primary navigation items for the tests.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        $this->getDataGenerator()->get_plugin_generator('local_extendednav')->ensure_native_nodes();
+    }
+
+    /**
      * Exported nodes can be imported again with the same values.
      */
     public function test_export_import_round_trip(): void {

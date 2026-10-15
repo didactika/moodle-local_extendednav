@@ -22,6 +22,8 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
   navigation and the user menu: add items, and rename, re-link, reorder, nest or hide Moodle's own items.
 - Moodle's own items keep Moodle's translated title and URL until they are overridden; the form shows them as
   placeholders.
+- Moodle's primary navigation items are read from Moodle, so items it turns off (for example in
+  Site administration > Appearance > Navigation) are marked "Not added by Moodle" and never added.
 - Visibility per item: visible to everyone, restricted to roles (by role shortname), or not visible.
 - "Block URL access": users who cannot see an item are sent away from its URL, to the Dashboard, the Site home,
   My courses or the default home page, or to an explanation page when all of them are blocked.

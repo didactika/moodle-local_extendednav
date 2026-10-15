@@ -43,6 +43,10 @@ final class primary_test extends \advanced_testcase {
         $this->resetAfterTest();
         node_access::reset_caches();
         hooks::reset();
+        primary::reset_discovery();
+        // From Moodle 5.3 the Home item is only added when this setting is on; earlier versions ignore it.
+        set_config('enablemyhome', 1);
+        $this->getDataGenerator()->get_plugin_generator('local_extendednav')->ensure_native_nodes();
         $this->setUser($this->getDataGenerator()->create_user());
     }
 
@@ -135,6 +139,36 @@ final class primary_test extends \advanced_testcase {
 
         force_current_language('en');
         $this->assertNotContains('ayuda', $this->get_top_keys($this->build_primary()));
+    }
+
+    /**
+     * The items come from Moodle's own primary navigation and follow its settings.
+     */
+    public function test_items_come_from_moodle(): void {
+        $this->setAdminUser();
+        $menu = new primary();
+        primary::reset_discovery();
+        $found = array_keys($menu->discover_native_nodes());
+        $this->assertContains('myhome', $found);
+        $this->assertContains('siteadminnode', $found);
+        $this->assertSame('/my/', $menu->get_native_node('myhome')->action);
+        $this->assertSame('/', $menu->get_native_node('home')->action, 'redirect=0 is not part of the item.');
+
+        set_config('enabledashboard', 0);
+        primary::reset_discovery();
+        $this->assertFalse($menu->is_shown_by_moodle('myhome'));
+        $this->assertTrue($menu->is_native('myhome'), 'An item Moodle stops adding is still known.');
+    }
+
+    /**
+     * An item Moodle does not add is not added by the plugin, even with a title and a URL.
+     */
+    public function test_item_turned_off_in_moodle_is_not_added(): void {
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
+        $generator->create_node(['nodekey' => 'myhome', 'title' => 'My learning', 'url' => '/my/']);
+        set_config('enabledashboard', 0);
+
+        $this->assertNotContains('myhome', $this->get_top_keys($this->build_primary()));
     }
 
     /**

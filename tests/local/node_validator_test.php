@@ -29,6 +29,15 @@ namespace local_extendednav\local;
  */
 final class node_validator_test extends \advanced_testcase {
     /**
+     * Finds Moodle's primary navigation items for the tests.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        $this->getDataGenerator()->get_plugin_generator('local_extendednav')->ensure_native_nodes();
+    }
+
+    /**
      * Validates a node against the other nodes of its menu.
      *
      * @param array $data Submitted values.
@@ -100,6 +109,7 @@ final class node_validator_test extends \advanced_testcase {
             'url' => 'https://docs.moodle.org/'])['errors']);
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('icon_provider')]
     /**
      * Icons must be FontAwesome classes, pix icons or "none".
      *
@@ -109,7 +119,6 @@ final class node_validator_test extends \advanced_testcase {
      */
     public function test_icon(string $icon, bool $valid): void {
         $this->assertSame($valid, node_validator::is_valid_icon($icon));
-    #[\PHPUnit\Framework\Attributes\DataProvider('icon_provider')]
     }
 
     /**

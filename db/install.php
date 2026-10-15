@@ -24,8 +24,8 @@
  */
 
 /**
- * Creates one empty row for every core node and imports the items already
- * defined in Moodle's custom menu settings.
+ * Creates one empty row for every item Moodle adds to the menus and imports the
+ * items already defined in Moodle's custom menu settings.
  *
  * Core rows are created empty, so core titles and URLs keep coming from Moodle
  * (and stay translated) until an administrator overrides them.
@@ -33,9 +33,24 @@
  * @return bool
  */
 function xmldb_local_extendednav_install() {
-    foreach (\local_extendednav\menu_manager::get_menus() as $menu) {
-        $menu->sync_native_nodes(false);
-        $menu->sync_from_config(false);
+    global $USER;
+
+    // Moodle's primary navigation items depend on the user, so they are found as the administrator,
+    // who sees them all. From the command line nobody is logged in yet.
+    $previous = $USER;
+    $switch = !is_siteadmin() && get_admin();
+    if ($switch) {
+        \core\session\manager::set_user(get_admin());
+    }
+    try {
+        foreach (\local_extendednav\menu_manager::get_menus() as $menu) {
+            $menu->sync_native_nodes(false);
+            $menu->sync_from_config(false);
+        }
+    } finally {
+        if ($switch) {
+            \core\session\manager::set_user($previous);
+        }
     }
     return true;
 }

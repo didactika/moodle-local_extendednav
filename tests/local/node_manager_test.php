@@ -29,6 +29,15 @@ namespace local_extendednav\local;
  */
 final class node_manager_test extends \advanced_testcase {
     /**
+     * Finds Moodle's primary navigation items for the tests.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        $this->getDataGenerator()->get_plugin_generator('local_extendednav')->ensure_native_nodes();
+    }
+
+    /**
      * Submitted values are normalised.
      */
     public function test_prepare(): void {
@@ -240,13 +249,15 @@ final class node_manager_test extends \advanced_testcase {
     }
 
     /**
-     * The installation creates empty rows for the core nodes.
+     * The installation creates empty rows for the items Moodle adds.
      */
     public function test_install_creates_empty_core_rows(): void {
         global $DB;
 
-        $this->resetAfterTest();
-        foreach (['home', 'myhome', 'mycourses', 'siteadminnode'] as $key) {
+        $natives = \local_extendednav\menu_manager::get_menu('primary')->get_native_nodes();
+        $this->assertArrayHasKey('myhome', $natives);
+        $this->assertArrayHasKey('siteadminnode', $natives);
+        foreach (array_keys($natives) as $key) {
             $record = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => $key], '*', MUST_EXIST);
             $this->assertNull($record->title, $key);
             $this->assertNull($record->url, $key);

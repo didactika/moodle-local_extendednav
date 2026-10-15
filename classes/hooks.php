@@ -32,6 +32,9 @@ use local_extendednav\local\node_repository;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hooks {
+    /** @var bool Set while Moodle's own primary navigation is built to find its items. */
+    public static bool $discovering = false;
+
     /** @var bool Whether the user menu setting has been rewritten in this request. */
     private static bool $usermenuapplied = false;
 
@@ -71,7 +74,7 @@ class hooks {
     public static function extend_primary_navigation(primary_extend $hook): void {
         global $CFG;
 
-        if (!self::is_active()) {
+        if (self::$discovering || !self::is_active()) {
             return;
         }
         self::backup_core_menus();

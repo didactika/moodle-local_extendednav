@@ -26,6 +26,41 @@ use local_extendednav\local\node_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_extendednav_generator extends component_generator_base {
+    /** @var bool Whether Moodle's primary navigation items have been found in this test. */
+    private bool $nativesready = false;
+
+    /**
+     * Turns on every item Moodle can add to the primary navigation and finds them as the administrator.
+     *
+     * Only settings this Moodle version has are changed (Home and My courses can be turned off from 5.3).
+     */
+    public function ensure_native_nodes(): void {
+        global $CFG, $USER;
+
+        if ($this->nativesready) {
+            return;
+        }
+        foreach (['enablemyhome', 'enabledashboard', 'enablemycourses'] as $name) {
+            if (isset($CFG->$name) && empty($CFG->$name)) {
+                set_config($name, 1);
+            }
+        }
+        $previous = $USER;
+        \local_extendednav\menu\primary::reset_discovery();
+        \core\session\manager::set_user(get_admin());
+        \local_extendednav\menu_manager::get_menu('primary')->sync_native_nodes(false);
+        \core\session\manager::set_user($previous);
+        \local_extendednav\menu\primary::reset_discovery();
+        $this->nativesready = true;
+    }
+
+    /**
+     * Resets the generator between tests.
+     */
+    public function reset() {
+        $this->nativesready = false;
+    }
+
     /**
      * Creates a node, or updates the core node with the same key.
      *
@@ -36,6 +71,9 @@ class local_extendednav_generator extends component_generator_base {
         global $DB;
 
         $menu = $data['menu'] ?? 'primary';
+        if ($menu === 'primary') {
+            $this->ensure_native_nodes();
+        }
         $record = node_manager::prepare($data + ['visibility' => 1], $menu);
         if (isset($data['sortorder'])) {
             $record->sortorder = (int)$data['sortorder'];

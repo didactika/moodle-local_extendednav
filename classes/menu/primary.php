@@ -16,9 +16,11 @@
 
 namespace local_extendednav\menu;
 
+use local_extendednav\hooks;
 use local_extendednav\local\node_access;
 use local_extendednav\local\node_text;
 use local_extendednav\local\node_validator;
+use local_extendednav\local\url_helper;
 
 /**
  * The primary navigation.
@@ -81,24 +83,122 @@ class primary extends base {
         ];
     }
 
+    /** @var string Plugin setting that keeps the items Moodle adds to the primary navigation. */
+    private const NATIVE_CONFIG = 'nativenodes_primary';
+
+    /** @var array|null Items Moodle adds for the current user, found once per request. */
+    private static ?array $discovered = null;
+
     /**
-     * Returns the core nodes of the primary navigation.
+     * Returns the items Moodle adds to the primary navigation, as last found by {@see refresh_native_nodes()}.
+     *
+     * Moodle has no list of these items: core\navigation\views\primary::initialise() adds them depending on
+     * the site settings and the user, and other plugins add theirs through the primary_extend hook. The plugin
+     * keeps every item it has found, so an item Moodle stops adding can still be configured.
      *
      * @return \stdClass[] Keyed by node key.
      */
     public function get_native_nodes(): array {
-        $items = [
-            'home' => ['text' => get_string('home'), 'action' => '/'],
-            'myhome' => ['text' => get_string('myhome'), 'action' => '/my/'],
-            'mycourses' => ['text' => get_string('mycourses'), 'action' => '/my/courses.php'],
-            'siteadminnode' => ['text' => get_string('administrationsite'), 'action' => '/admin/search.php'],
-        ];
-
+        $stored = json_decode((string)get_config('local_extendednav', self::NATIVE_CONFIG), true);
         $nodes = [];
-        foreach ($items as $key => $item) {
-            $nodes[$key] = (object)['key' => $key, 'text' => $item['text'], 'action' => $item['action'], 'icon' => null];
+        foreach (is_array($stored) ? $stored : [] as $key => $item) {
+            $nodes[$key] = (object)['key' => $key, 'text' => (string)$item['text'], 'action' => (string)$item['action'],
+                'icon' => null];
         }
         return $nodes;
+    }
+
+    /**
+     * Finds the items Moodle adds to the primary navigation for the current user.
+     *
+     * Builds Moodle's primary navigation without the plugin's changes. Moodle applies its own settings
+     * there, such as Appearance > Navigation on the versions that have them, and the theme's removed items.
+     *
+     * @return \stdClass[] Keyed by node key, with key, text and action (a site path).
+     */
+    public function discover_native_nodes(): array {
+        if (self::$discovered !== null) {
+            return self::$discovered;
+        }
+        global $PAGE;
+
+        $nodes = [];
+        // Callbacks of other plugins read the global page while the navigation is built, so use this one meanwhile.
+        $previouspage = $PAGE;
+        hooks::$discovering = true;
+        try {
+            $page = new \moodle_page();
+            $page->set_context(\context_system::instance());
+            $page->set_url('/');
+            $PAGE = $page;
+            $view = new \core\navigation\views\primary($page);
+            $view->initialise();
+            foreach ($view->children as $child) {
+                if (!$child->key || !$child->action instanceof \moodle_url) {
+                    continue;
+                }
+                // Moodle adds redirect=0 to the Home link only to stop the automatic redirection to the Dashboard.
+                $url = new \moodle_url($child->action);
+                $url->remove_params('redirect');
+                $action = url_helper::to_site_path($url->out(false));
+                $nodes[$child->key] = (object)['key' => $child->key, 'text' => trim(strip_tags((string)$child->text)),
+                    'action' => $action ?? $url->out(false), 'icon' => null];
+            }
+        } catch (\Throwable $e) {
+            $nodes = [];
+        } finally {
+            $PAGE = $previouspage;
+            hooks::$discovering = false;
+        }
+        return self::$discovered = $nodes;
+    }
+
+    /**
+     * Whether Moodle adds the item for the current user.
+     *
+     * @param string $nodekey Node key.
+     * @return bool
+     */
+    public function is_shown_by_moodle(string $nodekey): bool {
+        return isset($this->discover_native_nodes()[$nodekey]);
+    }
+
+    /**
+     * Saves the items Moodle adds for the current user, keeping the ones found before.
+     *
+     * Titles and URLs are updated, so placeholders follow Moodle; items Moodle no longer adds are kept.
+     */
+    public function refresh_native_nodes(): void {
+        $discovered = $this->discover_native_nodes();
+        if (empty($discovered)) {
+            return;
+        }
+        $stored = json_decode((string)get_config('local_extendednav', self::NATIVE_CONFIG), true);
+        $stored = is_array($stored) ? $stored : [];
+        foreach ($discovered as $key => $node) {
+            $stored[$key] = ['text' => $node->text, 'action' => $node->action];
+        }
+        $json = json_encode($stored);
+        if ($json !== get_config('local_extendednav', self::NATIVE_CONFIG)) {
+            set_config(self::NATIVE_CONFIG, $json, 'local_extendednav');
+        }
+    }
+
+    /**
+     * Finds Moodle's items before creating their rows.
+     *
+     * @param bool $events Whether to trigger node created events.
+     */
+    public function sync_native_nodes(bool $events = true): void {
+        $this->refresh_native_nodes();
+        parent::sync_native_nodes($events);
+    }
+
+    /**
+     * Forgets the items found in this request (for tests).
+     */
+    public static function reset_discovery(): void {
+        self::$discovered = null;
     }
 
     /**
@@ -140,7 +240,8 @@ class primary extends base {
                     $existingnode->action = new \moodle_url($state->url);
                 }
                 $existingnode->text = $decoration . $existingnode->text . $marker;
-            } else if ($state->shown && $state->title !== '' && $state->url !== null) {
+            } else if ($state->shown && $state->title !== '' && $state->url !== null && !$this->is_native($nodekey)) {
+                // A Moodle item that Moodle did not add (turned off in its settings) is never added by the plugin.
                 $existingnode = \navigation_node::create(
                     $decoration . format_string($state->title) . $marker,
                     new \moodle_url($state->url),

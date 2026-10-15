@@ -94,6 +94,9 @@ Select **Add node**, or the edit icon of an item:
 - Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, or open it in a new window.
 - Choose a **Parent** to show the item in that item's submenu.
 
+> [!NOTE]
+> Moodle's items are the ones Moodle itself adds to the primary navigation. Items Moodle turns off, for example in **Site administration > Appearance > Navigation** or through the theme, are marked **Not added by Moodle** and are not added by the plugin either.
+
 > [!TIP]
 > An item with submenu items opens its submenu instead of following its URL. The list marks its URL with a warning icon; the URL still counts for blocking.
 

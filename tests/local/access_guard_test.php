@@ -52,6 +52,7 @@ final class access_guard_test extends \advanced_testcase {
         $this->teacher = $generator->create_user();
         $generator->enrol_user($this->student->id, $course->id, 'student');
         $generator->enrol_user($this->teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->get_plugin_generator('local_extendednav')->ensure_native_nodes();
     }
 
     /**

@@ -31,6 +31,8 @@ $string['add_node'] = 'Add node';
 $string['apply'] = 'Apply';
 $string['back_to_nodes'] = 'Back to navigation';
 $string['badge_blocked'] = 'URL blocked';
+$string['badge_notadded'] = 'Not added by Moodle';
+$string['badge_notadded_help'] = 'Moodle does not add this item on this site, for example because it is turned off in Site administration > Appearance > Navigation or removed by the theme. The plugin does not add it either.';
 $string['blockaccess'] = 'Block URL access';
 $string['blockaccess_help'] = 'When checked, users who cannot see this item are also kept away from its URL: if they open it directly, they are sent to the Dashboard, then the Site home, then My courses, then the default home page, whichever they are allowed. If none of these pages is allowed, they see a page explaining that the page is not available.
 
