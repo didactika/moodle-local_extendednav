@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * File definition for caches.php.
+ * Cache definitions for local_extendednav.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -26,10 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
+    // Every node of every menu, ordered by sortorder. Purged whenever a node changes.
     'nodes' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
-        'simpledata' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
     ],
