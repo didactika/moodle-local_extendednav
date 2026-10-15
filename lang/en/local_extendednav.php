@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * File definition for local_extendednav.php.
+ * English strings for local_extendednav.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -23,167 +23,162 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['actions'] = 'Actions';
-$string['activity_log'] = 'Activity Log';
-$string['add_node'] = 'Add Node';
-$string['allow_hide_myhome'] = 'Allow hiding Dashboard / Home';
-$string['allow_hide_myhome_desc'] = 'If checked, you can completely restrict the Dashboard and Site Home. If a user hits a restricted URL and these fallbacks are also restricted, they will see Moodle\'s native permission error screen (Recommended). If unchecked, the Dashboard and Home will always be accessible to serve as fallbacks.';
+$string['action_created'] = 'Created';
+$string['action_deleted'] = 'Deleted';
+$string['action_updated'] = 'Updated';
+$string['activity_log'] = 'Activity log';
+$string['add_node'] = 'Add node';
 $string['apply'] = 'Apply';
-$string['before'] = 'before:';
-$string['beforekey'] = 'Insert Before Key';
-$string['beforekey_desc'] = 'If you want this custom item to appear before an existing menu item, type its key. Leave empty to append at the end. Not applicable when overriding.';
-$string['beforekey_help'] = 'If you want to move or reorder this menu, write the Node Key of the menu that should appear immediately AFTER it. (e.g., Type "myhome" to place this menu before the Dashboard). Leave empty to put it at the very end.';
-$string['blockedurls'] = 'Blocked URLs (Intercept Access)';
-$string['blockedurls_desc'] = 'If this node is Hidden for a user, you can type paths here (comma-separated, e.g. /my/courses.php) that will be actively blocked and redirected to the Dashboard if they try to access them directly.';
-$string['blockedurls_help'] = 'Paths to block.';
-$string['bulk_delete'] = 'Delete Selected';
-$string['bulk_delete_confirm'] = 'Are you sure you want to permanently delete these nodes? This action cannot be undone.';
-$string['bulk_deleted'] = 'Nodes successfully deleted.';
-$string['conflict_handling'] = 'Conflict Handling';
-$string['conflict_overwrite'] = 'Overwrite (Replace matching nodes)';
-$string['conflict_skip'] = 'Skip (Keep existing nodes)';
-$string['coreoverridealert'] = '<strong>Notice:</strong> You are overriding a native Moodle core node. By doing so, the Title and URL fields become optional (if you leave them blank, Moodle will retain the original values for this node).';
-$string['delete_node'] = 'Delete node';
-$string['delete_node_confirm'] = 'Are you sure you want to delete this navigation rule?';
-$string['description'] = 'Description';
-$string['doc_desc'] = 'Description';
-$string['doc_download_desc'] = 'Get a working sample YAML schema file';
-$string['doc_example_format'] = 'Example Format';
-$string['doc_example_tip'] = 'You can leave optional fields empty or omit them entirely. Missing fields will default to their native Moodle values if overriding a core node, or standard defaults for new nodes.';
-$string['doc_f_beforekey'] = 'Core Key of a node to insert this item before.';
-$string['doc_f_blockedurls'] = 'Comma-separated list of strict paths to actively block via URL redirection.';
-$string['doc_f_icon'] = 'FontAwesome or Moodle pix icon name (e.g. "block", "book").';
-$string['doc_f_newwindow'] = '1 = Open in new tab ("_blank"), 0 = Same window.';
-$string['doc_f_nodekey'] = 'The unique identifier for the node (e.g. "myhome", "custom_hub").';
-$string['doc_f_parentkey'] = 'Core Key of a parent node to nest this item.';
-$string['doc_f_roles'] = 'Comma-separated list of Role IDs for Restricted visibility.';
-$string['doc_f_title'] = 'Display text. If omitted on core nodes, the original language string is used.';
-$string['doc_f_url'] = 'Destination route (absolute or relative).';
-$string['doc_f_visibility'] = '0 = Hidden, 1 = Public, 2 = Restricted by Role.';
+$string['back_to_nodes'] = 'Back to navigation';
+$string['badge_blocked'] = 'URL blocked';
+$string['blockaccess'] = 'Block URL access';
+$string['blockaccess_help'] = 'When checked, users who cannot see this item are also kept away from its URL: if they open it directly, they are sent to the Dashboard, then the Site home, then My courses, then the default home page, whichever they are allowed. If none of these pages is allowed, they see a page explaining that the page is not available.
+
+Only URLs of this site can be blocked. Languages never affect blocking, and site administrators are never blocked.
+
+Blocking only applies to pages that show the site header, so it shapes navigation; it does not replace permissions.';
+$string['bulk_delete'] = 'Delete selected';
+$string['bulk_delete_confirm'] = 'Delete the selected nodes? Core Moodle nodes are kept. This cannot be undone.';
+$string['cachedef_nodes'] = 'Navigation nodes of every menu';
+$string['clear_filters'] = 'Clear';
+$string['conflict_handling'] = 'Existing nodes';
+$string['conflict_handling_help'] = 'What to do with nodes in the file whose menu and key already exist on this site: keep the existing node, or replace it with the one in the file.';
+$string['conflict_overwrite'] = 'Replace them with the file';
+$string['conflict_skip'] = 'Keep them';
+$string['coreoverridealert'] = 'This is a core Moodle node. Title and URL are optional: leave them empty to keep the Moodle values, which stay translated.';
+$string['delete_node_confirm'] = 'Delete this node? This cannot be undone.';
+$string['doc_example_format'] = 'Example';
+$string['doc_example_tip'] = 'Every field except nodekey is optional. Empty fields of a core node keep the Moodle values.';
+$string['doc_f_blockaccess'] = '1 to block the URL for users who cannot see the node, 0 otherwise. Only used when visibility is 0 or 2.';
+$string['doc_f_icon'] = 'FontAwesome class (for example "fa-book") or Moodle icon (for example "i/home"). "none" removes the icon.';
+$string['doc_f_langs'] = 'Comma-separated language codes (for example "es,pt_br"). The node is only shown in the menu for these languages. Empty means every language.';
+$string['doc_f_menu'] = 'Menu of the node: "primary" or "usermenu". Defaults to the menu being imported.';
+$string['doc_f_newwindow'] = '1 to open the link in a new window, 0 otherwise.';
+$string['doc_f_nodekey'] = 'Key of the node, unique within its menu. Use a core key (for example "myhome") to change a core node.';
+$string['doc_f_parentkey'] = 'Key of the parent node, to show this node in its submenu.';
+$string['doc_f_roles'] = 'Comma-separated role shortnames (for example "editingteacher,teacher"). Used when visibility is 2.';
+$string['doc_f_title'] = 'Display text. Empty on a core node keeps the Moodle title.';
+$string['doc_f_tooltip'] = 'Text shown when hovering over the link.';
+$string['doc_f_url'] = 'Destination: a path of this site (for example "/course/view.php?id=2") or a full address.';
+$string['doc_f_visibility'] = '1 = visible to everyone, 2 = restricted to the roles listed, 0 = not visible.';
 $string['doc_field'] = 'Field';
-$string['doc_fields_title'] = 'Supported Fields Reference';
-$string['doc_intro'] = 'The Extended Navigation plugin uses a strict YAML structure to manage navigation nodes. Below you can find the complete list of supported attributes and a functional template you can download and modify.';
-$string['doc_schema_reference'] = 'YAML Schema Reference';
-$string['doc_structure'] = 'Schema Structure';
-$string['doc_structure_title'] = 'YAML Configuration Structure';
-$string['doc_type'] = 'Type';
-$string['documentation'] = 'Documentation';
-$string['download_example'] = 'Download Example';
+$string['doc_fields_title'] = 'Fields';
+$string['doc_intro'] = 'Import files are YAML files with a "nodes" list. Each entry describes one node with the fields below.';
+$string['documentation'] = 'YAML format';
+$string['download_example'] = 'Download an example file';
 $string['edit_node'] = 'Edit node';
-$string['enable_plugin'] = 'Enable Plugin';
-$string['enable_plugin_desc'] = 'Master switch to completely enable or disable this plugin without uninstalling it.';
-$string['err_admin_child'] = 'Anti-lockout: Site Administration menu cannot be placed inside a dropdown.';
-$string['err_admin_hide'] = 'Anti-lockout: Site Administration menu cannot be hidden or restricted.';
-$string['err_admin_parent'] = 'Anti-lockout: Site Administration menu cannot be used as a dropdown container as it would break its link.';
-$string['err_custom_hidden'] = 'Completely hidden state is only available for core navigation nodes. For custom nodes, use role restrictions instead.';
-$string['err_duplicate_key'] = 'This Node Key is already in use. Please edit the existing rule instead to prevent duplicates and conflicts.';
-$string['err_duplicate_key_alert'] = '<strong>Conflict:</strong> This Node Key is already in use by another custom rule. You cannot use duplicate keys.';
-$string['err_invalid_yaml_file'] = 'Invalid file uploaded. Please upload a valid .yml or .yaml file.';
-$string['err_invalid_yaml_format'] = 'The YAML file could not be parsed due to formatting errors.';
-$string['err_invalid_yaml_structure'] = 'The YAML structure is invalid. It must contain a "nodes" array.';
-$string['err_parent_haschildren'] = 'This node already contains sub-menus. You cannot nest a dropdown inside another dropdown.';
+$string['enable_plugin'] = 'Enable';
+$string['enable_plugin_desc'] = 'Apply the navigation nodes and URL blocking. When disabled, Moodle\'s navigation is shown unchanged and no page is blocked.';
+$string['entries_count'] = '{$a} entries';
+$string['entries_count_one'] = '1 entry';
+$string['err_admin_child'] = 'Site administration cannot be placed in a submenu.';
+$string['err_admin_hide'] = 'Site administration cannot be hidden, restricted, blocked or limited to some languages.';
+$string['err_admin_parent'] = 'Site administration cannot have submenu items.';
+$string['err_duplicate_key'] = 'Another node of this menu already uses this key.';
+$string['err_duplicate_key_alert'] = 'Another node of this menu already uses this key.';
+$string['err_fallbacks_blocked'] = 'This would block the Dashboard, the Site home, My courses and the default home page for every user, leaving users with no page to land on. Unblock at least one of them.';
+$string['err_icon_invalid'] = 'Use a FontAwesome class (for example "fa-book"), a Moodle icon (for example "i/home") or "none".';
+$string['err_import_duplicate'] = 'This node appears more than once in the file.';
+$string['err_import_nodekey'] = 'The entry has no nodekey.';
+$string['err_invalid_list'] = 'Use only letters, numbers, underscores and hyphens, separated by commas.';
+$string['err_invalid_menu'] = 'Unknown menu. Use "primary" or "usermenu".';
+$string['err_invalid_nodekey'] = 'Use only letters, numbers, underscores and hyphens.';
+$string['err_invalid_visibility'] = 'Unknown visibility. Use 0, 1 or 2.';
+$string['err_invalid_yaml_file'] = 'The file could not be read. Upload a .yaml or .yml file.';
+$string['err_invalid_yaml_format'] = 'The file is not valid YAML.';
+$string['err_invalid_yaml_structure'] = 'The file must contain a "nodes" list.';
+$string['err_parent_haschildren'] = 'This node has submenu items, so it cannot be placed in a submenu.';
+$string['err_parent_missing'] = 'There is no node with the key "{$a}" in this menu.';
 $string['err_parent_self'] = 'A node cannot be its own parent.';
-$string['err_parent_thirdlevel'] = 'Moodle Top-Bar UI only supports 1 level of dropdowns. The parent you chose is already inside another menu.';
-$string['err_restricted_page'] = 'This page is restricted by the navigation hierarchy and role rules set for your account.';
+$string['err_parent_thirdlevel'] = 'The chosen parent is already in a submenu. Menus only have one level of submenus.';
+$string['err_restricted_page'] = 'The page you opened is not available for your account, and neither are the Dashboard, the Site home or My courses. Contact the site administrator if you think this is a mistake.';
+$string['err_text_html'] = 'HTML is not allowed here.';
+$string['err_title_usermenu_chars'] = 'User menu titles cannot contain "|" or line breaks.';
+$string['err_url_forbidden'] = 'This kind of URL is not allowed.';
+$string['err_url_invalid'] = 'Enter a valid URL, for example "/course/view.php?id=2" or "https://example.com".';
 $string['eventnodecreated'] = 'Navigation node created';
 $string['eventnodedeleted'] = 'Navigation node deleted';
 $string['eventnodeupdated'] = 'Navigation node updated';
-$string['export'] = 'Export Nodes';
-$string['export_all'] = 'Export All Configurations (Full Schema)';
-$string['export_all_btn'] = 'Export All';
-$string['export_nodes'] = 'Export YAML Configuration';
-$string['export_selected'] = 'Export Selected';
-$string['export_selected_mode'] = 'Export Selected Configurations Only';
-$string['exportmode_label'] = 'Export Mode';
-$string['fallbackurl_desc'] = 'If a user hits a blocked URL, and the native fallbacks (Dashboard/Home) are also completely restricted by rules, they will be forcibly redirected here (e.g. /login/index.php). <br><br><b>Leave blank</b> to show Moodle\'s native permission error screen instead (Recommended).';
-$string['filter_action'] = 'Action contains';
-$string['filter_active'] = 'Active Filter';
+$string['export_all_btn'] = 'Export all';
+$string['export_selected'] = 'Export selected';
+$string['extendednav:manage'] = 'Manage the navigation nodes';
+$string['filter_action'] = 'Filter by action';
+$string['filter_action_any'] = 'All actions';
 $string['filter_datefrom'] = 'From';
 $string['filter_dateto'] = 'Until';
 $string['filter_invalidperiod'] = 'The end date cannot be earlier than the start date.';
-$string['filters'] = 'Filters';
+$string['filter_parent'] = 'Filter by parent key';
+$string['filter_parent_any'] = 'Parent key';
+$string['filter_visibility'] = 'Filter by visibility';
 $string['icon'] = 'Icon';
-$string['icon_desc'] = 'Moodle pix icon name, e.g. "i/dashboard" or "i/home". Leave blank for none or to keep default.';
-$string['icon_help'] = 'The internal Moodle icon name (e.g., "i/home", "i/settings", "fa-book"). <br>• <b>Leave completely blank</b>: Retains the native icon (if it had one) or adds no icon.<br>• <b>Type "null" or "none"</b>: Explicitly removes and strips any icon from this menu, avoiding blank empty spaces in themes that force icons.';
-$string['import'] = 'Import Nodes';
-$string['import_append'] = 'Append / Update (Merge with current)';
-$string['import_instructions_desc'] = 'To import nodes, your YAML file must contain a root <strong>nodes</strong> key followed by a list of navigation objects. You can safely download and edit the example template below.';
-$string['import_instructions_title'] = 'YAML Structure Guidelines';
-$string['import_nodes'] = 'Import Nodes';
-$string['import_overwrite'] = 'Overwrite existing nodes (Delete all current)';
-$string['import_success'] = 'Nodes successfully imported from YAML.';
-$string['importmode'] = 'Import Action';
-$string['importmode_help'] = 'Skip will ignore nodes that already exist. Overwrite will replace any existing nodes that share the same Node Key with the data from the YAML file. Nodes not present in the YAML file will be left untouched.';
-$string['inside'] = 'inside:';
-$string['manage_nodes'] = 'Dashboard';
-$string['manage_nodes_desc'] = 'Add, edit, or remove custom navigation nodes, and override existing Moodle nodes.';
-$string['menu_type'] = 'Target Menu / Tab';
-$string['native_cannot_delete'] = 'Native Moodle nodes cannot be deleted. You can hide them instead by setting their visibility to "Not visible".';
-$string['native_route'] = 'native route';
-$string['native_string'] = 'native string';
-$string['nativenodeinfo'] = 'Native Moodle node';
-$string['newwindow'] = 'Open in new window (target="_blank")';
-$string['newwindow_help'] = 'Check this box if you want the hyperlink to open in a new browser tab instead of navigating away from the current page.';
-$string['no_nodes_export'] = 'There are no nodes available to export.';
-$string['nodekey'] = 'Node Key';
-$string['nodekey_desc'] = 'Unique identifier. To override an existing node use its core key (e.g., myhome, mycourses, siteadminnode).';
-$string['nodekey_help'] = 'The unique identifier for this menu item. To modify an existing Moodle menu, enter its exact internal key (for example: myhome, mycourses, siteadminnode). For a brand new menu, invent a new lowercase key without spaces (e.g., custom_tutorials).';
+$string['icon_help'] = 'A FontAwesome class (for example "fa-book" or "fa-solid fa-house") or a Moodle icon (for example "i/home"). Leave empty to keep the default, or type "none" to remove the icon. In the user menu only FontAwesome icons are supported.';
+$string['import'] = 'Import';
+$string['import_entry'] = 'Entry {$a}';
+$string['import_failed'] = 'Nothing was imported. Fix these problems in the file and try again:';
+$string['import_instructions_desc'] = 'The file must contain a "nodes" list. Every node is checked first; if any node is invalid, nothing is imported.';
+$string['import_instructions_title'] = 'Before importing';
+$string['import_nodes'] = 'Import nodes';
+$string['import_success'] = 'Import finished: {$a->created} created, {$a->updated} replaced, {$a->skipped} kept.';
+$string['langs'] = 'Languages';
+$string['langs_all'] = 'All languages';
+$string['langs_help'] = 'Show this item in the menu only to users whose current language is selected. Leave empty to show it in every language. A language also covers its regional variants: Spanish (es) includes Spanish - Mexico (es_mx).
+
+Languages only control whether the item appears in the menu. They never affect access to its URL, because users can change their own language at any time. Access is controlled by Visibility, Allowed roles and "Block URL access".
+
+To translate an item, create one node per language with the same URL, roles and visibility.';
+$string['langs_hidden_notice'] = 'This item is hidden from everyone, so the selected languages have no effect on the menu. They are kept in case you make the item visible again. Access to the URL depends only on "Block URL access".';
+$string['manage_nodes'] = 'Manage navigation';
+$string['manage_nodes_desc'] = 'Add items to the primary navigation and the user menu, and change, reorder, nest or hide Moodle\'s own items.';
+$string['menu_type'] = 'Menu';
+$string['movenode'] = 'Move {$a}';
+$string['native_cannot_delete'] = 'Core Moodle nodes cannot be deleted. Set their visibility to "Not visible" to hide them.';
+$string['nativenodeinfo'] = 'Core Moodle node';
+$string['newwindow'] = 'Open in a new window';
+$string['newwindow_help'] = 'Open the link in a new browser tab. Items with submenu items always open their submenu instead.';
+$string['no_nodes_export'] = 'There are no nodes to export.';
+$string['node_saved'] = 'Node saved.';
+$string['nodekey'] = 'Node key';
+$string['nodekey_help'] = 'Key of the item, unique within its menu. To change a Moodle item, use its key: home, myhome, mycourses or siteadminnode in the primary navigation. For a new item, choose a new key using letters, numbers, underscores and hyphens, for example "help_es".';
+$string['nodes_count'] = '{$a} items';
+$string['nodes_count_one'] = '1 item';
+$string['nodes_deleted'] = '{$a} node(s) deleted.';
 $string['nodes_selected'] = 'node(s) selected';
-$string['none'] = 'None';
 $string['none_title'] = 'Untitled';
-$string['opt_end_list'] = '- Default position / End of list -';
-$string['opt_invalid_admin_submenu'] = '- Invalid: The admin panel cannot be a sub-menu -';
-$string['opt_invalid_has_submenus'] = '- Invalid: This element already contains sub-menus -';
+$string['opt_invalid_admin_submenu'] = 'Site administration is always a top-level item, so it cannot be placed in a submenu.';
+$string['opt_invalid_has_submenus'] = 'This node has submenu items, so it cannot be placed in a submenu itself.';
 $string['opt_native'] = '{$a->text} ({$a->key})';
-$string['opt_none_root'] = '- None / Main Root -';
+$string['opt_none_root'] = '- None (top level) -';
 $string['opt_plugin'] = '{$a->title} ({$a->key})';
-$string['order'] = 'Priority / Order';
-$string['parentkey'] = 'Parent Node Key (Dropdown)';
-$string['parentkey_desc'] = 'If you want this node to be a sub-item in a dropdown, provide the key of the parent node here.';
-$string['parentkey_help'] = 'Nested menus feature. Form a dropdown menu by typing the unique Core Key of a parent menu here. (e.g. create a main node called "resources", then create a second node and type "resources" in this field to nest it inside). Leave blank for normal top-level navigation.';
-$string['pluginname'] = 'Extended Navigation';
-$string['positioning'] = 'Positioning';
-$string['primary_nav'] = 'Primary Navigation';
-$string['privacy:metadata'] = 'The Extended Navigation plugin does not store any personal data.';
-$string['quick_links'] = 'Quick Links';
-$string['reset'] = 'Reset';
-$string['roles'] = 'Allowed Roles';
-$string['roles_desc'] = 'Select the roles that are allowed to see this item if restricted visibility is selected.';
-$string['roles_help'] = 'Choose the specific user roles permitted to see this menu. Only requested if "Restricted to specific roles" is selected.';
-$string['search_free'] = 'Global Search (Key or Title)';
-$string['search_parent'] = 'Hidden Parent Key (Hierarchy)';
-$string['select_nodes'] = 'Select Nodes';
-$string['select_nodes_export'] = 'Nodes to Export';
+$string['order'] = 'Order';
+$string['parentkey'] = 'Parent';
+$string['parentkey_help'] = 'Show this item in the submenu of another item. Only top-level items can be parents, and an item with submenu items cannot itself be placed in a submenu.';
+$string['parenturlunused'] = 'This node has submenu items, so it opens its submenu instead of following its URL. The URL is still used for blocking.';
+$string['pluginname'] = 'Extended navigation';
+$string['primary_nav'] = 'Primary navigation';
+$string['privacy:metadata'] = 'The Extended navigation plugin does not store any personal data. Changes to navigation nodes are recorded in the standard log.';
+$string['restricted_title'] = 'Page not available';
+$string['roles'] = 'Allowed roles';
+$string['roles_help'] = 'Users with at least one of these roles, in any context, see the item. Every logged-in user also holds the default role for authenticated users.';
+$string['search_placeholder'] = 'Search by title, node key or URL...';
+$string['settings_page'] = 'Settings';
 $string['submenuof'] = 'Submenu of: {$a}';
-
-
-$string['title'] = 'Display Title';
-$string['title_desc'] = 'The text that will be displayed. Leave blank if overriding an existing node to keep defaults.';
-$string['title_help'] = 'The name displayed in the navigation bar. If you are modifying a native Moodle menu (like "mycourses") and want to keep its original translated name, leave this completely blank. Multilanguage filters (MLANG) are fully supported here.';
-
+$string['title'] = 'Title';
+$string['title_help'] = 'Text shown in the menu. On a Moodle item, leave it empty to keep the Moodle title, which is translated. A language string can be used as "identifier,component", for example "profile,moodle".';
+$string['tooltip'] = 'Tooltip';
+$string['tooltip_help'] = 'Text shown when hovering over the link. Optional.';
+$string['unknown_lang'] = 'Not installed: {$a}';
+$string['unknown_role'] = 'Unknown role: {$a}';
 $string['url'] = 'URL';
-$string['url_desc'] = 'The link destination. Leave blank if overriding an existing node to keep defaults.';
-$string['url_help'] = 'The web address where the menu will redirect. For native nodes, leave it blank to conserve original routing. For new menus, use local paths like "/course/view.php?id=2" or absolute links.';
-
-
-
-$string['user_menu'] = 'User Menu';
-$string['view_documentation'] = 'View Documentation';
+$string['url_help'] = 'Where the item leads: a path of this site, such as "/course/view.php?id=2", or a full address. On a Moodle item, leave it empty to keep the Moodle URL.';
+$string['user_menu'] = 'User menu';
+$string['view_documentation'] = 'See the YAML format';
 $string['vis_all'] = 'Visible to everyone';
 $string['vis_hidden'] = 'Not visible';
 $string['vis_roles'] = 'Restricted';
 $string['visibility'] = 'Visibility';
-$string['visibility_desc'] = 'Control who can see this node.';
-
-
-
-
-
-
-
-
-
-
-$string['yamlconfigfile'] = 'YAML Configuration File';
-
-$string['yamlconfigfile_help'] = 'Upload a valid extended navigation YAML file to import nodes into the database.';
+$string['visibility_help'] = 'Who sees the item in the menu: everyone, only users with the allowed roles, or nobody. With "Block URL access", users who cannot see the item cannot open its URL either.';
+$string['warn_fallbacks_blocked_for_some'] = 'The Dashboard, the Site home, My courses and the default home page are all blocked for users without some roles. Those users will see an error page instead of being redirected.';
+$string['warn_unknown_lang'] = 'The language "{$a}" is not installed.';
+$string['warn_unknown_role'] = 'There is no role with the shortname "{$a}".';
+$string['yamlconfigfile'] = 'YAML file';
+$string['yamlconfigfile_help'] = 'A .yaml or .yml file with a "nodes" list, like the files created by "Export all".';
