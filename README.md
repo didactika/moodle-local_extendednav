@@ -1,139 +1,149 @@
-# Extended Navigation for Moodle
+<div align="center">
 
-[![Moodle Plugin CI](https://github.com/didactika/moodle-local_extendednav/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/didactika/moodle-local_extendednav/actions/workflows/ci.yml)
-[![Moodle 4.2 to 4.5](https://img.shields.io/badge/Moodle-4.2%20to%205.2-f98012.svg)](https://moodledev.io/general/releases)
-[![Maturity: Stable](https://img.shields.io/badge/maturity-stable-2e7d32.svg)](version.php)
-[![License: GPL v3 or later](https://img.shields.io/badge/license-GPLv3%2B-blue.svg)](LICENSE)
+<img src="pix/icon.svg" width="96" alt="Extended navigation icon">
 
-**Extended navigation** allows Moodle site administrators to deeply customise the primary
-navigation menu. Built tightly upon the PSR-14 Hooks API, it safely modifies Moodle's native
-navigation tree to add, hide, redirect, limit by role and re-parent menu items without 
-hardcoding theme changes.
+# Extended navigation for Moodle
 
-Administrators can use its native management interface to deploy custom links, inject
-FontAwesome or SVG icons into menu items, and enforce URL-blocking rules that redirect
-unauthorised access away from restricted components, establishing a curated user 
-experience for targeted cohorts.
+*Shape the primary navigation and the user menu, and keep users on the pages meant for them*
 
-## At a glance
+[![Release](https://img.shields.io/github/v/release/didactika/moodle-local_extendednav?style=flat-square)](https://github.com/didactika/moodle-local_extendednav/releases)
+[![Moodle](https://img.shields.io/badge/Moodle-4.5_to_5.2-f98012?style=flat-square&logo=moodle&logoColor=white)](https://moodle.org)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-777bb4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![License](https://img.shields.io/badge/License-GPL_v3-blue?style=flat-square)](LICENSE)
 
-| | |
-|---|---|
-| **Component** | `local_extendednav` |
-| **Plugin type** | Local plugin |
-| **Supported Moodle releases** | 4.2 through 5.2 |
-| **Current maturity** | Stable |
-| **Languages** | English |
-| **License** | GNU GPL v3 or later |
+[Overview](#overview) • [Installation](#installation) • [Usage](#usage) • [Configuration](#configuration) • [Troubleshooting](#troubleshooting)
 
-### Key capabilities
+</div>
 
-- Granular role-based visibility control to selectively display navigation nodes.
-- Full capability to re-parent elements, move them before siblings, or hide native Moodle nodes like Dashboard or Site administration.
-- Advanced URL blocking that actively redirects unauthorized access to fallback pages (`/my/`, `/?redirect=0` or a custom configured URL).
-- Safe HTML and Javascript injection to open navigation items in a new window (`target="_blank"`) securely.
-- Extensive support for adding FontAwesome or core Moodle `pix_icon` visual assets directly into the navigation bar text.
-- Administration pages (`manage.php`, `edit.php`) for maintaining the navigation modifications through a Moodle-native UI.
-- Immune paths explicitly allow CLI, AJAX, Web Services, and site administrators to bypass any redirection bottlenecks.
+Extended navigation (`local_extendednav`) is a Moodle local plugin that lets administrators manage the two menus every user sees: the primary navigation at the top of the page and the user menu under the user's picture. Add items, rename, re-link, reorder, nest or hide Moodle's own items, show items only to some roles or languages, and stop users from opening the pages of items they cannot see.
 
-## Contents
+> [!IMPORTANT]
+> **The site needs a theme based on Boost.** The plugin changes the primary navigation and the user menu that Boost and its child themes display. Themes that do not use them, such as Classic, show no changes.
 
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Configuration and Management](#configuration-and-management)
-- [Privacy and security](#privacy-and-security)
-- [Development](#development)
-- [Support](#support)
-- [License](#license)
+> [!NOTE]
+> Moodle's own items stay translated. Leave the title and URL of a Moodle item empty and the plugin keeps using Moodle's values; the form shows them as placeholders.
 
-## Requirements
+## Overview
 
-- Moodle 4.2 through 5.2.
-- A PHP version supported by the installed Moodle release.
-- The new `core\hook\navigation\primary_extend` API (introduced in Moodle 4.2).
+Moodle's menus are the same for everyone and only partly configurable. Extended navigation gives each item its own visibility, roles, languages and blocking rule, so students, teachers and staff each see the navigation that fits them.
 
-The supported range is declared in [`version.php`](version.php). Pull requests
-are tested on the endpoints of that range with every PHP and database variant
-supported by the project workflow.
+### How an item is shown
+
+Every item has a visibility:
+
+| Visibility | In the menu | With **Block URL access** |
+|---|---|---|
+| Visible to everyone | Shown to every logged-in user | Not available |
+| Restricted | Shown to users with one of the allowed roles, in any context | Users without those roles cannot open its URL |
+| Not visible | Hidden from everyone | Nobody can open its URL |
+
+An item limited to **languages** is only shown to users whose current language is one of them (Spanish `es` also covers Spanish - Mexico `es_mx`). Languages never block a URL, because users can change their language themselves. To translate an item, create one item per language.
+
+### How blocking works
+
+A user who opens a blocked URL is sent to the first of these pages they are allowed: the Dashboard, the Site home, My courses, then the default home page when it is set to a URL. When all of them are blocked for the user, they see a page explaining that the page is not available.
+
+- An item the user can see opens its URL again, even when another item blocks it.
+- A URL with query parameters only blocks pages with those parameters: `/course/view.php?id=5` blocks course 5, not course 6.
+- External URLs are never blocked. Site administrators are never blocked, and neither are the admin, login and plugin pages.
+
+### Features
+
+- **Two menus:** the primary navigation and the user menu, each with Moodle's own items listed and editable.
+- **Submenus:** one level of submenus in both menus. Dragging a parent moves it with its submenu items; submenu items only move among their siblings.
+- **Drag-and-drop ordering:** with a keyboard-accessible move dialog.
+- **Per-item options:** title, tooltip, URL, FontAwesome or Moodle icon, and opening in a new window.
+- **Safety checks:** the form refuses changes that would leave every user without a landing page, and Site administration can never be hidden or nested.
+- **Moodle's menu settings:** the items of **Custom menu items** and **User menu items** are imported, with their tooltips and language codes, and kept in sync.
+- **YAML import and export:** copy the navigation between sites. The whole file is checked before anything is saved.
+- **Activity log:** who created, changed or deleted each item, and when.
+- **Delegation:** the `local/extendednav:manage` capability lets roles such as Manager manage the navigation.
 
 ## Installation
 
-1. Place the plugin in `local/extendednav` in the Moodle code directory.
-2. Sign in as a site administrator.
-3. Visit **Site administration > Notifications** and complete the database
-   upgrade.
-4. Purge caches.
+**Requirements:** Moodle 4.5 to 5.2, with the PHP version your Moodle release requires, and a theme based on Boost.
 
-For a command-line installation, run Moodle's normal upgrade command from the
-Moodle root:
+**From a release:** download the latest release ZIP, go to **Site administration > Plugins > Install plugins**, upload the file and follow the prompts.
+
+**From Git:**
 
 ```bash
-php admin/cli/upgrade.php --non-interactive
+cd /path/to/moodle
+# Moodle 4.5 and 5.0
+git clone https://github.com/didactika/moodle-local_extendednav.git local/extendednav
+# Moodle 5.1 and later
+git clone https://github.com/didactika/moodle-local_extendednav.git public/local/extendednav
+php admin/cli/upgrade.php
 ```
 
-## Configuration and Management
+The installation creates one row for each of Moodle's own items and imports the items already defined in **Custom menu items** and **User menu items**.
 
-Visit **Site administration > Plugins > Local plugins > Extended navigation** to enable 
-or disable the plugin globally and to establish a default global `fallbackurl` for 
-blocked queries.
+## Usage
 
-To manage individual nodes, administrators can access the main configuration page (via `manage.php`).
-Here, nodes can be defined by specifying:
-- **Keys**: Standard or custom keys to target or build the component.
-- **Roles**: Selecting exact roles allowed to view or be redirected from specific urls.
-- **Before Key / Parent Key**: To attach the element under an existing dropdown or move it before a sibling.
-- **Icons**: Adding `fa-` syntax for FontAwesome assets.
-- **Target Blank**: Toggling the external link mode safely.
+### 1. Open the management page
 
-### YAML Import / Export (Infrastructure & Deployments)
+Go to **Site administration > Appearance > Extended navigation > Manage navigation**. The **Primary navigation** and **User menu** tabs list the items of each menu, with filters by title, node key or URL, by parent and by visibility.
 
-This plugin includes native support for importing and exporting navigation rules (nodes) using standard YAML files. This approach mirrors modern Moodle configurations (like `theme_vle` or `local_serviceschema`) to allow Administrators/DevOps to seamlessly transfer node structures between Development, Staging, and Production environments safely.
+### 2. Add or change items
 
-- **Export YAML:** Clicking `Export YAML Configuration` from your manage panel automatically generates a complete backup (`extendednav_config_YYYYMMDD_HHMM.yml`) containing mathematically precise definitions of your active nodes. You can export **All** configurations or only a select few.
-- **Import YAML:** Clicking `Import YAML` prompts the user for a configuration file. You can either **Overwrite** (which flushes your database and mounts only the nodes inside the file) or **Append** (to merge them).
+Select **Add node**, or the edit icon of an item:
 
-**Example YAML Format:**
-The expected structure strictly requires a top-level `nodes:` key containing a list of objects exactly matching the database schema. Ensure boolean flags like `visibility` are integers (0 = Hidden, 1 = Visible, 2 = Restricted by Role).
+- For a new item, choose a **Node key** (letters, numbers, underscores and hyphens), a **Title** and a **URL**.
+- For one of Moodle's items, change only what you need; empty fields keep Moodle's values.
+- Choose the **Visibility**, the **Allowed roles** for a restricted item, and whether to **Block URL access**.
+- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, or open it in a new window.
+- Choose a **Parent** to show the item in that item's submenu.
 
-```yaml
-nodes:
-  - nodekey: didactika_custom
-    title: "Didactika"
-    url: "https://www.didactika.org/"
-    icon: "i/world"
-    visibility: 1
-    roles: ""
-    parentkey: "myhome"
-    beforekey: ""
-    newwindow: 1
-    blockedurls: ""
-```
-*Note: Include an empty string for `roles` or `blockedurls` if not needed. Never leave them entirely blank to prevent YAML null interpretation issues.*
+> [!TIP]
+> An item with submenu items opens its submenu instead of following its URL. The list marks its URL with a warning icon; the URL still counts for blocking.
 
-Moodle will cache the resulting navigation tree heavily. When updating complex role assignments
-or adding a high amount of URL block rules, ensure the site cache for `local_extendednav` is cleared if changes do not appear immediately.
+### 3. Order the items
 
-## Privacy and security
+Drag an item by the handle in the **Order** column, or select the handle for a list of positions. Moving a parent moves its submenu items with it. An item that leaves its parent stays right below that parent's group. Ordering is off while a filter is applied.
 
-The plugin intercepts navigation and URLs on a structural level but does not collect, 
-store or process personal user data. Modifications made to the internal DB structure
-only record the rules needed to extend the user interface.
+### 4. Copy the navigation to another site
 
-Redirects apply on standard web requests and intentionally ignore system executions like 
-Cron, CLI scripts and Web Services to prevent damaging standard platform synchronisation.
+Use **Export all**, or select items and **Export selected**, to download a `.yaml` file. On the other site, use **Import** and upload the file (`.yaml` or `.yml`), choosing whether existing items are kept or replaced. **See the YAML format** on the import page describes every field and offers an example file.
 
-## Development
+## Configuration
 
-For a local check, use [moodle-plugin-ci](https://github.com/moodlehq/moodle-plugin-ci)
-against a checkout of this plugin. Modifying the PSR-14 hooks implementation should be tracked tightly
-due to Moodle's aggressive caching of `db/hooks.php`.
+Settings are located at **Site administration > Appearance > Extended navigation > Settings**.
 
-## Support
+| Setting | Default | Description |
+|---|---|---|
+| Enable | On | Apply the items and URL blocking. When off, Moodle's navigation is shown unchanged and no page is blocked |
 
-Use [GitHub Issues](https://github.com/didactika/moodle-local_extendednav/issues)
-for reproducible bugs and feature proposals. Include the Moodle, PHP and database versions,
-a screenshot of the navigation configuration and the exact URL string that fails to redirect.
+### Capabilities
 
-## License
+| Capability | Default roles | Allows the user to |
+|---|---|---|
+| `local/extendednav:manage` | None | Manage the items, import, export and see the activity log, in the system context |
 
-[GNU GPL v3 or later](LICENSE), the same license used by Moodle.
+Users with this capability find the management page in the same place as administrators. The settings page requires `moodle/site:config`.
+
+> [!WARNING]
+> Whoever holds `local/extendednav:manage` decides every user's menu and which pages are blocked. Give it only to people you would trust with the site's navigation.
+
+### Privacy and backup
+
+- **Privacy:** the plugin stores navigation items, not personal data, and implements the Privacy API as a null provider.
+- **Activity:** changes to items are recorded as events in the site's log store, which the activity log reads, so they follow your log retention settings.
+- **Backup:** items are site configuration and are not part of course backups. Use the YAML export to copy them.
+
+## Troubleshooting
+
+| Problem | Possible cause |
+|---|---|
+| The menus are unchanged | The plugin is disabled, or the theme is not based on Boost |
+| An item does not appear | Its visibility, roles or languages exclude the user, or its parent is hidden. A new item also needs a title and a URL |
+| A page is not blocked | **Block URL access** is not set, the user is a site administrator, the URL is external, or another item the user can see uses the same URL |
+| A user is sent to the Dashboard | An item they cannot see blocks the page they opened. Look for items with a **URL blocked** badge |
+| A user sees "Page not available" | Every fallback page (Dashboard, Site home, My courses and the default home page) is blocked for them |
+| User menu icons are missing | The user menu only shows FontAwesome icons (`fa-...`) |
+| An import is refused | The page lists each invalid item and why. Nothing is saved until the whole file is valid |
+
+## Getting help
+
+To report a bug or request a feature, please open an [issue](https://github.com/didactika/moodle-local_extendednav/issues). Include your Moodle and PHP versions, the theme, and the items involved (an export helps). Do not include passwords, tokens or personal data.
+
+Report security problems privately through the repository's [security advisory form](https://github.com/didactika/moodle-local_extendednav/security/advisories/new).
