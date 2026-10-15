@@ -16,16 +16,35 @@
 
 namespace local_extendednav\menu;
 
+use local_extendednav\local\node_access;
+use local_extendednav\local\node_text;
+use local_extendednav\local\node_validator;
+
 /**
- * Scalable menu implementation for the Moodle User Menu.
+ * The user menu.
+ *
+ * Moodle builds the user menu from the customusermenuitems setting, so the plugin
+ * rewrites that setting for the current request. Moodle reads only "text|url"
+ * from each line, so icons, tooltips, new windows and submenus are applied in the
+ * browser by the local_extendednav/usermenu module.
  *
  * @package    local_extendednav
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class usermenu extends base {
+    /** @var string[] Default lines of Moodle's customusermenuitems setting. */
+    private const DEFAULT_ITEMS = [
+        'profile,moodle|/user/profile.php',
+        'grades,grades|/grade/report/mygrades.php',
+        'calendar,core_calendar|/calendar/view.php?view=month',
+        'privatefiles,moodle|/user/files.php',
+        'reports,core_reportbuilder|/reportbuilder/index.php',
+    ];
+
     /**
-     * Gets the key identifying the user menu.
+     * Returns the menu key.
      *
      * @return string
      */
@@ -34,7 +53,7 @@ class usermenu extends base {
     }
 
     /**
-     * Gets the human-readable localized name of this menu.
+     * Returns the localised menu name.
      *
      * @return string
      */
@@ -43,7 +62,7 @@ class usermenu extends base {
     }
 
     /**
-     * Associated core configuration name for user menu items.
+     * Returns the Moodle setting that defines user menu items.
      *
      * @return string|null
      */
@@ -52,7 +71,7 @@ class usermenu extends base {
     }
 
     /**
-     * Key prefix for items imported/synced from customusermenuitems.
+     * Returns the prefix of nodes imported from the user menu setting.
      *
      * @return string
      */
@@ -61,156 +80,171 @@ class usermenu extends base {
     }
 
     /**
-     * Synchronizes native core nodes into the plugin database.
+     * Splits a user menu line. Moodle reads it as text|url, so anything after the URL belongs to the URL.
+     *
+     * @param string $line Line without the leading dashes.
+     * @return array With keys text, url, tooltip and langs.
      */
-    public function sync_native_nodes(): void {
-        global $DB;
-
-        $nodes = $this->get_native_nodes();
-        $existing = $DB->get_records('local_extendednav', ['menu' => 'usermenu']);
-        $existingbykey = [];
-        foreach ($existing as $e) {
-            $existingbykey[$e->nodekey] = $e;
-        }
-
-        $maxsort = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', ['usermenu']);
-
-        foreach ($nodes as $key => $node) {
-            if (!isset($existingbykey[$key])) {
-                $maxsort++;
-                $record = new \stdClass();
-                $record->nodekey = $key;
-                $record->menu = 'usermenu';
-                $record->title = $node->text;
-                $record->url = $node->action;
-                $record->parentkey = null;
-                $record->icon = $node->icon;
-                $record->visibility = 1;
-                $record->roles = null;
-                $record->newwindow = 0;
-                $record->sortorder = $maxsort;
-                $record->id = (int)$DB->insert_record('local_extendednav', $record);
-                \local_extendednav\event\node_created::create_from_record($record)->trigger();
-            } else {
-                $rec = $existingbykey[$key];
-                if ($rec->url !== $node->action) {
-                    $rec->url = $node->action;
-                    $DB->update_record('local_extendednav', $rec);
-                    \local_extendednav\event\node_updated::create_from_record($rec)->trigger();
-                }
-            }
-        }
+    public function parse_config_line(string $line): array {
+        $bits = array_map('trim', explode('|', $line, 2));
+        return ['text' => $bits[0] ?? '', 'url' => $bits[1] ?? '', 'tooltip' => '', 'langs' => ''];
     }
 
     /**
-     * Gets all native nodes belonging to this menu as an array of objects.
+     * Returns the core user menu items, as Moodle defines them by default.
      *
-     * @return array
+     * @return \stdClass[] Keyed by node key.
      */
     public function get_native_nodes(): array {
-        $defaultitems = [
-            'profile,moodle|/user/profile.php',
-            'grades,grades|/grade/report/mygrades.php',
-            'calendar,core_calendar|/calendar/view.php?view=month',
-            'privatefiles,moodle|/user/files.php',
-            'reports,core_reportbuilder|/reportbuilder/index.php',
-        ];
         $nodes = [];
-        foreach ($defaultitems as $line) {
-            $settings = explode('|', $line);
-            $rawtext = trim($settings[0]);
-            $itemtext = ltrim($rawtext, '-');
-            $itemurl = isset($settings[1]) ? trim($settings[1]) : '';
-            $itemicon = isset($settings[2]) ? trim($settings[2]) : '';
-            $slug = preg_replace('/[^a-z0-9]/', '', strtolower($itemtext));
-            $nodekey = 'umenu_' . substr($slug, 0, 15);
-
-            $std = new \stdClass();
-            $std->text = $itemtext;
-            $std->action = $itemurl;
-            $std->icon = $itemicon;
-            $std->key = $nodekey;
-            $nodes[$nodekey] = $std;
+        foreach (self::DEFAULT_ITEMS as $line) {
+            $item = $this->parse_config_line($line);
+            $key = self::make_key($this->get_config_prefix(), $item['text']);
+            $nodes[$key] = (object)['key' => $key, 'text' => $item['text'], 'action' => $item['url'], 'icon' => null];
         }
         return $nodes;
     }
 
     /**
-     * Injects custom nodes into the user menu configuration.
+     * Builds the customusermenuitems value for the current user.
      *
-     * @param array $customnodes Array of custom nodes to inject
-     * @param mixed $context Optional context
+     * Only top-level nodes the user can see are included; child nodes are shown as
+     * submenus by the browser module.
+     *
+     * @param \stdClass[] $customnodes Nodes of this menu, ordered by sortorder.
+     * @return string
      */
-    public function inject_nodes(array $customnodes, $context = null): void {
-        global $CFG, $USER;
-
-        if (empty($customnodes)) {
-            return;
-        }
-
-        // Group nodes by parent.
-        $childrenbyparent = [];
-        $rootnodes = [];
-        foreach ($customnodes as $n) {
-            $allowed = true;
-            if ($n->visibility == 0) {
-                $allowed = false;
-            } else if ($n->visibility == 2) {
-                $allowed = false;
-                if (!empty($n->roles)) {
-                    $roleids = explode(',', $n->roles);
-                    foreach ($roleids as $rid) {
-                        if (!empty($rid) && user_has_role_assignment($USER->id, (int)$rid)) {
-                            $allowed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ($allowed) {
-                if (empty($n->parentkey)) {
-                    $rootnodes[] = $n;
-                } else {
-                    $childrenbyparent[$n->parentkey][] = $n;
-                }
-            }
-        }
-
-        $newcustomusermenu = [];
-        $nativenodes = $this->get_native_nodes();
-
-        foreach ($rootnodes as $node) {
-            $title = !empty($node->title) ? $node->title : ($nativenodes[$node->nodekey]->text ?? '');
-            $url = !empty($node->url) ? $node->url : ($nativenodes[$node->nodekey]->action ?? '');
-            $icon = (!empty($node->icon) && $node->icon !== 'none') ? $node->icon : '';
-
-            if (empty($title) && empty($url)) {
+    public function build_config_value(array $customnodes): string {
+        $natives = $this->get_native_nodes();
+        $lines = [];
+        foreach ($customnodes as $node) {
+            if (!empty($node->parentkey) || !node_access::is_shown($node)) {
                 continue;
             }
+            $native = $natives[$node->nodekey] ?? null;
 
-            if (!empty($url)) {
-                $line = $title . '|' . $url;
+            // Keep the "identifier,component" form of core items so Moodle translates them itself.
+            if (trim((string)$node->title) !== '') {
+                $title = format_string(node_text::resolve($node->title), true, ['escape' => false]);
             } else {
-                $line = $title;
+                $title = $native ? $native->text : '';
             }
-
-            if (!empty($icon)) {
-                $line .= '|' . $icon;
+            $url = trim((string)$node->url) !== '' ? trim((string)$node->url) : ($native ? $native->action : '');
+            if ($title === '' || $url === '') {
+                continue;
             }
-
-            $newcustomusermenu[] = $line;
+            $lines[] = str_replace(["\r", "\n", '|'], ' ', $title) . '|' . $url;
         }
-        $CFG->customusermenuitems = implode("\n", $newcustomusermenu);
+        return implode("\n", $lines);
     }
 
     /**
-     * Injects custom nodes via the user menu extension hook.
+     * Builds the data the browser module needs: fixes for top-level items and submenu panels.
      *
-     * @param array $customnodes Array of custom nodes
-     * @param mixed $hook The user menu hook
+     * @param \stdClass[] $customnodes Nodes of this menu, ordered by sortorder.
+     * @param \renderer_base $output Renderer for the submenu template.
+     * @return string HTML of the template elements, or an empty string when nothing is needed.
      */
-    public function inject_nodes_via_hook(array $customnodes, $hook): void {
-        unset($customnodes, $hook);
+    public function build_browser_templates(array $customnodes, \renderer_base $output): string {
+        $natives = $this->get_native_nodes();
+        $roots = [];
+        $children = [];
+        foreach ($customnodes as $node) {
+            if (!node_access::is_shown($node)) {
+                continue;
+            }
+            if (empty($node->parentkey)) {
+                $roots[$node->nodekey] = $node;
+            } else {
+                $children[$node->parentkey][] = $node;
+            }
+        }
+
+        $html = '';
+        foreach ($roots as $nodekey => $node) {
+            $haschildren = !empty($children[$nodekey]);
+            $icon = trim((string)$node->icon);
+            $tooltip = node_text::resolve($node->tooltip ?? '');
+            $attributes = [
+                'data-region' => 'local-extendednav-node-fix',
+                'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null),
+                'data-title' => strip_tags(format_string(node_text::get_title($node, $natives[$nodekey] ?? null))),
+            ];
+            if ($icon !== '' && node_validator::is_fontawesome($icon)) {
+                $attributes['data-icon'] = $icon;
+            }
+            if (!empty($node->newwindow) && !$haschildren) {
+                $attributes['data-newwindow'] = '1';
+            }
+            if ($tooltip !== '') {
+                $attributes['data-tooltip'] = strip_tags(format_string($tooltip));
+            }
+            if (count($attributes) > 3) {
+                $html .= \html_writer::tag('template', '', $attributes);
+            }
+        }
+
+        foreach ($children as $parentkey => $items) {
+            $parent = $roots[$parentkey] ?? null;
+            if ($parent === null && !isset($natives[$parentkey])) {
+                continue;
+            }
+            $parent = $parent ?? (object)['nodekey' => $parentkey, 'title' => null, 'url' => null];
+            $parenttitle = strip_tags(format_string(node_text::get_title($parent, $natives[$parentkey] ?? null)));
+            if ($parenttitle === '') {
+                continue;
+            }
+
+            $context = ['panelid' => 'carousel-item-extnav-' . preg_replace('/[^a-zA-Z0-9]/', '', $parentkey),
+                'title' => $parenttitle, 'items' => []];
+            foreach ($items as $child) {
+                $title = strip_tags(format_string(node_text::get_title($child, $natives[$child->nodekey] ?? null)));
+                $url = $this->get_absolute_url($child, $natives[$child->nodekey] ?? null);
+                if ($title === '' || $url === '') {
+                    continue;
+                }
+                $icon = trim((string)$child->icon);
+                $context['items'][] = [
+                    'url' => $url,
+                    'title' => $title,
+                    'tooltip' => strip_tags(format_string(node_text::resolve($child->tooltip ?? ''))),
+                    'icon' => ($icon !== '' && node_validator::is_fontawesome($icon)) ? $icon : false,
+                    'newwindow' => !empty($child->newwindow),
+                ];
+            }
+            if (empty($context['items'])) {
+                continue;
+            }
+
+            $html .= \html_writer::tag('template', $output->render_from_template('local_extendednav/usermenu/panel', $context), [
+                'data-region' => 'local-extendednav-submenu',
+                'data-panel-id' => $context['panelid'],
+                'data-trigger-url' => $this->get_absolute_url($parent, $natives[$parentkey] ?? null),
+                'data-trigger-title' => $parenttitle,
+            ]);
+        }
+        return $html;
+    }
+
+    /**
+     * Returns the absolute URL of a node, as Moodle prints it in the user menu.
+     *
+     * @param \stdClass $node Node record.
+     * @param \stdClass|null $native Core node definition, if any.
+     * @return string Absolute URL, or an empty string.
+     */
+    private function get_absolute_url(\stdClass $node, ?\stdClass $native): string {
+        $url = trim((string)($node->url ?? ''));
+        if ($url === '' && $native !== null) {
+            $url = (string)$native->action;
+        }
+        if ($url === '') {
+            return '';
+        }
+        try {
+            return (new \moodle_url($url))->out(false);
+        } catch (\moodle_exception $e) {
+            return '';
+        }
     }
 }

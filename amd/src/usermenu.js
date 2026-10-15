@@ -14,172 +14,193 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Usermenu enhancements for extended navigation.
+ * Adds icons, tooltips, new windows and submenus to the user menu.
+ *
+ * Moodle builds the user menu from "text|url" lines only, so the server prints
+ * template elements describing the extras and this module applies them.
  *
  * @module     local_extendednav/usermenu
- * @copyright  2026 Didactika
+ * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import $ from 'jquery';
 
+let initialised = false;
+
 /**
- * Helper to build an icon element without innerHTML string templates.
+ * Builds a FontAwesome icon element.
  *
- * @param {string} iconClass FontAwesome icon class name.
- * @returns {HTMLElement} The created icon element.
+ * @param {String} iconClass FontAwesome classes.
+ * @returns {HTMLElement}
  */
-const createIconElement = (iconClass) => {
-    const iconEl = document.createElement('i');
-    iconEl.className = `icon fa ${iconClass} fa-fw`;
-    iconEl.setAttribute('aria-hidden', 'true');
-    return iconEl;
+const createIcon = (iconClass) => {
+    const icon = document.createElement('i');
+    icon.className = `icon fa ${iconClass} fa-fw`;
+    icon.setAttribute('aria-hidden', 'true');
+    return icon;
 };
 
-export const init = () => {
-    if (!window.customUsermenuTargetBlankInjected) {
-        window.customUsermenuTargetBlankInjected = true;
-        document.addEventListener('click', e => {
-            const t = e.target.closest('a[target="_blank"]');
-            if (t && t.closest('.usermenu')) {
-                e.stopPropagation();
-            }
-        }, true);
+/**
+ * Normalises a URL so links can be compared: origin, path without "index.php", and query.
+ *
+ * @param {String} href URL.
+ * @returns {String|null}
+ */
+const normaliseUrl = (href) => {
+    if (!href) {
+        return null;
+    }
+    try {
+        const url = new URL(href, window.location.href);
+        return url.origin + url.pathname.replace(/\/index\.php$/, '/') + url.search;
+    } catch (error) {
+        return null;
+    }
+};
+
+/**
+ * Finds the user menu link of an item, by URL first and then by text.
+ *
+ * @param {HTMLElement} container Main panel of the user menu.
+ * @param {String} url Absolute URL of the item.
+ * @param {String} title Text of the item.
+ * @returns {HTMLAnchorElement|null}
+ */
+const findLink = (container, url, title) => {
+    const links = Array.from(container.querySelectorAll('a'));
+    const target = normaliseUrl(url);
+    if (target) {
+        const byUrl = links.find((link) => normaliseUrl(link.getAttribute('href')) === target);
+        if (byUrl) {
+            return byUrl;
+        }
+    }
+    if (title) {
+        return links.find((link) => link.textContent.trim() === title) || null;
+    }
+    return null;
+};
+
+/**
+ * Applies the icon, tooltip and new window settings of a top-level item.
+ *
+ * @param {HTMLElement} main Main panel of the user menu.
+ * @param {HTMLTemplateElement} fix Template element describing the item.
+ */
+const applyFix = (main, fix) => {
+    const link = findLink(main, fix.dataset.url, fix.dataset.title);
+    if (!link) {
+        return;
+    }
+    if (fix.dataset.newwindow) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener');
+    }
+    if (fix.dataset.tooltip) {
+        link.setAttribute('title', fix.dataset.tooltip);
+    }
+    if (!fix.dataset.icon) {
+        return;
+    }
+    const existing = link.querySelector('.icon');
+    if (existing && existing.tagName === 'I') {
+        existing.className = `icon fa ${fix.dataset.icon} fa-fw`;
+        return;
+    }
+    const wrapper = existing ? existing.closest('.carousel-navigation-link-icon') : null;
+    if (wrapper) {
+        wrapper.replaceChildren(createIcon(fix.dataset.icon));
+    } else if (existing) {
+        existing.replaceWith(createIcon(fix.dataset.icon));
+    } else {
+        const span = document.createElement('span');
+        span.className = 'carousel-navigation-link-icon';
+        span.appendChild(createIcon(fix.dataset.icon));
+        link.prepend(span);
+    }
+};
+
+/**
+ * Turns a top-level item into the trigger of a submenu panel.
+ *
+ * @param {HTMLElement} carousel Carousel of the user menu.
+ * @param {HTMLElement} main Main panel of the user menu.
+ * @param {HTMLTemplateElement} source Template element holding the panel.
+ */
+const addSubmenu = (carousel, main, source) => {
+    const panelId = source.dataset.panelId;
+    if (carousel.querySelector('#' + CSS.escape(panelId))) {
+        return;
+    }
+    const trigger = findLink(main, source.dataset.triggerUrl, source.dataset.triggerTitle);
+    if (!trigger) {
+        return;
     }
 
-    const sources = document.querySelectorAll('template[data-region="local-extendednav-submenu"]');
+    trigger.href = '#';
+    trigger.classList.add('carousel-navigation-link');
+    trigger.dataset.carouselTargetId = panelId;
+    carousel.append(source.content.cloneNode(true));
+    source.remove();
+
+    const show = (panel) => {
+        const index = Array.from(carousel.children).indexOf(panel);
+        $(carousel.closest('#usermenu-carousel')).carousel(index);
+    };
+    const onKey = (handler) => (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            handler(event);
+        }
+    };
+
+    const open = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        show(carousel.querySelector('#' + CSS.escape(panelId)));
+    };
+    trigger.addEventListener('click', open);
+    trigger.addEventListener('keydown', onKey(open));
+
+    // The back button is handled here to avoid the arrow Moodle adds to .carousel-navigation-link.
+    const back = carousel.querySelector('#' + CSS.escape(panelId) + ' .local-extendednav-back-btn');
+    if (back) {
+        const close = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            show(main);
+        };
+        back.addEventListener('click', close);
+        back.addEventListener('keydown', onKey(close));
+    }
+};
+
+/**
+ * Applies the user menu extras.
+ */
+export const init = () => {
+    if (initialised) {
+        return;
+    }
+    initialised = true;
+
+    // Keep the user menu open handling from swallowing clicks on links that open a new window.
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[target="_blank"]');
+        if (link && link.closest('.usermenu')) {
+            event.stopPropagation();
+        }
+    }, true);
+
     const carousel = document.querySelector('.usermenu #usermenu-carousel .carousel-inner');
     const main = document.querySelector('.usermenu #carousel-item-main');
-
     if (!carousel || !main) {
         return;
     }
 
-    // Fix missing FontAwesome icons and new window targets for root items.
-    const nodeFixes = document.querySelectorAll('template[data-region="local-extendednav-node-fix"]');
-    nodeFixes.forEach(fix => {
-        const url = fix.dataset.url;
-        const title = fix.dataset.title;
-        const icon = fix.dataset.icon;
-        const newWindow = fix.dataset.newwindow;
-
-        let link = null;
-        const links = Array.from(main.querySelectorAll('a'));
-
-        if (url) {
-            try {
-                link = main.querySelector(`a[href*="${url}"]`);
-            } catch (e) {
-                // Ignore invalid selectors.
-            }
-            if (!link) {
-                link = links.find(l => l.href && l.href.includes(url));
-            }
-        }
-
-        if (!link && title) {
-            link = links.find(l => l.textContent.trim() === title);
-        }
-
-        if (link) {
-            if (newWindow) {
-                link.setAttribute('target', '_blank');
-            }
-            if (!icon) {
-                return;
-            }
-            const existingIcon = link.querySelector('.icon');
-            if (existingIcon) {
-                if (existingIcon.tagName === 'IMG') {
-                    const iconEl = createIconElement(icon);
-                    const wrapper = existingIcon.closest('.carousel-navigation-link-icon');
-                    if (wrapper) {
-                        wrapper.replaceChildren(iconEl);
-                    } else {
-                        existingIcon.replaceWith(iconEl);
-                    }
-                } else if (existingIcon.tagName === 'I') {
-                    existingIcon.className = `icon fa ${icon} fa-fw`;
-                }
-            } else {
-                const spanWrapper = document.createElement('span');
-                spanWrapper.className = 'carousel-navigation-link-icon';
-                spanWrapper.appendChild(createIconElement(icon));
-                link.prepend(spanWrapper);
-            }
-        }
-    });
-
-    sources.forEach(source => {
-        const triggerUrl = source.dataset.triggerUrl;
-        const panelId = source.dataset.panelId;
-
-        if (carousel.querySelector('#' + panelId)) {
-            return;
-        }
-
-        let trigger = null;
-        const allLinks = Array.from(main.querySelectorAll('a'));
-
-        if (triggerUrl) {
-            try {
-                trigger = main.querySelector(`a[href*="${triggerUrl}"]`);
-            } catch (e) {
-                // Ignore invalid selectors.
-            }
-            if (!trigger) {
-                trigger = allLinks.find(l => l.href && l.href.includes(triggerUrl));
-            }
-        }
-
-        if (!trigger) {
-            const triggerTitle = source.dataset.triggerTitle;
-            if (triggerTitle) {
-                trigger = allLinks.find(l => l.textContent.trim() === triggerTitle);
-            }
-        }
-
-        if (!trigger) {
-            return;
-        }
-
-        trigger.href = '#';
-        trigger.classList.add('carousel-navigation-link');
-        trigger.dataset.carouselTargetId = panelId;
-
-        carousel.append(source.content.cloneNode(true));
-        source.remove();
-
-        const openSubmenu = event => {
-            event.preventDefault();
-            event.stopPropagation();
-            const panel = carousel.querySelector('#' + panelId);
-            const index = Array.from(carousel.children).indexOf(panel);
-            $(carousel.closest('#usermenu-carousel')).carousel(index);
-        };
-        trigger.addEventListener('click', openSubmenu);
-        trigger.addEventListener('keydown', event => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                openSubmenu(event);
-            }
-        });
-
-        // Add back button listener manually to avoid Moodle's right arrow CSS from .carousel-navigation-link.
-        const backBtn = carousel.querySelector('#' + panelId + ' .local-extendednav-back-btn');
-        if (backBtn) {
-            const closeSubmenu = event => {
-                event.preventDefault();
-                event.stopPropagation();
-                const index = Array.from(carousel.children).indexOf(main);
-                $(carousel.closest('#usermenu-carousel')).carousel(index);
-            };
-            backBtn.addEventListener('click', closeSubmenu);
-            backBtn.addEventListener('keydown', event => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    closeSubmenu(event);
-                }
-            });
-        }
-    });
+    document.querySelectorAll('template[data-region="local-extendednav-node-fix"]').forEach((fix) => applyFix(main, fix));
+    document.querySelectorAll('template[data-region="local-extendednav-submenu"]').forEach(
+        (source) => addSubmenu(carousel, main, source)
+    );
 };
