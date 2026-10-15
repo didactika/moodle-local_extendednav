@@ -44,6 +44,7 @@ Feature: Edit navigation nodes
       | nodekey | visibility | blockaccess |
       | myhome  | 0          | 1           |
       | home    | 0          | 1           |
+    And I reload the page
     When I click on "Edit" "link" in the "mycourses" "table_row"
     And I set the following fields to these values:
       | Visibility       | Not visible |

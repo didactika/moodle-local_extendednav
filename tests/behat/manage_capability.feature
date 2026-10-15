@@ -14,16 +14,17 @@ Feature: Let other roles manage the navigation
 
   Scenario: Managers cannot manage the navigation by default
     When I log in as "manager1"
-    And I visit "/local/extendednav/manage.php"
-    Then I should see "Access denied"
+    And I visit "/admin/search.php?query=navigation"
+    Then "Manage navigation" "link" should not exist in the "region-main" "region"
 
   Scenario: Managers with the capability manage the nodes but not the settings
     Given the following "permission overrides" exist:
       | capability               | permission | role    | contextlevel | reference |
       | local/extendednav:manage | Allow      | manager | System       |           |
     When I log in as "manager1"
-    And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
-    Then I should see "Primary navigation"
-    And I should see "myhome" in the "local-extendednav-manage" "table"
-    And I visit "/admin/settings.php?section=local_extendednav_settings"
+    And I visit "/admin/search.php?query=navigation"
+    Then "Manage navigation" "link" should exist in the "region-main" "region"
     And I should not see "Apply the navigation nodes and URL blocking"
+    And I click on "Manage navigation" "link" in the "region-main" "region"
+    And I should see "Primary navigation"
+    And I should see "myhome" in the "local-extendednav-manage" "table"
