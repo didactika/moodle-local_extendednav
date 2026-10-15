@@ -17,6 +17,9 @@
 /**
  * Admin settings for local_extendednav.
  *
+ * The settings page needs moodle/site:config. The management page needs
+ * local/extendednav:manage, so it can be given to roles such as Manager.
+ *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
@@ -25,35 +28,26 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    // Top category for local plugins.
-    $ADMIN->add('localplugins', new admin_category('local_extendednav_cat', get_string('pluginname', 'local_extendednav')));
+if ($hassiteconfig || has_capability('local/extendednav:manage', context_system::instance())) {
+    // Appearance is visible to every user who can open an admin page, unlike Local plugins,
+    // so administrators and managers find the plugin in the same place.
+    $ADMIN->add('appearance', new admin_category('local_extendednav_cat', get_string('pluginname', 'local_extendednav')));
 
-    // General settings page.
-    $settings = new admin_settingpage('local_extendednav_settings', get_string('pluginname', 'local_extendednav'));
-
-    $setting = new admin_setting_configcheckbox(
-        'local_extendednav/enable_plugin',
-        get_string('enable_plugin', 'local_extendednav'),
-        get_string('enable_plugin_desc', 'local_extendednav'),
-        1
-    );
-    $settings->add($setting);
-
-    $setting = new admin_setting_configcheckbox(
-        'local_extendednav/allow_hide_myhome',
-        get_string('allow_hide_myhome', 'local_extendednav'),
-        get_string('allow_hide_myhome_desc', 'local_extendednav'),
-        0
-    );
-    $settings->add($setting);
-
+    $settings = new admin_settingpage('local_extendednav_settings', get_string('settings_page', 'local_extendednav'));
+    if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configcheckbox(
+            'local_extendednav/enable_plugin',
+            get_string('enable_plugin', 'local_extendednav'),
+            get_string('enable_plugin_desc', 'local_extendednav'),
+            1
+        ));
+    }
     $ADMIN->add('local_extendednav_cat', $settings);
 
-    // Management page.
     $ADMIN->add('local_extendednav_cat', new admin_externalpage(
         'local_extendednav_manage',
         get_string('manage_nodes', 'local_extendednav'),
-        new moodle_url('/local/extendednav/manage.php')
+        new moodle_url('/local/extendednav/manage.php'),
+        'local/extendednav:manage'
     ));
 }
