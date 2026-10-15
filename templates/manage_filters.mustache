@@ -1,0 +1,74 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage_filters
+
+    Filters of the management page.
+
+    Context variables required for this template:
+    * menu - Menu key
+    * search - Current search text
+    * parents - Parent keys to filter by, each with value, name and selected
+    * visibilities - Visibilities to filter by, each with value, name and selected
+    * clearurl - URL that clears the filters
+
+    Example context (json):
+    {
+        "menu": "primary",
+        "search": "",
+        "parents": [{"value": "home", "name": "home", "selected": false}],
+        "visibilities": [
+            {"value": 1, "name": "Visible to everyone", "selected": false},
+            {"value": 2, "name": "Restricted", "selected": true},
+            {"value": 0, "name": "Not visible", "selected": false}
+        ],
+        "clearurl": "https://example.com/local/extendednav/manage.php?menu=primary"
+    }
+}}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" action="manage.php" class="local-extendednav-filterbar" role="search">
+            <input type="hidden" name="menu" value="{{menu}}">
+            <div class="position-relative local-extendednav-search">
+                <label for="local-extendednav-search" class="sr-only visually-hidden">{{#str}} search_placeholder, local_extendednav {{/str}}</label>
+                {{#pix}} a/search, core {{/pix}}
+                <input type="search" id="local-extendednav-search" name="search" value="{{search}}" class="form-control"
+                    placeholder="{{#str}} search_placeholder, local_extendednav {{/str}}" autocomplete="off">
+            </div>
+            <div>
+                <label for="local-extendednav-parent" class="sr-only visually-hidden">{{#str}} filter_parent, local_extendednav {{/str}}</label>
+                <select id="local-extendednav-parent" name="parent" class="custom-select form-select">
+                    <option value="">{{#str}} filter_parent_any, local_extendednav {{/str}}</option>
+                    {{#parents}}
+                        <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
+                    {{/parents}}
+                </select>
+            </div>
+            <div>
+                <label for="local-extendednav-visibility" class="sr-only visually-hidden">{{#str}} filter_visibility, local_extendednav {{/str}}</label>
+                <select id="local-extendednav-visibility" name="visibility" class="custom-select form-select">
+                    <option value="">{{#str}} visibility, local_extendednav {{/str}}</option>
+                    {{#visibilities}}
+                        <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
+                    {{/visibilities}}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">{{#str}} apply, local_extendednav {{/str}}</button>
+            <a href="{{clearurl}}" class="btn btn-outline-secondary">{{#str}} clear_filters, local_extendednav {{/str}}</a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage_toolbar
+
+    Menu tabs and main actions of the management page.
+
+    Context variables required for this template:
+    * tabs - Menus, each with name, url and active
+    * addurl - URL to add a node
+    * importurl - URL of the import page
+    * exporturl - URL to export every node of the menu
+    * activityurl - URL of the activity report
+
+    Example context (json):
+    {
+        "tabs": [
+            {"name": "Primary navigation", "url": "https://example.com/local/extendednav/manage.php?menu=primary", "active": true},
+            {"name": "User menu", "url": "https://example.com/local/extendednav/manage.php?menu=usermenu", "active": false}
+        ],
+        "addurl": "https://example.com/local/extendednav/edit.php?menu=primary",
+        "importurl": "https://example.com/local/extendednav/import.php?menu=primary",
+        "exporturl": "https://example.com/local/extendednav/export.php?all=1&menu=primary",
+        "activityurl": "https://example.com/local/extendednav/activity.php?menu=primary"
+    }
+}}
+<div class="d-flex flex-wrap align-items-end mb-3 local-extendednav-toolbar">
+    <ul class="nav nav-tabs flex-grow-1">
+        {{#tabs}}
+            <li class="nav-item">
+                <a href="{{url}}" class="nav-link{{#active}} active{{/active}}"{{#active}} aria-current="page"{{/active}}>{{name}}</a>
+            </li>
+        {{/tabs}}
+    </ul>
+    <div class="d-flex flex-wrap local-extendednav-actions">
+        <a href="{{addurl}}" class="btn btn-primary">{{#pix}} t/add, core {{/pix}}{{#str}} add_node, local_extendednav {{/str}}</a>
+        <a href="{{importurl}}" class="btn btn-outline-secondary">{{#pix}} i/import, core {{/pix}}{{#str}} import, local_extendednav {{/str}}</a>
+        <a href="{{exporturl}}" class="btn btn-outline-secondary">{{#pix}} t/download, core {{/pix}}{{#str}} export_all_btn, local_extendednav {{/str}}</a>
+        <a href="{{activityurl}}" class="btn btn-outline-secondary">{{#pix}} i/report, core {{/pix}}{{#str}} activity_log, local_extendednav {{/str}}</a>
+    </div>
+</div>
