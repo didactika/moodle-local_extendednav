@@ -28,6 +28,15 @@ on:
       - 'MOODLE_*_STABLE'
   workflow_dispatch:
 
+# A new push to a pull request cancels the run that is still going for the one before it, so the checks of a commit that is
+# already out of date do not keep running next to the ones of the commit that replaced it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   setup:
     # Turns $plugin->supported (version.php) into the test matrix consumed by
@@ -86,16 +95,14 @@ jobs:
           # this plugin still supports a pre-4.5 Moodle.
 
           # NOTE ON SEMANTICS: Moodle defines $plugin->supported as an
-          # inclusive RANGE, [lowest, highest] -- so [405, 502] means "4.5
-          # through 5.2", which includes 5.0 and 5.1, not just the two
-          # endpoints. What this loop builds is a matrix over the values
-          # actually written there, which for a well-formed two-element range
-          # means the floor and the ceiling get tested and the versions in
-          # between do not. That is a deliberate cost trade-off and the same
-          # one moodle-local_servicemanager makes by hand, but it is a choice,
-          # not what `supported` means: a regression that only affects 5.1
-          # would not be caught. To test the whole range, list the intermediate
-          # versions explicitly in MOODLE_PHP_TABLE and expand them here.
+          # inclusive RANGE, [lowest, highest], so [400, 502] means every
+          # Moodle version from 4.0 to 5.2. Testing all of them would multiply
+          # the matrix for little gain, so the matrix holds the two ENDS of the
+          # range and every LTS release (MOODLE_LTS below) that lies between
+          # them, each with the PHP versions Moodle supports for it: for
+          # [400, 502] that is 400, 401, 405 and 502. Add the code of a new LTS
+          # release to MOODLE_LTS when Moodle announces it.
+          MOODLE_LTS='["401", "405"]'
           supported_raw=$(grep -oP '\$plugin->supported\s*=\s*\[\K[^\]]+' version.php || true)
           if [ -z "$supported_raw" ]; then
             echo "::error::Could not find \$plugin->supported = [...] in version.php."
@@ -112,12 +119,19 @@ jobs:
           # output still needs a field literally called "include" -- that's
           # GitHub Actions' own matrix schema, not jq's, and unaffected by
           # this rename.
-          entries='[]'
-          IFS=',' read -ra versions <<< "$supported_raw"
-          for raw in "${versions[@]}"; do
-            v=$(echo "$raw" | tr -d '[:space:]')
-            [ -z "$v" ] && continue
+          lowest=$(echo "$supported_raw" | tr ',' '\n' | tr -d ' \t\r' | grep -v '^$' | sort -n | head -n 1)
+          highest=$(echo "$supported_raw" | tr ',' '\n' | tr -d ' \t\r' | grep -v '^$' | sort -n | tail -n 1)
+          for edge in "$lowest" "$highest"; do
+            if ! echo "$MOODLE_PHP_TABLE" | jq -e --arg v "$edge" 'has($v)' > /dev/null; then
+              echo "::error::Moodle version $edge is listed in \$plugin->supported but MOODLE_PHP_TABLE above has no entry for it. Add one (see https://moodledev.io/general/development/policies/php) before this can run."
+              exit 1
+            fi
+          done
+          versions=$(jq -rn --argjson lo "$lowest" --argjson hi "$highest" --argjson lts "$MOODLE_LTS" \
+            '([($lo | tostring), ($hi | tostring)] + ($lts | map(select((tonumber) > $lo and (tonumber) < $hi)))) | unique | sort_by(tonumber) | .[]' | tr -d '\r')
 
+          entries='[]'
+          for v in $versions; do
             # The trailing `tr -d '\r'` guards against a stray carriage
             # return ending up in a PHP version string (e.g. from a tool in
             # the pipeline emitting CRLF) and silently corrupting the
@@ -128,11 +142,21 @@ jobs:
               exit 1
             fi
 
+            # Moodle 5.3 asks for PostgreSQL 17 and MariaDB 11.4 at least; the earlier releases keep the
+            # versions that they were tested with.
+            if [ "$v" -ge 503 ]; then
+              pg="17"
+              maria="11.4"
+            else
+              pg="16"
+              maria="10"
+            fi
+
             while IFS= read -r php; do
               for db in pgsql mariadb; do
                 entries=$(echo "$entries" | jq -c \
-                  --arg php "$php" --arg branch "MOODLE_${v}_STABLE" --arg db "$db" \
-                  '. + [{"php": $php, "moodle-branch": $branch, "database": $db}]')
+                  --arg php "$php" --arg branch "MOODLE_${v}_STABLE" --arg db "$db" --arg pg "$pg" --arg maria "$maria" \
+                  '. + [{"php": $php, "moodle-branch": $branch, "database": $db, "postgres-version": $pg, "mariadb-version": $maria}]')
               done
             done <<< "$phps"
           done
@@ -148,7 +172,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -157,7 +181,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
       mariadb:
-        image: mariadb:10
+        image: mariadb:${{ matrix.mariadb-version }}
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -165,7 +189,7 @@ jobs:
           MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+        options: --health-cmd="mariadb-admin ping" --health-interval 10s --health-timeout 5s --health-retries 3
 
     strategy:
       fail-fast: false
@@ -239,6 +263,16 @@ jobs:
       - name: Grunt
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
+
+      # Only for a plugin that writes its styles as SCSS and compiles them with its own tools/build-styles.mjs, which takes
+      # the root of a Moodle checkout and, with --check, fails when styles.css is not what the SCSS produces.
+      - name: Check generated component styles
+        if: ${{ !cancelled() && hashFiles('plugin/tools/build-styles.mjs') != '' }}
+        run: |
+          # Match the installed core's Node runtime, including legacy Node Sass bindings.
+          source "$NVM_DIR/nvm.sh"
+          nvm use "$(cat moodle/.nvmrc)"
+          node plugin/tools/build-styles.mjs moodle --check
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
