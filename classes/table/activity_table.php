@@ -35,6 +35,9 @@ class activity_table extends \table_sql {
     /** @var array<int, string|false> User names keyed by user id. */
     private array $usernames = [];
 
+    /** @var string[] Actions the node events record. */
+    public const ACTIONS = ['created', 'updated', 'deleted'];
+
     /**
      * Creates an activity table constrained to navigation events.
      *
@@ -81,14 +84,18 @@ class activity_table extends \table_sql {
         $this->pageable(true);
         $this->define_baseurl($baseurl);
         $this->set_attribute('id', 'local-extendednav-activity-table');
-        $this->set_attribute('class', 'reportlog generaltable generalbox table-sm');
+        $this->set_attribute('class', 'generaltable table-hover mb-0 local-extendednav-activity');
+        foreach (['timecreated', 'fullnameuser', 'action', 'ip'] as $column) {
+            $this->column_class($column, 'text-nowrap');
+        }
 
         $where = "log.component = 'local_extendednav'";
         $params = [];
 
         if ($menu !== '') {
-            $where .= " AND " . $DB->sql_like('log.other', ':menuparam');
-            $params['menuparam'] = '%"menu":"' . $menu . '"%';
+            // The menu is stored inside the JSON of the "other" field, as "menu":"primary".
+            $where .= ' AND ' . $DB->sql_like('log.other', ':menuparam');
+            $params['menuparam'] = '%' . $DB->sql_like_escape(substr(json_encode(['menu' => $menu]), 1, -1)) . '%';
         }
 
         if (!empty($filters['datefrom'])) {
@@ -104,9 +111,9 @@ class activity_table extends \table_sql {
             $params['filterdateto'] = $requestedend;
         }
 
-        if (!empty($filters['action'])) {
-            $where .= ' AND ' . $DB->sql_like('log.action', ':filteraction', false);
-            $params['filteraction'] = '%' . $DB->sql_like_escape($filters['action']) . '%';
+        if (in_array($filters['action'] ?? '', self::ACTIONS, true)) {
+            $where .= ' AND log.action = :filteraction';
+            $params['filteraction'] = $filters['action'];
         }
 
         $countsql = 'SELECT COUNT(log.id) FROM {logstore_standard_log} log WHERE ' . $where;
@@ -153,14 +160,51 @@ class activity_table extends \table_sql {
      * @return string
      */
     public function col_action($row): string {
-        $action = s($row->action);
-        $badgeclass = match ($row->action) {
-            'created' => 'badge badge-success',
-            'updated' => 'badge badge-info',
-            'deleted' => 'badge badge-danger',
-            default => 'badge badge-secondary',
+        $variant = match ($row->action) {
+            'created' => 'success',
+            'updated' => 'info',
+            'deleted' => 'danger',
+            default => 'secondary',
         };
-        return \html_writer::tag('span', $action, ['class' => $badgeclass . ' p-1']);
+        $text = in_array($row->action, self::ACTIONS, true) ? get_string('action_' . $row->action, 'local_extendednav')
+            : s($row->action);
+        return \html_writer::span($text, 'badge badge-pill rounded-pill badge-' . $variant . ' text-bg-' . $variant);
+    }
+
+    /**
+     * Starts the table without the paging bar, which the page shows in the card footer.
+     */
+    public function start_html() {
+        $usepages = $this->use_pages;
+        $this->use_pages = false;
+        parent::start_html();
+        $this->use_pages = $usepages;
+    }
+
+    /**
+     * Ends the table without the paging bar, which the page shows in the card footer.
+     */
+    public function finish_html() {
+        $usepages = $this->use_pages;
+        $this->use_pages = false;
+        parent::finish_html();
+        $this->use_pages = $usepages;
+    }
+
+    /**
+     * Returns the paging bar of the table, once it has been printed.
+     *
+     * @return string HTML, or an empty string when everything fits in one page.
+     */
+    public function get_paging_bar(): string {
+        global $OUTPUT;
+
+        if (!$this->use_pages || $this->totalrows <= $this->pagesize) {
+            return '';
+        }
+        $bar = new \paging_bar($this->totalrows, $this->currpage, $this->pagesize, $this->baseurl);
+        $bar->pagevar = $this->request[TABLE_VAR_PAGE];
+        return $OUTPUT->render($bar);
     }
 
     /**
