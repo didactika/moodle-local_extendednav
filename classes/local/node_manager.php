@@ -163,31 +163,47 @@ class node_manager {
         foreach ($todelete as $record) {
             $bymenu[$record->menu][] = $record;
         }
-        // Keep the order as it is shown, so the children of a deleted parent stay where they were.
+
+        // Read every node of the affected menus once, to keep the order shown and find the orphaned children.
+        $menunodes = $DB->get_records_list('local_extendednav', 'menu', array_keys($bymenu));
         $orders = [];
-        foreach (array_keys($bymenu) as $menukey) {
-            $orders[$menukey] = array_values(array_diff(self::get_grouped_ids($menukey), array_keys($todelete)));
+        $children = [];
+        foreach ($bymenu as $menukey => $menurecords) {
+            $nodes = array_filter($menunodes, static fn(\stdClass $node): bool => $node->menu === $menukey);
+            $ids = array_map(static fn(\stdClass $node): int => (int)$node->id, self::group_by_parent($nodes));
+            $orders[$menukey] = array_values(array_diff($ids, array_keys($todelete)));
+
+            $deletedkeys = array_map(static fn(\stdClass $record): string => $record->nodekey, $menurecords);
+            foreach ($nodes as $node) {
+                if (!isset($todelete[$node->id]) && in_array((string)$node->parentkey, $deletedkeys, true)) {
+                    $children[$node->id] = $node;
+                }
+            }
         }
 
         $DB->delete_records_list('local_extendednav', 'id', array_keys($todelete));
-        node_repository::purge();
 
-        foreach ($todelete as $record) {
-            if ($events) {
-                node_deleted::create_from_record($record)->trigger();
+        // The children of a deleted parent become top-level nodes, where the parent was.
+        if (!empty($children)) {
+            [$insql, $params] = $DB->get_in_or_equal(array_keys($children), SQL_PARAMS_NAMED);
+            $now = time();
+            $DB->set_field_select('local_extendednav', 'parentkey', null, 'id ' . $insql, $params);
+            $DB->set_field_select('local_extendednav', 'timemodified', $now, 'id ' . $insql, $params);
+            foreach (array_keys($bymenu) as $menukey) {
+                self::reorder($menukey, $orders[$menukey]);
             }
         }
+        node_repository::purge();
 
-        // The children of a deleted parent become top-level nodes.
-        foreach ($bymenu as $menukey => $menurecords) {
-            $keys = array_map(static fn(\stdClass $record): string => $record->nodekey, $menurecords);
-            $children = $DB->get_records_list('local_extendednav', 'parentkey', $keys, '', 'id, menu, parentkey');
-            foreach ($children as $child) {
-                if ($child->menu === $menukey) {
-                    self::update((object)['id' => $child->id, 'parentkey' => null], $events);
-                }
+        if ($events) {
+            foreach ($todelete as $record) {
+                node_deleted::create_from_record($record)->trigger();
             }
-            self::reorder($menukey, $orders[$menukey]);
+            foreach ($children as $child) {
+                $child->parentkey = null;
+                $child->timemodified = $now;
+                node_updated::create_from_record($child)->trigger();
+            }
         }
         if ($updateconfig) {
             foreach ($bymenu as $menukey => $menurecords) {
