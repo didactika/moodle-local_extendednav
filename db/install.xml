@@ -1,32 +1,34 @@
-<?php
-/**
- * XMLDB file definition for local_extendednav.
- */
-?>
-<XMLDB PATH="local/extendednav/db" VERSION="20231010" COMMENT="Custom Primary Navigation Nodes"
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/extendednav/db" VERSION="20261014" COMMENT="XMLDB file for Moodle local/extendednav"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_extendednav" COMMENT="Stores custom primary navigation nodes">
+    <TABLE NAME="local_extendednav" COMMENT="Navigation nodes added to, or overriding, the primary navigation and the user menu">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="menu" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="primary" SEQUENCE="false" COMMENT="Which menu this node belongs to (e.g. primary, usermenu)"/>
-        <FIELD NAME="nodekey" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="url" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="icon" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="beforekey" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="parentkey" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="visibility" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="roles" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="blockedurls" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="newwindow" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to open link in a new window/tab"/>
+        <FIELD NAME="menu" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="primary" SEQUENCE="false" COMMENT="Menu the node belongs to (primary or usermenu)"/>
+        <FIELD NAME="nodekey" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Unique key of the node within its menu. Core nodes use their core key"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Display text. Empty on a core node means the core string is used"/>
+        <FIELD NAME="tooltip" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Title attribute of the link"/>
+        <FIELD NAME="url" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Link destination. Empty on a core node means the core URL is used"/>
+        <FIELD NAME="icon" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="FontAwesome class or Moodle pix icon"/>
+        <FIELD NAME="visibility" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="0 = not visible, 1 = visible to everyone, 2 = restricted to roles"/>
+        <FIELD NAME="roles" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated role shortnames allowed when visibility is restricted"/>
+        <FIELD NAME="blockaccess" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to block access to the node URL for users who cannot see the node"/>
+        <FIELD NAME="langs" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated language codes the node is shown for. Empty means all languages"/>
+        <FIELD NAME="parentkey" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Key of the parent node when the node is a submenu item"/>
+        <FIELD NAME="newwindow" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to open the link in a new window"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="menu_nodekey" UNIQUE="true" FIELDS="menu, nodekey"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

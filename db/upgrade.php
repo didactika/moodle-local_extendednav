@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * File definition for upgrade.php.
+ * Upgrade steps for local_extendednav.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -24,47 +24,14 @@
  */
 
 /**
- * Upgrade script for the extendednav local plugin.
+ * Runs the upgrade steps for this plugin.
  *
- * @param int $oldversion the version we are upgrading from
- * @return bool result
+ * There are no upgrade steps yet: 1.0.0 is the first public release and its
+ * schema is created by db/install.xml.
+ *
+ * @param int $oldversion The version being upgraded from.
+ * @return bool
  */
 function xmldb_local_extendednav_upgrade($oldversion) {
-    global $DB;
-    $dbman = $DB->get_manager();
-
-    if ($oldversion < 2023101005) {
-        $table = new xmldb_table('local_extendednav');
-        $field = new xmldb_field('parentkey', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'beforekey');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2023101005, 'local', 'extendednav');
-    }
-
-    if ($oldversion < 2023101007) {
-        $table = new xmldb_table('local_extendednav');
-        $field = new xmldb_field('newwindow', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'blockedurls');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2023101007, 'local', 'extendednav');
-    }
-
-    if ($oldversion < 2026100700) {
-        $table = new xmldb_table('local_extendednav');
-        $field = new xmldb_field('menu', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'primary', 'id');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2026100700, 'local', 'extendednav');
-    }
-
     return true;
 }
