@@ -225,6 +225,31 @@ class primary extends base {
     }
 
     /**
+     * Whether the node can be deleted: plugin nodes, and Moodle's items that Moodle does not add right now.
+     *
+     * Site administration never can, as it cannot be hidden: it is missing only for users without access.
+     *
+     * @param string $nodekey Node key.
+     * @return bool
+     */
+    public function can_delete(string $nodekey): bool {
+        if (!$this->is_native($nodekey)) {
+            return true;
+        }
+        return $nodekey !== 'siteadminnode' && !$this->is_shown_by_moodle($nodekey);
+    }
+
+    /**
+     * Forgets deleted Moodle items, so they come back as new items if Moodle adds them again.
+     *
+     * @param string[] $nodekeys Node keys.
+     */
+    public function forget_native_nodes(array $nodekeys): void {
+        $stored = $this->get_stored_nodes();
+        $this->save_stored_nodes(array_diff_key($stored, array_flip($nodekeys)));
+    }
+
+    /**
      * Finds Moodle's items before creating their rows.
      *
      * @param bool $events Whether to trigger node created events.

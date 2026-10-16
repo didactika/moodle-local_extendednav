@@ -112,6 +112,24 @@ abstract class base {
     }
 
     /**
+     * Whether the node can be deleted. Core nodes cannot.
+     *
+     * @param string $nodekey Node key.
+     * @return bool
+     */
+    public function can_delete(string $nodekey): bool {
+        return !$this->is_native($nodekey);
+    }
+
+    /**
+     * Called after core nodes were deleted, for menus whose core nodes can be deleted.
+     *
+     * @param string[] $nodekeys Node keys.
+     */
+    public function forget_native_nodes(array $nodekeys): void {
+    }
+
+    /**
      * Returns the core title and URL of every core node, for form placeholders.
      *
      * @return array Keyed by node key, each with 'title' (in the current language) and 'url'.

@@ -221,15 +221,15 @@ class nodes_table extends \flexible_table {
         } else {
             $badges = [$this->badge(get_string('vis_all', 'local_extendednav'), 'success')];
         }
-        // An item Moodle normally adds that it does not add on this site, for example because it is turned off.
+        // A Moodle item that Moodle does not add right now, for example because it is turned off.
         if (
             $this->menu instanceof primary && $this->menu->is_native($node->nodekey)
                 && !$this->menu->is_shown_by_moodle($node->nodekey)
         ) {
             $badges[] = \html_writer::span(
-                get_string('badge_notadded', 'local_extendednav'),
+                get_string('badge_unavailable', 'local_extendednav'),
                 'badge badge-pill rounded-pill badge-secondary text-bg-secondary',
-                ['title' => get_string('badge_notadded_help', 'local_extendednav')]
+                ['title' => get_string('badge_unavailable_help', 'local_extendednav')]
             );
         }
         if (!empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL) {
@@ -309,7 +309,7 @@ class nodes_table extends \flexible_table {
     }
 
     /**
-     * Edit and delete buttons. Core nodes cannot be deleted.
+     * Edit and delete buttons. Core nodes can only be deleted when their menu allows it.
      *
      * @param \stdClass $node Node record.
      * @return string
@@ -322,7 +322,7 @@ class nodes_table extends \flexible_table {
             new \moodle_url('/local/extendednav/edit.php', ['id' => $node->id, 'menu' => $node->menu]),
             new \pix_icon('t/edit', get_string('edit'))
         );
-        if (!$this->menu->is_native($node->nodekey)) {
+        if ($this->menu->can_delete($node->nodekey)) {
             $html .= $OUTPUT->action_icon(
                 new \moodle_url('/local/extendednav/manage.php', $params + ['action' => 'delete']),
                 new \pix_icon('t/delete', get_string('delete')),

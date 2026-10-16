@@ -31,8 +31,8 @@ $string['add_node'] = 'Add node';
 $string['apply'] = 'Apply';
 $string['back_to_nodes'] = 'Back to navigation';
 $string['badge_blocked'] = 'URL blocked';
-$string['badge_notadded'] = 'Not added by Moodle';
-$string['badge_notadded_help'] = 'Moodle does not add this item on this site, for example because it is turned off in Site administration > Appearance > Navigation or removed by the theme. The plugin does not add it either.';
+$string['badge_unavailable'] = 'Currently unavailable';
+$string['badge_unavailable_help'] = 'Moodle is not adding this item right now: it may be turned off in Site administration > Appearance > Navigation, removed by the theme, or come from a plugin that is no longer installed. The plugin does not add it either. You can delete it; it comes back if Moodle adds it again.';
 $string['blockaccess'] = 'Block URL access';
 $string['blockaccess_help'] = 'When checked, users who cannot see this item are also kept away from its URL: if they open it directly, they are sent to the Dashboard, then the Site home, then My courses, then the default home page, whichever they are allowed. If none of these pages is allowed, they see a page explaining that the page is not available.
 
@@ -40,7 +40,7 @@ Only URLs of this site can be blocked. Languages never affect blocking, and site
 
 Blocking only applies to pages that show the site header, so it shapes navigation; it does not replace permissions.';
 $string['bulk_delete'] = 'Delete selected';
-$string['bulk_delete_confirm'] = 'Delete the selected nodes? Core Moodle nodes are kept. This cannot be undone.';
+$string['bulk_delete_confirm'] = 'Delete the selected nodes? Core Moodle nodes are kept, unless they are currently unavailable. This cannot be undone.';
 $string['cachedef_nodes'] = 'Navigation nodes of every menu';
 $string['clear_filters'] = 'Clear';
 $string['conflict_handling'] = 'Existing nodes';

@@ -78,3 +78,13 @@ Feature: Edit navigation nodes
     And I click on "Delete" "link" in the "help" "table_row"
     And I should see "1 node(s) deleted."
     And I should not see "help" in the "local-extendednav-manage" "table"
+
+  Scenario: Moodle items that Moodle no longer adds can be deleted
+    Given the following config values are set as admin:
+      | enabledashboard | 0 |
+    And I reload the page
+    Then I should see "Currently unavailable" in the "myhome" "table_row"
+    And "Delete" "link" should not exist in the "siteadminnode" "table_row"
+    And I click on "Delete" "link" in the "myhome" "table_row"
+    And I should see "1 node(s) deleted."
+    And I should not see "myhome" in the "local-extendednav-manage" "table"

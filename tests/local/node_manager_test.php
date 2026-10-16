@@ -123,12 +123,13 @@ final class node_manager_test extends \advanced_testcase {
     }
 
     /**
-     * Core nodes are never deleted.
+     * Core nodes Moodle adds are not deleted.
      */
     public function test_delete_skips_core_nodes(): void {
         global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $custom = $generator->create_node(['nodekey' => 'help', 'title' => 'Help', 'url' => '/h.php']);
         $core = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'myhome']);

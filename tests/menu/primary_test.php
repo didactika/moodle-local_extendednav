@@ -18,6 +18,7 @@ namespace local_extendednav\menu;
 
 use local_extendednav\hooks;
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_manager;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\primary::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\hooks::class)]
@@ -197,6 +198,42 @@ final class primary_test extends \advanced_testcase {
 
         primary::reset_discovery();
         $this->assertSame('myhome', $menu->get_native_node('myhome')->text, 'Without Moodle\'s text, the key is shown.');
+    }
+
+    /**
+     * Items Moodle no longer adds can be deleted, and come back as new items when Moodle adds them again.
+     */
+    public function test_unavailable_items_can_be_deleted(): void {
+        global $DB;
+
+        $this->setAdminUser();
+        $menu = new primary();
+        set_config('enabledashboard', 0);
+        primary::reset_discovery();
+        $this->assertTrue($menu->can_delete('myhome'));
+        $this->assertFalse($menu->can_delete('siteadminnode'));
+        $this->assertFalse($menu->can_delete('home'), 'Moodle adds it.');
+
+        // Users without access to Site administration do not get it, but it is still kept.
+        $this->setUser($this->getDataGenerator()->create_user());
+        primary::reset_discovery();
+        $this->assertFalse($menu->is_shown_by_moodle('siteadminnode'));
+        $this->assertFalse($menu->can_delete('siteadminnode'));
+        $this->setAdminUser();
+        primary::reset_discovery();
+
+        $records = $DB->get_records('local_extendednav', ['menu' => 'primary'], '', '*');
+        $this->assertSame(1, node_manager::delete($records, false));
+        $this->assertFalse($DB->record_exists('local_extendednav', ['menu' => 'primary', 'nodekey' => 'myhome']));
+        $this->assertTrue($DB->record_exists('local_extendednav', ['menu' => 'primary', 'nodekey' => 'siteadminnode']));
+        $this->assertFalse($menu->is_native('myhome'));
+
+        set_config('enabledashboard', 1);
+        primary::reset_discovery();
+        $menu->sync_native_nodes(false);
+        $record = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'myhome'], '*', MUST_EXIST);
+        $this->assertNull($record->title);
+        $this->assertTrue($menu->is_native('myhome'));
     }
 
     /**

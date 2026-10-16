@@ -136,7 +136,7 @@ class node_manager {
     }
 
     /**
-     * Deletes nodes. Core nodes are never deleted.
+     * Deletes nodes. Core nodes are only deleted when their menu allows it.
      *
      * Items that came from Moodle's custom menu settings are removed from those settings too.
      *
@@ -151,7 +151,7 @@ class node_manager {
         $todelete = [];
         foreach ($records as $record) {
             $menu = menu_manager::get_menu($record->menu);
-            if ($menu === null || !$menu->is_native($record->nodekey)) {
+            if ($menu === null || $menu->can_delete($record->nodekey)) {
                 $todelete[$record->id] = $record;
             }
         }
@@ -203,6 +203,16 @@ class node_manager {
                 $child->parentkey = null;
                 $child->timemodified = $now;
                 node_updated::create_from_record($child)->trigger();
+            }
+        }
+        foreach ($bymenu as $menukey => $menurecords) {
+            $menu = menu_manager::get_menu($menukey);
+            $natives = $menu === null ? [] : array_filter(
+                array_map(static fn(\stdClass $record): string => $record->nodekey, $menurecords),
+                [$menu, 'is_native']
+            );
+            if (!empty($natives)) {
+                $menu->forget_native_nodes(array_values($natives));
             }
         }
         if ($updateconfig) {
