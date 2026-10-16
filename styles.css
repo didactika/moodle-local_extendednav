@@ -1,0 +1,158 @@
+/*
+ * Extended Navigation styles.
+ *
+ * @package    local_extendednav
+ * @copyright  2026 Didactika.org
+ * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/* Hides "Block URL access" in the node form while the URL is external. */
+.mform .fitem.local-extendednav-hidden {
+    display: none;
+}
+
+.local-extendednav-nodes {
+    min-width: 860px;
+}
+
+.local-extendednav-nodes th,
+.local-extendednav-nodes td,
+.local-extendednav-activity th,
+.local-extendednav-activity td {
+    padding: .75rem 1rem;
+}
+
+.local-extendednav-nodes .local-extendednav-col-title {
+    max-width: 18rem;
+}
+
+.local-extendednav-nodes .local-extendednav-col-url {
+    max-width: 16rem;
+    word-break: break-all;
+}
+
+.local-extendednav-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+}
+
+/* The dragged copy of a row and its children (see amd/src/manage.js). */
+.local-extendednav-nodes-card table.local-extendednav-drag-proxy {
+    z-index: 1050;
+    min-width: 0;
+    background-color: var(--bs-body-bg, #fff);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+.local-extendednav-nodes-card .local-extendednav-nodes tbody tr.sortable-list-current-position {
+    background-color: var(--bs-secondary-bg, #e9ecef);
+}
+
+/* Children of a dragged parent fade out and back in (FADE_MS in amd/src/manage.js). */
+.local-extendednav-nodes tbody tr {
+    transition: opacity .15s ease-in-out;
+}
+
+.local-extendednav-nodes tbody tr.local-extendednav-fading {
+    opacity: 0;
+}
+
+/* A dropped row is highlighted briefly, as in the report builder. */
+@keyframes local-extendednav-dropped {
+    from {
+        background-color: var(--bs-secondary-bg, #e9ecef);
+    }
+
+    to {
+        background-color: inherit;
+    }
+}
+
+.local-extendednav-nodes tbody tr.sortable-list-is-dropped {
+    animation: local-extendednav-dropped 1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .local-extendednav-nodes tbody tr {
+        transition: none;
+    }
+
+    .local-extendednav-nodes tbody tr.sortable-list-is-dropped {
+        animation: none;
+    }
+}
+
+/* Tabs and actions share one row; the tab line stops before the buttons. */
+.local-extendednav-toolbar {
+    gap: .5rem 1rem;
+}
+
+.local-extendednav-actions {
+    gap: .5rem;
+}
+
+/* Filters on one row that wraps on small screens. */
+.local-extendednav-filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+.local-extendednav-filterbar .local-extendednav-search {
+    flex: 1 1 18rem;
+}
+
+.local-extendednav-filterbar select {
+    min-width: 14rem;
+}
+
+.local-extendednav-filter-field {
+    gap: .5rem;
+}
+
+.local-extendednav-activity-footer {
+    gap: .5rem;
+}
+
+.local-extendednav-activity-footer .pagination {
+    margin-bottom: 0;
+}
+
+/* Moodle 4.5 makes the hidden sort label of a table header a block inside .no-overflow, which
+   pushes the sort icon to a second line. Keep it inline so label and icon stay together. */
+.local-extendednav-activity-card .local-extendednav-activity th .accesshide {
+    display: inline-block;
+}
+
+.local-extendednav-search .icon {
+    position: absolute;
+    top: 50%;
+    left: .75rem;
+    margin: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.local-extendednav-search input {
+    padding-left: 2.25rem;
+}
+
+/* The footer, with the bulk actions, stays on screen while scrolling a long list. */
+.local-extendednav-nodes-card .local-extendednav-nodes-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    gap: .5rem;
+    min-height: 3.5rem;
+    background-color: var(--bs-body-bg, #fff);
+}
+
+.local-extendednav-bulkbar:not(.d-none) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}

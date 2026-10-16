@@ -1,0 +1,65 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/usermenu/panel
+
+    Submenu panel added to Moodle's user menu carousel.
+
+    Context variables required for this template:
+    * panelid - Id of the carousel item
+    * title - Title of the parent item
+    * items - Submenu items, each with url, title, tooltip, icon (FontAwesome class or false) and newwindow
+
+    Example context (json):
+    {
+        "panelid": "carousel-item-extnav-example",
+        "title": "Example Submenu",
+        "items": [
+            {
+                "url": "https://example.com",
+                "title": "Example Link",
+                "tooltip": "Opens in a new window",
+                "icon": "fa-star",
+                "newwindow": true
+            }
+        ]
+    }
+}}
+<div id="{{panelid}}" role="menu" class="carousel-item submenu" tabindex="-1" aria-label="{{title}}">
+    <div class="d-flex flex-column h-100">
+        <div class="header">
+            <button type="button" class="btn btn-icon carousel-navigation-link text-decoration-none text-body local-extendednav-back-btn" data-carousel-target-id="carousel-item-main" aria-label="{{#str}}usermenugoback, core{{/str}}">
+                <span class="dir-rtl-hide">{{#pix}}i/arrow-left, core{{/pix}}</span>
+                <span class="dir-ltr-hide">{{#pix}}i/arrow-right, core{{/pix}}</span>
+            </button>
+            <span class="pl-2 ps-2" id="carousel-item-title-{{panelid}}">{{title}}</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="items h-100 overflow-auto" role="menu" aria-labelledby="carousel-item-title-{{panelid}}">
+            {{#items}}
+            <a href="{{url}}" class="dropdown-item pl-5 ps-5" role="menuitem" tabindex="-1" {{#tooltip}}title="{{tooltip}}"{{/tooltip}} {{#newwindow}}target="_blank" rel="noopener"{{/newwindow}}>
+                {{#icon}}
+                <span class="carousel-navigation-link-icon">
+                    <i class="icon fa {{icon}} fa-fw" aria-hidden="true"></i>
+                </span>
+                {{/icon}}
+                {{title}}
+            </a>
+            {{/items}}
+        </div>
+    </div>
+</div>

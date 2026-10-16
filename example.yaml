@@ -1,0 +1,49 @@
+nodes:
+  - nodekey: myhome
+    menu: primary
+    title: ""
+    tooltip: ""
+    url: ""
+    icon: ""
+    visibility: 2
+    roles: "editingteacher,teacher"
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    newwindow: 0
+  - nodekey: help_en
+    menu: primary
+    title: "Help"
+    tooltip: "Guides and contact details"
+    url: "/mod/page/view.php?id=10"
+    icon: "fa-circle-question"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: "en"
+    parentkey: ""
+    newwindow: 0
+  - nodekey: help_es
+    menu: primary
+    title: "Ayuda"
+    tooltip: "Guías y datos de contacto"
+    url: "/mod/page/view.php?id=11"
+    icon: "fa-circle-question"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: "es"
+    parentkey: ""
+    newwindow: 0
+  - nodekey: moodle_docs
+    menu: usermenu
+    title: "Moodle Docs"
+    tooltip: ""
+    url: "https://docs.moodle.org/"
+    icon: "fa-book"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    newwindow: 1

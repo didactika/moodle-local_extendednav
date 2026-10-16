@@ -1,0 +1,67 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/activity_filters
+
+    Filters of the activity log.
+
+    Context variables required for this template:
+    * menu - Menu key
+    * datefrom - First day shown, as YYYY-MM-DD, or empty
+    * dateto - Last day shown, as YYYY-MM-DD, or empty
+    * actions - Actions to filter by, each with value, name and selected
+    * clearurl - URL that clears the filters
+
+    Example context (json):
+    {
+        "menu": "primary",
+        "datefrom": "2026-10-01",
+        "dateto": "",
+        "actions": [
+            {"value": "created", "name": "Created", "selected": false},
+            {"value": "updated", "name": "Updated", "selected": true},
+            {"value": "deleted", "name": "Deleted", "selected": false}
+        ],
+        "clearurl": "https://example.com/local/extendednav/activity.php?menu=primary"
+    }
+}}
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" action="activity.php" class="local-extendednav-filterbar">
+            <input type="hidden" name="menu" value="{{menu}}">
+            <div class="d-flex align-items-center local-extendednav-filter-field">
+                <label for="local-extendednav-datefrom" class="mb-0">{{#str}} filter_datefrom, local_extendednav {{/str}}</label>
+                <input type="date" id="local-extendednav-datefrom" name="datefrom" value="{{datefrom}}" class="form-control">
+            </div>
+            <div class="d-flex align-items-center local-extendednav-filter-field">
+                <label for="local-extendednav-dateto" class="mb-0">{{#str}} filter_dateto, local_extendednav {{/str}}</label>
+                <input type="date" id="local-extendednav-dateto" name="dateto" value="{{dateto}}" class="form-control">
+            </div>
+            <div>
+                <label for="local-extendednav-action" class="sr-only visually-hidden">{{#str}} filter_action, local_extendednav {{/str}}</label>
+                <select id="local-extendednav-action" name="action" class="custom-select form-select">
+                    <option value="">{{#str}} filter_action_any, local_extendednav {{/str}}</option>
+                    {{#actions}}
+                        <option value="{{value}}"{{#selected}} selected{{/selected}}>{{name}}</option>
+                    {{/actions}}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">{{#str}} apply, local_extendednav {{/str}}</button>
+            <a href="{{clearurl}}" class="btn btn-outline-secondary">{{#str}} clear_filters, local_extendednav {{/str}}</a>
+        </form>
+    </div>
+</div>

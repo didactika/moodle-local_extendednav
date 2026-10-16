@@ -15,17 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language strings for PLUGINTYPE_PLUGINNAME
+ * Behat data generator for local_extendednav.
  *
- * VERIFY: rename this file to match $plugin->component from version.php
- * (e.g. lang/en/local_servicemanager.php), and fill in @author.
+ * Adds the "the following "local_extendednav > nodes" exist:" step.
  *
- * @package    PLUGINTYPE_PLUGINNAME
- * @copyright  YEAR YOUR ORGANISATION
+ * @package    local_extendednav
+ * @category   test
+ * @copyright  2026 Didactika.org
+ * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-// Mandatory: moodle-plugin-ci validate fails without a pluginname string.
-$string['pluginname'] = 'PLUGINTYPE_PLUGINNAME'; // VERIFY: replace before first commit.
+class behat_local_extendednav_generator extends behat_generator_base {
+    /**
+     * Returns the entities this generator creates.
+     *
+     * @return array
+     */
+    protected function get_creatable_entities(): array {
+        return [
+            'nodes' => [
+                'singular' => 'node',
+                'datagenerator' => 'node',
+                'required' => ['nodekey'],
+            ],
+        ];
+    }
+}

@@ -1,0 +1,13 @@
+nodes:
+  - nodekey: help_en
+    menu: primary
+    title: "Help"
+    url: "/mod/page/view.php?id=10"
+    visibility: 1
+    langs: "en"
+  - nodekey: help_es
+    menu: primary
+    title: "Ayuda"
+    url: "/mod/page/view.php?id=11"
+    visibility: 1
+    langs: "es"
