@@ -94,8 +94,10 @@ Select **Add node**, or the edit icon of an item:
 - Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, or open it in a new window.
 - Choose a **Parent** to show the item in that item's submenu.
 
+An item is shown as the active tab on its page, also when the page adds parameters to its URL (an item linking to `/user/profile.php` is active on `/user/profile.php?id=2`).
+
 > [!NOTE]
-> Moodle's items are the ones Moodle itself adds to the primary navigation. Items Moodle turns off, for example in **Site administration > Appearance > Navigation** or through the theme, are marked **Not added by Moodle** and are not added by the plugin either.
+> Moodle's items are the ones Moodle itself adds to the primary navigation, including the tabs other plugins add, and the default **User menu items**. New primary items are found whenever the management page is opened. Items Moodle stops adding, for example when they are turned off in **Site administration > Appearance > Navigation**, removed by the theme, or come from an uninstalled plugin, are marked **Currently unavailable** and are not added by the plugin either. They can be deleted, and come back as new items if Moodle adds them again.
 
 > [!TIP]
 > An item with submenu items opens its submenu instead of following its URL. The list marks its URL with a warning icon; the URL still counts for blocking.
