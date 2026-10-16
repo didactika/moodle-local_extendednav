@@ -96,16 +96,48 @@ class primary extends base {
      * the site settings and the user, and other plugins add theirs through the primary_extend hook. The plugin
      * keeps every item it has found, so an item Moodle stops adding can still be configured.
      *
+     * Only the URLs are kept, because a saved title would stay in one language. Once Moodle's items have been
+     * found in this request, the text is Moodle's own, in the current language; otherwise it is the node key.
+     *
      * @return \stdClass[] Keyed by node key.
      */
     public function get_native_nodes(): array {
-        $stored = json_decode((string)get_config('local_extendednav', self::NATIVE_CONFIG), true);
         $nodes = [];
-        foreach (is_array($stored) ? $stored : [] as $key => $item) {
-            $nodes[$key] = (object)['key' => $key, 'text' => (string)$item['text'], 'action' => (string)$item['action'],
-                'icon' => null];
+        foreach ($this->get_stored_nodes() as $key => $action) {
+            $text = isset(self::$discovered[$key]) ? self::$discovered[$key]->text : $key;
+            $nodes[$key] = (object)['key' => $key, 'text' => $text, 'action' => $action, 'icon' => null];
         }
         return $nodes;
+    }
+
+    /**
+     * Returns the URL of every item found so far.
+     *
+     * @return string[] Site paths keyed by node key.
+     */
+    private function get_stored_nodes(): array {
+        $stored = json_decode((string)get_config('local_extendednav', self::NATIVE_CONFIG), true);
+        $actions = [];
+        foreach (is_array($stored) ? $stored : [] as $key => $item) {
+            $actions[(string)$key] = (string)($item['action'] ?? '');
+        }
+        return $actions;
+    }
+
+    /**
+     * Saves the URL of every item found so far.
+     *
+     * @param string[] $actions Site paths keyed by node key.
+     */
+    private function save_stored_nodes(array $actions): void {
+        $stored = [];
+        foreach ($actions as $key => $action) {
+            $stored[$key] = ['action' => $action];
+        }
+        $json = json_encode($stored);
+        if ($json !== get_config('local_extendednav', self::NATIVE_CONFIG)) {
+            set_config(self::NATIVE_CONFIG, $json, 'local_extendednav');
+        }
     }
 
     /**
@@ -172,22 +204,19 @@ class primary extends base {
     /**
      * Saves the items Moodle adds for the current user, keeping the ones found before.
      *
-     * Titles and URLs are updated, so placeholders follow Moodle; items Moodle no longer adds are kept.
+     * New items are added and changed URLs updated, so blocking follows Moodle; items Moodle no longer adds
+     * are kept until they are deleted. Nothing is written when nothing changed.
      */
     public function refresh_native_nodes(): void {
         $discovered = $this->discover_native_nodes();
         if (empty($discovered)) {
             return;
         }
-        $stored = json_decode((string)get_config('local_extendednav', self::NATIVE_CONFIG), true);
-        $stored = is_array($stored) ? $stored : [];
+        $stored = $this->get_stored_nodes();
         foreach ($discovered as $key => $node) {
-            $stored[$key] = ['text' => $node->text, 'action' => $node->action];
+            $stored[$key] = $node->action;
         }
-        $json = json_encode($stored);
-        if ($json !== get_config('local_extendednav', self::NATIVE_CONFIG)) {
-            set_config(self::NATIVE_CONFIG, $json, 'local_extendednav');
-        }
+        $this->save_stored_nodes($stored);
     }
 
     /**

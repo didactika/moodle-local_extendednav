@@ -52,6 +52,8 @@ if ($id) {
     $url->param('id', $id);
 }
 $PAGE->set_url($url);
+// Find Moodle's items, so the form shows their titles in the current language.
+$menu->ensure_synced();
 $heading = get_string($id ? 'edit_node' : 'add_node', 'local_extendednav') . ' (' . $menu->get_name() . ')';
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);

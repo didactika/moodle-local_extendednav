@@ -183,6 +183,23 @@ final class primary_test extends \advanced_testcase {
     }
 
     /**
+     * Only the URLs of Moodle's items are saved; their text is Moodle's own, in the current language.
+     */
+    public function test_item_texts_are_not_saved(): void {
+        $this->setAdminUser();
+        $menu = new primary();
+        primary::reset_discovery();
+        $menu->refresh_native_nodes();
+
+        $stored = json_decode(get_config('local_extendednav', 'nativenodes_primary'), true);
+        $this->assertSame(['action' => '/my/'], $stored['myhome']);
+        $this->assertSame(get_string('myhome'), $menu->get_native_node('myhome')->text);
+
+        primary::reset_discovery();
+        $this->assertSame('myhome', $menu->get_native_node('myhome')->text, 'Without Moodle\'s text, the key is shown.');
+    }
+
+    /**
      * An item Moodle does not add is not added by the plugin, even with a title and a URL.
      */
     public function test_item_turned_off_in_moodle_is_not_added(): void {
