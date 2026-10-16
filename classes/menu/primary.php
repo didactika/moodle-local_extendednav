@@ -161,6 +161,11 @@ class primary extends base {
         $previouspage = $PAGE;
         $previousoutput = $OUTPUT;
         $previouscourse = $COURSE;
+        // Links are marked active by comparing them with the URL Moodle keeps for the request, which it would
+        // otherwise take from this page.
+        if ($previouspage->has_set_url()) {
+            \navigation_node::override_active_url(new \moodle_url($previouspage->url));
+        }
         hooks::$discovering = true;
         try {
             $page = new \moodle_page();

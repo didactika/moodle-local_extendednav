@@ -200,6 +200,22 @@ final class primary_test extends \advanced_testcase {
     }
 
     /**
+     * Finding Moodle's items leaves the URL Moodle uses to mark active links unchanged.
+     */
+    public function test_discovery_keeps_the_active_url(): void {
+        global $PAGE;
+
+        $this->setAdminUser();
+        $PAGE->set_context(\context_system::instance());
+        $PAGE->set_url('/local/extendednav/manage.php');
+        primary::reset_discovery();
+        (new primary())->discover_native_nodes();
+
+        $node = \navigation_node::create('Manage', new \moodle_url('/local/extendednav/manage.php'));
+        $this->assertTrue($node->check_if_active());
+    }
+
+    /**
      * An item Moodle does not add is not added by the plugin, even with a title and a URL.
      */
     public function test_item_turned_off_in_moodle_is_not_added(): void {
