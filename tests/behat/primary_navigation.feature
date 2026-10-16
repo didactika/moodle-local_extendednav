@@ -32,6 +32,15 @@ Feature: Change the primary navigation
     And I log in as "student1"
     And I should see "Help centre" in the ".primary-navigation" "css_element"
 
+  Scenario: A custom item is marked active on its page
+    Given the following "local_extendednav > nodes" exist:
+      | nodekey    | title       | url                |
+      | mycalendar | My calendar | /calendar/view.php |
+    When I log in as "student1"
+    And I follow "Calendar" in the user menu
+    Then I should see "My calendar" in the ".primary-navigation a.nav-link.active" "css_element"
+    And I should not see "Dashboard" in the ".primary-navigation a.nav-link.active" "css_element"
+
   Scenario: Core items keep their Moodle title until they are renamed
     Given the following "local_extendednav > nodes" exist:
       | nodekey | title     |

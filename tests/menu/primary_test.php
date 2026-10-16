@@ -54,14 +54,15 @@ final class primary_test extends \advanced_testcase {
     /**
      * Builds the primary navigation of a page.
      *
+     * @param string $url URL of the page.
      * @return \core\navigation\views\primary
      */
-    private function build_primary(): \core\navigation\views\primary {
+    private function build_primary(string $url = '/my/'): \core\navigation\views\primary {
         global $PAGE;
 
         $PAGE = new \moodle_page();
         $PAGE->set_context(\context_system::instance());
-        $PAGE->set_url('/my/');
+        $PAGE->set_url($url);
         $primary = new \core\navigation\views\primary($PAGE);
         $primary->initialise();
         return $primary;
@@ -250,6 +251,30 @@ final class primary_test extends \advanced_testcase {
 
         $node = \navigation_node::create('Manage', new \moodle_url('/local/extendednav/manage.php'));
         $this->assertTrue($node->check_if_active());
+    }
+
+    /**
+     * A plugin item is the active tab on its page, even when the page has more parameters.
+     */
+    public function test_item_of_the_page_is_active(): void {
+        global $PAGE;
+
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
+        $generator->create_node(['nodekey' => 'profile', 'title' => 'Profile', 'url' => '/user/profile.php']);
+        $generator->create_node(['nodekey' => 'mine', 'title' => 'Mine', 'url' => '/my/']);
+
+        $this->build_primary('/user/profile.php?id=2');
+        $this->assertSame('profile', $PAGE->get_primary_activate_tab());
+
+        $this->build_primary('/user/profile.php?id=2#section');
+        $this->assertSame('profile', $PAGE->get_primary_activate_tab(), 'The fragment does not matter.');
+
+        // Moodle's exact match wins: the Dashboard links to /my/ too.
+        $this->build_primary('/my/');
+        $this->assertNull($PAGE->get_primary_activate_tab());
+
+        $this->build_primary('/course/index.php');
+        $this->assertNull($PAGE->get_primary_activate_tab());
     }
 
     /**

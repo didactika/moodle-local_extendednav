@@ -375,8 +375,53 @@ class primary extends base {
             $child->icon = null;
         }
 
+        $this->activate_matching_node($customnodes, $states, $primarynav);
+
         if ($needsscript) {
             $PAGE->requires->js_call_amd('local_extendednav/primary', 'init');
+        }
+    }
+
+    /**
+     * Marks the node of the current page as active when Moodle would not find it.
+     *
+     * Moodle marks an item active only when its URL is exactly the page URL, so an item linking to
+     * "/user/profile.php" is not active on "/user/profile.php?id=2". When no item is exact and the page did not
+     * choose its tab, the first node shown whose URL matches the page as URL blocking does becomes the tab.
+     *
+     * @param \stdClass[] $customnodes Nodes of this menu, ordered by sortorder.
+     * @param \stdClass[] $states Display states keyed by node key.
+     * @param \core\navigation\views\primary $primarynav The primary navigation view.
+     */
+    private function activate_matching_node(array $customnodes, array $states, \core\navigation\views\primary $primarynav): void {
+        global $PAGE;
+
+        if (!$PAGE->has_set_url() || $PAGE->get_primary_activate_tab() !== null) {
+            return;
+        }
+        $current = url_helper::to_site_path($PAGE->url->out(false));
+        if ($current === null) {
+            return;
+        }
+        $nodes = [];
+        foreach ($primarynav->children as $child) {
+            $nodes[] = $child;
+            foreach ($child->children as $grandchild) {
+                $nodes[] = $grandchild;
+            }
+        }
+        foreach ($nodes as $node) {
+            if ($node->action instanceof \moodle_url && $node->action->compare($PAGE->url, URL_MATCH_EXACT)) {
+                return;
+            }
+        }
+        foreach ($customnodes as $cnode) {
+            $state = $states[$cnode->nodekey];
+            $rule = $state->shown && $state->url !== null ? url_helper::to_site_path($state->url) : null;
+            if ($rule !== null && $primarynav->find($cnode->nodekey, null) && url_helper::matches($rule, $current)) {
+                $PAGE->set_primary_active_tab($cnode->nodekey);
+                return;
+            }
         }
     }
 
