@@ -34,14 +34,8 @@ use local_extendednav\local\node_validator;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class usermenu extends base {
-    /** @var string[] Default lines of Moodle's customusermenuitems setting. */
-    private const DEFAULT_ITEMS = [
-        'profile,moodle|/user/profile.php',
-        'grades,grades|/grade/report/mygrades.php',
-        'calendar,core_calendar|/calendar/view.php?view=month',
-        'privatefiles,moodle|/user/files.php',
-        'reports,core_reportbuilder|/reportbuilder/index.php',
-    ];
+    /** @var string Plugin setting that keeps the default value of Moodle's customusermenuitems setting. */
+    private const NATIVE_CONFIG = 'nativenodes_usermenu';
 
     /**
      * Returns the menu key.
@@ -91,18 +85,54 @@ class usermenu extends base {
     }
 
     /**
-     * Returns the core user menu items, as Moodle defines them by default.
+     * Returns the core user menu items: the lines of the default value of Moodle's customusermenuitems setting.
      *
      * @return \stdClass[] Keyed by node key.
      */
     public function get_native_nodes(): array {
         $nodes = [];
-        foreach (self::DEFAULT_ITEMS as $line) {
+        $lines = array_filter(array_map('trim', explode("\n", (string)get_config('local_extendednav', self::NATIVE_CONFIG))));
+        foreach ($lines as $line) {
             $item = $this->parse_config_line($line);
             $key = self::make_key($this->get_config_prefix(), $item['text']);
             $nodes[$key] = (object)['key' => $key, 'text' => $item['text'], 'action' => $item['url'], 'icon' => null];
         }
         return $nodes;
+    }
+
+    /**
+     * Saves the default value of Moodle's customusermenuitems setting, the first time.
+     *
+     * The default is only known to the admin settings tree, which is too slow to build on every page.
+     */
+    public function refresh_native_nodes(): void {
+        global $CFG;
+
+        if (get_config('local_extendednav', self::NATIVE_CONFIG) !== false) {
+            return;
+        }
+        require_once($CFG->libdir . '/adminlib.php');
+        try {
+            $page = admin_get_root(false, true)->locate('themesettingsadvanced');
+        } catch (\Throwable $e) {
+            return;
+        }
+        if ($page instanceof \admin_settingpage && isset($page->settings->customusermenuitems)) {
+            $default = $page->settings->customusermenuitems->get_defaultsetting();
+            if (is_string($default)) {
+                set_config(self::NATIVE_CONFIG, $default, 'local_extendednav');
+            }
+        }
+    }
+
+    /**
+     * Finds Moodle's items before creating their rows.
+     *
+     * @param bool $events Whether to trigger node created events.
+     */
+    public function sync_native_nodes(bool $events = true): void {
+        $this->refresh_native_nodes();
+        parent::sync_native_nodes($events);
     }
 
     /**

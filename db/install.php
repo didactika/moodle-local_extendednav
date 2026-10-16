@@ -35,8 +35,11 @@
 function xmldb_local_extendednav_install() {
     global $USER;
 
-    // Moodle's primary navigation items depend on the user, so they are found as the administrator,
-    // who sees them all. From the command line nobody is logged in yet.
+    // Moodle has no list of its primary navigation items: it adds them while it builds the navigation, depending
+    // on the site settings and on the user (the Dashboard needs a logged-in user, Site administration the
+    // capability). From the command line nobody is logged in, so they are found as the main administrator, who
+    // sees them all. The user is put back afterwards. The default user menu items are read from the admin
+    // settings, which also need the administrator.
     $previous = $USER;
     $switch = !is_siteadmin() && get_admin();
     if ($switch) {

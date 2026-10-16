@@ -60,6 +60,28 @@ final class usermenu_test extends \advanced_testcase {
     }
 
     /**
+     * The core items are the lines of the default value of Moodle's user menu setting.
+     */
+    public function test_items_come_from_moodle(): void {
+        $this->resetAfterTest();
+        $menu = menu_manager::get_menu('usermenu');
+
+        // Saved when the plugin was installed.
+        $this->assertArrayHasKey('umenu_profilemoodle', $menu->get_native_nodes());
+
+        unset_config('nativenodes_usermenu', 'local_extendednav');
+        $this->setAdminUser();
+        $menu->refresh_native_nodes();
+        $default = admin_get_root(false, true)->locate('themesettingsadvanced')->settings->customusermenuitems;
+        $this->assertSame($default->get_defaultsetting(), get_config('local_extendednav', 'nativenodes_usermenu'));
+
+        set_config('nativenodes_usermenu', "badges,badges|/badges/mybadges.php\n", 'local_extendednav');
+        $natives = $menu->get_native_nodes();
+        $this->assertSame(['umenu_badgesbadges'], array_keys($natives));
+        $this->assertSame('/badges/mybadges.php', $natives['umenu_badgesbadges']->action);
+    }
+
+    /**
      * Icons, tooltips and submenus are passed to the browser as template elements.
      */
     public function test_build_browser_templates(): void {
