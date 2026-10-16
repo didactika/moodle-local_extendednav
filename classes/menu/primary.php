@@ -120,11 +120,15 @@ class primary extends base {
         if (self::$discovered !== null) {
             return self::$discovered;
         }
-        global $PAGE;
+        global $COURSE, $OUTPUT, $PAGE;
 
         $nodes = [];
         // Callbacks of other plugins read the global page while the navigation is built, so use this one meanwhile.
+        // Moodle also points the global output and course at it, so they are put back with the page; otherwise
+        // the page being printed loses its scripts.
         $previouspage = $PAGE;
+        $previousoutput = $OUTPUT;
+        $previouscourse = $COURSE;
         hooks::$discovering = true;
         try {
             $page = new \moodle_page();
@@ -148,6 +152,8 @@ class primary extends base {
             $nodes = [];
         } finally {
             $PAGE = $previouspage;
+            $OUTPUT = $previousoutput;
+            $COURSE = $previouscourse;
             hooks::$discovering = false;
         }
         return self::$discovered = $nodes;
