@@ -63,6 +63,25 @@ final class node_validator_test extends \advanced_testcase {
     }
 
     /**
+     * A pop-up needs a width and a height in range; other displays ignore them.
+     */
+    public function test_display(): void {
+        $node = ['nodekey' => 'help', 'title' => 'Help', 'url' => '/help.php'];
+
+        $this->assertSame([], $this->run_validation($node + ['display' => 2, 'popupwidth' => 620, 'popupheight' => 450])['errors']);
+        $this->assertSame([], $this->run_validation($node + ['display' => 1, 'popupwidth' => 5])['errors']);
+
+        $errors = $this->run_validation($node + ['display' => 2, 'popupwidth' => 99, 'popupheight' => ''])['errors'];
+        $this->assertArrayHasKey('popupwidth', $errors);
+        $this->assertArrayHasKey('popupheight', $errors);
+        $this->assertArrayHasKey('popupwidth', $this->run_validation($node + ['display' => 2, 'popupwidth' => 10000,
+            'popupheight' => 450])['errors']);
+        $this->assertArrayHasKey('popupwidth', $this->run_validation($node + ['display' => 2, 'popupwidth' => '12.5',
+            'popupheight' => 450])['errors']);
+        $this->assertArrayHasKey('display', $this->run_validation($node + ['display' => 3])['errors']);
+    }
+
+    /**
      * Custom nodes need a title and a URL; core nodes do not.
      */
     public function test_required_fields(): void {

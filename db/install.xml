@@ -18,7 +18,9 @@
         <FIELD NAME="blockaccess" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to block access to the node URL for users who cannot see the node"/>
         <FIELD NAME="langs" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated language codes the node is shown for. Empty means all languages"/>
         <FIELD NAME="parentkey" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Key of the parent node when the node is a submenu item"/>
-        <FIELD NAME="newwindow" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to open the link in a new window"/>
+        <FIELD NAME="display" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="How the link opens: 0 = current window, 1 = new window, 2 = pop-up"/>
+        <FIELD NAME="popupwidth" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Width of the pop-up window in pixels, when display is 2"/>
+        <FIELD NAME="popupheight" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Height of the pop-up window in pixels, when display is 2"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

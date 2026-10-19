@@ -98,7 +98,7 @@ final class primary_test extends \advanced_testcase {
         $generator->create_node(['nodekey' => 'home', 'visibility' => 0]);
         $generator->create_node(['nodekey' => 'myhome', 'title' => 'My learning', 'tooltip' => 'Your courses and news']);
         $generator->create_node(['nodekey' => 'help', 'title' => 'Help', 'url' => '/help.php', 'icon' => 'fa-circle-question',
-            'newwindow' => 1]);
+            'display' => 1]);
 
         $primary = $this->build_primary();
         $keys = $this->get_top_keys($primary);
@@ -108,8 +108,27 @@ final class primary_test extends \advanced_testcase {
         $this->assertSame('Your courses and news', $primary->get('myhome')->get_title());
         $this->assertContains('help', $keys);
         $this->assertStringContainsString('fa-circle-question', $primary->get('help')->text);
-        $this->assertStringContainsString('local-extendednav-newwindow', $primary->get('help')->text);
+        $this->assertStringContainsString('data-extnav-display="new"', $primary->get('help')->text);
         $this->assertGreaterThan(array_search('myhome', $keys), array_search('help', $keys));
+    }
+
+    /**
+     * Pop-ups carry their size; a parent opens its submenu, so how its link opens is ignored.
+     */
+    public function test_link_display(): void {
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
+        $generator->create_node(['nodekey' => 'tools', 'title' => 'Tools', 'url' => '/tools.php', 'display' => 1]);
+        $generator->create_node(['nodekey' => 'chat', 'title' => 'Chat', 'url' => '/chat.php', 'parentkey' => 'tools',
+            'display' => 2, 'popupwidth' => 800, 'popupheight' => 600]);
+        $generator->create_node(['nodekey' => 'docs', 'title' => 'Docs', 'url' => '/docs.php']);
+
+        $primary = $this->build_primary();
+        $chat = $primary->find('chat', null)->text;
+        $this->assertStringContainsString('data-extnav-display="popup"', $chat);
+        $this->assertStringContainsString('data-extnav-width="800"', $chat);
+        $this->assertStringContainsString('data-extnav-height="600"', $chat);
+        $this->assertStringNotContainsString('data-extnav-display', $primary->get('tools')->text);
+        $this->assertStringNotContainsString('data-extnav-display', $primary->get('docs')->text);
     }
 
     /**

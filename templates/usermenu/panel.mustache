@@ -22,7 +22,8 @@
     Context variables required for this template:
     * panelid - Id of the carousel item
     * title - Title of the parent item
-    * items - Submenu items, each with url, title, tooltip, icon (FontAwesome class or false) and newwindow
+    * items - Submenu items, each with url, title, tooltip, icon (FontAwesome class or false), newwindow and
+      popup (false, or the width and height of the pop-up window)
 
     Example context (json):
     {
@@ -34,7 +35,16 @@
                 "title": "Example Link",
                 "tooltip": "Opens in a new window",
                 "icon": "fa-star",
-                "newwindow": true
+                "newwindow": true,
+                "popup": false
+            },
+            {
+                "url": "https://example.com/help",
+                "title": "Help",
+                "tooltip": "",
+                "icon": false,
+                "newwindow": false,
+                "popup": {"width": 620, "height": 450}
             }
         ]
     }
@@ -51,7 +61,7 @@
         <div class="dropdown-divider"></div>
         <div class="items h-100 overflow-auto" role="menu" aria-labelledby="carousel-item-title-{{panelid}}">
             {{#items}}
-            <a href="{{url}}" class="dropdown-item pl-5 ps-5" role="menuitem" tabindex="-1" {{#tooltip}}title="{{tooltip}}"{{/tooltip}} {{#newwindow}}target="_blank" rel="noopener"{{/newwindow}}>
+            <a href="{{url}}" class="dropdown-item pl-5 ps-5" role="menuitem" tabindex="-1" {{#tooltip}}title="{{tooltip}}"{{/tooltip}} {{#newwindow}}target="_blank" rel="noopener" data-extnav-display="new"{{/newwindow}} {{#popup}}data-extnav-display="popup" data-extnav-width="{{width}}" data-extnav-height="{{height}}"{{/popup}}>
                 {{#icon}}
                 <span class="carousel-navigation-link-icon">
                     <i class="icon fa {{icon}} fa-fw" aria-hidden="true"></i>

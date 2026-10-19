@@ -18,6 +18,7 @@ namespace local_extendednav\form;
 
 use local_extendednav\local\access_guard;
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_display;
 use local_extendednav\local\node_manager;
 use local_extendednav\local\node_repository;
 use local_extendednav\local\node_text;
@@ -111,8 +112,16 @@ class node_form extends \moodleform {
             ));
         }
 
-        $mform->addElement('advcheckbox', 'newwindow', get_string('newwindow', 'local_extendednav'));
-        $mform->addHelpButton('newwindow', 'newwindow', 'local_extendednav');
+        $mform->addElement('select', 'display', get_string('display', 'local_extendednav'), node_display::get_options());
+        $mform->setDefault('display', node_display::CURRENT);
+        $mform->addHelpButton('display', 'display', 'local_extendednav');
+        $sizes = ['popupwidth' => node_display::DEFAULT_WIDTH, 'popupheight' => node_display::DEFAULT_HEIGHT];
+        foreach ($sizes as $field => $default) {
+            $mform->addElement('text', $field, get_string($field, 'local_extendednav'), ['size' => 5]);
+            $mform->setType($field, PARAM_INT);
+            $mform->setDefault($field, $default);
+            $mform->hideIf($field, 'display', 'neq', node_display::POPUP);
+        }
 
         $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
         $mform->setType('icon', PARAM_TEXT);

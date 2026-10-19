@@ -33,6 +33,27 @@ Feature: Edit navigation nodes
     And I set the field "Visibility" to "Not visible"
     And I should see "This item is hidden from everyone"
 
+  @javascript
+  Scenario: The pop-up size is only asked for pop-ups
+    When I follow "Add node"
+    Then I should not see "Pop-up width (in pixels)"
+    And I set the field "Display" to "Pop-up"
+    And the field "Pop-up width (in pixels)" matches value "620"
+    And the field "Pop-up height (in pixels)" matches value "450"
+    And I set the following fields to these values:
+      | Node key                 | chat               |
+      | Title                    | Chat               |
+      | URL                      | /calendar/view.php |
+      | Pop-up width (in pixels) | 50                 |
+    And I press "Save changes"
+    And I should see "Enter a whole number from 100 to 9999."
+    And I set the field "Pop-up width (in pixels)" to "800"
+    And I press "Save changes"
+    And I should see "Node saved."
+    And I click on "Edit" "link" in the "chat" "table_row"
+    And the field "Display" matches value "Pop-up"
+    And the field "Pop-up width (in pixels)" matches value "800"
+
   Scenario: Site administration cannot be hidden
     When I click on "Edit" "link" in the "siteadminnode" "table_row"
     And I set the field "Visibility" to "Not visible"

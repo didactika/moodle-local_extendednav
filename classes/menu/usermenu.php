@@ -17,6 +17,7 @@
 namespace local_extendednav\menu;
 
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_display;
 use local_extendednav\local\node_text;
 use local_extendednav\local\node_validator;
 
@@ -203,8 +204,8 @@ class usermenu extends base {
             if ($icon !== '' && node_validator::is_fontawesome($icon)) {
                 $attributes['data-icon'] = $icon;
             }
-            if (!empty($node->newwindow) && !$haschildren) {
-                $attributes['data-newwindow'] = '1';
+            if (!$haschildren) {
+                $attributes += node_display::get_link_attributes($node);
             }
             if ($tooltip !== '') {
                 $attributes['data-tooltip'] = strip_tags(format_string($tooltip));
@@ -234,12 +235,17 @@ class usermenu extends base {
                     continue;
                 }
                 $icon = trim((string)$child->icon);
+                $display = node_display::get_link_attributes($child);
                 $context['items'][] = [
                     'url' => $url,
                     'title' => $title,
                     'tooltip' => strip_tags(format_string(node_text::resolve($child->tooltip ?? ''))),
                     'icon' => ($icon !== '' && node_validator::is_fontawesome($icon)) ? $icon : false,
-                    'newwindow' => !empty($child->newwindow),
+                    'newwindow' => ($display['data-extnav-display'] ?? '') === 'new',
+                    'popup' => ($display['data-extnav-display'] ?? '') === 'popup' ? [
+                        'width' => $display['data-extnav-width'],
+                        'height' => $display['data-extnav-height'],
+                    ] : false,
                 ];
             }
             if (empty($context['items'])) {

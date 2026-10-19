@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Adds icons, tooltips, new windows and submenus to the user menu.
+ * Adds icons, tooltips, how links open and submenus to the user menu.
  *
  * Moodle builds the user menu from "text|url" lines only, so the server prints
  * template elements describing the extras and this module applies them.
@@ -26,6 +26,7 @@
  */
 
 import $ from 'jquery';
+import {init as initLinkDisplay} from 'local_extendednav/link_display';
 
 let initialised = false;
 
@@ -84,7 +85,7 @@ const findLink = (container, url, title) => {
 };
 
 /**
- * Applies the icon, tooltip and new window settings of a top-level item.
+ * Applies the icon, tooltip and link display settings of a top-level item.
  *
  * @param {HTMLElement} main Main panel of the user menu.
  * @param {HTMLTemplateElement} fix Template element describing the item.
@@ -94,7 +95,12 @@ const applyFix = (main, fix) => {
     if (!link) {
         return;
     }
-    if (fix.dataset.newwindow) {
+    ['extnavDisplay', 'extnavWidth', 'extnavHeight'].forEach((name) => {
+        if (fix.dataset[name]) {
+            link.dataset[name] = fix.dataset[name];
+        }
+    });
+    if (fix.dataset.extnavDisplay === 'new') {
         link.setAttribute('target', '_blank');
         link.setAttribute('rel', 'noopener');
     }
@@ -185,13 +191,7 @@ export const init = () => {
     }
     initialised = true;
 
-    // Keep the user menu open handling from swallowing clicks on links that open a new window.
-    document.addEventListener('click', (event) => {
-        const link = event.target.closest('a[target="_blank"]');
-        if (link && link.closest('.usermenu')) {
-            event.stopPropagation();
-        }
-    }, true);
+    initLinkDisplay();
 
     const carousel = document.querySelector('.usermenu #usermenu-carousel .carousel-inner');
     const main = document.querySelector('.usermenu #carousel-item-main');

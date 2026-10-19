@@ -41,6 +41,21 @@ Feature: Change the primary navigation
     Then I should see "My calendar" in the ".primary-navigation a.nav-link.active" "css_element"
     And I should not see "Dashboard" in the ".primary-navigation a.nav-link.active" "css_element"
 
+  @javascript
+  Scenario: Items open in a new window or a pop-up
+    Given the following "local_extendednav > nodes" exist:
+      | nodekey | title | url                  | display | popupwidth | popupheight |
+      | docs    | Docs  | /badges/mybadges.php | 1       |            |             |
+      | chat    | Chat  | /calendar/view.php   | 2       | 800        | 600         |
+    When I log in as "student1"
+    And I click on "Docs" "link" in the ".primary-navigation" "css_element"
+    Then I switch to a second window
+    And I close all opened windows
+    And I click on "Chat" "link" in the ".primary-navigation" "css_element"
+    And I switch to a second window
+    And I close all opened windows
+    And I should see "Chat" in the ".primary-navigation" "css_element"
+
   Scenario: Core items keep their Moodle title until they are renamed
     Given the following "local_extendednav > nodes" exist:
       | nodekey | title     |

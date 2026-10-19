@@ -10,7 +10,9 @@ nodes:
     blockaccess: 0
     langs: ""
     parentkey: ""
-    newwindow: 0
+    display: 0
+    popupwidth: ""
+    popupheight: ""
   - nodekey: help_en
     menu: primary
     title: "Help"
@@ -22,7 +24,9 @@ nodes:
     blockaccess: 0
     langs: "en"
     parentkey: ""
-    newwindow: 0
+    display: 0
+    popupwidth: ""
+    popupheight: ""
   - nodekey: help_es
     menu: primary
     title: "Ayuda"
@@ -34,7 +38,9 @@ nodes:
     blockaccess: 0
     langs: "es"
     parentkey: ""
-    newwindow: 0
+    display: 0
+    popupwidth: ""
+    popupheight: ""
   - nodekey: moodle_docs
     menu: usermenu
     title: "Moodle Docs"
@@ -46,4 +52,20 @@ nodes:
     blockaccess: 0
     langs: ""
     parentkey: ""
-    newwindow: 1
+    display: 1
+    popupwidth: ""
+    popupheight: ""
+  - nodekey: support_chat
+    menu: usermenu
+    title: "Support chat"
+    tooltip: "Opens in a small window"
+    url: "/local/support/chat.php"
+    icon: "fa-comments"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    display: 2
+    popupwidth: 620
+    popupheight: 450

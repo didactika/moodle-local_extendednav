@@ -81,7 +81,10 @@ final class yaml_test extends \basic_testcase {
         $this->assertArrayHasKey('nodes', $parsed);
         $this->assertSame('help_es', $parsed['nodes'][2]['nodekey']);
         $this->assertSame('Guías y datos de contacto', $parsed['nodes'][2]['tooltip']);
-        $this->assertSame(1, $parsed['nodes'][3]['newwindow']);
+        $this->assertSame(1, $parsed['nodes'][3]['display']);
+        $this->assertSame(2, $parsed['nodes'][4]['display']);
+        $this->assertSame(620, $parsed['nodes'][4]['popupwidth']);
+        $this->assertSame('', $parsed['nodes'][0]['popupwidth']);
         $this->assertSame('', $parsed['nodes'][0]['title']);
     }
 

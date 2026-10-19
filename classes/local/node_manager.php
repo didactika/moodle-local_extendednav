@@ -35,14 +35,14 @@ class node_manager {
     /** @var string[] Fields an administrator can set on a node. */
     public const EDITABLE_FIELDS = [
         'nodekey', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'newwindow',
+        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight',
     ];
 
     /**
      * Builds a record ready to save from submitted values.
      *
      * Empty values become null, the URL is normalised, roles and languages become
-     * comma-separated lists, and "Block URL access" is cleared where it cannot apply.
+     * comma-separated lists, and "Block URL access" and the pop-up size are cleared where they cannot apply.
      *
      * @param array|\stdClass $data Submitted values (form data or an imported node).
      * @param string $menu Menu key.
@@ -74,7 +74,18 @@ class node_manager {
         $record->roles = $record->visibility === node_access::VISIBILITY_ROLES ? $list($data['roles'] ?? null) : null;
         $record->langs = $list($data['langs'] ?? null);
         $record->parentkey = $text($data['parentkey'] ?? null);
-        $record->newwindow = empty($data['newwindow']) ? 0 : 1;
+        $record->display = isset($data['display']) && is_numeric($data['display']) ? (int)$data['display']
+            : node_display::CURRENT;
+        $size = static function ($value): ?int {
+            if ($value === null || (is_string($value) && trim($value) === '')) {
+                return null;
+            }
+            // Anything that is not a whole number is kept as 0, so validation reports it.
+            return is_numeric($value) && (int)$value == $value ? (int)$value : 0;
+        };
+        $popup = $record->display === node_display::POPUP;
+        $record->popupwidth = $popup ? $size($data['popupwidth'] ?? null) : null;
+        $record->popupheight = $popup ? $size($data['popupheight'] ?? null) : null;
 
         $record->blockaccess = 0;
         if (!empty($data['blockaccess']) && $record->visibility !== node_access::VISIBILITY_ALL) {

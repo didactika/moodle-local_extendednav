@@ -52,7 +52,7 @@ A user who opens a blocked URL is sent to the first of these pages they are allo
 - **Two menus:** the primary navigation and the user menu, each with Moodle's own items listed and editable.
 - **Submenus:** one level of submenus in both menus. Dragging a parent moves it with its submenu items; submenu items only move among their siblings.
 - **Drag-and-drop ordering:** with a keyboard-accessible move dialog.
-- **Per-item options:** title, tooltip, URL, FontAwesome or Moodle icon, and opening in a new window.
+- **Per-item options:** title, tooltip, URL, FontAwesome or Moodle icon, and how the link opens: in the current window, a new window or a pop-up of a chosen size, as Moodle's URL resource offers.
 - **Safety checks:** the form refuses changes that would leave every user without a landing page, and Site administration can never be hidden or nested.
 - **Moodle's menu settings:** the items of **Custom menu items** and **User menu items** are imported, with their tooltips and language codes, and kept in sync.
 - **YAML import and export:** copy the navigation between sites. The whole file is checked before anything is saved.
@@ -91,7 +91,7 @@ Select **Add node**, or the edit icon of an item:
 - For a new item, choose a **Node key** (letters, numbers, underscores and hyphens), a **Title** and a **URL**.
 - For one of Moodle's items, change only what you need; empty fields keep Moodle's values.
 - Choose the **Visibility**, the **Allowed roles** for a restricted item, and whether to **Block URL access**.
-- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, or open it in a new window.
+- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, and choose how it opens with **Display**: **Current window**, **New window** or **Pop-up** (with its width and height, 620 × 450 pixels by default).
 - Choose a **Parent** to show the item in that item's submenu.
 
 An item is shown as the active tab on its page, also when the page adds parameters to its URL (an item linking to `/user/profile.php` is active on `/user/profile.php?id=2`).

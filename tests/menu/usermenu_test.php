@@ -94,7 +94,11 @@ final class usermenu_test extends \advanced_testcase {
         $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'library', 'title' => 'Library', 'url' => '/library.php',
             'icon' => 'fa-book', 'tooltip' => 'Books']);
         $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'catalogue', 'title' => 'Catalogue',
-            'url' => '/catalogue.php', 'parentkey' => 'library', 'newwindow' => 1]);
+            'url' => '/catalogue.php', 'parentkey' => 'library', 'display' => 1]);
+        $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'atlas', 'title' => 'Atlas',
+            'url' => '/atlas.php', 'parentkey' => 'library', 'display' => 2, 'popupwidth' => 700, 'popupheight' => 500]);
+        $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'chat', 'title' => 'Chat', 'url' => '/chat.php',
+            'display' => 2, 'popupwidth' => 800, 'popupheight' => 600]);
 
         $html = menu_manager::get_menu('usermenu')->build_browser_templates(
             node_repository::get_menu_nodes('usermenu'),
@@ -107,5 +111,8 @@ final class usermenu_test extends \advanced_testcase {
         $this->assertStringContainsString('data-region="local-extendednav-submenu"', $html);
         $this->assertStringContainsString('Catalogue', $html);
         $this->assertStringContainsString('target="_blank"', $html);
+        $this->assertStringContainsString('data-extnav-display="popup" data-extnav-width="700" data-extnav-height="500"', $html);
+        $this->assertMatchesRegularExpression('~data-url="[^"]*/chat\.php"[^>]*data-extnav-display="popup"'
+            . '[^>]*data-extnav-width="800"[^>]*data-extnav-height="600"~', $html);
     }
 }

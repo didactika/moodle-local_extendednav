@@ -18,6 +18,7 @@ namespace local_extendednav\menu;
 
 use local_extendednav\hooks;
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_display;
 use local_extendednav\local\node_text;
 use local_extendednav\local\node_validator;
 use local_extendednav\local\url_helper;
@@ -283,12 +284,21 @@ class primary extends base {
             $states[$cnode->nodekey] = $this->build_state($cnode);
         }
 
+        // A node with submenu items opens its submenu, so how its link opens does not apply.
+        $parents = [];
+        foreach ($states as $nodekey => $state) {
+            if ($state->shown && $state->parentkey !== null && $state->parentkey !== $nodekey) {
+                $parents[$state->parentkey] = true;
+            }
+        }
+
         $needsscript = false;
         foreach ($states as $nodekey => $state) {
             $decoration = $this->render_icon($state->icon);
             $marker = '';
-            if ($state->newwindow) {
-                $marker = \html_writer::span('', 'local-extendednav-newwindow', ['hidden' => 'hidden']);
+            if (!empty($state->linkattributes) && !isset($parents[$nodekey])) {
+                // The primary navigation template prints no link attributes, so they go on a hidden marker in the text.
+                $marker = \html_writer::span('', 'local-extendednav-display', ['hidden' => 'hidden'] + $state->linkattributes);
                 $needsscript = true;
             }
 
@@ -378,7 +388,7 @@ class primary extends base {
         $this->activate_matching_node($customnodes, $states, $primarynav);
 
         if ($needsscript) {
-            $PAGE->requires->js_call_amd('local_extendednav/primary', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/link_display', 'init');
         }
     }
 
@@ -429,7 +439,7 @@ class primary extends base {
      * Works out how one node is displayed for the current user.
      *
      * @param \stdClass $cnode Node record.
-     * @return \stdClass With shown, title, url, icon, tooltip, parentkey and newwindow.
+     * @return \stdClass With shown, title, url, icon, tooltip, parentkey and linkattributes.
      */
     private function build_state(\stdClass $cnode): \stdClass {
         $state = new \stdClass();
@@ -439,7 +449,7 @@ class primary extends base {
         $state->url = trim((string)($cnode->url ?? '')) === '' ? null : trim((string)$cnode->url);
         $state->icon = trim((string)($cnode->icon ?? ''));
         $state->parentkey = trim((string)($cnode->parentkey ?? '')) === '' ? null : trim((string)$cnode->parentkey);
-        $state->newwindow = !empty($cnode->newwindow);
+        $state->linkattributes = node_display::get_link_attributes($cnode);
 
         if (node_access::is_protected($cnode)) {
             $state->parentkey = null;

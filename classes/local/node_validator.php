@@ -134,6 +134,21 @@ class node_validator {
             }
         }
 
+        $display = (int)($node->display ?? node_display::CURRENT);
+        if (!node_display::is_valid($display)) {
+            $errors['display'] = get_string('err_invalid_display', 'local_extendednav');
+        } else if ($display === node_display::POPUP) {
+            foreach (['popupwidth', 'popupheight'] as $field) {
+                $value = $node->$field ?? null;
+                if (!node_display::is_valid_size($value === null ? null : (int)$value)) {
+                    $errors[$field] = get_string('err_popup_size', 'local_extendednav', (object)[
+                        'min' => node_display::MIN_SIZE,
+                        'max' => node_display::MAX_SIZE,
+                    ]);
+                }
+            }
+        }
+
         $errors += self::validate_parent($node, $others);
 
         if (node_access::is_protected($node)) {

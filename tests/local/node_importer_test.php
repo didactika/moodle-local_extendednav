@@ -49,7 +49,8 @@ final class node_importer_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $generator->create_node(['nodekey' => 'help_es', 'title' => 'Ayuda: guías #1', 'tooltip' => 'Contacto',
             'url' => '/mod/page/view.php?id=2&x=1', 'icon' => 'fa-circle-question', 'visibility' => 2,
-            'roles' => 'editingteacher,teacher', 'blockaccess' => 1, 'langs' => 'es,es_mx', 'newwindow' => 1]);
+            'roles' => 'editingteacher,teacher', 'blockaccess' => 1, 'langs' => 'es,es_mx', 'display' => 2,
+            'popupwidth' => 800, 'popupheight' => 600]);
         $generator->create_node(['nodekey' => 'myhome', 'title' => 'true']);
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary'], 'sortorder ASC');

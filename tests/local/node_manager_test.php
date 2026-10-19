@@ -52,7 +52,9 @@ final class node_manager_test extends \advanced_testcase {
             'langs' => ['es', 'pt_br', 'es'],
             'blockaccess' => 1,
             'parentkey' => '',
-            'newwindow' => '1',
+            'display' => '2',
+            'popupwidth' => '800',
+            'popupheight' => '',
         ], 'primary');
 
         $this->assertSame('help', $record->nodekey);
@@ -62,7 +64,13 @@ final class node_manager_test extends \advanced_testcase {
         $this->assertSame('es,pt_br', $record->langs);
         $this->assertSame(0, $record->blockaccess, 'Visible nodes never block.');
         $this->assertNull($record->parentkey);
-        $this->assertSame(1, $record->newwindow);
+        $this->assertSame(2, $record->display);
+        $this->assertSame(800, $record->popupwidth);
+        $this->assertNull($record->popupheight);
+
+        $record = node_manager::prepare(['nodekey' => 'help', 'display' => '1', 'popupwidth' => '800'], 'primary');
+        $this->assertNull($record->popupwidth, 'The size only applies to pop-ups.');
+        $this->assertSame(0, node_manager::prepare(['nodekey' => 'help'], 'primary')->display);
     }
 
     /**

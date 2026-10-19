@@ -30,8 +30,14 @@ class node_importer {
     /** @var string[] Keys written for each node, in order. */
     public const EXPORT_FIELDS = [
         'nodekey', 'menu', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'newwindow',
+        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight',
     ];
+
+    /** @var string[] Fields written as whole numbers. */
+    private const INT_FIELDS = ['visibility', 'blockaccess', 'display'];
+
+    /** @var string[] Fields written as whole numbers, or empty when not set. */
+    private const OPTIONAL_INT_FIELDS = ['popupwidth', 'popupheight'];
 
     /** @var string Menu used for nodes that do not name one. */
     private string $defaultmenu;
@@ -60,8 +66,10 @@ class node_importer {
         $data = [];
         foreach (self::EXPORT_FIELDS as $field) {
             $value = $node->$field ?? null;
-            if (in_array($field, ['visibility', 'blockaccess', 'newwindow'], true)) {
+            if (in_array($field, self::INT_FIELDS, true)) {
                 $data[$field] = (int)$value;
+            } else if (in_array($field, self::OPTIONAL_INT_FIELDS, true)) {
+                $data[$field] = $value === null ? '' : (int)$value;
             } else {
                 $data[$field] = $value === null ? '' : (string)$value;
             }

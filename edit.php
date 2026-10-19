@@ -25,6 +25,7 @@
 
 use local_extendednav\local\access_guard;
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_display;
 use local_extendednav\local\node_manager;
 use local_extendednav\local\node_repository;
 use local_extendednav\menu_manager;
@@ -65,6 +66,9 @@ if ($node) {
     $formdata = clone $node;
     $formdata->roles = node_access::split_list($node->roles);
     $formdata->langs = node_access::split_list($node->langs);
+    // Offer Moodle's default size when the node is switched to a pop-up.
+    $formdata->popupwidth = $node->popupwidth ?? node_display::DEFAULT_WIDTH;
+    $formdata->popupheight = $node->popupheight ?? node_display::DEFAULT_HEIGHT;
     $form->set_data($formdata);
 }
 
