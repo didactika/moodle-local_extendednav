@@ -1,0 +1,76 @@
+nodes:
+  - nodekey: myhome
+    menu: primary
+    order: 1
+    title: ""
+    tooltip: ""
+    url: ""
+    icon: ""
+    visibility: 2
+    roles: "editingteacher,teacher"
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    display: 0
+    popupwidth: ""
+    popupheight: ""
+  - nodekey: help_en
+    menu: primary
+    order: 2
+    title: "Help"
+    tooltip: "Guides and contact details"
+    url: "/mod/page/view.php?id=10"
+    icon: "fa-circle-question"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: "en"
+    parentkey: ""
+    display: 0
+    popupwidth: ""
+    popupheight: ""
+  - nodekey: help_es
+    menu: primary
+    order: 3
+    title: "Ayuda"
+    tooltip: "Guías y datos de contacto"
+    url: "/mod/page/view.php?id=11"
+    icon: "fa-circle-question"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: "es"
+    parentkey: ""
+    display: 0
+    popupwidth: ""
+    popupheight: ""
+  - nodekey: moodle_docs
+    menu: usermenu
+    order: 1
+    title: "Moodle Docs"
+    tooltip: ""
+    url: "https://docs.moodle.org/"
+    icon: "fa-book"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    display: 1
+    popupwidth: ""
+    popupheight: ""
+  - nodekey: support_chat
+    menu: usermenu
+    order: 2
+    title: "Support chat"
+    tooltip: "Opens in a small window"
+    url: "/local/support/chat.php"
+    icon: "fa-comments"
+    visibility: 1
+    roles: ""
+    blockaccess: 0
+    langs: ""
+    parentkey: ""
+    display: 2
+    popupwidth: 620
+    popupheight: 450

@@ -1,0 +1,39 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/import_intro
+
+    Introduction of the import page.
+
+    Context variables required for this template:
+    * backurl - URL of the management page
+    * docurl - URL of the YAML documentation page
+
+    Example context (json):
+    {
+        "backurl": "https://example.com/local/extendednav/manage.php?menu=primary",
+        "docurl": "https://example.com/local/extendednav/documentation.php"
+    }
+}}
+<div class="mb-3">
+    <a href="{{backurl}}" class="btn btn-outline-secondary">{{#pix}} t/left, core {{/pix}}{{#str}} back_to_nodes, local_extendednav {{/str}}</a>
+</div>
+<div class="alert alert-info">
+    <h3 class="h5">{{#str}} import_instructions_title, local_extendednav {{/str}}</h3>
+    <p>{{#str}} import_instructions_desc, local_extendednav {{/str}}</p>
+    <p class="mb-0"><a href="{{docurl}}" class="alert-link">{{#str}} view_documentation, local_extendednav {{/str}}</a></p>
+</div>
