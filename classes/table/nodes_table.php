@@ -17,9 +17,9 @@
 namespace local_extendednav\table;
 
 use local_extendednav\local\node_access;
+use local_extendednav\local\node_icon;
 use local_extendednav\local\node_repository;
 use local_extendednav\local\node_text;
-use local_extendednav\local\node_validator;
 use local_extendednav\menu\base;
 use local_extendednav\menu\primary;
 
@@ -254,20 +254,8 @@ class nodes_table extends \flexible_table {
      * @return string
      */
     public function col_icon($node): string {
-        global $OUTPUT;
-
-        $icon = trim((string)$node->icon);
-        if ($icon === '' || node_validator::is_no_icon($icon)) {
-            return \html_writer::span('-', 'text-secondary');
-        }
-        if (node_validator::is_fontawesome($icon)) {
-            return \html_writer::tag('i', '', ['class' => 'icon fa ' . $icon . ' fa-fw', 'aria-hidden' => 'true']);
-        }
-        try {
-            return $OUTPUT->pix_icon($icon, '');
-        } catch (\moodle_exception $e) {
-            return \html_writer::span('-', 'text-secondary');
-        }
+        $html = node_icon::render($node->icon);
+        return $html === '' ? \html_writer::span('-', 'text-secondary') : $html;
     }
 
     /**

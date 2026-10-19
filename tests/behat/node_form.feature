@@ -54,6 +54,22 @@ Feature: Edit navigation nodes
     And the field "Display" matches value "Pop-up"
     And the field "Pop-up width (in pixels)" matches value "800"
 
+  @javascript
+  Scenario: An icon is chosen from the icon picker
+    When I follow "Add node"
+    And I click on "Choose icon" "button"
+    And I click on "FontAwesome" "button" in the "Choose an icon" "dialogue"
+    And I set the field "Search icons" to "home"
+    And I click on "[data-value='fa-house']" "css_element" in the "Choose an icon" "dialogue"
+    Then the field "Icon" matches value "fa-house"
+    And I click on "Choose icon" "button"
+    And I click on "Moodle icons" "button" in the "Choose an icon" "dialogue"
+    And I set the field "Search icons" to "i/home"
+    And I click on "[data-value='core:i/home']" "css_element" in the "Choose an icon" "dialogue"
+    And the field "Icon" matches value "core:i/home"
+    And I click on "Clear" "button"
+    And the field "Icon" matches value ""
+
   Scenario: Site administration cannot be hidden
     When I click on "Edit" "link" in the "siteadminnode" "table_row"
     And I set the field "Visibility" to "Not visible"

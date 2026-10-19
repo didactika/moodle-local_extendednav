@@ -33,4 +33,10 @@ $definitions = [
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
     ],
+    // Icons offered by the icon picker. Rebuilt after each upgrade, when Moodle and its plugins may bring new icons.
+    'icons' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ],
 ];

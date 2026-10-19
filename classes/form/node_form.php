@@ -126,6 +126,7 @@ class node_form extends \moodleform {
         $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
         $mform->setType('icon', PARAM_TEXT);
         $mform->addHelpButton('icon', 'icon', 'local_extendednav');
+        $PAGE->requires->js_call_amd('local_extendednav/icon_picker', 'init', ['icon']);
 
         $mform->addElement('select', 'visibility', get_string('visibility', 'local_extendednav'), [
             node_access::VISIBILITY_ALL => get_string('vis_all', 'local_extendednav'),

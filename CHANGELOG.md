@@ -30,7 +30,8 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 - "Block URL access": users who cannot see an item are sent away from its URL, to the Dashboard, the Site home,
   My courses or the default home page, or to an explanation page when all of them are blocked.
 - Languages per item: show an item only to users of some languages. Languages never affect URL blocking.
-- Tooltips, FontAwesome or Moodle icons, and how every item opens: in the current window, a new window or a pop-up
+- Tooltips, an icon picker with Moodle's icons (including those of its plugins) and the FontAwesome icons Moodle
+  ships, and how every item opens: in the current window, a new window or a pop-up
   of a chosen size, as Moodle's URL resource offers.
 - One level of submenus in the primary navigation and the user menu.
 - Drag-and-drop ordering that keeps submenu items with their parent.

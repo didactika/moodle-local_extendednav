@@ -19,8 +19,8 @@ namespace local_extendednav\menu;
 use local_extendednav\hooks;
 use local_extendednav\local\node_access;
 use local_extendednav\local\node_display;
+use local_extendednav\local\node_icon;
 use local_extendednav\local\node_text;
-use local_extendednav\local\node_validator;
 use local_extendednav\local\url_helper;
 
 /**
@@ -467,18 +467,7 @@ class primary extends base {
      * @return string HTML.
      */
     private function render_icon(string $icon): string {
-        global $OUTPUT;
-
-        if ($icon === '' || node_validator::is_no_icon($icon)) {
-            return '';
-        }
-        if (node_validator::is_fontawesome($icon)) {
-            return \html_writer::tag('i', '', ['class' => 'icon fa ' . $icon . ' fa-fw', 'aria-hidden' => 'true']) . ' ';
-        }
-        try {
-            return $OUTPUT->pix_icon($icon, '') . ' ';
-        } catch (\moodle_exception $e) {
-            return '';
-        }
+        $html = node_icon::render($icon);
+        return $html === '' ? '' : $html . ' ';
     }
 }

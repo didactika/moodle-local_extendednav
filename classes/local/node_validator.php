@@ -30,8 +30,8 @@ class node_validator {
     /** @var string Pattern of a FontAwesome icon, such as "fa-book" or "fa-solid fa-house". */
     private const ICON_FONTAWESOME = '~^(fa[a-z]?(-[a-z]+)?\s+)?fa-[a-z0-9-]+(\s+fa-[a-z0-9-]+)*$~';
 
-    /** @var string Pattern of a Moodle pix icon, such as "i/home". */
-    private const ICON_PIX = '~^[a-z0-9_-]+(/[a-z0-9_-]+)+$~';
+    /** @var string Pattern of a Moodle icon: "component:name" (such as "core:i/home") or a core icon path ("i/home"). */
+    private const ICON_PIX = '~^([a-z][a-z0-9_]*:[a-z0-9_-]+(/[a-z0-9_-]+)*|[a-z0-9_-]+(/[a-z0-9_-]+)+)$~';
 
     /** @var string[] Icon values that explicitly remove the icon. */
     private const ICON_NONE = ['none', 'null'];

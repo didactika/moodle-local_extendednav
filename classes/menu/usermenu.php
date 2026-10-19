@@ -18,8 +18,8 @@ namespace local_extendednav\menu;
 
 use local_extendednav\local\node_access;
 use local_extendednav\local\node_display;
+use local_extendednav\local\node_icon;
 use local_extendednav\local\node_text;
-use local_extendednav\local\node_validator;
 
 /**
  * The user menu.
@@ -201,8 +201,10 @@ class usermenu extends base {
                 'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null),
                 'data-title' => strip_tags(format_string(node_text::get_title($node, $natives[$nodekey] ?? null))),
             ];
-            if ($icon !== '' && node_validator::is_fontawesome($icon)) {
-                $attributes['data-icon'] = $icon;
+            // The user menu shows FontAwesome icons only, so Moodle icons are turned into theirs.
+            $iconclasses = node_icon::get_fontawesome_classes($icon);
+            if ($iconclasses !== null) {
+                $attributes['data-icon'] = $iconclasses;
             }
             if (!$haschildren) {
                 $attributes += node_display::get_link_attributes($node);
@@ -240,7 +242,7 @@ class usermenu extends base {
                     'url' => $url,
                     'title' => $title,
                     'tooltip' => strip_tags(format_string(node_text::resolve($child->tooltip ?? ''))),
-                    'icon' => ($icon !== '' && node_validator::is_fontawesome($icon)) ? $icon : false,
+                    'icon' => node_icon::get_fontawesome_classes($icon) ?? false,
                     'newwindow' => ($display['data-extnav-display'] ?? '') === 'new',
                     'popup' => ($display['data-extnav-display'] ?? '') === 'popup' ? [
                         'width' => $display['data-extnav-width'],

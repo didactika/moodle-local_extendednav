@@ -52,7 +52,7 @@ A user who opens a blocked URL is sent to the first of these pages they are allo
 - **Two menus:** the primary navigation and the user menu, each with Moodle's own items listed and editable.
 - **Submenus:** one level of submenus in both menus. Dragging a parent moves it with its submenu items; submenu items only move among their siblings.
 - **Drag-and-drop ordering:** with a keyboard-accessible move dialog.
-- **Per-item options:** title, tooltip, URL, FontAwesome or Moodle icon, and how the link opens: in the current window, a new window or a pop-up of a chosen size, as Moodle's URL resource offers.
+- **Per-item options:** title, tooltip, URL, an icon chosen from a searchable picker of Moodle's icons (including those of its plugins) and the FontAwesome icons Moodle ships, and how the link opens: in the current window, a new window or a pop-up of a chosen size, as Moodle's URL resource offers.
 - **Safety checks:** the form refuses changes that would leave every user without a landing page, and Site administration can never be hidden or nested.
 - **Moodle's menu settings:** the items of **Custom menu items** and **User menu items** are imported, with their tooltips and language codes, and kept in sync.
 - **YAML import and export:** copy the navigation between sites. The whole file is checked before anything is saved.
@@ -91,7 +91,7 @@ Select **Add node**, or the edit icon of an item:
 - For a new item, choose a **Node key** (letters, numbers, underscores and hyphens), a **Title** and a **URL**.
 - For one of Moodle's items, change only what you need; empty fields keep Moodle's values.
 - Choose the **Visibility**, the **Allowed roles** for a restricted item, and whether to **Block URL access**.
-- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**, and choose how it opens with **Display**: **Current window**, **New window** or **Pop-up** (with its width and height, 620 × 450 pixels by default).
+- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon** (the square next to the field opens a searchable list of Moodle and FontAwesome icons), and choose how it opens with **Display**: **Current window**, **New window** or **Pop-up** (with its width and height, 620 × 450 pixels by default).
 - Choose a **Parent** to show the item in that item's submenu.
 
 An item is shown as the active tab on its page, also when the page adds parameters to its URL (an item linking to `/user/profile.php` is active on `/user/profile.php?id=2`).
@@ -144,7 +144,8 @@ Users with this capability find the management page in the same place as adminis
 | A page is not blocked | **Block URL access** is not set, the user is a site administrator, the URL is external, or another item the user can see uses the same URL |
 | A user is sent to the Dashboard | An item they cannot see blocks the page they opened. Look for items with a **URL blocked** badge |
 | A user sees "Page not available" | Every fallback page (Dashboard, Site home, My courses and the default home page) is blocked for them |
-| User menu icons are missing | The user menu only shows FontAwesome icons (`fa-...`) |
+| User menu icons are missing | The user menu only shows FontAwesome icons; Moodle icons are shown as their FontAwesome icon, so a Moodle icon without one (an image icon) is not shown |
+| The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where Moodle 4.5 to 5.3 keep it; a later Moodle version may keep it elsewhere. Type the class in the field instead |
 | An import is refused | The page lists each invalid item and why. Nothing is saved until the whole file is valid |
 
 ## Getting help

@@ -156,3 +156,144 @@
     align-items: center;
     gap: .5rem;
 }
+
+/* Icon picker of the node form. Selectors are doubled so the theme's own styles, loaded after these, do not win. */
+/* Moodle's form element is a flex row too, so the field row and the line below it take its whole width. */
+.local-extendednav-iconfield {
+    display: flex;
+    flex: 0 0 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+.local-extendednav-iconinfo {
+    flex: 0 0 100%;
+    width: 100%;
+    margin-top: .25rem;
+}
+
+.local-extendednav-iconfield .local-extendednav-icontile {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.375rem;
+    height: 2.375rem;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #8f959e;
+    border-radius: .5rem;
+    background: #fff;
+    color: inherit;
+}
+
+.local-extendednav-iconfield .local-extendednav-icontile:hover,
+.local-extendednav-iconfield .local-extendednav-icontile:focus {
+    border-color: #0f6cbf;
+    background: #e7f1fa;
+}
+
+.local-extendednav-iconfield .local-extendednav-icontile.local-extendednav-icontile-empty {
+    border-style: dashed;
+}
+
+.local-extendednav-iconfield .local-extendednav-icontile .icon {
+    width: auto;
+    height: auto;
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.local-extendednav-iconfield .form-control {
+    flex: 0 1 20rem;
+    width: auto;
+}
+
+.local-extendednav-iconfield .btn-link {
+    padding-left: .25rem;
+    padding-right: .25rem;
+}
+
+.local-extendednav-iconpicker .local-extendednav-icongrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: .25rem;
+    max-height: 55vh;
+    padding: .25rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconcell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .25rem;
+    min-width: 0;
+    height: 5.75rem;
+    margin: 0;
+    padding: .65rem .35rem .35rem;
+    border: 1px solid transparent;
+    border-radius: .5rem;
+    background: transparent;
+    color: inherit;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconcell:hover,
+.local-extendednav-icongrid .local-extendednav-iconcell:focus {
+    border-color: #dee2e6;
+    background: #f5f7f9;
+    outline: none;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconcell:focus-visible {
+    box-shadow: 0 0 0 .2rem rgba(15, 108, 191, .5);
+}
+
+.local-extendednav-icongrid .local-extendednav-iconcell.local-extendednav-iconcell-current {
+    border-color: #0f6cbf;
+    background: #e7f1fa;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconglyph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 1.75rem;
+    height: 1.75rem;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconglyph .icon {
+    width: auto;
+    height: auto;
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconlabel {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: .75rem;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconcomponent {
+    max-width: 100%;
+    overflow: hidden;
+    color: #6a737b;
+    font-size: .65rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.local-extendednav-icongrid .local-extendednav-iconsentinel {
+    grid-column: 1 / -1;
+    height: 1px;
+}

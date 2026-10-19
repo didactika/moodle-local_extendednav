@@ -26,6 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'local_extendednav_get_icons' => [
+        'classname' => \local_extendednav\external\get_icons::class,
+        'description' => 'Lists the icons the icon picker offers: Moodle icons and FontAwesome icons.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
     'local_extendednav_reorder_nodes' => [
         'classname' => \local_extendednav\external\reorder_nodes::class,
         'description' => 'Saves a new order for the nodes of one menu.',
