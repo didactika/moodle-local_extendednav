@@ -47,6 +47,7 @@ Feature: Change the primary navigation
       | nodekey | title | url                  | display | popupwidth | popupheight |
       | docs    | Docs  | /badges/mybadges.php | 1       |            |             |
       | chat    | Chat  | /calendar/view.php   | 2       | 800        | 600         |
+    And I change window size to "large"
     When I log in as "student1"
     And I click on "Docs" "link" in the ".primary-navigation" "css_element"
     Then I switch to a second window
