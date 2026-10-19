@@ -44,6 +44,8 @@ const updateBulkBar = (checkboxes, selectAll) => {
     if (bar && count) {
         count.textContent = selected;
         bar.classList.toggle('d-none', selected === 0);
+        // Keep the bulk actions on screen only while they can be used.
+        bar.closest('.local-extendednav-nodes-footer')?.classList.toggle('local-extendednav-nodes-footer-sticky', selected > 0);
     }
 };
 

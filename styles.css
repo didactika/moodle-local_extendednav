@@ -140,14 +140,18 @@
     padding-left: 2.25rem;
 }
 
-/* The footer, with the bulk actions, stays on screen while scrolling a long list. */
 .local-extendednav-nodes-card .local-extendednav-nodes-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
     gap: .5rem;
     min-height: 3.5rem;
     background-color: var(--bs-body-bg, #fff);
+}
+
+/* While nodes are selected, the footer with the bulk actions stays on screen when scrolling a long list.
+   It is not fixed otherwise, so it never covers the rows people are working on. */
+.local-extendednav-nodes-card .local-extendednav-nodes-footer.local-extendednav-nodes-footer-sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
 }
 
 .local-extendednav-bulkbar:not(.d-none) {

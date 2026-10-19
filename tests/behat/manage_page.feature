@@ -23,6 +23,12 @@ Feature: Order and select nodes on the management page
   @javascript
   Scenario: Selecting nodes shows the bulk actions
     Then I should not see "Delete selected"
+    And ".local-extendednav-nodes-footer-sticky" "css_element" should not exist
     And I click on "Select" "checkbox" in the "First" "table_row"
     And I should see "1 node(s) selected"
     And I should see "Delete selected"
+    And ".local-extendednav-nodes-footer-sticky" "css_element" should exist
+    # Selecting all and then nothing clears the selection from the header, which the footer never covers.
+    And I click on "Select all" "checkbox"
+    And I click on "Select all" "checkbox"
+    And ".local-extendednav-nodes-footer-sticky" "css_element" should not exist
