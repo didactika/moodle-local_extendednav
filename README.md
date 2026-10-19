@@ -145,7 +145,7 @@ Users with this capability find the management page in the same place as adminis
 | A user is sent to the Dashboard | An item they cannot see blocks the page they opened. Look for items with a **URL blocked** badge |
 | A user sees "Page not available" | Every fallback page (Dashboard, Site home, My courses and the default home page) is blocked for them |
 | User menu icons are missing | The user menu only shows FontAwesome icons; Moodle icons are shown as their FontAwesome icon, so a Moodle icon without one (an image icon) is not shown |
-| The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where Moodle 4.5 to 5.3 keep it; a later Moodle version may keep it elsewhere. Type the class in the field instead |
+| The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where Moodle 4.5 to 5.2 keep it; a later Moodle version may keep it elsewhere. Type the class in the field instead |
 | An import is refused | The page lists each invalid item and why. Nothing is saved until the whole file is valid |
 
 ## Getting help
