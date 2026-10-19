@@ -36,6 +36,7 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 - Drag-and-drop ordering that keeps submenu items with their parent.
 - Synchronisation with Moodle's "Custom menu items" and "User menu items" settings, including tooltips and
   language codes.
-- YAML import and export (`.yaml`, also `.yml` on import), validating the whole file before anything is saved.
+- YAML import and export (`.yaml`, also `.yml` on import), validating the whole file before anything is saved and
+  keeping the position of every item.
 - Activity log of item changes, based on the standard log.
 - Capability `local/extendednav:manage`, so roles such as Manager can manage the navigation.

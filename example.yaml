@@ -1,6 +1,7 @@
 nodes:
   - nodekey: myhome
     menu: primary
+    order: 1
     title: ""
     tooltip: ""
     url: ""
@@ -15,6 +16,7 @@ nodes:
     popupheight: ""
   - nodekey: help_en
     menu: primary
+    order: 2
     title: "Help"
     tooltip: "Guides and contact details"
     url: "/mod/page/view.php?id=10"
@@ -29,6 +31,7 @@ nodes:
     popupheight: ""
   - nodekey: help_es
     menu: primary
+    order: 3
     title: "Ayuda"
     tooltip: "Guías y datos de contacto"
     url: "/mod/page/view.php?id=11"
@@ -43,6 +46,7 @@ nodes:
     popupheight: ""
   - nodekey: moodle_docs
     menu: usermenu
+    order: 1
     title: "Moodle Docs"
     tooltip: ""
     url: "https://docs.moodle.org/"
@@ -57,6 +61,7 @@ nodes:
     popupheight: ""
   - nodekey: support_chat
     menu: usermenu
+    order: 2
     title: "Support chat"
     tooltip: "Opens in a small window"
     url: "/local/support/chat.php"

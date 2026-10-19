@@ -85,6 +85,7 @@ final class yaml_test extends \basic_testcase {
         $this->assertSame(2, $parsed['nodes'][4]['display']);
         $this->assertSame(620, $parsed['nodes'][4]['popupwidth']);
         $this->assertSame('', $parsed['nodes'][0]['popupwidth']);
+        $this->assertSame(1, $parsed['nodes'][0]['order']);
         $this->assertSame('', $parsed['nodes'][0]['title']);
     }
 

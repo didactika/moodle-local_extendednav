@@ -54,6 +54,7 @@ if (empty($nodes)) {
     redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }
 
-$content = \local_extendednav\yaml::dump(['nodes' => array_values(array_map([node_importer::class, 'export_node'], $nodes))]);
+$menunodes = $all ? $nodes : $DB->get_records('local_extendednav', ['menu' => $menukey]);
+$content = \local_extendednav\yaml::dump(['nodes' => node_importer::export_nodes($nodes, $menunodes)]);
 
 send_file($content, $filename, 0, 0, true, true, 'application/yaml');

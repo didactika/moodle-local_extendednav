@@ -29,12 +29,12 @@ use local_extendednav\menu_manager;
 class node_importer {
     /** @var string[] Keys written for each node, in order. */
     public const EXPORT_FIELDS = [
-        'nodekey', 'menu', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
+        'nodekey', 'menu', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
         'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight',
     ];
 
     /** @var string[] Fields written as whole numbers. */
-    private const INT_FIELDS = ['visibility', 'blockaccess', 'display'];
+    private const INT_FIELDS = ['order', 'visibility', 'blockaccess', 'display'];
 
     /** @var string[] Fields written as whole numbers, or empty when not set. */
     private const OPTIONAL_INT_FIELDS = ['popupwidth', 'popupheight'];
@@ -57,12 +57,35 @@ class node_importer {
     }
 
     /**
+     * Returns the exported form of nodes of one menu, with their position in the menu.
+     *
+     * @param \stdClass[] $nodes Nodes to export.
+     * @param \stdClass[] $menunodes Every node of their menu, to number the positions as the management page lists them.
+     * @return array[]
+     */
+    public static function export_nodes(array $nodes, array $menunodes): array {
+        $positions = [];
+        foreach (node_manager::group_by_parent($menunodes) as $index => $node) {
+            $positions[(int)$node->id] = $index + 1;
+        }
+        $exported = [];
+        foreach ($nodes as $node) {
+            $exported[] = self::export_node($node, $positions[(int)$node->id] ?? null);
+        }
+        usort($exported, static fn(array $a, array $b): int => $a['order'] <=> $b['order']);
+        return $exported;
+    }
+
+    /**
      * Returns the exported form of a node.
      *
      * @param \stdClass $node Node record.
+     * @param int|null $order Position of the node in its menu, 1 being the first.
      * @return array
      */
-    public static function export_node(\stdClass $node): array {
+    public static function export_node(\stdClass $node, ?int $order = null): array {
+        $node = clone $node;
+        $node->order = $order ?? 0;
         $data = [];
         foreach (self::EXPORT_FIELDS as $field) {
             $value = $node->$field ?? null;
@@ -96,6 +119,7 @@ class node_importer {
 
         // Build the records and drop the ones that are skipped.
         $batch = [];
+        $orders = [];
         foreach (array_values($items) as $index => $item) {
             $label = get_string('import_entry', 'local_extendednav', $index + 1);
             if (!is_array($item) || !isset($item['nodekey']) || trim((string)$item['nodekey']) === '') {
@@ -113,6 +137,11 @@ class node_importer {
             $values = array_intersect_key($item, array_flip(node_manager::EDITABLE_FIELDS));
             $record = node_manager::prepare($values, $menukey);
             $label = $menukey . '/' . $record->nodekey;
+            $order = $item['order'] ?? '';
+            if ($order !== '' && $order !== null && !(is_numeric($order) && (int)$order == $order && (int)$order >= 1)) {
+                $errors[] = $label . ' (order): ' . get_string('err_import_order', 'local_extendednav');
+                continue;
+            }
             if (isset($batch[$menukey][$record->nodekey])) {
                 $errors[] = $label . ': ' . get_string('err_import_duplicate', 'local_extendednav');
                 continue;
@@ -127,6 +156,9 @@ class node_importer {
                 $record->id = $current->id;
             }
             $batch[$menukey][$record->nodekey] = $record;
+            if ($order !== '' && $order !== null) {
+                $orders[$menukey][$record->nodekey] = [(int)$order, $index];
+            }
         }
 
         // Validate every record against the menu as it would be after the import.
@@ -161,20 +193,51 @@ class node_importer {
             return ['errors' => $errors, 'warnings' => $warnings, 'counts' => $counts];
         }
 
-        foreach ($batch as $records) {
-            foreach ($records as $record) {
+        foreach ($batch as $menukey => $records) {
+            $ids = [];
+            foreach ($records as $nodekey => $record) {
                 if (isset($record->id)) {
                     node_manager::update($record);
                     $counts['updated']++;
                 } else {
-                    node_manager::create($record);
+                    $record = node_manager::create($record);
                     $counts['created']++;
                 }
+                $ids[$nodekey] = (int)$record->id;
+            }
+            if (!empty($orders[$menukey])) {
+                self::apply_orders($menukey, $orders[$menukey], $ids);
             }
         }
         if (access_guard::check_fallbacks(node_repository::get_all()) === access_guard::FALLBACKS_BLOCKED_FOR_SOME) {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
         return ['errors' => [], 'warnings' => $warnings, 'counts' => $counts];
+    }
+
+    /**
+     * Moves imported nodes to the position given in the file.
+     *
+     * The other nodes keep their order around them. Nodes are placed by ascending position, so a file
+     * exported from a whole menu is imported in the same order.
+     *
+     * @param string $menukey Menu key.
+     * @param array[] $orders Position and file index, keyed by node key.
+     * @param int[] $ids Saved node ids, keyed by node key.
+     */
+    private static function apply_orders(string $menukey, array $orders, array $ids): void {
+        global $DB;
+
+        uasort($orders, static fn(array $a, array $b): int => $a <=> $b);
+        $placed = array_map(static fn(string $nodekey): int => $ids[$nodekey], array_keys($orders));
+        $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey], '', 'id, nodekey, parentkey, sortorder');
+        $list = array_values(array_diff(
+            array_map(static fn(\stdClass $node): int => (int)$node->id, node_manager::group_by_parent($nodes)),
+            $placed
+        ));
+        foreach ($orders as $nodekey => [$order]) {
+            array_splice($list, min($order - 1, count($list)), 0, [$ids[$nodekey]]);
+        }
+        node_manager::reorder($menukey, $list);
     }
 }

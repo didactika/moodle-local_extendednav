@@ -108,7 +108,7 @@ Drag an item by the handle in the **Order** column, or select the handle for a l
 
 ### 4. Copy the navigation to another site
 
-Use **Export all**, or select items and **Export selected**, to download a `.yaml` file. On the other site, use **Import** and upload the file (`.yaml` or `.yml`), choosing whether existing items are kept or replaced. **See the YAML format** on the import page describes every field and offers an example file.
+Use **Export all**, or select items and **Export selected**, to download a `.yaml` file. On the other site, use **Import** and upload the file (`.yaml` or `.yml`), choosing whether existing items are kept or replaced. Each item keeps its position (`order`), so a whole menu is imported in the same order; items without one keep their place, or go last when they are new. **See the YAML format** on the import page describes every field and offers an example file.
 
 ## Configuration
 
