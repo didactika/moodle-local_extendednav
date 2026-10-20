@@ -7,7 +7,7 @@
 *Shape the primary navigation and the user menu, and keep users on the pages meant for them*
 
 [![Release](https://img.shields.io/github/v/release/didactika/moodle-local_extendednav?style=flat-square)](https://github.com/didactika/moodle-local_extendednav/releases)
-[![Moodle](https://img.shields.io/badge/Moodle-4.5_to_5.2-f98012?style=flat-square&logo=moodle&logoColor=white)](https://moodle.org)
+[![Moodle](https://img.shields.io/badge/Moodle-5.3-f98012?style=flat-square&logo=moodle&logoColor=white)](https://moodle.org)
 [![PHP](https://img.shields.io/badge/PHP-8.1+-777bb4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![License](https://img.shields.io/badge/License-GPL_v3-blue?style=flat-square)](LICENSE)
 
@@ -61,7 +61,7 @@ A user who opens a blocked URL is sent to the first of these pages they are allo
 
 ## Installation
 
-**Requirements:** Moodle 4.5 to 5.2, with the PHP version your Moodle release requires, and a theme based on Boost.
+**Requirements:** Moodle 5.3, with the PHP version your Moodle release requires, and a theme based on Boost.
 
 **From a release:** download the latest release ZIP, go to **Site administration > Plugins > Install plugins**, upload the file and follow the prompts.
 
@@ -69,10 +69,7 @@ A user who opens a blocked URL is sent to the first of these pages they are allo
 
 ```bash
 cd /path/to/moodle
-# Moodle 4.5 and 5.0
-git clone https://github.com/didactika/moodle-local_extendednav.git local/extendednav
-# Moodle 5.1 and later
-git clone https://github.com/didactika/moodle-local_extendednav.git public/local/extendednav
+git clone -b MOODLE_503_STABLE https://github.com/didactika/moodle-local_extendednav.git public/local/extendednav
 php admin/cli/upgrade.php
 ```
 
@@ -145,7 +142,7 @@ Users with this capability find the management page in the same place as adminis
 | A user is sent to the Dashboard | An item they cannot see blocks the page they opened. Look for items with a **URL blocked** badge |
 | A user sees "Page not available" | Every fallback page (Dashboard, Site home, My courses and the default home page) is blocked for them |
 | User menu icons are missing | The user menu only shows FontAwesome icons; Moodle icons are shown as their FontAwesome icon, so a Moodle icon without one (an image icon) is not shown |
-| The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where Moodle 4.5 to 5.2 keep it; a later Moodle version may keep it elsewhere. Type the class in the field instead |
+| The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where Moodle 5.3 keeps it; a later Moodle version may keep it elsewhere. Type the class in the field instead |
 | An import is refused | The page lists each invalid item and why. Nothing is saved until the whole file is valid |
 
 ## Getting help

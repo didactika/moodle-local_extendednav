@@ -13,6 +13,18 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+## [1.0.0-m503] - 2026-10-19
+
+### Added
+
+- First public release for Moodle 5.3, with every feature of 1.0.0-m405.
+
+### Fixed
+
+- Icons and "New window" or "Pop-up" items in the primary navigation: Moodle 5.3 draws it with React, which prints
+  the text of top-level items as plain text, so they showed as code. They are shown again in the browser, also when
+  they move into the "More" menu.
+
 ## [1.0.0-m405] - 2026-10-15
 
 ### Added

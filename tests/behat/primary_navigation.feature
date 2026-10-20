@@ -57,6 +57,18 @@ Feature: Change the primary navigation
     And I close all opened windows
     And I should see "Chat" in the ".primary-navigation" "css_element"
 
+  @javascript
+  Scenario: Top-level items show their icon, not its code
+    Given the following "local_extendednav > nodes" exist:
+      | nodekey | title | url                  | icon    | display |
+      | docs    | Docs  | /badges/mybadges.php | fa-book | 1       |
+    And I change window size to "large"
+    When I log in as "student1"
+    Then ".primary-navigation a .fa-book" "css_element" should exist
+    And I should see "Docs" in the ".primary-navigation" "css_element"
+    And I should not see "<i" in the ".primary-navigation" "css_element"
+    And I should not see "local-extendednav-display" in the ".primary-navigation" "css_element"
+
   Scenario: Core items keep their Moodle title until they are renamed
     Given the following "local_extendednav > nodes" exist:
       | nodekey | title     |

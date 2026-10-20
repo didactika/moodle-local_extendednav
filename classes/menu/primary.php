@@ -293,6 +293,7 @@ class primary extends base {
         }
 
         $needsscript = false;
+        $needslabels = false;
         foreach ($states as $nodekey => $state) {
             $decoration = $this->render_icon($state->icon);
             $marker = '';
@@ -301,6 +302,7 @@ class primary extends base {
                 $marker = \html_writer::span('', 'local-extendednav-display', ['hidden' => 'hidden'] + $state->linkattributes);
                 $needsscript = true;
             }
+            $needslabels = $needslabels || $decoration !== '' || $marker !== '';
 
             $existingnode = $primarynav->get($nodekey);
             if ($existingnode) {
@@ -387,6 +389,10 @@ class primary extends base {
 
         $this->activate_matching_node($customnodes, $states, $primarynav);
 
+        if ($needslabels) {
+            // Moodle 5.3 prints the text of top-level items as plain text; the module shows the icon and marker again.
+            $PAGE->requires->js_call_amd('local_extendednav/primary_labels', 'init');
+        }
         if ($needsscript) {
             $PAGE->requires->js_call_amd('local_extendednav/link_display', 'init');
         }
