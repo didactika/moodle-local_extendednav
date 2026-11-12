@@ -1,0 +1,52 @@
+---
+title: Extended navigation
+summary: Shape the primary navigation and the user menu, and keep users on the pages meant for them.
+order: 1
+---
+
+Extended navigation (`local_extendednav`) is a Moodle local plugin that lets administrators manage the two menus every user sees: the primary navigation at the top of the page and the user menu under the picture of the user. Add items, rename, re-link, reorder, nest or hide the items of Moodle, show items only to some roles or languages, and stop users from opening the pages of the items they cannot see.
+
+<Screenshot src="asset:manage-primary.webp" alt="The page that manages the primary navigation, with one row per item, its visibility, icon, node key and URL" caption="The management page: every item of the primary navigation, with its visibility and actions." url="/local/extendednav/manage.php" />
+
+> [!IMPORTANT]
+> **The site needs a theme based on Boost.** The plugin changes the primary navigation and the user menu that Boost and its child themes display. The themes that do not use them, such as Classic, show no changes.
+
+> [!NOTE]
+> The items of Moodle stay translated. Leave the title and the URL of an item of Moodle empty and the plugin keeps using the values of Moodle; the form shows them as placeholders.
+
+## Find your way
+
+Pick the route that matches what you want to do. Each one lists the pages to read, in order, with what each is for.
+
+<div class="d-paths">
+<Path title="I administer the site" icon="admin-panel-settings-rounded" time="20 min" goal="Install the plugin, add the first items and decide who sees each one." pages={['getting-started/installation', 'getting-started/quick-start', 'guides/add-or-change-items', 'guides/order-items']} />
+<Path title="I move a navigation between sites" icon="sync-alt-rounded" time="10 min" goal="Export the items of one site, import them in another and review who changed what." pages={['guides/import-and-export', 'reference/yaml-format', 'guides/activity-log']} />
+<Path title="I build on it or review it" icon="code-rounded" time="45 min" goal="Understand how an item is shown and how a URL is blocked, and how the plugin is built." pages={['concepts/how-an-item-is-shown', 'concepts/how-blocking-works', 'technical/index', 'reference/settings-and-capabilities']} />
+</div>
+
+## How this documentation is organised
+
+<FeatureGrid>
+  <Feature icon="rocket-launch-rounded" title="Getting started" href="page:getting-started/installation">Install the plugin and change a first item.</Feature>
+  <Feature icon="lightbulb-rounded" title="Concepts" href="page:concepts/how-an-item-is-shown">Visibility, languages, blocking and the items of Moodle.</Feature>
+  <Feature icon="task-alt-rounded" title="Guides" href="page:guides/add-or-change-items">One task per page, with the screens you will see.</Feature>
+  <Feature icon="menu-book-rounded" title="Reference" href="page:reference/settings-and-capabilities">The settings, the capabilities and the YAML format.</Feature>
+  <Feature icon="schema-rounded" title="Technical documentation" href="page:technical">The domain model, use cases, analysis, design and a map to the code.</Feature>
+</FeatureGrid>
+
+## Why it exists
+
+The menus of Moodle are the same for everyone and only partly configurable. Extended navigation gives each item its own visibility, roles, languages and blocking rule, so students, teachers and staff each see the navigation that fits them.
+
+## What it does
+
+<FeatureGrid>
+  <Feature icon="menu-rounded" title="Two menus">The primary navigation and the user menu, each with the items of Moodle listed and editable.</Feature>
+  <Feature icon="account-tree-rounded" title="Submenus">One level of submenus in both menus. A parent moves with its submenu items.</Feature>
+  <Feature icon="drag-indicator-rounded" title="Ordering by dragging">With a move dialog that works with the keyboard.</Feature>
+  <Feature icon="tune-rounded" title="Options of each item">Title, tooltip, URL, icon, and how the link opens: in the current window, in a new window or in a pop-up.</Feature>
+  <Feature icon="verified-user-rounded" title="Safety checks">The form refuses the changes that would leave every user without a landing page.</Feature>
+  <Feature icon="history-rounded" title="Activity log">Who created, changed or deleted each item, and when.</Feature>
+</FeatureGrid>
+
+Besides, the items of **Custom menu items** and **User menu items** of Moodle are imported and kept in sync, the whole navigation can be copied between sites with YAML files, and the capability `local/extendednav:manage` lets other roles manage it.

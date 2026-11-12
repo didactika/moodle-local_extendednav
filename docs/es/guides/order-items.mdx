@@ -1,0 +1,16 @@
+---
+title: Ordenar los elementos
+summary: Cambie la posición de los elementos arrastrándolos, o con una lista de posiciones.
+order: 40
+---
+
+Arrastre un elemento por el asa de la columna **Orden**, o seleccione el asa para abrir una lista de posiciones que funciona con el teclado.
+
+<Screenshot src="asset:manage-primary.webp" alt="La página de gestión, con el asa de cada elemento en la columna Orden" caption="La columna Orden tiene un asa para cada elemento." url="/local/extendednav/manage.php" />
+
+- Mover un padre mueve consigo a sus elementos de submenú.
+- Un elemento de submenú solo se mueve entre sus hermanos.
+- Un elemento que sale de su padre queda justo debajo del grupo de ese padre.
+- El orden está desactivado mientras se aplica un filtro. Use **Borrar** para volver a ordenar.
+
+El orden de la lista es el orden del menú, y un archivo exportado lo conserva: cada elemento tiene su posición en el campo `order`.

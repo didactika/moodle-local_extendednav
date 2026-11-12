@@ -1,0 +1,44 @@
+@startuml
+!theme plain
+hide empty members
+hide circle
+skinparam linetype polyline
+skinparam nodesep 60
+skinparam ranksep 70
+top to bottom direction
+
+package "Level 1 - Core" <<level1>> {
+  class Node {
+    nodekey
+    title
+    url
+    visibility
+    blockaccess
+  }
+}
+
+package "Level 2 - Structural" <<level2>> {
+  class Menu
+  class Visibility
+}
+
+package "Level 3 - Detail" <<level3>> {
+  class Role
+  class Language
+  class Submenu
+}
+
+package "Level 4 - Support" <<level4>> {
+  class ActivityRecord
+  class ImportFile
+}
+
+Menu "1" -down- "0..*" Node : lists
+Visibility "1" -down- "0..*" Node : sets who sees
+Node "0..*" o-down- "0..*" Role : is shown to
+Node "0..*" o-down- "0..*" Language : is limited to
+Node "1" o-down- "0..*" Submenu : opens
+Node "1" -down- "0..*" ActivityRecord : leaves
+ImportFile ..> Node : creates
+
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+participant "Moodle" as moodle
+participant "hooks" as hooks
+participant "menu_manager" as manager
+participant "menu" as menu
+participant "node_access" as access
+database "local_extendednav" as table
+
+moodle -> hooks : primary_extend
+hooks -> hooks : is_active() (plugin on, logged in, not guest)
+hooks -> manager : get_menu('primary')
+hooks -> table : get_menu_nodes('primary')
+hooks -> menu : inject_nodes(nodes, primaryview)
+menu -> access : is_shown(node, user, language)
+hooks -> menu : build_config_value(user menu nodes)
+
+@enduml

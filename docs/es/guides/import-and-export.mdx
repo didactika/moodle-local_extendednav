@@ -1,0 +1,21 @@
+---
+title: Importar y exportar
+summary: Copie la navegación de un sitio a otro con archivos YAML.
+order: 50
+---
+
+## Exportar
+
+En la página de gestión, use **Exportar todo**, o seleccione algunos elementos y **Exportar los seleccionados**, para descargar un archivo `.yaml`.
+
+## Importar
+
+En el otro sitio, seleccione **Importar** y suba el archivo (`.yaml` o `.yml`). En **Nodos existentes**, elija si los elementos que ya existen se conservan o se sustituyen.
+
+<Screenshot src="asset:import.webp" alt="La página de importación, con el campo del archivo YAML y la elección para los elementos existentes" caption="La página de importación." url="/local/extendednav/import.php" />
+
+- Todo el archivo se comprueba antes de guardar nada. Si algún elemento no es válido, la página lista cada uno con el motivo y no se importa nada.
+- Cada elemento conserva su posición, de modo que un menú completo se importa en el mismo orden. Un elemento sin posición conserva su lugar, o va al final cuando es nuevo.
+- Un idioma que no está instalado en el sitio da una advertencia, y el elemento se importa.
+
+**Ver el formato YAML**, en la página de importación, describe cada campo y ofrece un archivo de ejemplo. La misma descripción está en [El formato YAML](page:reference/yaml-format).

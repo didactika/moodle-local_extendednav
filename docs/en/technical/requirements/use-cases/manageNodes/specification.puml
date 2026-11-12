@@ -1,0 +1,27 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "manageNodes" as manageNodes {
+  state " " as List
+  state " " as Form
+  state " " as Checking
+  state " " as Saved
+
+  [*] --> List : Administrator opens the management page
+  List --> Form : Administrator adds an item or edits one
+  Form --> Checking : Administrator saves
+  Checking --> Form : System refuses, for instance a repeated node key
+  Checking --> Saved : System saves the item and records the event
+  Saved --> List : System shows the list again
+  List --> Saved : Administrator deletes an item
+  List --> [*] : Administrator leaves the page
+
+  note on link
+    Administrator: fills in the item
+    System: validates, saves and logs
+  end note
+}
+
+@enduml

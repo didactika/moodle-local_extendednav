@@ -1,0 +1,34 @@
+---
+title: Settings and capabilities
+summary: The setting of the plugin, its capability, and what it stores.
+order: 40
+---
+
+## Settings
+
+The settings are at **Site administration > Appearance > Extended navigation > Settings**. The page requires `moodle/site:config`.
+
+<Screenshot src="asset:settings.webp" alt="The settings page of Extended navigation, with the setting Enable" caption="The only setting of the plugin." url="/admin/settings.php?section=local_extendednav_settings" />
+
+| Setting | Default | Description |
+|---|---|---|
+| Enable | On | Apply the items and the URL blocking. When off, Moodle shows its navigation unchanged and no page is blocked |
+
+## Capabilities
+
+| Capability | Default roles | Allows the user to |
+|---|---|---|
+| `local/extendednav:manage` | None | Manage the items, import, export and see the activity log, in the system context |
+
+The users who have this capability find the management page in the same place as the administrators.
+
+> [!WARNING]
+> Whoever holds `local/extendednav:manage` decides the menu of every user and which pages are blocked. Give it only to people you would trust with the navigation of the site.
+
+## Privacy
+
+The plugin stores navigation items, not personal data, and implements the Privacy API as a null provider.
+
+## Backup
+
+The items are configuration of the site and are not part of the backups of courses. Use the YAML export to copy them.

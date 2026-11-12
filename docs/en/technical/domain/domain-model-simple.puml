@@ -1,0 +1,15 @@
+@startuml
+!theme plain
+hide empty members
+hide circle
+skinparam linetype polyline
+top to bottom direction
+
+class Menu
+class Node
+class Visibility
+
+Menu "1" -down- "0..*" Node
+Visibility "1" -down- "0..*" Node
+
+@enduml

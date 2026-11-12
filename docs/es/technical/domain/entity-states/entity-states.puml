@@ -1,0 +1,25 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+[*] --> Visible : created visible to everyone
+[*] --> Restricted : created with roles
+[*] --> Hidden : created not visible
+Visible --> Restricted : roles chosen
+Restricted --> Visible : roles removed
+Visible --> Hidden : hidden
+Hidden --> Visible : shown
+Visible --> Unavailable : Moodle stops adding it
+Unavailable --> Visible : Moodle adds it again
+Visible --> [*] : deleted
+Restricted --> [*] : deleted
+Hidden --> [*] : deleted
+Unavailable --> [*] : deleted
+
+note right of Unavailable
+  Only an item of Moodle can become unavailable.
+  The plugin does not add it while it is.
+end note
+
+@enduml

@@ -1,0 +1,33 @@
+---
+title: Cómo funciona el bloqueo
+summary: Qué ocurre cuando un usuario abre la URL de un elemento que no puede ver.
+order: 20
+---
+
+Un elemento con **Bloquear el acceso a la URL** impide que los usuarios que no pueden verlo abran su página, y no solo que lo vean en el menú.
+
+## A dónde va un usuario bloqueado
+
+Un usuario que abre una URL bloqueada es enviado a la primera de estas páginas que tenga permiso para abrir:
+
+1. El Área personal.
+2. La página principal del sitio.
+3. Mis cursos.
+4. La página de inicio predeterminada, cuando está fijada en una URL.
+
+Cuando todas están bloqueadas para el usuario, ve una página que explica que la página no está disponible.
+
+## Qué cubre el bloqueo
+
+- Un elemento que el usuario puede ver vuelve a abrir su URL, aunque otro elemento la bloquee.
+- Una URL con parámetros solo bloquea las páginas que tienen esos parámetros: `/course/view.php?id=5` bloquea el curso 5, no el 6.
+- Las URL externas nunca se bloquean.
+- Los administradores del sitio nunca se bloquean, ni tampoco las páginas de administración, de inicio de sesión y de plugins.
+
+## Comprobaciones de seguridad
+
+El formulario rechaza los cambios que dejarían a todos los usuarios sin una página de destino, y la Administración del sitio nunca puede ocultarse ni anidarse.
+
+## Desactivar el bloqueo
+
+El ajuste **Activar** del plugin aplica los elementos y el bloqueo. Cuando está desactivado, Moodle muestra su navegación sin cambios y no se bloquea ninguna página.

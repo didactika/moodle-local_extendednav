@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "reorderNodes" as reorderNodes {
+  state " " as List
+  state " " as Moving
+  state " " as Saved
+
+  [*] --> List : Administrator opens the management page
+  List --> Moving : Administrator drags an item or opens its list of positions
+  Moving --> List : System refuses, for instance while a filter is applied
+  Moving --> Saved : System saves the new order of the menu
+  Saved --> List : System shows the list in the new order
+  List --> [*] : Administrator leaves the page
+
+  note on link
+    Administrator: moves an item
+    System: keeps submenus together and saves
+  end note
+}
+
+@enduml

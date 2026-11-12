@@ -1,0 +1,12 @@
+@startsalt
+{
+  {* Primary navigation | User menu }
+  ==
+  [ Add node ] | [ Import ] | [ Export all ] | [ Activity log ]
+  {#
+    Title | Visibility | Node key | URL | Actions
+    Training | Visible to everyone | training | /course/index.php | [edit] [delete]
+    Teaching resources | Restricted | teaching_resources | /course/management.php | [edit] [delete]
+  }
+}
+@endsalt
