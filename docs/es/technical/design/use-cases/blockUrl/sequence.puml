@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+participant "Moodle" as moodle
+participant "hooks" as hooks
+participant "access_guard" as guard
+participant "node_access" as access
+database "local_extendednav" as table
+
+moodle -> hooks : before_http_headers
+hooks -> guard : check(page)
+guard -> guard : to_site_path(url), is_immune()
+guard -> table : get_all()
+guard -> access : get_user_rules(nodes, user)
+alt the page is not blocked
+  guard --> moodle : nothing to do
+else
+  guard -> guard : the first fallback that is allowed
+  guard --> moodle : redirect (or restricted.php)
+end
+
+@enduml

@@ -1,0 +1,49 @@
+---
+title: The YAML format
+summary: Every field of an import file and an example.
+order: 41
+---
+
+An import file is a YAML file with a `nodes` list. Each entry describes one item with the fields below. Every field except `nodekey` is optional, and the empty fields of an item of Moodle keep the values of Moodle.
+
+| Field | Description |
+|---|---|
+| `nodekey` | Key of the item, unique within its menu. Use the key of an item of Moodle (for example `myhome`) to change it |
+| `menu` | Menu of the item: `primary` or `usermenu`. It is the menu being imported when omitted |
+| `order` | Position of the item in its menu, 1 being the first. Exported files list every position. On import, an item without it keeps its place, or goes last when it is new |
+| `title` | Display text. Empty on an item of Moodle keeps the title of Moodle |
+| `tooltip` | Text shown when hovering over the link |
+| `url` | Destination: a path of this site (for example `/course/view.php?id=2`) or a full address |
+| `icon` | FontAwesome class (for example `fa-book`) or icon of Moodle (for example `i/home`). `none` removes the icon |
+| `visibility` | `1` visible to everyone, `2` restricted to the roles listed, `0` not visible |
+| `roles` | Role shortnames separated by commas (for example `editingteacher,teacher`). Used when `visibility` is `2` |
+| `blockaccess` | `1` to block the URL for the users who cannot see the item, `0` otherwise. Only used when `visibility` is `0` or `2` |
+| `langs` | Language codes separated by commas (for example `es,pt_br`). The item is only shown for these languages. Empty means every language |
+| `parentkey` | Key of the parent item, to show this item in its submenu |
+| `display` | How the link opens: `0` current window, `1` new window, `2` pop-up |
+| `popupwidth`, `popupheight` | Width and height of the pop-up in pixels, from 100 to 9999. Used when `display` is `2` |
+
+## Example
+
+```yaml
+nodes:
+  - nodekey: help_en
+    menu: primary
+    order: 24
+    title: "Help"
+    tooltip: "Guides and contact details"
+    url: "/mod/page/view.php?id=13"
+    icon: "fa-circle-question"
+    visibility: 1
+    langs: "en"
+  - nodekey: guide_teachers
+    menu: primary
+    title: "Guide for teachers"
+    url: "/mod/page/view.php?id=12"
+    visibility: 2
+    roles: "editingteacher,teacher"
+    blockaccess: 1
+    parentkey: "guides"
+```
+
+The import page also offers an example file to download.

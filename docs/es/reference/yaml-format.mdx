@@ -1,0 +1,49 @@
+---
+title: El formato YAML
+summary: Cada campo de un archivo de importación y un ejemplo.
+order: 41
+---
+
+Un archivo de importación es un archivo YAML con una lista `nodes`. Cada entrada describe un elemento con los campos siguientes. Todos los campos salvo `nodekey` son opcionales, y los campos vacíos de un elemento de Moodle conservan los valores de Moodle.
+
+| Campo | Descripción |
+|---|---|
+| `nodekey` | Clave del elemento, única dentro de su menú. Use la clave de un elemento de Moodle (por ejemplo `myhome`) para cambiarlo |
+| `menu` | Menú del elemento: `primary` o `usermenu`. Es el menú que se importa cuando se omite |
+| `order` | Posición del elemento en su menú, siendo 1 la primera. Los archivos exportados listan todas las posiciones. Al importar, un elemento sin ella conserva su lugar, o va al final cuando es nuevo |
+| `title` | Texto que se muestra. Vacío en un elemento de Moodle conserva el título de Moodle |
+| `tooltip` | Texto que se muestra al pasar el cursor sobre el enlace |
+| `url` | Destino: una ruta de este sitio (por ejemplo `/course/view.php?id=2`) o una dirección completa |
+| `icon` | Clase de FontAwesome (por ejemplo `fa-book`) o icono de Moodle (por ejemplo `i/home`). `none` quita el icono |
+| `visibility` | `1` visible para todos, `2` restringido a los roles indicados, `0` no visible |
+| `roles` | Nombres cortos de rol separados por comas (por ejemplo `editingteacher,teacher`). Se usa cuando `visibility` es `2` |
+| `blockaccess` | `1` para bloquear la URL a los usuarios que no pueden ver el elemento, `0` en caso contrario. Solo se usa cuando `visibility` es `0` o `2` |
+| `langs` | Códigos de idioma separados por comas (por ejemplo `es,pt_br`). El elemento solo se muestra para esos idiomas. Vacío significa todos los idiomas |
+| `parentkey` | Clave del elemento padre, para mostrar este elemento en su submenú |
+| `display` | Cómo se abre el enlace: `0` ventana actual, `1` ventana nueva, `2` ventana emergente |
+| `popupwidth`, `popupheight` | Ancho y alto de la ventana emergente en píxeles, de 100 a 9999. Se usan cuando `display` es `2` |
+
+## Ejemplo
+
+```yaml
+nodes:
+  - nodekey: help_en
+    menu: primary
+    order: 24
+    title: "Help"
+    tooltip: "Guides and contact details"
+    url: "/mod/page/view.php?id=13"
+    icon: "fa-circle-question"
+    visibility: 1
+    langs: "en"
+  - nodekey: guide_teachers
+    menu: primary
+    title: "Guide for teachers"
+    url: "/mod/page/view.php?id=12"
+    visibility: 2
+    roles: "editingteacher,teacher"
+    blockaccess: 1
+    parentkey: "guides"
+```
+
+La página de importación ofrece también un archivo de ejemplo para descargar.

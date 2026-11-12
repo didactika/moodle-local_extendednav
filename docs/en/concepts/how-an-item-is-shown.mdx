@@ -1,0 +1,31 @@
+---
+title: How an item is shown
+summary: Visibility, roles and languages: who sees each item of a menu.
+order: 10
+---
+
+Every item has a visibility, and it can also be limited to some languages.
+
+## Visibility
+
+| Visibility | In the menu | With **Block URL access** |
+|---|---|---|
+| Visible to everyone | Shown to every logged-in user | Not available |
+| Restricted | Shown to the users who have one of the allowed roles, in any context | Users without those roles cannot open its URL |
+| Not visible | Hidden from everyone | Nobody can open its URL |
+
+<Screenshot src="asset:node-form.webp" alt="The form of an item, with its visibility, allowed roles and the option to block the URL" caption="An item restricted to two roles, with its URL blocked for everybody else." url="/local/extendednav/edit.php" />
+
+## Languages
+
+An item limited to **languages** is only shown to the users whose current language is one of them (Spanish `es` also covers Spanish - Mexico `es_mx`). Languages never block a URL, because users can change their language themselves.
+
+To translate an item, create one item per language: for example `help_en` for English and `help_es` for Spanish, with the same URL or a translated one.
+
+## Submenus
+
+An item can have a **parent**, to show it in the submenu of that item. The plugin offers one level of submenus in both menus. An item that has submenu items opens its submenu instead of following its URL; the list marks its URL with a warning icon, and the URL still counts for blocking.
+
+## The active item
+
+An item is shown as the active tab on its page, also when the page adds parameters to its URL: an item that links to `/user/profile.php` is active on `/user/profile.php?id=2`.

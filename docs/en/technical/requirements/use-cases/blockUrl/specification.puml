@@ -1,0 +1,23 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "blockUrl" as blockUrl {
+  state " " as Opening
+  state " " as Deciding
+  state " " as Redirected
+
+  [*] --> Opening : A user opens a page
+  Opening --> [*] : The page is immune or no item blocks it
+  Opening --> Deciding : An item the user cannot see blocks the page
+  Deciding --> Redirected : System sends the user to the first fallback page allowed
+  Deciding --> Redirected : Every fallback is blocked, System shows the explanation page
+  Redirected --> [*] : The user lands on an allowed page
+
+  note on link
+    System: evaluates the rules of the user
+  end note
+}
+
+@enduml

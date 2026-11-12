@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+actor "Administrator" as actor
+participant "import.php" as page
+participant "yaml" as yaml
+participant "node_importer" as importer
+participant "node_validator" as validator
+database "local_extendednav" as table
+
+actor -> page : file, what to do with existing items
+page -> yaml : parse(content)
+page -> importer : import(items)
+importer -> validator : every item
+alt any error
+  importer --> actor : the list of errors, nothing saved
+else
+  importer -> table : create, update or skip each item
+  importer --> actor : the counts and the warnings
+end
+
+@enduml

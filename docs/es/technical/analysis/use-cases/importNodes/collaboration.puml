@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Import page" as screen <<boundary>>
+class "Export page" as export <<boundary>>
+class "YAML" as yaml <<control>>
+class "Node importer" as importer <<control>>
+class "Node validator" as validator <<control>>
+class "Node" as node <<entity>>
+
+user --> export : 1: exports
+export --> importer : 2: export_nodes
+importer --> yaml : 3: dump
+user --> screen : 4: uploads a file
+screen --> yaml : 5: parse
+screen --> importer : 6: import(items)
+importer --> validator : 7: the whole file first
+importer --> node : 8: create, update or skip
+
+@enduml

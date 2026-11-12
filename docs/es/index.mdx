@@ -1,0 +1,52 @@
+---
+title: Navegación extendida
+summary: Dé forma a la navegación principal y al menú de usuario, y mantenga a los usuarios en las páginas que les corresponden.
+order: 1
+---
+
+Extended navigation (`local_extendednav`) es un plugin local de Moodle que permite a los administradores gestionar los dos menús que ve todo usuario: la navegación principal, en la parte superior de la página, y el menú de usuario, bajo la imagen del usuario. Añada elementos, cámbieles el nombre o el enlace, reordénelos, anídelos u oculte los elementos de Moodle, muestre elementos solo a algunos roles o idiomas, e impida que los usuarios abran las páginas de los elementos que no pueden ver.
+
+<Screenshot src="asset:manage-primary.webp" alt="La página que gestiona la navegación principal, con una fila por elemento, su visibilidad, icono, clave de nodo y URL" caption="La página de gestión: cada elemento de la navegación principal, con su visibilidad y sus acciones." url="/local/extendednav/manage.php" />
+
+> [!IMPORTANT]
+> **El sitio necesita un tema basado en Boost.** El plugin cambia la navegación principal y el menú de usuario que muestran Boost y sus temas hijos. Los temas que no los usan, como Classic, no muestran cambios.
+
+> [!NOTE]
+> Los elementos de Moodle siguen traducidos. Deje vacíos el título y la URL de un elemento de Moodle y el plugin sigue usando los valores de Moodle; el formulario los muestra como texto de ejemplo.
+
+## Encuentre su camino
+
+Elija la ruta que corresponda a lo que desea hacer. Cada una enumera las páginas que debe leer, en orden, con su propósito.
+
+<div class="d-paths">
+<Path title="Administro el sitio" icon="admin-panel-settings-rounded" time="20 min" goal="Instalar el plugin, añadir los primeros elementos y decidir quién ve cada uno." pages={['getting-started/installation', 'getting-started/quick-start', 'guides/add-or-change-items', 'guides/order-items']} />
+<Path title="Traslado una navegación entre sitios" icon="sync-alt-rounded" time="10 min" goal="Exportar los elementos de un sitio, importarlos en otro y revisar quién cambió qué." pages={['guides/import-and-export', 'reference/yaml-format', 'guides/activity-log']} />
+<Path title="Desarrollo sobre él o lo reviso" icon="code-rounded" time="45 min" goal="Entender cómo se muestra un elemento y cómo se bloquea una URL, y cómo está construido el plugin." pages={['concepts/how-an-item-is-shown', 'concepts/how-blocking-works', 'technical/index', 'reference/settings-and-capabilities']} />
+</div>
+
+## Cómo se organiza esta documentación
+
+<FeatureGrid>
+  <Feature icon="rocket-launch-rounded" title="Primeros pasos" href="page:getting-started/installation">Instale el plugin y cambie un primer elemento.</Feature>
+  <Feature icon="lightbulb-rounded" title="Conceptos" href="page:concepts/how-an-item-is-shown">Visibilidad, idiomas, bloqueo y los elementos de Moodle.</Feature>
+  <Feature icon="task-alt-rounded" title="Guías" href="page:guides/add-or-change-items">Una tarea por página, con las pantallas que verá.</Feature>
+  <Feature icon="menu-book-rounded" title="Referencia" href="page:reference/settings-and-capabilities">Los ajustes, las capacidades y el formato YAML.</Feature>
+  <Feature icon="schema-rounded" title="Documentación técnica" href="page:technical">El modelo de dominio, los casos de uso, el análisis, el diseño y un mapa del código.</Feature>
+</FeatureGrid>
+
+## Por qué existe
+
+Los menús de Moodle son iguales para todos y solo se pueden configurar en parte. Extended navigation da a cada elemento su propia visibilidad, roles, idiomas y regla de bloqueo, de modo que estudiantes, docentes y personal ven la navegación que les conviene.
+
+## Qué hace
+
+<FeatureGrid>
+  <Feature icon="menu-rounded" title="Dos menús">La navegación principal y el menú de usuario, con los elementos de Moodle listados y editables.</Feature>
+  <Feature icon="account-tree-rounded" title="Submenús">Un nivel de submenús en ambos menús. Un padre se mueve con sus elementos de submenú.</Feature>
+  <Feature icon="drag-indicator-rounded" title="Orden por arrastre">Con un cuadro de movimiento que funciona con el teclado.</Feature>
+  <Feature icon="tune-rounded" title="Opciones de cada elemento">Título, ayuda emergente, URL, icono, y cómo se abre el enlace: en la ventana actual, en una ventana nueva o en una ventana emergente.</Feature>
+  <Feature icon="verified-user-rounded" title="Comprobaciones de seguridad">El formulario rechaza los cambios que dejarían a todos los usuarios sin una página de destino.</Feature>
+  <Feature icon="history-rounded" title="Registro de actividad">Quién creó, cambió o eliminó cada elemento, y cuándo.</Feature>
+</FeatureGrid>
+
+Además, los elementos de **Elementos de menú personalizados** y de **Elementos del menú de usuario** de Moodle se importan y se mantienen sincronizados, toda la navegación puede copiarse entre sitios con archivos YAML, y la capacidad `local/extendednav:manage` permite que otros roles la gestionen.

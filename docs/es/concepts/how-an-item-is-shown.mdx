@@ -1,0 +1,31 @@
+---
+title: Cómo se muestra un elemento
+summary: Visibilidad, roles e idiomas: quién ve cada elemento de un menú.
+order: 10
+---
+
+Cada elemento tiene una visibilidad, y también puede limitarse a algunos idiomas.
+
+## Visibilidad
+
+| Visibilidad | En el menú | Con **Bloquear el acceso a la URL** |
+|---|---|---|
+| Visible para todos | Se muestra a todo usuario con sesión iniciada | No disponible |
+| Restringido | Se muestra a los usuarios que tienen uno de los roles permitidos, en cualquier contexto | Los usuarios sin esos roles no pueden abrir su URL |
+| No visible | Oculto para todos | Nadie puede abrir su URL |
+
+<Screenshot src="asset:node-form.webp" alt="El formulario de un elemento, con su visibilidad, los roles permitidos y la opción de bloquear la URL" caption="Un elemento restringido a dos roles, con su URL bloqueada para todos los demás." url="/local/extendednav/edit.php" />
+
+## Idiomas
+
+Un elemento limitado a **idiomas** solo se muestra a los usuarios cuyo idioma actual es uno de ellos (el español `es` incluye también el español de México `es_mx`). Los idiomas nunca bloquean una URL, porque los usuarios pueden cambiar de idioma por sí mismos.
+
+Para traducir un elemento, cree un elemento por idioma: por ejemplo `help_en` para inglés y `help_es` para español, con la misma URL o con una traducida.
+
+## Submenús
+
+Un elemento puede tener un **padre**, para mostrarlo en el submenú de ese elemento. El plugin ofrece un nivel de submenús en ambos menús. Un elemento que tiene elementos de submenú abre su submenú en lugar de seguir su URL; la lista marca su URL con un icono de advertencia, y la URL sigue contando para el bloqueo.
+
+## El elemento activo
+
+Un elemento se muestra como pestaña activa en su página, también cuando la página añade parámetros a su URL: un elemento que enlaza con `/user/profile.php` está activo en `/user/profile.php?id=2`.

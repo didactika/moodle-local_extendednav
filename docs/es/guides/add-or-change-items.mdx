@@ -1,0 +1,38 @@
+---
+title: Añadir o cambiar elementos
+summary: Cree un elemento, o cambie uno de Moodle, en la navegación principal o en el menú de usuario.
+order: 30
+---
+
+Vaya a **Administración del sitio > Apariencia > Extended navigation > Gestionar la navegación**. Las pestañas **Navegación principal** y **Menú de usuario** listan los elementos de cada menú, con filtros por título, clave de nodo o URL, por padre y por visibilidad.
+
+<Screenshot src="asset:manage-usermenu.webp" alt="La pestaña del menú de usuario, con los elementos de Moodle y los elementos añadidos por el plugin" caption="La pestaña del menú de usuario." url="/local/extendednav/manage.php" />
+
+Se necesita la capacidad `local/extendednav:manage`, o ser administrador del sitio.
+
+## Añadir o cambiar un elemento
+
+Seleccione **Añadir nodo**, o el icono de edición de un elemento.
+
+- Para un elemento nuevo, elija una **Clave del nodo** (letras, números, guiones bajos y guiones), un **Título** y una **URL**.
+- Para un elemento de Moodle, cambie solo lo necesario. Los campos vacíos conservan los valores de Moodle.
+- Elija la **Visibilidad**, los **Roles permitidos** de un elemento restringido y si se **Bloquea el acceso a la URL**.
+- Opcionalmente, limite el elemento a algunos **Idiomas**, añada una **Ayuda emergente** o un **Icono**. El cuadrado junto al campo abre una lista con búsqueda de iconos de Moodle y de FontAwesome.
+- Elija cómo se abre con **Mostrar**: **Ventana actual**, **Ventana nueva** o **Ventana emergente**, con su ancho y su alto (620 × 450 píxeles de forma predeterminada).
+- Elija un **Padre** para mostrar el elemento en el submenú de ese elemento.
+
+<Screenshot src="asset:node-form.webp" alt="El formulario de un elemento" caption="El formulario de un elemento." url="/local/extendednav/edit.php" />
+
+## Eliminar un elemento
+
+Seleccione el icono de eliminación de un elemento. Un elemento de Moodle que se elimina vuelve como un elemento nuevo si Moodle lo añade de nuevo. Consulte [Los elementos de Moodle](page:concepts/moodles-own-items).
+
+## Qué rechaza el formulario
+
+El formulario rechaza los cambios que dejarían a todos los usuarios sin una página de destino, y la Administración del sitio nunca puede ocultarse ni anidarse.
+
+## Compruebe el resultado
+
+La navegación principal y el menú de usuario muestran el cambio al instante. Un elemento limitado a idiomas solo aparece a los usuarios de esos idiomas.
+
+<Screenshot src="asset:user-menu.webp" alt="El menú de usuario con un elemento añadido por el plugin" caption="El menú de usuario con el elemento Support." url="/my/" />

@@ -1,0 +1,34 @@
+---
+title: Ajustes y capacidades
+summary: El ajuste del plugin, su capacidad y lo que almacena.
+order: 40
+---
+
+## Ajustes
+
+Los ajustes están en **Administración del sitio > Apariencia > Extended navigation > Ajustes**. La página requiere `moodle/site:config`.
+
+<Screenshot src="asset:settings.webp" alt="La página de ajustes de Extended navigation, con el ajuste Activar" caption="El único ajuste del plugin." url="/admin/settings.php?section=local_extendednav_settings" />
+
+| Ajuste | Valor predeterminado | Descripción |
+|---|---|---|
+| Activar | Activado | Aplica los elementos y el bloqueo de URL. Cuando está desactivado, Moodle muestra su navegación sin cambios y no se bloquea ninguna página |
+
+## Capacidades
+
+| Capacidad | Roles predeterminados | Permite al usuario |
+|---|---|---|
+| `local/extendednav:manage` | Ninguno | Gestionar los elementos, importar, exportar y ver el registro de actividad, en el contexto del sistema |
+
+Los usuarios que tienen esta capacidad encuentran la página de gestión en el mismo lugar que los administradores.
+
+> [!WARNING]
+> Quien tenga `local/extendednav:manage` decide el menú de cada usuario y qué páginas se bloquean. Concédala solo a personas en quienes confiaría para la navegación del sitio.
+
+## Privacidad
+
+El plugin almacena elementos de navegación, no datos personales, e implementa la API de privacidad como proveedor nulo.
+
+## Copia de seguridad
+
+Los elementos son configuración del sitio y no forman parte de las copias de seguridad de los cursos. Use la exportación YAML para copiarlos.

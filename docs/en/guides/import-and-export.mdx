@@ -1,0 +1,21 @@
+---
+title: Import and export
+summary: Copy the navigation from one site to another with YAML files.
+order: 50
+---
+
+## Export
+
+On the management page, use **Export all**, or select some items and **Export selected**, to download a `.yaml` file.
+
+## Import
+
+On the other site, select **Import** and upload the file (`.yaml` or `.yml`). In **Existing nodes**, choose whether the items that already exist are kept or replaced.
+
+<Screenshot src="asset:import.webp" alt="The import page, with the field for the YAML file and the choice for the existing items" caption="The import page." url="/local/extendednav/import.php" />
+
+- The whole file is checked before anything is saved. If any item is not valid, the page lists each one with the reason and nothing is imported.
+- Each item keeps its position, so a whole menu is imported in the same order. An item without a position keeps its place, or goes last when it is new.
+- A language that is not installed on the site gives a warning, and the item is imported.
+
+**See the YAML format** on the import page describes every field and offers an example file. The same description is in [The YAML format](page:reference/yaml-format).

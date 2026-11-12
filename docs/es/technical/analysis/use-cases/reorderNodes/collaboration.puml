@@ -1,0 +1,18 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Management page" as screen <<boundary>>
+class "Reorder service" as service <<control>>
+class "Node manager" as manager <<control>>
+class "Node" as node <<entity>>
+
+user --> screen : 1: drags an item
+screen --> service : 2: menu, ordered ids
+service --> manager : 3: reorder(menu, ids)
+manager --> node : 4: new positions, parents kept with their submenus
+
+@enduml

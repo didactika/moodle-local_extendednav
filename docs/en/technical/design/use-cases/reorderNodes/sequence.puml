@@ -1,0 +1,20 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+actor "Administrator" as actor
+participant "manage.js" as js
+participant "reorder_nodes" as service
+participant "node_manager" as manager
+database "local_extendednav" as table
+
+actor -> js : drags an item, or chooses a position
+js -> service : menu, ordered ids
+service -> manager : reorder(menu, ids)
+manager -> table : the new position of each item
+manager --> service : done
+service --> js : ok
+js --> actor : the list in the new order
+
+@enduml

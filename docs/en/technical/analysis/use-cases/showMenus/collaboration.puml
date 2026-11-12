@@ -1,0 +1,18 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Moodle" as user <<actor>>
+class "Hooks" as hooks <<control>>
+class "Menu" as menu <<control>>
+class "Node access" as access <<control>>
+class "Node" as node <<entity>>
+
+user --> hooks : 1: primary_extend, before_standard_head
+hooks --> menu : 2: inject_nodes, build_config_value
+menu --> node : 3: the nodes of the menu
+menu --> access : 4: is the node shown to this user and language
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+package "Entry points" {
+  class "manage.php, edit.php, import.php" as pages
+  class reorder_nodes
+  class get_icons
+  class hooks
+  class observer
+}
+package "Services" {
+  class node_manager
+  class node_validator
+  class node_importer
+  class node_repository
+  class node_access
+  class access_guard
+  class url_helper
+  class menu_manager
+  class yaml
+}
+package "Menus" {
+  class primary
+  class usermenu
+}
+
+pages --> node_manager
+pages --> node_importer
+reorder_nodes --> node_manager
+hooks --> menu_manager
+hooks --> access_guard
+observer --> node_manager
+node_manager --> node_repository
+node_manager --> node_validator
+node_importer --> node_validator
+node_importer --> yaml
+access_guard --> node_access
+access_guard --> url_helper
+menu_manager --> primary
+menu_manager --> usermenu
+primary --> node_access
+usermenu --> node_access
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Moodle" as user <<actor>>
+class "Hooks" as hooks <<control>>
+class "Access guard" as guard <<control>>
+class "Node access" as access <<control>>
+class "Restricted page" as page <<boundary>>
+class "Node" as node <<entity>>
+
+user --> hooks : 1: before_http_headers
+hooks --> guard : 2: check(page)
+guard --> node : 3: the nodes that block
+guard --> access : 4: may this user see each one
+guard --> page : 5: redirect, or explain
+
+@enduml

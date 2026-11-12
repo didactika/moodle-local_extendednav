@@ -1,0 +1,25 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+actor "Administrator" as actor
+participant "edit.php" as page
+participant "node_form" as form
+participant "node_validator" as validator
+participant "node_manager" as manager
+database "local_extendednav" as table
+
+actor -> page : fields of the item
+page -> form : get_data()
+form -> validator : validate(node, others)
+alt not valid
+  validator --> actor : the error under the field
+else
+  page -> manager : create / update
+  manager -> table : insert or update
+  manager -> manager : trigger node_created / node_updated
+  manager --> actor : the list again
+end
+
+@enduml

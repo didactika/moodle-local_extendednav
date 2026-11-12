@@ -1,0 +1,38 @@
+---
+title: Add or change items
+summary: Create an item, or change one of Moodle, in the primary navigation or in the user menu.
+order: 30
+---
+
+Go to **Site administration > Appearance > Extended navigation > Manage navigation**. The tabs **Primary navigation** and **User menu** list the items of each menu, with filters by title, node key or URL, by parent and by visibility.
+
+<Screenshot src="asset:manage-usermenu.webp" alt="The tab of the user menu, with the items of Moodle and the items added by the plugin" caption="The tab of the user menu." url="/local/extendednav/manage.php" />
+
+You need the capability `local/extendednav:manage`, or to be a site administrator.
+
+## Add or change an item
+
+Select **Add node**, or the edit icon of an item.
+
+- For a new item, choose a **Node key** (letters, numbers, underscores and hyphens), a **Title** and a **URL**.
+- For an item of Moodle, change only what you need. The empty fields keep the values of Moodle.
+- Choose the **Visibility**, the **Allowed roles** of a restricted item and whether to **Block URL access**.
+- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**. The square next to the field opens a searchable list of icons of Moodle and FontAwesome.
+- Choose how it opens with **Display**: **Current window**, **New window** or **Pop-up**, with its width and height (620 × 450 pixels by default).
+- Choose a **Parent** to show the item in the submenu of that item.
+
+<Screenshot src="asset:node-form.webp" alt="The form of an item" caption="The form of an item." url="/local/extendednav/edit.php" />
+
+## Delete an item
+
+Select the delete icon of an item. An item of Moodle that is deleted comes back as a new item if Moodle adds it again. See [The items of Moodle](page:concepts/moodles-own-items).
+
+## What the form refuses
+
+The form refuses the changes that would leave every user without a landing page, and Site administration can never be hidden or nested.
+
+## Check the result
+
+The primary navigation and the user menu show the change at once. An item that is limited to languages appears only to the users of those languages.
+
+<Screenshot src="asset:user-menu.webp" alt="The user menu with an item added by the plugin" caption="The user menu with the item Support." url="/my/" />

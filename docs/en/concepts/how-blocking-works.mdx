@@ -1,0 +1,33 @@
+---
+title: How blocking works
+summary: What happens when a user opens the URL of an item they cannot see.
+order: 20
+---
+
+An item with **Block URL access** stops the users who cannot see it from opening its page, not only from seeing it in the menu.
+
+## Where a blocked user goes
+
+A user who opens a blocked URL is sent to the first of these pages that they are allowed to open:
+
+1. The Dashboard.
+2. The Site home.
+3. My courses.
+4. The default home page, when it is set to a URL.
+
+When all of them are blocked for the user, they see a page that explains that the page is not available.
+
+## What blocking covers
+
+- An item that the user can see opens its URL again, even when another item blocks it.
+- A URL with query parameters only blocks the pages that have those parameters: `/course/view.php?id=5` blocks course 5, not course 6.
+- External URLs are never blocked.
+- Site administrators are never blocked, and neither are the pages of administration, of login and of plugins.
+
+## Safety checks
+
+The form refuses the changes that would leave every user without a landing page, and Site administration can never be hidden or nested.
+
+## Turning blocking off
+
+The setting **Enable** of the plugin applies the items and the blocking. When it is off, Moodle shows its navigation unchanged and no page is blocked.
