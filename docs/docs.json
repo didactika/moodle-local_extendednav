@@ -1,0 +1,11 @@
+{
+  "kind": "plugin",
+  "slug": "local-extendednav",
+  "title": { "en": "Extended navigation", "es": "Navegación extendida" },
+  "summary": {
+    "en": "Shape the primary navigation and the user menu, and keep users on the pages meant for them.",
+    "es": "Dé forma a la navegación principal y al menú de usuario, y mantenga a los usuarios en las páginas que les corresponden."
+  },
+  "directory": { "published": "auto", "url": null },
+  "translations": { "source": "l10n" }
+}
