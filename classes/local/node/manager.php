@@ -38,7 +38,7 @@ class manager {
     /** @var string[] Fields an administrator can set on a node. */
     public const EDITABLE_FIELDS = [
         'nodekey', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
+        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins', 'availability',
     ];
 
     /**
@@ -92,6 +92,9 @@ class manager {
 
         $placement = isset($data['placement']) && is_numeric($data['placement']) ? (int)$data['placement'] : 0;
         $record->placement = in_array($placement, [0, 1, 2], true) ? $placement : 0;
+        // The conditions are kept as given; the validator says when they are not valid ones.
+        $conditions = is_string($data['availability'] ?? null) ? trim($data['availability']) : '';
+        $record->availability = $conditions === '' ? null : $conditions;
         // A node of the site administration is hidden from administrators too unless the data says otherwise.
         if (array_key_exists('hideadmins', $data)) {
             $record->hideadmins = empty($data['hideadmins']) ? 0 : 1;

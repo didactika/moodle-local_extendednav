@@ -19,6 +19,7 @@ namespace local_extendednav\local\listing;
 use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
 use local_extendednav\local\node\access;
+use local_extendednav\local\node\availability;
 use local_extendednav\local\node\icon;
 use local_extendednav\local\node\manager;
 use local_extendednav\local\node\repository;
@@ -288,6 +289,10 @@ class nodes {
             access::VISIBILITY_HIDDEN => ['vis_hidden', 'danger'],
         ];
         [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[access::VISIBILITY_HIDDEN];
+        // A node for everyone that has conditions is shown only to whoever meets them.
+        if ($visibility === access::VISIBILITY_ALL && trim((string)($node->availability ?? '')) !== '') {
+            [$visibilitystring, $tone] = ['vis_conditional', 'warning'];
+        }
 
         $protected = access::is_protected($node);
         // What narrows the visibility: a short flag for each kind of restriction, shown beside the visibility, and a whole line
@@ -321,6 +326,17 @@ class nodes {
         }
         if (!empty($native->moodlehidden)) {
             $restrict('hidden_by_moodle', get_string('hidden_by_moodle', 'local_extendednav'));
+        }
+        // The conditions of Moodle's Restrict access, in its words; a node with dates says whether it is still to come or over.
+        $conditions = availability::describe($node);
+        if ($conditions !== '') {
+            $restrict('flag_conditions', $conditions);
+        }
+        $period = availability::period($node);
+        if ($period && $period['state'] === 'scheduled') {
+            $restrict('flag_scheduled', get_string('period_scheduled', 'local_extendednav', userdate($period['from'])));
+        } else if ($period && $period['state'] === 'ended') {
+            $restrict('flag_ended', get_string('period_ended', 'local_extendednav', userdate($period['until'])));
         }
         if ($protected) {
             $restrict('flag_protected', get_string('flag_protected_help', 'local_extendednav'));

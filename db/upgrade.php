@@ -103,5 +103,17 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112504, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112505) {
+        // The conditions of a node, as Moodle's Restrict access writes them.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('local_extendednav');
+        $field = new xmldb_field('availability', XMLDB_TYPE_TEXT, null, null, null, null, null, 'hideadmins');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026112505, 'local', 'extendednav');
+    }
+
     return true;
 }

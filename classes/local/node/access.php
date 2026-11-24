@@ -163,7 +163,7 @@ class access {
 
         $visibility = (int)$node->visibility;
         if ($visibility === self::VISIBILITY_ALL) {
-            return true;
+            return availability::allows($node, $userid);
         }
         if ($visibility !== self::VISIBILITY_ROLES) {
             return false;
@@ -174,7 +174,8 @@ class access {
             return false;
         }
         $userroles = self::get_user_roles($userid ?? (int)$USER->id);
-        return !empty(array_intersect($allowed, $userroles));
+        // The roles and the conditions both have to let the user see the node.
+        return !empty(array_intersect($allowed, $userroles)) && availability::allows($node, $userid);
     }
 
     /**
