@@ -33,7 +33,7 @@ use local_extendednav\local\navigation\context_scope;
  */
 function local_extendednav_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context): void {
     $scope = context_scope::from_id((int)$context->id);
-    if ($scope === null || !$scope->can_manage()) {
+    if ($scope === null || !$scope->can_view()) {
         return;
     }
     $navigation->add(
@@ -54,7 +54,7 @@ function local_extendednav_extend_navigation_course(navigation_node $navigation,
  */
 function local_extendednav_extend_navigation_category_settings(navigation_node $navigation, context_coursecat $context): void {
     $scope = context_scope::from_id((int)$context->id);
-    if ($scope === null || !$scope->can_manage()) {
+    if ($scope === null || !$scope->can_view()) {
         return;
     }
     $navigation->add(
@@ -79,7 +79,7 @@ function local_extendednav_extend_settings_navigation(settings_navigation $navig
     }
     $settings = $navigation->find('modulesettings', navigation_node::TYPE_SETTING);
     $scope = $settings ? context_scope::from_id((int)$context->id) : null;
-    if ($scope === null || !$scope->can_manage()) {
+    if ($scope === null || !$scope->can_view()) {
         return;
     }
     $settings->add(

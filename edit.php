@@ -59,9 +59,18 @@ if ($contextid !== 0 && !nodes::supports_scopes($menukey)) {
 // A node of a category, a course or an activity is changed by whoever manages the navigations of that context, on its pages;
 // the nodes of the site, in the site administration.
 $scope = $contextid ? context_scope::from_id($contextid) : null;
+$locked = [];
 if ($scope !== null) {
     $scope->login();
     $scope->require_manage();
+    // A node of its own needs the capability that adds them; the fields of each kind of change, the one of that kind.
+    if (!$id && $nodekey === '' && !$scope->can('addnodes')) {
+        require_capability('local/extendednav:addnodes', $scope->context());
+    }
+    $locked = $scope->locked_fields();
+    if (count($locked) === count(array_merge(...array_values(context_scope::CHANGES)))) {
+        require_capability('local/extendednav:changevisibility', $scope->context());
+    }
     $PAGE->set_pagelayout('admin');
 } else {
     $contextid = 0;
@@ -89,7 +98,7 @@ $manageurl = $scope !== null ? $scope->url($menukey) : new moodle_url('/local/ex
 $source = $node ?? $inherited;
 $form = new \local_extendednav\form\node_form(
     $url,
-    ['menu' => $menukey, 'node' => $source, 'contextid' => $contextid]
+    ['menu' => $menukey, 'node' => $source, 'contextid' => $contextid, 'locked' => $locked]
 );
 
 if ($source) {
@@ -115,6 +124,10 @@ if ($form->is_cancelled()) {
     }
     $record = manager::prepare($data, $menukey);
     $record->contextid = $contextid;
+    // What the user may not change keeps the value it had, whatever the request said.
+    foreach ($locked as $field) {
+        $record->$field = $source ? ($source->$field ?? null) : null;
+    }
 
     if ($node) {
         $record->id = $node->id;

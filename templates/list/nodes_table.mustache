@@ -36,7 +36,7 @@
                 "flags": [{"label": "Roles", "detail": "Roles: teacher"}], "details": ["Roles: teacher"], "hasdetails": true,
                 "visibilitydetail": "Shown only to the roles chosen.",
                 "exception": false, "inherited": false, "candelete": false, "canhide": true, "canshow": true,
-                "isselected": false, "editurl": "#", "depth": 0, "haschildren": false, "virtual": false,
+                "isselected": false, "editurl": "#", "canedit": true, "depth": 0, "haschildren": false, "virtual": false,
                 "openlabel": "Open Grades", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
                 "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": false,
                 "selectable": true, "canmove": true, "draglabel": "Drag Grades to move it"
@@ -98,7 +98,8 @@
                         <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">
                             {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-body" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
                             {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{^canshow}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/canshow}}{{/canhide}}
-                            <a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
+                            {{#canedit}}<a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>{{/canedit}}
+                            {{^canedit}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/canedit}}
                             {{#candelete}}<button type="button" class="btn btn-link btn-icon btn-sm text-danger" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>{{/candelete}}
                             {{^candelete}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/candelete}}
                         </span>

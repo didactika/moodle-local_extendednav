@@ -162,6 +162,9 @@ class nodes {
                 $parents[(string)$node->parentkey] = true;
             }
         }
+        // In a category, a course or an activity, each action takes the capability of its kind of change.
+        $scope = $contextid ? \local_extendednav\local\navigation\context_scope::from_id($contextid) : null;
+        $can = $scope ? $scope->abilities() : null;
         $rows = [];
         if ($level && $parent === '' && !empty($general) && empty($wanted) && count($origins) !== 1 && !$restrictions) {
             $rows[] = self::general_row();
@@ -170,11 +173,19 @@ class nodes {
             $row = self::export_row($menu, $node, $contextid, $siblings);
             $row['haschildren'] = $istree && isset($parents[$node->nodekey]);
             $row['depth'] = $istree ? self::depth_of($all, $node) : ($row['child'] ? 1 : 0);
+            $row['canedit'] = true;
+            if ($can !== null) {
+                $row['canhide'] = $row['canhide'] && $can['changevisibility'];
+                $row['canshow'] = $row['canshow'] && $can['changevisibility'];
+                $row['candelete'] = $row['candelete'] && $can['deletenodes'];
+                $changes = array_intersect_key($can, \local_extendednav\local\navigation\context_scope::CHANGES);
+                $row['canedit'] = (bool)array_filter($changes);
+            }
             $rows[] = $row;
         }
         // Moving a node only makes sense in a whole list, not in a part of it; in the tree, the whole level shown.
         $reorderable = trim($search) === '' && $visibility === '' && count($origins) !== 1 && !$restrictions
-            && ($istree || $parent === '');
+            && ($istree || $parent === '') && ($can === null || $can['changeorder']);
         $path = [];
         if ($ingeneral) {
             $path = [['key' => admintree::GENERAL, 'title' => get_string('general')]];
@@ -205,6 +216,7 @@ class nodes {
             'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
             'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
+            'canedit' => false,
             'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true,
         ];
     }

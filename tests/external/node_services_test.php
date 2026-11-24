@@ -188,6 +188,50 @@ final class node_services_test extends \advanced_testcase {
     }
 
     /**
+     * Each kind of change takes its own capability in a course: a teacher who may order the nodes but not hide them sees the
+     * list with the order and without the eye, and is refused when hiding; one who may only see the navigation sees it.
+     */
+    public function test_each_change_takes_its_capability(): void {
+        $this->prepare();
+        $course = $this->getDataGenerator()->create_course();
+        $context = \context_course::instance($course->id);
+        $teacher = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'student');
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('local/extendednav:managecontext', CAP_ALLOW, $roleid, $context);
+        assign_capability('local/extendednav:changeorder', CAP_ALLOW, $roleid, $context);
+        role_assign($roleid, $teacher->id, $context);
+        $this->setUser($teacher);
+
+        $list = external_api::clean_returnvalue(get_nodes::execute_returns(), get_nodes::execute('course', $context->id));
+        $this->assertTrue($list['reorderable']);
+        $this->assertFalse($list['rows'][0]['canhide'], 'Hiding takes its own capability.');
+        $scope = \local_extendednav\local\navigation\context_scope::from_id($context->id);
+        $this->assertTrue($scope->can('changeorder'));
+        $this->assertFalse($scope->can('changevisibility'));
+        $this->assertContains('visibility', $scope->locked_fields());
+        $this->assertNotContains('parentkey', $scope->locked_fields());
+
+        try {
+            change_nodes::set_visibility('course', $context->id, ['one'], access::VISIBILITY_HIDDEN);
+            $this->fail('Hiding needs local/extendednav:changevisibility.');
+        } catch (\required_capability_exception $e) {
+            $this->assertSame('local/extendednav:changevisibility', $e->a['capability'] ?? 'local/extendednav:changevisibility');
+        }
+
+        // A teacher who may only see the navigation of the course reads it and changes nothing.
+        $viewer = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($viewer->id, $course->id, 'student');
+        $viewrole = $this->getDataGenerator()->create_role();
+        assign_capability('local/extendednav:viewcontext', CAP_ALLOW, $viewrole, $context);
+        role_assign($viewrole, $viewer->id, $context);
+        $this->setUser($viewer);
+        $this->assertNotEmpty(get_nodes::execute('course', $context->id)['rows']);
+        $this->expectException(\required_capability_exception::class);
+        change_nodes::place('course', $context->id, ['one'], '', 'two');
+    }
+
+    /**
      * Whoever manages the navigation of a course changes its exceptions, and only there.
      */
     public function test_a_course_manager_changes_only_their_course(): void {
@@ -197,6 +241,7 @@ final class node_services_test extends \advanced_testcase {
         $teacher = $this->getDataGenerator()->create_user();
         $roleid = $this->getDataGenerator()->create_role();
         assign_capability('local/extendednav:managecontext', CAP_ALLOW, $roleid, \context_course::instance($course->id));
+        assign_capability('local/extendednav:changevisibility', CAP_ALLOW, $roleid, \context_course::instance($course->id));
         role_assign($roleid, $teacher->id, \context_course::instance($course->id));
         // Enrolled in both courses, so only the capability tells them apart.
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'student');
