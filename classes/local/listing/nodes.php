@@ -329,7 +329,10 @@ class nodes {
         }
         // The conditions of Moodle's Restrict access, in its words; a node with dates says whether it is still to come or over.
         $conditions = availability::describe($node);
-        if ($conditions !== '') {
+        if ($conditions !== '' && $visibility === access::VISIBILITY_ALL) {
+            // The badge of the visibility already says With conditions; the tooltip gives them.
+            $details[] = $conditions;
+        } else if ($conditions !== '') {
             $restrict('flag_conditions', $conditions);
         }
         $period = availability::period($node);

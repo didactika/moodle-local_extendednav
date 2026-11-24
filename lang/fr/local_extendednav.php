@@ -34,6 +34,7 @@ $string['activity_from'] = 'Du';
 $string['activity_log'] = 'Journal d’activité';
 $string['activity_node'] = 'Nœud';
 $string['activity_nolog'] = 'Le journal standard est désactivé, les modifications ne sont donc pas enregistrées. Activez-le dans Administration du site > Plugins > Journalisation.';
+$string['activity_report'] = 'Activité de la navigation étendue';
 $string['activity_search'] = 'Rechercher par clé du nœud ou personne';
 $string['activity_to'] = 'Au';
 $string['add_node'] = 'Ajouter un nœud';

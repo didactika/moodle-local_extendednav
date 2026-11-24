@@ -34,6 +34,7 @@ $string['activity_from'] = 'Dal';
 $string['activity_log'] = 'Registro delle attività';
 $string['activity_node'] = 'Nodo';
 $string['activity_nolog'] = 'Il log standard è disattivato, quindi le modifiche non vengono registrate. Attivalo in Amministrazione del sito > Plugin > Log.';
+$string['activity_report'] = 'Attività della navigazione estesa';
 $string['activity_search'] = 'Cerca per chiave del nodo o persona';
 $string['activity_to'] = 'Al';
 $string['add_node'] = 'Aggiungi nodo';

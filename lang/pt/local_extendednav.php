@@ -34,6 +34,7 @@ $string['activity_from'] = 'De';
 $string['activity_log'] = 'Registo de atividade';
 $string['activity_node'] = 'Nó';
 $string['activity_nolog'] = 'O registo padrão está desativado, pelo que as alterações não são registadas. Ative-o em Administração do site > Plugins > Registos.';
+$string['activity_report'] = 'Atividade da navegação alargada';
 $string['activity_search'] = 'Pesquisar por chave do nó ou pessoa';
 $string['activity_to'] = 'Até';
 $string['add_node'] = 'Adicionar nó';

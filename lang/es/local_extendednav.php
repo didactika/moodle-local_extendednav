@@ -34,6 +34,7 @@ $string['activity_from'] = 'Desde';
 $string['activity_log'] = 'Registro de actividad';
 $string['activity_node'] = 'Nodo';
 $string['activity_nolog'] = 'El registro estándar está desactivado, así que los cambios no se registran. Actívelo en Administración del sitio > Extensiones > Registros.';
+$string['activity_report'] = 'Actividad de la navegación ampliada';
 $string['activity_search'] = 'Buscar por clave del nodo o persona';
 $string['activity_to'] = 'Hasta';
 $string['add_node'] = 'Añadir nodo';

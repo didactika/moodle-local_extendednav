@@ -39,6 +39,13 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/manage.php'),
         'local/extendednav:manage'
     ));
+    // The changes to the navigation are a report, with the other reports of the site.
+    $ADMIN->add('reports', new admin_externalpage(
+        'local_extendednav_activity',
+        get_string('activity_report', 'local_extendednav'),
+        new moodle_url('/local/extendednav/activity.php'),
+        'local/extendednav:manage'
+    ));
 }
 
 // The site administration as the plugin shapes it: names, hidden pages and the order of each category. Moodle is building the

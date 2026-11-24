@@ -31,7 +31,7 @@ use local_extendednav\menu_manager;
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-admin_externalpage_setup('local_extendednav_manage');
+admin_externalpage_setup('local_extendednav_activity');
 
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 $menu = menu_manager::get_menu($menukey);
@@ -41,10 +41,8 @@ if ($menu === null) {
 }
 
 $PAGE->set_url(new moodle_url('/local/extendednav/activity.php', ['menu' => $menukey]));
-$PAGE->set_title(get_string('activity_log', 'local_extendednav') . ' - ' . $menu->get_name());
-$PAGE->set_heading(get_string('activity_log', 'local_extendednav'));
-$PAGE->navbar->add(get_string('activity_log', 'local_extendednav'));
-$PAGE->set_secondary_active_tab('appearance');
+$PAGE->set_title(get_string('activity_report', 'local_extendednav') . ' - ' . $menu->get_name());
+$PAGE->set_heading(get_string('activity_report', 'local_extendednav'));
 
 $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/activity.php');
 
