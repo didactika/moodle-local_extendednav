@@ -33,6 +33,9 @@ namespace local_extendednav;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class menu_manager {
+    /** @var string Key of the page that lists the kinds of activity, which is no navigation. */
+    public const ACTIVITIES = 'activities';
+
     /** @var string[] The icon of Moodle that stands for each navigation in the column; a kind of activity has its own. */
     private const ICONS = [
         'primary' => 'i/menu', 'usermenu' => 'i/user', 'frontpage' => 'i/home', 'course' => 'i/course',
@@ -175,45 +178,79 @@ class menu_manager {
         foreach ($lists as $string => $keys) {
             if ($entries = $items($keys)) {
                 $label = get_string($string, 'local_extendednav');
-                $origins[] = ['label' => $label, 'items' => $entries, 'picker' => false];
+                $origins[] = ['label' => $label, 'items' => $entries];
                 $options[] = ['label' => $label, 'options' => array_map($option, $entries)];
             }
         }
 
-        // The kinds of activity: a select with a search, the kinds the site uses in a group of their own.
-        $used = $items($activities['used']);
-        $others = $items($activities['others']);
-        if ($used || $others) {
+        // The kinds of activity are many: the column has one entry, Activities, which opens the list of the kinds, and stays open
+        // while the navigation of one of them is shown. A select lists the kinds themselves, the ones the site uses first.
+        $kinds = array_merge($items($activities['used']), $items($activities['others']));
+        if ($kinds) {
             $label = get_string('origin_group_activity', 'local_extendednav');
-            $groups = [];
-            if ($used) {
-                $groups[] = [
-                    'label' => get_string('origin_kinds_used', 'local_extendednav'),
-                    'options' => array_map($option, $used),
-                ];
-            }
-            if ($others) {
-                $groups[] = [
-                    'label' => get_string('origin_kinds_others', 'local_extendednav'),
-                    'options' => array_map($option, $others),
-                ];
-            }
-            $chosen = array_values(array_filter(array_merge($used, $others), static fn(array $entry): bool => $entry['active']));
-            $origins[] = [
-                'label' => $label,
-                'picker' => true,
-                'pickergroups' => $groups,
-                'pickeractive' => !empty($chosen),
-                'pickeroff' => !empty($chosen) && $chosen[0]['off'],
-            ];
-            $options[] = ['label' => $label, 'options' => array_map($option, array_merge($used, $others))];
+            $onkind = $current === self::ACTIVITIES || str_starts_with($current, \local_extendednav\menu\activity::PREFIX);
+            $origins[] = ['label' => $label, 'items' => [[
+                'key' => self::ACTIVITIES,
+                'name' => $label,
+                'short' => $label,
+                'url' => (new \moodle_url($script, $params + ['menu' => self::ACTIVITIES]))->out(false),
+                'active' => $onkind,
+                'icon' => 'i/activities',
+                'component' => 'core',
+                'off' => false,
+            ]]];
+            $options[] = ['label' => $label, 'options' => array_map($option, $kinds)];
         }
 
         if ($entries = $items(['admin'])) {
             $label = get_string('origin_group_admin', 'local_extendednav');
-            $origins[] = ['label' => $label, 'items' => $entries, 'picker' => false];
+            $origins[] = ['label' => $label, 'items' => $entries];
             $options[] = ['label' => $label, 'options' => array_map($option, $entries)];
         }
         return ['origins' => $origins, 'originoptions' => $options];
+    }
+
+    /**
+     * Returns the kinds of activity as the list of the kinds shows them: the ones the site uses first, each with its icon, the
+     * activities of the site that are of that kind, the items of its navigation, the nodes it changes and whether it is on.
+     *
+     * @param string $script Page each kind opens, such as /local/extendednav/manage.php.
+     * @param array $params Other parameters of the links.
+     * @return array The rows.
+     */
+    public static function get_kind_rows(string $script, array $params = []): array {
+        global $DB;
+
+        $counts = $DB->get_records_sql_menu(
+            'SELECT m.name, COUNT(cm.id)
+               FROM {modules} m
+               JOIN {course_modules} cm ON cm.module = m.id
+              WHERE cm.deletioninprogress = 0
+           GROUP BY m.name'
+        );
+        $changed = $DB->get_records_sql_menu(
+            "SELECT menu, COUNT(1)
+               FROM {local_extendednav}
+              WHERE menu LIKE :prefix AND contextid = 0 AND timemodified > timecreated
+           GROUP BY menu",
+            ['prefix' => \local_extendednav\menu\activity::PREFIX . '%']
+        );
+        $rows = [];
+        foreach (\local_extendednav\menu\activity::types() as $modname => $name) {
+            $menu = new \local_extendednav\menu\activity($modname);
+            $rows[] = [
+                'key' => $menu->get_key(),
+                'name' => $name,
+                'component' => 'mod_' . $modname,
+                'url' => (new \moodle_url($script, $params + ['menu' => $menu->get_key()]))->out(false),
+                'activities' => (int)($counts[$modname] ?? 0),
+                'items' => count($menu->get_native_nodes()),
+                'changed' => (int)($changed[$menu->get_key()] ?? 0),
+                'off' => !self::is_enabled($menu->get_key()),
+            ];
+        }
+        usort($rows, static fn(array $one, array $two): int => [$two['activities'] > 0, $one['name']]
+            <=> [$one['activities'] > 0, $two['name']]);
+        return $rows;
     }
 }

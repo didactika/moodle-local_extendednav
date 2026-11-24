@@ -39,6 +39,7 @@ export const init = (toolbar) => {
         return {count: () => null};
     }
     const panel = group.querySelector('[data-region="filter-panel"]');
+    const head = group.querySelector('[data-region="filter-panel-head"]') || panel;
     const list = group.querySelector(':scope > .dropdown-menu');
     const toggle = group.querySelector(':scope > [data-menu-toggle]');
     const state = {grouped: false, needed: 0, count: 0};
@@ -69,7 +70,7 @@ export const init = (toolbar) => {
         toggle.classList.toggle('border-primary', state.count > 0);
     };
 
-    // While the menus are grouped, the button that clears every filter is the last thing of the group.
+    // While the menus are grouped, the button that clears every filter goes to the head of the group, at its right.
     const reset = toolbar.querySelector('[data-action="clearfilters"]')?.parentElement;
     const resetHome = reset?.parentElement;
 
@@ -86,14 +87,14 @@ export const init = (toolbar) => {
                 state.grouped = true;
                 filters.forEach((child) => panel.appendChild(child));
                 if (reset) {
-                    panel.appendChild(reset);
+                    head.appendChild(reset);
                 }
                 group.hidden = false;
             }
         } else if (room >= state.needed) {
             state.grouped = false;
             open(false);
-            Array.from(panel.children).filter((child) => child !== reset).forEach((child) => box.insertBefore(child, group));
+            Array.from(panel.children).forEach((child) => box.insertBefore(child, group));
             if (reset) {
                 resetHome.appendChild(reset);
             }

@@ -237,3 +237,8 @@
     font-size: 0.8125rem;
     line-height: 1.4;
 }
+
+// The groups of the column of the navigations are apart by a band of the surface, with no name above them.
+.len [data-region="originlist"] > .list-group + .list-group {
+    border-top: 0.375rem solid var(--dd-surface-2);
+}

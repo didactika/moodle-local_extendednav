@@ -103,6 +103,11 @@ class access {
             // The way to the management page of the plugin is never hidden in the site administration.
             return in_array($node->nodekey, \local_extendednav\menu\admintree::PROTECTED, true);
         }
+        // The way into the navigation of a category, a course or an activity (the tab Navigation of the plugin) is never
+        // hidden either: it can be renamed and moved, as Moodle only shows it to whoever may change that navigation.
+        if ($node->nodekey === 'local_extendednav') {
+            return true;
+        }
         return $node->menu === 'primary' && $node->nodekey === 'siteadminnode';
     }
 
