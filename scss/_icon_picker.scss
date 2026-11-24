@@ -1,0 +1,105 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// The icon picker of the form of a node: beside the field, a square button that shows the icon chosen (dashed while there is
+// none); in its dialog, a grid of Bootstrap buttons, one per icon, the one chosen marked as active. Every rule targets a
+// Bootstrap class under a region that the script marks.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+.mform [data-region="iconfield"] {
+    flex: 0 0 100%;
+
+    & > .form-control {
+        flex: 0 1 20rem;
+        width: auto;
+    }
+
+    & > .btn[data-region="icontile"] {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 2.375rem;
+        height: 2.375rem;
+        padding: 0;
+        border-radius: var(--dd-radius-sm, 0.5rem);
+
+        &[data-empty="1"] {
+            border-style: dashed;
+        }
+
+        & .icon {
+            width: auto;
+            height: auto;
+            margin: 0;
+            font-size: 1.15rem;
+        }
+    }
+}
+
+// The list of the dialogs is nested, so each of its selectors gets the region (interpolated, only the last one would).
+#{$len-modal} {
+    & [data-region="iconpicker"] > [data-region="grid"] {
+        grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+        gap: 0.25rem;
+        max-height: 55vh;
+        padding: 0.25rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    & .btn[data-region="iconcell"] {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        min-width: 0;
+        height: 5.75rem;
+        padding: 0.65rem 0.35rem 0.35rem;
+        border-color: transparent;
+        background-color: transparent;
+        line-height: 1.2;
+
+        &:hover {
+            border-color: var(--dd-line);
+            background-color: var(--dd-surface-2, var(--dd-primary-soft));
+        }
+
+        &.active {
+            border-color: var(--dd-primary);
+            background-color: var(--dd-primary-soft);
+            color: var(--dd-primary-ink);
+        }
+    }
+
+    & [data-region="iconglyph"] {
+        display: flex;
+        flex: 0 0 1.75rem;
+        align-items: center;
+        justify-content: center;
+        height: 1.75rem;
+
+        & .icon {
+            width: auto;
+            height: auto;
+            margin: 0;
+            font-size: 1.35rem;
+        }
+    }
+
+    // Two lines at most for the name of an icon.
+    & [data-region="iconlabel"] {
+        display: -webkit-box;
+        max-width: 100%;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    & [data-region="iconsentinel"] {
+        grid-column: 1 / -1;
+        height: 1px;
+    }
+}

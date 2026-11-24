@@ -80,7 +80,7 @@ class display {
     }
 
     /**
-     * Returns the attributes the local_extendednav/link_display module reads, or none for the current window.
+     * Returns the attributes the local_extendednav/menus/link_display module reads, or none for the current window.
      *
      * @param \stdClass $node Node record.
      * @return string[]

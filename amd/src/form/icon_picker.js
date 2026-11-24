@@ -19,7 +19,7 @@
  * The list is loaded once and searched in the browser. Icons are added to the grid in batches as it scrolls, so
  * the thousands of FontAwesome icons cost little more than the first batch.
  *
- * @module     local_extendednav/icon_picker
+ * @module     local_extendednav/form/icon_picker
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -114,7 +114,7 @@ const updatePreview = async(tile, info, value) => {
     tile.dataset.value = value;
     const [identifier, param] = describe(value);
     const empty = identifier === 'icon_info_none' || identifier === 'icon_info_invalid';
-    tile.classList.toggle('local-extendednav-icontile-empty', empty);
+    tile.dataset.empty = empty ? '1' : '';
     tile.replaceChildren();
     getString(identifier, 'local_extendednav', param).then((text) => {
         info.textContent = text;
@@ -154,29 +154,31 @@ const updatePreview = async(tile, info, value) => {
 const buildCell = (icon, current) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'local-extendednav-iconcell';
+    button.className = 'btn btn-light';
+    button.dataset.region = 'iconcell';
     button.dataset.value = icon.value;
     button.title = icon.value;
     button.setAttribute('aria-label', icon.value);
     if (icon.value === current) {
-        button.classList.add('local-extendednav-iconcell-current');
+        button.classList.add('active');
         button.setAttribute('aria-current', 'true');
     }
     const [component, name] = icon.value.includes(':') ? icon.value.split(':', 2) : ['', icon.label];
 
     const glyph = document.createElement('span');
-    glyph.className = 'local-extendednav-iconglyph';
+    glyph.dataset.region = 'iconglyph';
     const element = document.createElement('i');
     element.className = icon.classes;
     element.setAttribute('aria-hidden', 'true');
     glyph.appendChild(element);
     const label = document.createElement('span');
-    label.className = 'local-extendednav-iconlabel';
+    label.className = 'small';
+    label.dataset.region = 'iconlabel';
     label.textContent = name;
     button.append(glyph, label);
     if (component !== '') {
         const small = document.createElement('span');
-        small.className = 'local-extendednav-iconcomponent';
+        small.className = 'small text-muted text-truncate mw-100';
         small.textContent = component;
         button.appendChild(small);
     }
@@ -223,7 +225,7 @@ const openPicker = async(field, onPick) => {
     let matches = [];
     let shown = 0;
     const sentinel = document.createElement('div');
-    sentinel.className = 'local-extendednav-iconsentinel';
+    sentinel.dataset.region = 'iconsentinel';
 
     const showMore = () => {
         const fragment = document.createDocumentFragment();
@@ -295,10 +297,12 @@ export const init = async(fieldName) => {
     ]);
 
     const row = document.createElement('div');
-    row.className = 'local-extendednav-iconfield';
+    row.className = 'd-flex flex-wrap align-items-center gap-2 w-100';
+    row.dataset.region = 'iconfield';
     const tile = document.createElement('button');
     tile.type = 'button';
-    tile.className = 'local-extendednav-icontile';
+    tile.className = 'btn btn-outline-secondary';
+    tile.dataset.region = 'icontile';
     tile.title = choose;
     tile.setAttribute('aria-label', choose);
     const clearButton = document.createElement('button');
@@ -306,7 +310,7 @@ export const init = async(fieldName) => {
     clearButton.className = 'btn btn-link';
     clearButton.textContent = clear;
     const info = document.createElement('div');
-    info.className = 'local-extendednav-iconinfo form-text text-muted';
+    info.className = 'form-text text-muted w-100';
     info.setAttribute('aria-live', 'polite');
     field.before(row);
     row.append(tile, field, clearButton);

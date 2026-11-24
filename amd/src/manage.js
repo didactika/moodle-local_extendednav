@@ -28,7 +28,7 @@ import Ajax from 'core/ajax';
 import {get_strings as getStrings} from 'core/str';
 import List from 'local_extendednav/local/list';
 import {describeError, toast} from 'local_extendednav/local/ui';
-import {init as fitTables} from 'local_extendednav/fit_tables';
+import {init as fitTables} from 'local_extendednav/local/fit_tables';
 import {init as filterGroup} from 'local_extendednav/local/filter_group';
 import {init as popupMenu} from 'local_extendednav/local/popup_menu';
 import {init as initActions} from 'local_extendednav/manage/actions';

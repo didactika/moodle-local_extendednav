@@ -388,7 +388,7 @@ class primary extends base {
         $this->activate_matching_node($customnodes, $states, $primarynav);
 
         if ($needsscript) {
-            $PAGE->requires->js_call_amd('local_extendednav/link_display', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/link_display', 'init');
         }
     }
 

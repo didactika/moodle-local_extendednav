@@ -22,13 +22,14 @@
  * - Hides "Block URL access" for external URLs, which cannot be blocked.
  * - Explains that languages have no effect while the node is not visible.
  *
- * @module     local_extendednav/node_form
+ * @module     local_extendednav/form/node_form
  * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-const HIDDEN_CLASS = 'local-extendednav-hidden';
+// Bootstrap hides the row; Moodle's own rules of the form use the hidden attribute, so the two never undo each other.
+const HIDDEN_CLASS = 'd-none';
 
 /**
  * Returns the label container of a form field.

@@ -136,7 +136,7 @@ class node_form extends \moodleform {
             $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
             $mform->setType('icon', PARAM_TEXT);
             $mform->addHelpButton('icon', 'icon', 'local_extendednav');
-            $PAGE->requires->js_call_amd('local_extendednav/icon_picker', 'init', ['icon']);
+            $PAGE->requires->js_call_amd('local_extendednav/form/icon_picker', 'init', ['icon']);
 
             $mform->addElement('text', 'tooltip', get_string('tooltip', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
             $mform->setType('tooltip', PARAM_TEXT);
@@ -276,7 +276,7 @@ class node_form extends \moodleform {
             'req text-danger',
             ['title' => get_string('requiredelement', 'form')]
         );
-        $PAGE->requires->js_call_amd('local_extendednav/node_form', 'init', [[
+        $PAGE->requires->js_call_amd('local_extendednav/form/node_form', 'init', [[
             'placeholders' => $menu->get_placeholders(),
             'customKeys' => $customkeys,
             'requiredHtml' => $required,

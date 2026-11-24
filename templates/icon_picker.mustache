@@ -17,7 +17,7 @@
 {{!
     @template local_extendednav/icon_picker
 
-    Body of the icon picker dialogue. The local_extendednav/icon_picker module fills the grid.
+    Body of the icon picker dialogue. The local_extendednav/form/icon_picker module fills the grid.
 
     Context variables required for this template:
     * tabs - Lists of icons, each with key, label and active
@@ -31,7 +31,7 @@
         ]
     }
 }}
-<div class="local-extendednav-iconpicker">
+<div data-region="iconpicker">
     <input type="search" class="form-control mb-3" data-region="search"
         placeholder="{{#str}} icon_search, local_extendednav {{/str}}" aria-label="{{#str}} icon_search, local_extendednav {{/str}}">
     <div class="btn-group mb-3" role="group" aria-label="{{#str}} icon_picker, local_extendednav {{/str}}">
@@ -43,5 +43,5 @@
     <p class="text-muted" data-region="loading">{{#str}} icon_loading, local_extendednav {{/str}}</p>
     <div class="alert alert-info" data-region="unavailable" hidden>{{#str}} icon_unavailable, local_extendednav {{/str}}</div>
     <p class="text-muted" data-region="empty" hidden>{{#str}} icon_noresults, local_extendednav {{/str}}</p>
-    <div class="local-extendednav-icongrid" data-region="grid"></div>
+    <div class="d-grid" data-region="grid"></div>
 </div>

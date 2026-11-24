@@ -16,7 +16,7 @@
 /**
  * Normalises responsive Moodle form controls used in compact plugin surfaces.
  *
- * @module     local_extendednav/form_layout
+ * @module     local_extendednav/form/form_layout
  * @author     Hector Arrechea <hectorlazaroarrechea@gmail.com>
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

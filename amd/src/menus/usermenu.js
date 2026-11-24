@@ -19,14 +19,14 @@
  * Moodle builds the user menu from "text|url" lines only, so the server prints
  * template elements describing the extras and this module applies them.
  *
- * @module     local_extendednav/usermenu
+ * @module     local_extendednav/menus/usermenu
  * @copyright  2026 Didactika.org
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 import $ from 'jquery';
-import {init as initLinkDisplay} from 'local_extendednav/link_display';
+import {init as initLinkDisplay} from 'local_extendednav/menus/link_display';
 
 let initialised = false;
 

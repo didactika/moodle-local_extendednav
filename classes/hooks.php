@@ -130,7 +130,7 @@ class hooks {
         $html = $usermenu->build_browser_templates(repository::get_menu_nodes('usermenu'), $hook->renderer);
         if ($html !== '') {
             $hook->add_html($html);
-            $PAGE->requires->js_call_amd('local_extendednav/usermenu', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/usermenu', 'init');
         }
     }
 

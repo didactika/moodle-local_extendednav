@@ -19,7 +19,7 @@
  * page. It is one height whatever the table holds, at least 18rem, measured again when the window changes size or what is
  * above it moves it.
  *
- * @module     local_extendednav/fit_tables
+ * @module     local_extendednav/local/fit_tables
  * @copyright  2026 Didactika.org
  * @author     Hector Arrechea <hectorlazaroarrechea@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

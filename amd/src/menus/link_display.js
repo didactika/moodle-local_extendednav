@@ -21,7 +21,7 @@
  * attributes. Clicks are handled on the document, so the copies the "More" menu and the mobile drawer
  * make of the links work too.
  *
- * @module     local_extendednav/link_display
+ * @module     local_extendednav/menus/link_display
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
