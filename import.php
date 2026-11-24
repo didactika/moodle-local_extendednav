@@ -50,6 +50,9 @@ $problems = [];
 if ($form->is_cancelled()) {
     redirect($manageurl);
 } else if ($data = $form->get_data()) {
+    // A file of every navigation can hold thousands of nodes; each is checked before any is saved.
+    \core_php_time_limit::raise();
+    raise_memory_limit(MEMORY_EXTRA);
     $content = $form->get_file_content('yamlfile');
     if ($content === false) {
         throw new \moodle_exception('err_invalid_yaml_file', 'local_extendednav');

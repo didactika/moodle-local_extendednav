@@ -140,6 +140,95 @@ class manager {
     }
 
     /**
+     * Saves many nodes at once, as an import does: in one transaction, with one purge of the cache at the end and the event of
+     * each node made from the record given, so thousands of nodes cost one write each and nothing more.
+     *
+     * @param \stdClass[] $records Records from {@see prepare()}; the ones with an id are updated, the others created.
+     * @return \stdClass[] The records saved, in the same order and with the same keys, each with its id.
+     */
+    public static function save_many(array $records): array {
+        global $DB;
+
+        // The rows that exist are read in chunks, so a node that does not change is neither written nor logged.
+        $current = [];
+        $ids = array_filter(array_map(static fn(\stdClass $record): int => (int)($record->id ?? 0), $records));
+        foreach (array_chunk(array_values($ids), 1000) as $chunk) {
+            $current += $DB->get_records_list('local_extendednav', 'id', $chunk);
+        }
+        $unchanged = [];
+
+        $transaction = $DB->start_delegated_transaction();
+        $now = time();
+        $saved = [];
+        // The next place of each navigation and scope, read once for the nodes that are new and have none.
+        $next = [];
+        foreach ($records as $key => $record) {
+            $record = clone $record;
+            if (!empty($record->id)) {
+                $before = $current[(int)$record->id] ?? null;
+                if ($before !== null && self::same($before, $record)) {
+                    $saved[$key] = $before;
+                    $unchanged[$key] = true;
+                    continue;
+                }
+                $record->timemodified = $now;
+                $DB->update_record('local_extendednav', $record);
+                $saved[$key] = $record;
+                continue;
+            }
+            $record->timemodified = $now;
+            unset($record->id);
+            if (!isset($record->sortorder)) {
+                $group = $record->menu . '@' . (int)($record->contextid ?? 0);
+                if (!isset($next[$group])) {
+                    $max = $DB->get_field_sql(
+                        'SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = :menu AND contextid = :contextid',
+                        ['menu' => $record->menu, 'contextid' => (int)($record->contextid ?? 0)]
+                    );
+                    $next[$group] = $max === null || $max === false ? 0 : (int)$max + 1;
+                }
+                $record->sortorder = $next[$group]++;
+            }
+            $record->timecreated = $now;
+            $record->id = (int)$DB->insert_record('local_extendednav', $record);
+            $saved[$key] = $record;
+        }
+        $transaction->allow_commit();
+        repository::purge();
+
+        foreach ($records as $key => $record) {
+            if (isset($unchanged[$key])) {
+                continue;
+            }
+            $event = !empty($record->id) ? node_updated::class : node_created::class;
+            $event::create_from_record($saved[$key])->trigger();
+        }
+        return $saved;
+    }
+
+    /**
+     * Whether a record to save holds what the row already has, in every field it sets.
+     *
+     * @param \stdClass $row The row as it is.
+     * @param \stdClass $record The record to save.
+     * @return bool
+     */
+    private static function same(\stdClass $row, \stdClass $record): bool {
+        foreach ([...self::EDITABLE_FIELDS, 'contextid', 'sortorder', 'parentkey'] as $field) {
+            if (!property_exists($record, $field)) {
+                continue;
+            }
+            $now = $record->$field;
+            $was = $row->$field ?? null;
+            // The database gives numbers as text and empty texts as null; the values are compared as they read.
+            if ((string)($now ?? '') !== (string)($was ?? '')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Updates a node.
      *
      * @param \stdClass $record Record with an id; only the fields present are changed.

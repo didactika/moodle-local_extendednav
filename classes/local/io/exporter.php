@@ -132,6 +132,8 @@ final class exporter {
             $counters[$group] = ($counters[$group] ?? 0) + 1;
             $ranks[(int)$node->id] = $counters[$group];
         }
+        // The names of the categories and courses are found together, in a few queries, before the nodes are written.
+        scope::preload(array_map(static fn(\stdClass $node): int => (int)($node->contextid ?? 0), $scoped));
         $exported = [];
         foreach ($nodes as $node) {
             $exported[] = self::export_node($node, $positions[(int)$node->id] ?? $ranks[(int)$node->id] ?? null);

@@ -176,33 +176,23 @@ class importer {
             return ['errors' => $errors, 'warnings' => $warnings, 'counts' => $counts];
         }
 
-        foreach ($batch as $menukey => $records) {
-            $ids = [];
-            foreach ($records as $nodekey => $record) {
-                if (isset($record->id)) {
-                    manager::update($record);
-                    $counts['updated']++;
-                } else {
-                    $record = manager::create($record);
-                    $counts['created']++;
-                }
-                $ids[$nodekey] = (int)$record->id;
+        // Every node of the file is saved in one go per navigation: one write each, one purge of the cache.
+        $count = static function (array $records) use (&$counts): void {
+            foreach ($records as $record) {
+                $counts[isset($record->id) ? 'updated' : 'created']++;
             }
+        };
+        foreach ($batch as $menukey => $records) {
+            $count($records);
+            $ids = array_map(static fn(\stdClass $record): int => (int)$record->id, manager::save_many($records));
             if (!empty($orders[$menukey]) && $menukey === \local_extendednav\menu\admintree::KEY) {
                 self::apply_sibling_orders($menukey, $orders[$menukey]);
             } else if (!empty($orders[$menukey])) {
                 self::apply_orders($menukey, $orders[$menukey], $ids);
             }
         }
-        foreach ($scopedrecords as $record) {
-            if (isset($record->id)) {
-                manager::update($record);
-                $counts['updated']++;
-            } else {
-                manager::create($record);
-                $counts['created']++;
-            }
-        }
+        $count($scopedrecords);
+        manager::save_many($scopedrecords);
         if (access_guard::check_fallbacks(repository::get_all()) === access_guard::FALLBACKS_BLOCKED_FOR_SOME) {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
