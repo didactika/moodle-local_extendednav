@@ -1,3 +1,1980 @@
+/* Generated from styles.scss. Edit the SCSS component sources and rebuild. */
+/* Moodle 4.0 and later cores disagree on decimal formatting; use the current leading-zero style. */
+/* stylelint-disable number-leading-zero */
+
+/* stylelint-disable max-line-length *//* stylelint-disable declaration-no-important */
+
+.len .gap-1,
+.path-local-extendednav .modal .gap-1,
+.path-admin-local-extendednav .modal .gap-1,
+#page-admin-setting-local_extendednav_settings .modal .gap-1,
+#page-local-extendednav-manage .modal .gap-1 {
+    gap: 0.25rem !important;
+}
+
+.len .gap-2,
+.path-local-extendednav .modal .gap-2,
+.path-admin-local-extendednav .modal .gap-2,
+#page-admin-setting-local_extendednav_settings .modal .gap-2,
+#page-local-extendednav-manage .modal .gap-2 {
+    gap: 0.5rem !important;
+}
+
+.len .gap-3,
+.path-local-extendednav .modal .gap-3,
+.path-admin-local-extendednav .modal .gap-3,
+#page-admin-setting-local_extendednav_settings .modal .gap-3,
+#page-local-extendednav-manage .modal .gap-3 {
+    gap: 1rem !important;
+}
+
+.len .d-grid,
+.path-local-extendednav .modal .d-grid,
+.path-admin-local-extendednav .modal .d-grid,
+#page-admin-setting-local_extendednav_settings .modal .d-grid,
+#page-local-extendednav-manage .modal .d-grid {
+    display: grid !important;
+}
+
+.len .fw-normal,
+.path-local-extendednav .modal .fw-normal,
+.path-admin-local-extendednav .modal .fw-normal,
+#page-admin-setting-local_extendednav_settings .modal .fw-normal,
+#page-local-extendednav-manage .modal .fw-normal {
+    font-weight: 400 !important;
+}
+
+.len .fw-semibold,
+.path-local-extendednav .modal .fw-semibold,
+.path-admin-local-extendednav .modal .fw-semibold,
+#page-admin-setting-local_extendednav_settings .modal .fw-semibold,
+#page-local-extendednav-manage .modal .fw-semibold {
+    font-weight: 600 !important;
+}
+
+.len .fw-bold,
+.path-local-extendednav .modal .fw-bold,
+.path-admin-local-extendednav .modal .fw-bold,
+#page-admin-setting-local_extendednav_settings .modal .fw-bold,
+#page-local-extendednav-manage .modal .fw-bold {
+    font-weight: 700 !important;
+}
+
+.len .ms-1,
+.path-local-extendednav .modal .ms-1,
+.path-admin-local-extendednav .modal .ms-1,
+#page-admin-setting-local_extendednav_settings .modal .ms-1,
+#page-local-extendednav-manage .modal .ms-1 {
+    margin-left: 0.25rem !important;
+}
+
+.len .ms-2,
+.path-local-extendednav .modal .ms-2,
+.path-admin-local-extendednav .modal .ms-2,
+#page-admin-setting-local_extendednav_settings .modal .ms-2,
+#page-local-extendednav-manage .modal .ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.len .ms-auto,
+.path-local-extendednav .modal .ms-auto,
+.path-admin-local-extendednav .modal .ms-auto,
+#page-admin-setting-local_extendednav_settings .modal .ms-auto,
+#page-local-extendednav-manage .modal .ms-auto {
+    margin-left: auto !important;
+}
+
+.len .me-1,
+.path-local-extendednav .modal .me-1,
+.path-admin-local-extendednav .modal .me-1,
+#page-admin-setting-local_extendednav_settings .modal .me-1,
+#page-local-extendednav-manage .modal .me-1 {
+    margin-right: 0.25rem !important;
+}
+
+.len .me-2,
+.path-local-extendednav .modal .me-2,
+.path-admin-local-extendednav .modal .me-2,
+#page-admin-setting-local_extendednav_settings .modal .me-2,
+#page-local-extendednav-manage .modal .me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.len .me-3,
+.path-local-extendednav .modal .me-3,
+.path-admin-local-extendednav .modal .me-3,
+#page-admin-setting-local_extendednav_settings .modal .me-3,
+#page-local-extendednav-manage .modal .me-3 {
+    margin-right: 1rem !important;
+}
+
+.len .text-end,
+.path-local-extendednav .modal .text-end,
+.path-admin-local-extendednav .modal .text-end,
+#page-admin-setting-local_extendednav_settings .modal .text-end,
+#page-local-extendednav-manage .modal .text-end {
+    text-align: right !important;
+}
+
+.len .font-monospace,
+.path-local-extendednav .modal .font-monospace,
+.path-admin-local-extendednav .modal .font-monospace,
+#page-admin-setting-local_extendednav_settings .modal .font-monospace,
+#page-local-extendednav-manage .modal .font-monospace {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+.len .bg-body-tertiary,
+.path-local-extendednav .modal .bg-body-tertiary,
+.path-admin-local-extendednav .modal .bg-body-tertiary,
+#page-admin-setting-local_extendednav_settings .modal .bg-body-tertiary,
+#page-local-extendednav-manage .modal .bg-body-tertiary {
+    background-color: var(--bs-tertiary-bg, #f8f9fa) !important;
+}
+
+.len .visually-hidden,
+.path-local-extendednav .modal .visually-hidden,
+.path-admin-local-extendednav .modal .visually-hidden,
+#page-admin-setting-local_extendednav_settings .modal .visually-hidden,
+#page-local-extendednav-manage .modal .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* stylelint-enable declaration-no-important */
+
+.len,
+.path-local-extendednav .modal,
+.path-admin-local-extendednav .modal,
+#page-admin-setting-local_extendednav_settings .modal,
+#page-local-extendednav-manage .modal,
+#page-admin-setting-local_extendednav_settings #region-main {
+    --dd-primary: var(--bs-primary, var(--primary, #0f6cbf));
+    --dd-secondary: var(--bs-secondary, var(--secondary, #6a737b));
+    --dd-success: var(--bs-success, var(--success, #357a32));
+    --dd-info: var(--bs-info, var(--info, #008196));
+    --dd-warning: var(--bs-warning, var(--warning, #f0ad4e));
+    --dd-danger: var(--bs-danger, var(--danger, #ca3120));
+    --dd-ink: var(--bs-body-color, #1d2125);
+    --dd-surface: var(--bs-body-bg, #fff);
+    --dd-muted: var(--bs-secondary-color, #6a737b);
+    --dd-hairline: var(--bs-border-color, #dee2e6);
+    --dd-line: color-mix(in srgb, var(--dd-ink) 42%, var(--dd-surface));
+    --dd-line-hover: color-mix(in srgb, var(--dd-ink) 62%, var(--dd-surface));
+    --dd-surface-2: color-mix(in srgb, var(--dd-ink) 4%, var(--dd-surface));
+    --dd-surface-3: color-mix(in srgb, var(--dd-ink) 9%, var(--dd-surface));
+    --dd-ring: color-mix(in srgb, var(--dd-primary) 30%, transparent);
+    --dd-radius: 0.625rem;
+    --dd-radius-sm: 0.5rem;
+    --dd-radius-lg: 0.75rem;
+    --dd-table-h: 34rem;
+    --dd-h: 2.25rem;
+    --dd-h-sm: 1.75rem;
+    --dd-ease: 140ms cubic-bezier(0.2, 0, 0, 1);
+    --dd-shadow-sm: 0 1px 2px rgb(15 23 42 / 6%), 0 1px 3px rgb(15 23 42 / 8%);
+    --dd-shadow-md: 0 14px 34px -12px rgb(15 23 42 / 30%), 0 2px 6px rgb(15 23 42 / 8%);
+    --dd-shadow-lg: 0 28px 64px -18px rgb(15 23 42 / 40%), 0 4px 12px rgb(15 23 42 / 10%);
+    --dd-primary-soft: color-mix(in srgb, var(--dd-primary) 10%, var(--dd-surface));
+    --dd-primary-soft-2: color-mix(in srgb, var(--dd-primary) 18%, var(--dd-surface));
+    --dd-primary-ink: color-mix(in srgb, var(--dd-primary) 78%, var(--dd-ink));
+    color: var(--dd-ink);
+}
+
+.len .btn,
+.len .badge,
+.len .icon-box,
+.path-local-extendednav .modal .btn,
+.path-local-extendednav .modal .badge,
+.path-local-extendednav .modal .icon-box,
+.path-admin-local-extendednav .modal .btn,
+.path-admin-local-extendednav .modal .badge,
+.path-admin-local-extendednav .modal .icon-box,
+#page-admin-setting-local_extendednav_settings .modal .btn,
+#page-admin-setting-local_extendednav_settings .modal .badge,
+#page-admin-setting-local_extendednav_settings .modal .icon-box,
+#page-local-extendednav-manage .modal .btn,
+#page-local-extendednav-manage .modal .badge,
+#page-local-extendednav-manage .modal .icon-box,
+#page-admin-setting-local_extendednav_settings #region-main .btn,
+#page-admin-setting-local_extendednav_settings #region-main .badge,
+#page-admin-setting-local_extendednav_settings #region-main .icon-box {
+    --dd-c: var(--dd-primary);
+}
+
+.len [class*=-primary],
+.path-local-extendednav .modal [class*=-primary],
+.path-admin-local-extendednav .modal [class*=-primary],
+#page-admin-setting-local_extendednav_settings .modal [class*=-primary],
+#page-local-extendednav-manage .modal [class*=-primary],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-primary] {
+    --dd-c: var(--dd-primary);
+}
+
+.len [class*=-secondary],
+.path-local-extendednav .modal [class*=-secondary],
+.path-admin-local-extendednav .modal [class*=-secondary],
+#page-admin-setting-local_extendednav_settings .modal [class*=-secondary],
+#page-local-extendednav-manage .modal [class*=-secondary],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-secondary] {
+    --dd-c: var(--dd-secondary);
+}
+
+.len [class*=-success],
+.path-local-extendednav .modal [class*=-success],
+.path-admin-local-extendednav .modal [class*=-success],
+#page-admin-setting-local_extendednav_settings .modal [class*=-success],
+#page-local-extendednav-manage .modal [class*=-success],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-success] {
+    --dd-c: var(--dd-success);
+}
+
+.len [class*=-info],
+.path-local-extendednav .modal [class*=-info],
+.path-admin-local-extendednav .modal [class*=-info],
+#page-admin-setting-local_extendednav_settings .modal [class*=-info],
+#page-local-extendednav-manage .modal [class*=-info],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-info] {
+    --dd-c: var(--dd-info);
+}
+
+.len [class*=-warning],
+.path-local-extendednav .modal [class*=-warning],
+.path-admin-local-extendednav .modal [class*=-warning],
+#page-admin-setting-local_extendednav_settings .modal [class*=-warning],
+#page-local-extendednav-manage .modal [class*=-warning],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-warning] {
+    --dd-c: var(--dd-warning);
+}
+
+.len [class*=-danger],
+.path-local-extendednav .modal [class*=-danger],
+.path-admin-local-extendednav .modal [class*=-danger],
+#page-admin-setting-local_extendednav_settings .modal [class*=-danger],
+#page-local-extendednav-manage .modal [class*=-danger],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-danger] {
+    --dd-c: var(--dd-danger);
+}
+
+.len .btn,
+.len .badge,
+.len .icon-box,
+.len [class*=-primary],
+.len [class*=-secondary],
+.len [class*=-success],
+.len [class*=-info],
+.len [class*=-warning],
+.len [class*=-danger],
+.path-local-extendednav .modal .btn,
+.path-local-extendednav .modal .badge,
+.path-local-extendednav .modal .icon-box,
+.path-local-extendednav .modal [class*=-primary],
+.path-local-extendednav .modal [class*=-secondary],
+.path-local-extendednav .modal [class*=-success],
+.path-local-extendednav .modal [class*=-info],
+.path-local-extendednav .modal [class*=-warning],
+.path-local-extendednav .modal [class*=-danger],
+.path-admin-local-extendednav .modal .btn,
+.path-admin-local-extendednav .modal .badge,
+.path-admin-local-extendednav .modal .icon-box,
+.path-admin-local-extendednav .modal [class*=-primary],
+.path-admin-local-extendednav .modal [class*=-secondary],
+.path-admin-local-extendednav .modal [class*=-success],
+.path-admin-local-extendednav .modal [class*=-info],
+.path-admin-local-extendednav .modal [class*=-warning],
+.path-admin-local-extendednav .modal [class*=-danger],
+#page-admin-setting-local_extendednav_settings .modal .btn,
+#page-admin-setting-local_extendednav_settings .modal .badge,
+#page-admin-setting-local_extendednav_settings .modal .icon-box,
+#page-admin-setting-local_extendednav_settings .modal [class*=-primary],
+#page-admin-setting-local_extendednav_settings .modal [class*=-secondary],
+#page-admin-setting-local_extendednav_settings .modal [class*=-success],
+#page-admin-setting-local_extendednav_settings .modal [class*=-info],
+#page-admin-setting-local_extendednav_settings .modal [class*=-warning],
+#page-admin-setting-local_extendednav_settings .modal [class*=-danger],
+#page-local-extendednav-manage .modal .btn,
+#page-local-extendednav-manage .modal .badge,
+#page-local-extendednav-manage .modal .icon-box,
+#page-local-extendednav-manage .modal [class*=-primary],
+#page-local-extendednav-manage .modal [class*=-secondary],
+#page-local-extendednav-manage .modal [class*=-success],
+#page-local-extendednav-manage .modal [class*=-info],
+#page-local-extendednav-manage .modal [class*=-warning],
+#page-local-extendednav-manage .modal [class*=-danger],
+#page-admin-setting-local_extendednav_settings #region-main .btn,
+#page-admin-setting-local_extendednav_settings #region-main .badge,
+#page-admin-setting-local_extendednav_settings #region-main .icon-box,
+#page-admin-setting-local_extendednav_settings #region-main [class*=-primary],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-secondary],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-success],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-info],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-warning],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-danger] {
+    --dd-c-soft: color-mix(in srgb, var(--dd-c) 10%, var(--dd-surface));
+    --dd-c-soft-2: color-mix(in srgb, var(--dd-c) 18%, var(--dd-surface));
+    --dd-c-ink: color-mix(in srgb, var(--dd-c) 55%, var(--dd-ink));
+}
+
+.len [class*=-secondary],
+.path-local-extendednav .modal [class*=-secondary],
+.path-admin-local-extendednav .modal [class*=-secondary],
+#page-admin-setting-local_extendednav_settings .modal [class*=-secondary],
+#page-local-extendednav-manage .modal [class*=-secondary],
+#page-admin-setting-local_extendednav_settings #region-main [class*=-secondary] {
+    --dd-c-soft: color-mix(in srgb, var(--dd-c) 24%, var(--dd-surface));
+    --dd-c-soft-2: color-mix(in srgb, var(--dd-c) 36%, var(--dd-surface));
+    --dd-c-ink: color-mix(in srgb, var(--dd-c) 18%, var(--dd-ink));
+}
+
+.len {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+.len .d-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.len > [data-region=cards].row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    margin: 0;
+}
+
+.len > [data-region=cards].row > [class*=col-] {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 992px) {
+
+    .len > [data-region=cards].row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.len [data-region=account-cards].row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    margin: 0;
+}
+
+.len [data-region=account-cards].row > li {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 576px) {
+
+    .len [data-region=account-cards].row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+
+    .len [data-region=account-cards].row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.len > [data-region=legend].row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+}
+
+.len > [data-region=legend].row > [class*=col-] {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+@media (min-width: 576px) {
+
+    .len > [data-region=legend].row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 992px) {
+
+    .len > [data-region=legend].row {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.len [data-region=accounts][data-region=accounts] {
+    display: inline-flex;
+    align-items: center;
+}
+
+.len [data-region=accounts][data-region=accounts] > .userinitials,
+.len [data-region=accounts][data-region=accounts] > .userpicture {
+    flex: none;
+    margin: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--dd-surface);
+}
+
+.len [data-region=accounts][data-region=accounts] > * + .userinitials,
+.len [data-region=accounts][data-region=accounts] > * + .userpicture {
+    margin-inline-start: -0.25rem;
+}
+
+.len .nav-tabs.nav-tabs {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 0;
+    background-color: transparent;
+    box-shadow: inset 0 -1px 0 var(--dd-hairline);
+    scrollbar-width: none;
+}
+
+.len .nav-tabs.nav-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.len .nav-tabs.nav-tabs .nav-item {
+    flex: none;
+}
+
+.len .nav-tabs.nav-tabs .nav-link.nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--dd-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: box-shadow var(--dd-ease), color var(--dd-ease);
+}
+
+.len .nav-tabs.nav-tabs .nav-link.nav-link:hover {
+    box-shadow: inset 0 -2px 0 var(--dd-line);
+    color: var(--dd-ink);
+}
+
+.len .nav-tabs.nav-tabs .nav-link.nav-link:is(:focus, :focus-visible, :active, .focus):not(.active) {
+    /* stylelint-disable-next-line declaration-no-important */
+    outline: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    background: none !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    box-shadow: inset 0 -2px 0 var(--dd-line) !important;
+    color: var(--dd-ink);
+}
+
+.len .nav-tabs.nav-tabs .nav-link.nav-link.active,
+.len .nav-tabs.nav-tabs .nav-link.nav-link.active:is(:hover, :focus, :focus-visible, :active, .focus) {
+    /* stylelint-disable-next-line declaration-no-important */
+    border: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    outline: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    background: none !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    box-shadow: inset 0 -3px 0 var(--dd-primary) !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--dd-primary-ink) !important;
+}
+
+.len .card {
+    overflow: hidden;
+    border: 1px solid var(--dd-hairline);
+    border-radius: var(--dd-radius-lg);
+    background: var(--dd-surface);
+    box-shadow: none;
+}
+
+.len .card-body {
+    padding: 1.25rem;
+}
+
+.len .card-title {
+    margin-bottom: 0.75rem;
+    color: var(--dd-ink);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.len [data-region=filters] {
+    flex-wrap: nowrap;
+}
+
+.len [data-region=filters] > :first-child {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.len [data-region=filters] > :first-child > [role=search] {
+    flex: 1 1 10rem;
+    min-width: 10rem;
+}
+
+.len [data-region=filters] > :last-child:not(:first-child) {
+    flex: none;
+}
+
+@media (max-width: 400px) {
+
+    .len [data-region=filters] > :first-child > [role=search] {
+        min-width: 7rem;
+    }
+}
+
+.len .table-responsive {
+    margin: 0;
+    transition: opacity var(--dd-ease);
+}
+
+.len .table-responsive[aria-busy=true] {
+    opacity: 0.6;
+}
+
+.len .table-responsive[data-region=tablewrap] {
+    block-size: var(--dd-table-h);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.len .table-responsive[data-region=tablewrap] thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background-color: var(--dd-surface);
+}
+
+.len [data-region=empty]:not([hidden]),
+.len [data-region=error]:not([hidden]) {
+    display: grid;
+    min-block-size: calc(var(--dd-table-h) + var(--dd-foot-h, 0px));
+    place-content: center;
+}
+
+.len .table {
+    margin-bottom: 0;
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+}
+
+.len .table th,
+.len .table td {
+    padding: 0.75rem 1rem;
+    border-color: var(--dd-hairline);
+    vertical-align: middle;
+}
+
+.len .table thead th {
+    border-top: 0;
+    border-bottom: 1px solid var(--dd-line);
+    color: var(--dd-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.len .table tbody th {
+    font-weight: 600;
+}
+
+.len .table tbody tr:hover > * {
+    background-color: color-mix(in srgb, var(--dd-primary) 5%, var(--dd-surface));
+}
+
+.len .table tbody tr:last-child > * {
+    border-bottom: 1px solid var(--dd-hairline);
+}
+
+.len .table tbody tr.table-active > * {
+    background-color: var(--dd-primary-soft);
+    box-shadow: none;
+}
+
+.len .table [data-column=select] {
+    width: 2.75rem;
+    padding-right: 0;
+}
+
+.len .table [data-column=select] .form-check-input {
+    position: static;
+    display: block;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.len .table [data-column=actions] {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.len .table .userpicture,
+.len .table .userinitials {
+    flex: none;
+    margin: 0 0.75rem 0 0;
+}
+
+.len .table .text-truncate {
+    max-width: 16rem;
+}
+
+.len thead th > .btn.btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+}
+
+.len thead th > .btn.btn-link::after {
+    content: "";
+    flex: none;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    opacity: 0.35;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 200ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms;
+}
+
+.len thead th > .btn.btn-link:hover {
+    color: var(--dd-ink);
+}
+
+.len thead th > .btn.btn-link:hover::after {
+    opacity: 0.8;
+}
+
+.len thead th > .btn.btn-link:focus-visible {
+    outline: 0;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len th[aria-sort] {
+    color: var(--dd-ink);
+}
+
+.len th[aria-sort] > .btn.btn-link {
+    color: var(--dd-primary-ink);
+}
+
+.len th[aria-sort] > .btn.btn-link::after {
+    opacity: 1;
+    color: var(--dd-primary);
+}
+
+.len th[aria-sort=ascending] > .btn.btn-link::after {
+    transform: translateY(2px) rotate(-135deg);
+}
+
+.len .placeholder {
+    display: block;
+    min-height: 0;
+    opacity: 1;
+    cursor: default;
+    height: 0.875rem;
+    border-radius: 0.375rem;
+    background: linear-gradient(90deg, var(--dd-hairline) 0%, var(--dd-surface-3) 50%, var(--dd-hairline) 100%);
+    background-size: 200% 100%;
+    animation: len-shimmer 1.4s linear infinite;
+}
+
+.len .card > .alert {
+    margin: 1rem;
+}
+
+@keyframes len-shimmer {
+
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .len .placeholder {
+        animation: none;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .len [role=search] {
+        max-width: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+
+    .len {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .len .table-responsive .table th,
+    .len .table-responsive .table td {
+        white-space: nowrap;
+    }
+
+    .len .table-responsive .table th:first-child,
+    .len .table-responsive .table td:first-child {
+        position: sticky;
+        inset-inline-start: 0;
+        z-index: 1;
+        background-color: var(--dd-surface);
+        box-shadow: inset -1px 0 0 var(--dd-hairline, rgba(0, 0, 0, 0.08));
+    }
+
+    .len .table-responsive .table thead th:first-child {
+        z-index: 2;
+    }
+
+    .len .table-responsive .table th[data-column=select],
+    .len .table-responsive .table td[data-column=select] {
+        width: 2.75rem;
+        min-width: 2.75rem;
+        max-width: 2.75rem;
+        box-shadow: none;
+    }
+
+    .len .table-responsive .table :is(th, td)[data-column=select] + :is(th, td) {
+        position: sticky;
+        inset-inline-start: 2.75rem;
+        z-index: 1;
+        padding-inline-start: 0.5rem;
+        background-color: var(--dd-surface);
+        box-shadow: inset -1px 0 0 var(--dd-hairline, rgba(0, 0, 0, 0.08));
+    }
+
+    .len .table-responsive .table thead th[data-column=select] + th {
+        z-index: 2;
+    }
+
+    .len .table-responsive .table th:first-child:not([data-column=select]),
+    .len .table-responsive .table td:first-child:not([data-column=select]),
+    .len .table-responsive .table :is(th, td)[data-column=select] + :is(th, td) {
+        max-width: 12rem;
+        overflow: hidden;
+    }
+
+    .len .table-responsive .table th:first-child:not([data-column=select]) .d-flex.flex-column,
+    .len .table-responsive .table td:first-child:not([data-column=select]) .d-flex.flex-column,
+    .len .table-responsive .table :is(th, td)[data-column=select] + :is(th, td) .d-flex.flex-column {
+        min-width: 0;
+    }
+
+    .len .table-responsive .table th:first-child:not([data-column=select]) .d-flex.flex-column > *,
+    .len .table-responsive .table td:first-child:not([data-column=select]) .d-flex.flex-column > *,
+    .len .table-responsive .table :is(th, td)[data-column=select] + :is(th, td) .d-flex.flex-column > * {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.len [role=search],
+.path-local-extendednav .modal [role=search],
+.path-admin-local-extendednav .modal [role=search],
+#page-admin-setting-local_extendednav_settings .modal [role=search],
+#page-local-extendednav-manage .modal [role=search] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    max-width: 22rem;
+}
+
+.len [role=search].mw-100,
+.path-local-extendednav .modal [role=search].mw-100,
+.path-admin-local-extendednav .modal [role=search].mw-100,
+#page-admin-setting-local_extendednav_settings .modal [role=search].mw-100,
+#page-local-extendednav-manage .modal [role=search].mw-100 {
+    max-width: 100%;
+}
+
+.len [role=search] .icon,
+.path-local-extendednav .modal [role=search] .icon,
+.path-admin-local-extendednav .modal [role=search] .icon,
+#page-admin-setting-local_extendednav_settings .modal [role=search] .icon,
+#page-local-extendednav-manage .modal [role=search] .icon {
+    position: absolute;
+    left: 0.75rem;
+    margin: 0;
+    color: var(--dd-muted);
+    pointer-events: none;
+}
+
+.len [role=search] .form-control,
+.path-local-extendednav .modal [role=search] .form-control,
+.path-admin-local-extendednav .modal [role=search] .form-control,
+#page-admin-setting-local_extendednav_settings .modal [role=search] .form-control,
+#page-local-extendednav-manage .modal [role=search] .form-control {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--dd-h);
+    padding-left: 2.25rem;
+    border-color: var(--dd-line);
+    border-radius: 999px;
+}
+
+.len [role=search] input[type=search]::-webkit-search-cancel-button,
+.path-local-extendednav .modal [role=search] input[type=search]::-webkit-search-cancel-button,
+.path-admin-local-extendednav .modal [role=search] input[type=search]::-webkit-search-cancel-button,
+#page-admin-setting-local_extendednav_settings .modal [role=search] input[type=search]::-webkit-search-cancel-button,
+#page-local-extendednav-manage .modal [role=search] input[type=search]::-webkit-search-cancel-button {
+    display: none;
+    appearance: none;
+}
+
+.len [role=search] input[type=search]:has(~ [data-action=clear-search]:not([hidden])),
+.path-local-extendednav .modal [role=search] input[type=search]:has(~ [data-action=clear-search]:not([hidden])),
+.path-admin-local-extendednav .modal [role=search] input[type=search]:has(~ [data-action=clear-search]:not([hidden])),
+#page-admin-setting-local_extendednav_settings .modal [role=search] input[type=search]:has(~ [data-action=clear-search]:not([hidden])),
+#page-local-extendednav-manage .modal [role=search] input[type=search]:has(~ [data-action=clear-search]:not([hidden])) {
+    padding-right: 2.5rem;
+}
+
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0.375rem;
+    margin-block: auto;
+    width: 1.5rem;
+    min-width: 0;
+    height: 1.5rem;
+    padding: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--dd-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transform: none;
+}
+
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon:focus,
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon:active,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:active,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:active,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:active,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:active {
+    transform: none;
+}
+
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:hover {
+    background-color: color-mix(in srgb, var(--dd-ink) 10%, transparent);
+    color: var(--dd-ink);
+}
+
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon:focus-visible,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus-visible,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus-visible,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon:focus-visible {
+    box-shadow: 0 0 0 2px var(--dd-ring);
+}
+
+.len [role=search] > [data-action=clear-search].btn-link.btn-icon .icon,
+.path-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon .icon,
+.path-admin-local-extendednav .modal [role=search] > [data-action=clear-search].btn-link.btn-icon .icon,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > [data-action=clear-search].btn-link.btn-icon .icon,
+#page-local-extendednav-manage .modal [role=search] > [data-action=clear-search].btn-link.btn-icon .icon {
+    position: static;
+    margin: 0;
+    color: inherit;
+    pointer-events: none;
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select),
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select),
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select),
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select),
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select) {
+    width: auto;
+    min-width: 0;
+    max-width: 20rem;
+    min-height: var(--dd-h);
+    padding-left: 1rem;
+    border-color: var(--dd-line);
+    border-radius: 999px;
+    background-color: var(--dd-surface);
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color var(--dd-ease), box-shadow var(--dd-ease);
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(select):not(.form-select-sm),
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(select):not(.form-select-sm),
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(select):not(.form-select-sm),
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(select):not(.form-select-sm),
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(select):not(.form-select-sm) {
+    min-width: 12rem;
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):hover,
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):hover,
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):hover,
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):hover,
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):hover {
+    border-color: var(--dd-line-hover);
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):focus,
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):focus,
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):focus,
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):focus,
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):focus {
+    border-color: var(--dd-primary);
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary {
+    border-color: var(--dd-primary);
+    background-color: var(--dd-primary-soft);
+    color: var(--dd-primary-ink);
+    font-weight: 600;
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary,
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select).border-primary {
+    padding-right: 2.5rem;
+    background-image: none;
+}
+
+.len :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(button),
+.path-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(button),
+.path-admin-local-extendednav .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(button),
+#page-admin-setting-local_extendednav_settings .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(button),
+#page-local-extendednav-manage .modal :is([data-region=filters], [data-region=foot]) :is(.form-select, .custom-select):is(button) {
+    display: block;
+    overflow: hidden;
+    text-align: start;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.len .dropdown,
+.path-local-extendednav .modal .dropdown,
+.path-admin-local-extendednav .modal .dropdown,
+#page-admin-setting-local_extendednav_settings .modal .dropdown,
+#page-local-extendednav-manage .modal .dropdown {
+    position: relative;
+    display: inline-flex;
+    max-width: 100%;
+}
+
+.len [data-menu-clear],
+.path-local-extendednav .modal [data-menu-clear],
+.path-admin-local-extendednav .modal [data-menu-clear],
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear],
+#page-local-extendednav-manage .modal [data-menu-clear] {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--dd-primary-ink);
+    transform: translateY(-50%);
+    transition: background-color var(--dd-ease);
+}
+
+.len [data-menu-clear] .icon,
+.path-local-extendednav .modal [data-menu-clear] .icon,
+.path-admin-local-extendednav .modal [data-menu-clear] .icon,
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear] .icon,
+#page-local-extendednav-manage .modal [data-menu-clear] .icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.len [data-menu-clear]:hover,
+.path-local-extendednav .modal [data-menu-clear]:hover,
+.path-admin-local-extendednav .modal [data-menu-clear]:hover,
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear]:hover,
+#page-local-extendednav-manage .modal [data-menu-clear]:hover {
+    background-color: color-mix(in srgb, var(--dd-primary) 14%, transparent);
+}
+
+.len [data-menu-clear]:focus-visible,
+.path-local-extendednav .modal [data-menu-clear]:focus-visible,
+.path-admin-local-extendednav .modal [data-menu-clear]:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear]:focus-visible,
+#page-local-extendednav-manage .modal [data-menu-clear]:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len .btn-icon,
+.path-local-extendednav .modal .btn-icon,
+.path-admin-local-extendednav .modal .btn-icon,
+#page-admin-setting-local_extendednav_settings .modal .btn-icon,
+#page-local-extendednav-manage .modal .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--dd-h);
+    height: var(--dd-h);
+    padding: 0;
+    border-radius: 50%;
+}
+
+.len .btn-icon.btn-sm,
+.path-local-extendednav .modal .btn-icon.btn-sm,
+.path-admin-local-extendednav .modal .btn-icon.btn-sm,
+#page-admin-setting-local_extendednav_settings .modal .btn-icon.btn-sm,
+#page-local-extendednav-manage .modal .btn-icon.btn-sm {
+    width: var(--dd-h-sm);
+    height: var(--dd-h-sm);
+}
+
+.len .btn-icon .icon,
+.path-local-extendednav .modal .btn-icon .icon,
+.path-admin-local-extendednav .modal .btn-icon .icon,
+#page-admin-setting-local_extendednav_settings .modal .btn-icon .icon,
+#page-local-extendednav-manage .modal .btn-icon .icon {
+    margin: 0;
+}
+
+.len .btn-link.btn-icon,
+.path-local-extendednav .modal .btn-link.btn-icon,
+.path-admin-local-extendednav .modal .btn-link.btn-icon,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon,
+#page-local-extendednav-manage .modal .btn-link.btn-icon {
+    --dd-c: var(--dd-muted);
+    background-color: transparent;
+    color: var(--dd-c);
+    text-decoration: none;
+    transition: background-color var(--dd-ease), color var(--dd-ease), opacity var(--dd-ease), transform var(--dd-ease);
+}
+
+.len .btn-link.btn-icon.text-primary,
+.path-local-extendednav .modal .btn-link.btn-icon.text-primary,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-primary,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-primary,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-primary {
+    --dd-c: var(--dd-primary);
+}
+
+.len .btn-link.btn-icon.text-info,
+.path-local-extendednav .modal .btn-link.btn-icon.text-info,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-info,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-info,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-info {
+    --dd-c: var(--dd-info);
+}
+
+.len .btn-link.btn-icon.text-success,
+.path-local-extendednav .modal .btn-link.btn-icon.text-success,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-success,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-success,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-success {
+    --dd-c: var(--dd-success);
+}
+
+.len .btn-link.btn-icon.text-warning,
+.path-local-extendednav .modal .btn-link.btn-icon.text-warning,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-warning,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-warning,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-warning {
+    --dd-c: color-mix(in srgb, var(--dd-warning) 70%, var(--dd-ink));
+}
+
+.len .btn-link.btn-icon.text-danger,
+.path-local-extendednav .modal .btn-link.btn-icon.text-danger,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-danger,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-danger,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-danger {
+    --dd-c: var(--dd-danger);
+}
+
+.len .btn-link.btn-icon:not(.disabled, :disabled),
+.path-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled),
+.path-admin-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled),
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon:not(.disabled, :disabled),
+#page-local-extendednav-manage .modal .btn-link.btn-icon:not(.disabled, :disabled) {
+    background-color: color-mix(in srgb, var(--dd-c) 9%, var(--dd-surface));
+}
+
+.len .btn-link.btn-icon:not(.disabled, :disabled):hover,
+.len .btn-link.btn-icon:not(.disabled, :disabled):focus-visible,
+.path-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled):hover,
+.path-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled):focus-visible,
+.path-admin-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled):hover,
+.path-admin-local-extendednav .modal .btn-link.btn-icon:not(.disabled, :disabled):focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon:not(.disabled, :disabled):hover,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon:not(.disabled, :disabled):focus-visible,
+#page-local-extendednav-manage .modal .btn-link.btn-icon:not(.disabled, :disabled):hover,
+#page-local-extendednav-manage .modal .btn-link.btn-icon:not(.disabled, :disabled):focus-visible {
+    outline: 0;
+    background-color: color-mix(in srgb, var(--dd-c) 18%, var(--dd-surface));
+    color: color-mix(in srgb, var(--dd-c) 80%, var(--dd-ink));
+    transform: translateY(-1px);
+}
+
+.len .btn-link.btn-icon:focus-visible,
+.path-local-extendednav .modal .btn-link.btn-icon:focus-visible,
+.path-admin-local-extendednav .modal .btn-link.btn-icon:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon:focus-visible,
+#page-local-extendednav-manage .modal .btn-link.btn-icon:focus-visible {
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len .btn-link.btn-icon.disabled,
+.len .btn-link.btn-icon:disabled,
+.path-local-extendednav .modal .btn-link.btn-icon.disabled,
+.path-local-extendednav .modal .btn-link.btn-icon:disabled,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.disabled,
+.path-admin-local-extendednav .modal .btn-link.btn-icon:disabled,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.disabled,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon:disabled,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.disabled,
+#page-local-extendednav-manage .modal .btn-link.btn-icon:disabled {
+    color: var(--dd-muted);
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
+.len [data-column=actions],
+.path-local-extendednav .modal [data-column=actions],
+.path-admin-local-extendednav .modal [data-column=actions],
+#page-admin-setting-local_extendednav_settings .modal [data-column=actions],
+#page-local-extendednav-manage .modal [data-column=actions] {
+    white-space: nowrap;
+}
+
+.len [data-column=actions] .btn-icon + .btn-icon,
+.path-local-extendednav .modal [data-column=actions] .btn-icon + .btn-icon,
+.path-admin-local-extendednav .modal [data-column=actions] .btn-icon + .btn-icon,
+#page-admin-setting-local_extendednav_settings .modal [data-column=actions] .btn-icon + .btn-icon,
+#page-local-extendednav-manage .modal [data-column=actions] .btn-icon + .btn-icon {
+    margin-left: 0.25rem;
+}
+
+.len .icon-box,
+.path-local-extendednav .modal .icon-box,
+.path-admin-local-extendednav .modal .icon-box,
+#page-admin-setting-local_extendednav_settings .modal .icon-box,
+#page-local-extendednav-manage .modal .icon-box {
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border-radius: 1rem;
+    background-color: var(--dd-c-soft-2);
+    color: var(--dd-c-ink);
+    font-size: 1.375rem;
+    line-height: 1;
+}
+
+.len .icon-box .icon,
+.path-local-extendednav .modal .icon-box .icon,
+.path-admin-local-extendednav .modal .icon-box .icon,
+#page-admin-setting-local_extendednav_settings .modal .icon-box .icon,
+#page-local-extendednav-manage .modal .icon-box .icon {
+    width: auto;
+    height: auto;
+    margin: 0;
+    color: inherit;
+    font-size: inherit;
+}
+
+.len [data-region=floatbar].card {
+    position: fixed;
+    flex-direction: row;
+    bottom: 1.5rem;
+    left: 50%;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: calc(100vw - 2rem);
+    padding: 0.5rem 0.6rem 0.5rem 1.25rem;
+    border: 1px solid var(--dd-hairline);
+    border-radius: 1rem;
+    background-color: var(--dd-surface);
+    box-shadow: var(--dd-shadow-lg);
+    transform: translateX(-50%);
+    animation: len-rise 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.len [data-region=floatbar].card[hidden] {
+    display: none;
+}
+
+@keyframes len-rise {
+
+    from {
+        opacity: 0;
+        transform: translate(-50%, 0.75rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .len [data-region=floatbar].card {
+        animation: none;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .len [data-region=floatbar].card {
+        right: 0.75rem;
+        left: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: none;
+        border-radius: var(--dd-radius-lg);
+        transform: none;
+        animation: none;
+    }
+}
+
+.len .dropdown-menu.show,
+.path-local-extendednav .modal .dropdown-menu.show,
+.path-admin-local-extendednav .modal .dropdown-menu.show,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show,
+#page-local-extendednav-manage .modal .dropdown-menu.show {
+    position: fixed;
+    z-index: 1060;
+    display: block;
+    min-width: 10rem;
+    margin: 0;
+    padding: 0.375rem;
+    overflow-y: auto;
+    border: 1px solid var(--dd-hairline);
+    border-radius: var(--dd-radius);
+    background-color: var(--dd-surface);
+    box-shadow: var(--dd-shadow-md);
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    animation: len-pop 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.len .dropdown-menu.show .dropdown-header,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-header,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-header,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-header,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-header {
+    padding: 0.5rem 0.75rem 0.25rem;
+    color: var(--dd-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.len .dropdown-menu.show .dropdown-item,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: none;
+    color: var(--dd-ink);
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dd-ease), color var(--dd-ease);
+}
+
+.len .dropdown-menu.show .dropdown-item + .dropdown-item,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item + .dropdown-item,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item + .dropdown-item,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item + .dropdown-item,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item + .dropdown-item {
+    margin-top: 2px;
+}
+
+.len .dropdown-menu.show .dropdown-item:hover,
+.len .dropdown-menu.show .dropdown-item:focus,
+.len .dropdown-menu.show .dropdown-item.active,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item:hover,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item:focus,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item.active,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item:hover,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item:focus,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item.active,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item:hover,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item:focus,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item.active,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item:hover,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item:focus,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item.active {
+    outline: 0;
+    background-color: var(--dd-surface-2);
+    color: var(--dd-ink);
+}
+
+.len .dropdown-menu.show .dropdown-item[aria-selected=true],
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true],
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true],
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item[aria-selected=true],
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item[aria-selected=true] {
+    background-color: var(--dd-primary-soft);
+    color: var(--dd-primary-ink);
+    font-weight: 600;
+}
+
+.len .dropdown-menu.show .dropdown-item[aria-selected=true]::after,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::after,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::after,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::after,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::after {
+    content: "";
+    flex: none;
+    width: 0.3rem;
+    height: 0.6rem;
+    margin-right: 0.25rem;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-1px);
+}
+
+.len .dropdown-menu.show .dropdown-item[aria-selected=true]:focus,
+.len .dropdown-menu.show .dropdown-item[aria-selected=true].active,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]:focus,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true].active,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]:focus,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true].active,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item[aria-selected=true]:focus,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item[aria-selected=true].active,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item[aria-selected=true]:focus,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item[aria-selected=true].active {
+    background-color: var(--dd-primary-soft-2);
+}
+
+.len .dropdown-menu.show .dropdown-item[aria-selected=true]::before,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::before,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::before,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::before,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item[aria-selected=true]::before {
+    content: none;
+    display: none;
+}
+
+.len .dropdown-menu.show .dropdown-item.disabled,
+.path-local-extendednav .modal .dropdown-menu.show .dropdown-item.disabled,
+.path-admin-local-extendednav .modal .dropdown-menu.show .dropdown-item.disabled,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu.show .dropdown-item.disabled,
+#page-local-extendednav-manage .modal .dropdown-menu.show .dropdown-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.len select[aria-expanded=true],
+.path-local-extendednav .modal select[aria-expanded=true],
+.path-admin-local-extendednav .modal select[aria-expanded=true],
+#page-admin-setting-local_extendednav_settings .modal select[aria-expanded=true],
+#page-local-extendednav-manage .modal select[aria-expanded=true] {
+    border-color: var(--dd-primary);
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+@keyframes len-pop {
+
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .len .dropdown-menu,
+    .path-local-extendednav .modal .dropdown-menu,
+    .path-admin-local-extendednav .modal .dropdown-menu,
+    #page-admin-setting-local_extendednav_settings .modal .dropdown-menu,
+    #page-local-extendednav-manage .modal .dropdown-menu {
+        animation: none;
+    }
+}
+
+.len :is(.form-select, .custom-select).form-select-sm {
+    min-width: 4.75rem;
+    min-height: var(--dd-h-sm);
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    font-size: 0.875rem;
+}
+
+/* stylelint-disable declaration-no-important */
+
+.len .badge,
+.path-local-extendednav .modal .badge,
+.path-admin-local-extendednav .modal .badge,
+#page-admin-setting-local_extendednav_settings .modal .badge,
+#page-local-extendednav-manage .modal .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35em 0.8em;
+    border-radius: 999px;
+    background-color: var(--dd-c-soft-2) !important;
+    color: var(--dd-c-ink) !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.len .badge.border,
+.path-local-extendednav .modal .badge.border,
+.path-admin-local-extendednav .modal .badge.border,
+#page-admin-setting-local_extendednav_settings .modal .badge.border,
+#page-local-extendednav-manage .modal .badge.border {
+    border-color: var(--dd-c) !important;
+    background-color: transparent !important;
+}
+
+/* stylelint-enable declaration-no-important */
+
+.len [role=search] > span[aria-hidden=true],
+.path-local-extendednav .modal [role=search] > span[aria-hidden=true],
+.path-admin-local-extendednav .modal [role=search] > span[aria-hidden=true],
+#page-admin-setting-local_extendednav_settings .modal [role=search] > span[aria-hidden=true],
+#page-local-extendednav-manage .modal [role=search] > span[aria-hidden=true] {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--dd-muted);
+    pointer-events: none;
+}
+
+.len [role=search] > span[aria-hidden=true] .icon,
+.path-local-extendednav .modal [role=search] > span[aria-hidden=true] .icon,
+.path-admin-local-extendednav .modal [role=search] > span[aria-hidden=true] .icon,
+#page-admin-setting-local_extendednav_settings .modal [role=search] > span[aria-hidden=true] .icon,
+#page-local-extendednav-manage .modal [role=search] > span[aria-hidden=true] .icon {
+    position: static;
+    margin: 0;
+}
+
+.len .dropdown > .dropdown-menu {
+    position: fixed;
+    z-index: 1060;
+    display: block;
+    min-width: 10rem;
+    margin: 0;
+    padding: 0.375rem;
+    overflow-y: auto;
+    border: 1px solid var(--dd-hairline);
+    border-radius: var(--dd-radius);
+    background-color: var(--dd-surface);
+    box-shadow: var(--dd-shadow-md);
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    animation: len-pop 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.len .dropdown > .dropdown-menu .dropdown-header {
+    padding: 0.5rem 0.75rem 0.25rem;
+    color: var(--dd-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: none;
+    color: var(--dd-ink);
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dd-ease), color var(--dd-ease);
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item + .dropdown-item {
+    margin-top: 2px;
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item:hover,
+.len .dropdown > .dropdown-menu .dropdown-item:focus,
+.len .dropdown > .dropdown-menu .dropdown-item.active {
+    outline: 0;
+    background-color: var(--dd-surface-2);
+    color: var(--dd-ink);
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item[aria-selected=true] {
+    background-color: var(--dd-primary-soft);
+    color: var(--dd-primary-ink);
+    font-weight: 600;
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item[aria-selected=true]::after {
+    content: "";
+    flex: none;
+    width: 0.3rem;
+    height: 0.6rem;
+    margin-right: 0.25rem;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translateY(-1px);
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item[aria-selected=true]:focus,
+.len .dropdown > .dropdown-menu .dropdown-item[aria-selected=true].active {
+    background-color: var(--dd-primary-soft-2);
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item[aria-selected=true]::before {
+    content: none;
+    display: none;
+}
+
+.len .dropdown > .dropdown-menu .dropdown-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.len .dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
+.len button:is(.form-select, .custom-select) {
+    display: block;
+    min-width: 0;
+    max-width: 18rem;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.len .dropdown > .dropdown-menu {
+    position: absolute;
+    inset: calc(100% + 2px) auto auto 0;
+    width: max-content;
+    min-width: 100%;
+    max-width: 22rem;
+    max-height: 20rem;
+}
+
+.len .dropdown > .dropdown-menu-end {
+    inset: calc(100% + 2px) 0 auto auto;
+}
+
+.len .dropup > .dropdown-menu {
+    inset: auto auto calc(100% + 2px) 0;
+}
+
+.len .dropdown-menu label.dropdown-item {
+    margin: 0;
+    font-weight: 400;
+}
+
+.len .dropdown-menu .dropdown-item .form-check-input {
+    position: static;
+    flex: none;
+    margin: 0;
+}
+
+.len .dropdown-menu .dropdown-item > span:first-of-type {
+    flex: 1 1 auto;
+}
+
+.len .dropdown-menu hr {
+    margin: 0.375rem 0;
+    border-color: var(--dd-hairline);
+}
+
+.len [data-region=filter-menus] {
+    display: flex;
+    flex: none;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.len [data-region=filter-menus] button:is(.form-select, .custom-select) {
+    max-width: 14rem;
+}
+
+.len [data-menu=filters] > button:is(.form-select, .custom-select) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+}
+
+.len [data-menu=filters] > .dropdown-menu {
+    width: 17rem;
+    min-width: 0;
+    max-width: calc(100vw - 2rem);
+    max-height: none;
+    overflow: visible;
+}
+
+.len [data-region=filter-panel] {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.len [data-region=filter-panel] .dropdown,
+.len [data-region=filter-panel] :is(button, select):is(.form-select, .custom-select) {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.path-local-extendednav .modal .modal-dialog.modal-lg,
+.path-admin-local-extendednav .modal .modal-dialog.modal-lg,
+#page-admin-setting-local_extendednav_settings .modal .modal-dialog.modal-lg,
+#page-local-extendednav-manage .modal .modal-dialog.modal-lg {
+    max-width: 56rem;
+}
+
+.path-local-extendednav .modal .fdate_time_selector,
+.path-local-extendednav .modal .fdate_selector,
+.path-admin-local-extendednav .modal .fdate_time_selector,
+.path-admin-local-extendednav .modal .fdate_selector,
+#page-admin-setting-local_extendednav_settings .modal .fdate_time_selector,
+#page-admin-setting-local_extendednav_settings .modal .fdate_selector,
+#page-local-extendednav-manage .modal .fdate_time_selector,
+#page-local-extendednav-manage .modal .fdate_selector {
+    align-items: center;
+    column-gap: 0;
+    row-gap: 0.5rem;
+    font-size: 0;
+}
+
+.path-local-extendednav .modal .fdate_time_selector > .fitem,
+.path-local-extendednav .modal .fdate_selector > .fitem,
+.path-admin-local-extendednav .modal .fdate_time_selector > .fitem,
+.path-admin-local-extendednav .modal .fdate_selector > .fitem,
+#page-admin-setting-local_extendednav_settings .modal .fdate_time_selector > .fitem,
+#page-admin-setting-local_extendednav_settings .modal .fdate_selector > .fitem,
+#page-local-extendednav-manage .modal .fdate_time_selector > .fitem,
+#page-local-extendednav-manage .modal .fdate_selector > .fitem {
+    margin: 0 0.5rem 0 0;
+    font-size: 0.9375rem;
+}
+
+.path-local-extendednav .modal .fdate_time_selector > .fitem:has(input[type=checkbox]),
+.path-local-extendednav .modal .fdate_selector > .fitem:has(input[type=checkbox]),
+.path-admin-local-extendednav .modal .fdate_time_selector > .fitem:has(input[type=checkbox]),
+.path-admin-local-extendednav .modal .fdate_selector > .fitem:has(input[type=checkbox]),
+#page-admin-setting-local_extendednav_settings .modal .fdate_time_selector > .fitem:has(input[type=checkbox]),
+#page-admin-setting-local_extendednav_settings .modal .fdate_selector > .fitem:has(input[type=checkbox]),
+#page-local-extendednav-manage .modal .fdate_time_selector > .fitem:has(input[type=checkbox]),
+#page-local-extendednav-manage .modal .fdate_selector > .fitem:has(input[type=checkbox]) {
+    flex-basis: 100%;
+}
+
+.path-local-extendednav .modal .fdate_time_selector select,
+.path-local-extendednav .modal .fdate_selector select,
+.path-admin-local-extendednav .modal .fdate_time_selector select,
+.path-admin-local-extendednav .modal .fdate_selector select,
+#page-admin-setting-local_extendednav_settings .modal .fdate_time_selector select,
+#page-admin-setting-local_extendednav_settings .modal .fdate_selector select,
+#page-local-extendednav-manage .modal .fdate_time_selector select,
+#page-local-extendednav-manage .modal .fdate_selector select {
+    min-width: 0;
+}
+
+.path-local-extendednav .modal .modal-content,
+.path-admin-local-extendednav .modal .modal-content,
+#page-admin-setting-local_extendednav_settings .modal .modal-content,
+#page-local-extendednav-manage .modal .modal-content {
+    overflow: hidden;
+    border: 1px solid var(--dd-hairline);
+    border-radius: 1.25rem;
+    background-color: var(--dd-surface);
+    box-shadow: var(--dd-shadow-lg);
+    color: var(--dd-ink);
+}
+
+.path-local-extendednav .modal .modal-dialog:focus .modal-content,
+.path-local-extendednav .modal .modal-dialog.focus .modal-content,
+.path-admin-local-extendednav .modal .modal-dialog:focus .modal-content,
+.path-admin-local-extendednav .modal .modal-dialog.focus .modal-content,
+#page-admin-setting-local_extendednav_settings .modal .modal-dialog:focus .modal-content,
+#page-admin-setting-local_extendednav_settings .modal .modal-dialog.focus .modal-content,
+#page-local-extendednav-manage .modal .modal-dialog:focus .modal-content,
+#page-local-extendednav-manage .modal .modal-dialog.focus .modal-content {
+    border-radius: 1.25rem;
+    box-shadow: var(--dd-shadow-lg);
+}
+
+.path-local-extendednav .modal .modal-header,
+.path-admin-local-extendednav .modal .modal-header,
+#page-admin-setting-local_extendednav_settings .modal .modal-header,
+#page-local-extendednav-manage .modal .modal-header {
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.25rem 0.5rem 1.5rem;
+    border-bottom: 0;
+}
+
+.path-local-extendednav .modal .modal-header .close,
+.path-local-extendednav .modal .modal-header .btn-close,
+.path-admin-local-extendednav .modal .modal-header .close,
+.path-admin-local-extendednav .modal .modal-header .btn-close,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .close,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .btn-close,
+#page-local-extendednav-manage .modal .modal-header .close,
+#page-local-extendednav-manage .modal .modal-header .btn-close {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: 0 0 0 auto;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--dd-muted);
+    opacity: 1;
+    text-shadow: none;
+    transition: background-color var(--dd-ease), color var(--dd-ease);
+}
+
+.path-local-extendednav .modal .modal-header .close:hover,
+.path-local-extendednav .modal .modal-header .close:focus-visible,
+.path-local-extendednav .modal .modal-header .btn-close:hover,
+.path-local-extendednav .modal .modal-header .btn-close:focus-visible,
+.path-admin-local-extendednav .modal .modal-header .close:hover,
+.path-admin-local-extendednav .modal .modal-header .close:focus-visible,
+.path-admin-local-extendednav .modal .modal-header .btn-close:hover,
+.path-admin-local-extendednav .modal .modal-header .btn-close:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .close:hover,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .close:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .btn-close:hover,
+#page-admin-setting-local_extendednav_settings .modal .modal-header .btn-close:focus-visible,
+#page-local-extendednav-manage .modal .modal-header .close:hover,
+#page-local-extendednav-manage .modal .modal-header .close:focus-visible,
+#page-local-extendednav-manage .modal .modal-header .btn-close:hover,
+#page-local-extendednav-manage .modal .modal-header .btn-close:focus-visible {
+    outline: 0;
+    background-color: var(--dd-surface-3);
+    color: var(--dd-ink);
+}
+
+.path-local-extendednav .modal .modal-title,
+.path-admin-local-extendednav .modal .modal-title,
+#page-admin-setting-local_extendednav_settings .modal .modal-title,
+#page-local-extendednav-manage .modal .modal-title {
+    color: var(--dd-ink);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.011em;
+}
+
+.path-local-extendednav .modal .modal-body,
+.path-admin-local-extendednav .modal .modal-body,
+#page-admin-setting-local_extendednav_settings .modal .modal-body,
+#page-local-extendednav-manage .modal .modal-body {
+    padding: 0.5rem 1.5rem 1rem;
+    line-height: 1.55;
+}
+
+.path-local-extendednav .modal .modal-footer,
+.path-admin-local-extendednav .modal .modal-footer,
+#page-admin-setting-local_extendednav_settings .modal .modal-footer,
+#page-local-extendednav-manage .modal .modal-footer {
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem 1.25rem;
+    border-top: 0;
+}
+
+.path-local-extendednav .modal .modal-footer > *,
+.path-admin-local-extendednav .modal .modal-footer > *,
+#page-admin-setting-local_extendednav_settings .modal .modal-footer > *,
+#page-local-extendednav-manage .modal .modal-footer > * {
+    margin: 0;
+}
+
+.path-local-extendednav .modal .modal-dialog-scrollable .modal-body,
+.path-admin-local-extendednav .modal .modal-dialog-scrollable .modal-body,
+#page-admin-setting-local_extendednav_settings .modal .modal-dialog-scrollable .modal-body,
+#page-local-extendednav-manage .modal .modal-dialog-scrollable .modal-body {
+    border-top: 1px solid var(--dd-hairline);
+    border-bottom: 1px solid var(--dd-hairline);
+}
+
+.path-local-extendednav .modal.show .modal-dialog,
+.path-admin-local-extendednav .modal.show .modal-dialog,
+#page-admin-setting-local_extendednav_settings .modal.show .modal-dialog,
+#page-local-extendednav-manage .modal.show .modal-dialog {
+    animation: len-dialog 280ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes len-dialog {
+
+    from {
+        opacity: 0;
+        transform: translateY(0.75rem) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .path-local-extendednav .modal.show .modal-dialog,
+    .path-admin-local-extendednav .modal.show .modal-dialog,
+    #page-admin-setting-local_extendednav_settings .modal.show .modal-dialog,
+    #page-local-extendednav-manage .modal.show .modal-dialog {
+        animation: none;
+    }
+}
+
+.len [data-region=layout] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+
+    .len [data-region=layout] {
+        grid-template-columns: 15rem minmax(0, 1fr);
+        align-items: start;
+    }
+}
+
+.len [data-region=layout] > [data-region=origin] {
+    min-width: 0;
+}
+
+.len [data-region=layout] [data-region=origins] .list-group-item.active {
+    border-color: var(--dd-primary);
+    background-color: var(--dd-primary-soft);
+    color: var(--dd-primary-ink);
+    font-weight: 600;
+}
+
+.len [data-menu=scope] {
+    position: relative;
+}
+
+.len [data-menu=scope] > .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1060;
+    min-width: 18rem;
+    max-height: 20rem;
+    margin-top: 2px;
+    overflow: auto;
+}
+
+.len [data-region=tablewrap] th[data-column=title] {
+    min-width: 12rem;
+}
+
+.len [data-region=tablewrap] td[data-column=actions] {
+    width: 1%;
+}
+
 /*
  * Extended Navigation styles.
  *
@@ -6,8 +1983,8 @@
  * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 /* Hides "Block URL access" in the node form while the URL is external. */
+
 .mform .fitem.local-extendednav-hidden {
     display: none;
 }
@@ -20,7 +1997,7 @@
 .local-extendednav-nodes td,
 .local-extendednav-activity th,
 .local-extendednav-activity td {
-    padding: .75rem 1rem;
+    padding: 0.75rem 1rem;
 }
 
 .local-extendednav-nodes .local-extendednav-col-title {
@@ -35,15 +2012,16 @@
 .local-extendednav-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: .25rem;
+    gap: 0.25rem;
 }
 
 /* The dragged copy of a row and its children (see amd/src/manage.js). */
+
 .local-extendednav-nodes-card table.local-extendednav-drag-proxy {
     z-index: 1050;
     min-width: 0;
     background-color: var(--bs-body-bg, #fff);
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .local-extendednav-nodes-card .local-extendednav-nodes tbody tr.sortable-list-current-position {
@@ -51,8 +2029,9 @@
 }
 
 /* Children of a dragged parent fade out and back in (FADE_MS in amd/src/manage.js). */
+
 .local-extendednav-nodes tbody tr {
-    transition: opacity .15s ease-in-out;
+    transition: opacity 0.15s ease-in-out;
 }
 
 .local-extendednav-nodes tbody tr.local-extendednav-fading {
@@ -60,7 +2039,9 @@
 }
 
 /* A dropped row is highlighted briefly, as in the report builder. */
+
 @keyframes local-extendednav-dropped {
+
     from {
         background-color: var(--bs-secondary-bg, #e9ecef);
     }
@@ -75,6 +2056,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .local-extendednav-nodes tbody tr {
         transition: none;
     }
@@ -83,22 +2065,23 @@
         animation: none;
     }
 }
-
 /* Tabs and actions share one row; the tab line stops before the buttons. */
+
 .local-extendednav-toolbar {
-    gap: .5rem 1rem;
+    gap: 0.5rem 1rem;
 }
 
 .local-extendednav-actions {
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 /* Filters on one row that wraps on small screens. */
+
 .local-extendednav-filterbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 .local-extendednav-filterbar .local-extendednav-search {
@@ -110,11 +2093,11 @@
 }
 
 .local-extendednav-filter-field {
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 .local-extendednav-activity-footer {
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 .local-extendednav-activity-footer .pagination {
@@ -123,6 +2106,7 @@
 
 /* Moodle 4.5 makes the hidden sort label of a table header a block inside .no-overflow, which
    pushes the sort icon to a second line. Keep it inline so label and icon stay together. */
+
 .local-extendednav-activity-card .local-extendednav-activity th .accesshide {
     display: inline-block;
 }
@@ -130,7 +2114,7 @@
 .local-extendednav-search .icon {
     position: absolute;
     top: 50%;
-    left: .75rem;
+    left: 0.75rem;
     margin: 0;
     transform: translateY(-50%);
     pointer-events: none;
@@ -141,13 +2125,14 @@
 }
 
 .local-extendednav-nodes-card .local-extendednav-nodes-footer {
-    gap: .5rem;
+    gap: 0.5rem;
     min-height: 3.5rem;
     background-color: var(--bs-body-bg, #fff);
 }
 
 /* While nodes are selected, the footer with the bulk actions stays on screen when scrolling a long list.
    It is not fixed otherwise, so it never covers the rows people are working on. */
+
 .local-extendednav-nodes-card .local-extendednav-nodes-footer.local-extendednav-nodes-footer-sticky {
     position: sticky;
     bottom: 0;
@@ -158,23 +2143,24 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 /* Icon picker of the node form. Selectors are doubled so the theme's own styles, loaded after these, do not win. */
 /* Moodle's form element is a flex row too, so the field row and the line below it take its whole width. */
+
 .local-extendednav-iconfield {
     display: flex;
     flex: 0 0 100%;
     flex-wrap: wrap;
     align-items: center;
-    gap: .5rem;
+    gap: 0.5rem;
 }
 
 .local-extendednav-iconinfo {
     flex: 0 0 100%;
     width: 100%;
-    margin-top: .25rem;
+    margin-top: 0.25rem;
 }
 
 .local-extendednav-iconfield .local-extendednav-icontile {
@@ -187,7 +2173,7 @@
     margin: 0;
     padding: 0;
     border: 1px solid #8f959e;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     background: #fff;
     color: inherit;
 }
@@ -215,16 +2201,16 @@
 }
 
 .local-extendednav-iconfield .btn-link {
-    padding-left: .25rem;
-    padding-right: .25rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 }
 
 .local-extendednav-iconpicker .local-extendednav-icongrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-    gap: .25rem;
+    gap: 0.25rem;
     max-height: 55vh;
-    padding: .25rem;
+    padding: 0.25rem;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -234,13 +2220,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: .25rem;
+    gap: 0.25rem;
     min-width: 0;
     height: 5.75rem;
     margin: 0;
-    padding: .65rem .35rem .35rem;
+    padding: 0.65rem 0.35rem 0.35rem;
     border: 1px solid transparent;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     background: transparent;
     color: inherit;
     line-height: 1.2;
@@ -255,7 +2241,7 @@
 }
 
 .local-extendednav-icongrid .local-extendednav-iconcell:focus-visible {
-    box-shadow: 0 0 0 .2rem rgba(15, 108, 191, .5);
+    box-shadow: 0 0 0 0.2rem rgba(15, 108, 191, 0.5);
 }
 
 .local-extendednav-icongrid .local-extendednav-iconcell.local-extendednav-iconcell-current {
@@ -282,7 +2268,7 @@
     display: -webkit-box;
     max-width: 100%;
     overflow: hidden;
-    font-size: .75rem;
+    font-size: 0.75rem;
     overflow-wrap: anywhere;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -292,7 +2278,7 @@
     max-width: 100%;
     overflow: hidden;
     color: #6a737b;
-    font-size: .65rem;
+    font-size: 0.65rem;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -300,4 +2286,442 @@
 .local-extendednav-icongrid .local-extendednav-iconsentinel {
     grid-column: 1 / -1;
     height: 1px;
+}
+
+.len .btn.btn:focus:not(:focus-visible),
+.len .btn.btn:active:focus:not(:focus-visible),
+.len .page-link.page-link:focus:not(:focus-visible),
+.len .page-link.page-link:active:focus:not(:focus-visible),
+.len .dropdown-item.dropdown-item:focus:not(:focus-visible),
+.len .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+.len .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+.len .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+.len button:is(.form-select, .custom-select):focus:not(:focus-visible),
+.len button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+.len [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+.len [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+.len select.custom-select:focus:not(:focus-visible),
+.len select.custom-select:active:focus:not(:focus-visible),
+.len select.form-select:focus:not(:focus-visible),
+.len select.form-select:active:focus:not(:focus-visible),
+.path-local-extendednav .modal .btn.btn:focus:not(:focus-visible),
+.path-local-extendednav .modal .btn.btn:active:focus:not(:focus-visible),
+.path-local-extendednav .modal .page-link.page-link:focus:not(:focus-visible),
+.path-local-extendednav .modal .page-link.page-link:active:focus:not(:focus-visible),
+.path-local-extendednav .modal .dropdown-item.dropdown-item:focus:not(:focus-visible),
+.path-local-extendednav .modal .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+.path-local-extendednav .modal .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+.path-local-extendednav .modal .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+.path-local-extendednav .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+.path-local-extendednav .modal button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+.path-local-extendednav .modal [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+.path-local-extendednav .modal [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+.path-local-extendednav .modal select.custom-select:focus:not(:focus-visible),
+.path-local-extendednav .modal select.custom-select:active:focus:not(:focus-visible),
+.path-local-extendednav .modal select.form-select:focus:not(:focus-visible),
+.path-local-extendednav .modal select.form-select:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .btn.btn:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .btn.btn:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .page-link.page-link:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .page-link.page-link:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .dropdown-item.dropdown-item:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+.path-admin-local-extendednav .modal button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.custom-select:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.custom-select:active:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.form-select:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.form-select:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .page-link.page-link:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .page-link.page-link:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .dropdown-item.dropdown-item:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.custom-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.custom-select:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.form-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.form-select:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .btn.btn:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .btn.btn:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .page-link.page-link:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .page-link.page-link:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .dropdown-item.dropdown-item:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+#page-local-extendednav-manage .modal button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.custom-select:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.custom-select:active:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.form-select:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.form-select:active:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+.len .btn.btn:focus-visible,
+.len .page-link.page-link:focus-visible,
+.len .dropdown-item.dropdown-item:focus-visible,
+.len .list-group-item-action.list-group-item-action:focus-visible,
+.len button:is(.form-select, .custom-select):focus-visible,
+.len [data-menu-clear][data-menu-clear]:focus-visible,
+.len select.custom-select:focus-visible,
+.len select.form-select:focus-visible,
+.path-local-extendednav .modal .btn.btn:focus-visible,
+.path-local-extendednav .modal .page-link.page-link:focus-visible,
+.path-local-extendednav .modal .dropdown-item.dropdown-item:focus-visible,
+.path-local-extendednav .modal .list-group-item-action.list-group-item-action:focus-visible,
+.path-local-extendednav .modal button:is(.form-select, .custom-select):focus-visible,
+.path-local-extendednav .modal [data-menu-clear][data-menu-clear]:focus-visible,
+.path-local-extendednav .modal select.custom-select:focus-visible,
+.path-local-extendednav .modal select.form-select:focus-visible,
+.path-admin-local-extendednav .modal .btn.btn:focus-visible,
+.path-admin-local-extendednav .modal .page-link.page-link:focus-visible,
+.path-admin-local-extendednav .modal .dropdown-item.dropdown-item:focus-visible,
+.path-admin-local-extendednav .modal .list-group-item-action.list-group-item-action:focus-visible,
+.path-admin-local-extendednav .modal button:is(.form-select, .custom-select):focus-visible,
+.path-admin-local-extendednav .modal [data-menu-clear][data-menu-clear]:focus-visible,
+.path-admin-local-extendednav .modal select.custom-select:focus-visible,
+.path-admin-local-extendednav .modal select.form-select:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .page-link.page-link:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .dropdown-item.dropdown-item:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal .list-group-item-action.list-group-item-action:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal button:is(.form-select, .custom-select):focus-visible,
+#page-admin-setting-local_extendednav_settings .modal [data-menu-clear][data-menu-clear]:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal select.custom-select:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal select.form-select:focus-visible,
+#page-local-extendednav-manage .modal .btn.btn:focus-visible,
+#page-local-extendednav-manage .modal .page-link.page-link:focus-visible,
+#page-local-extendednav-manage .modal .dropdown-item.dropdown-item:focus-visible,
+#page-local-extendednav-manage .modal .list-group-item-action.list-group-item-action:focus-visible,
+#page-local-extendednav-manage .modal button:is(.form-select, .custom-select):focus-visible,
+#page-local-extendednav-manage .modal [data-menu-clear][data-menu-clear]:focus-visible,
+#page-local-extendednav-manage .modal select.custom-select:focus-visible,
+#page-local-extendednav-manage .modal select.form-select:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len select.custom-select:focus:not(:focus-visible),
+.len select.form-select:focus:not(:focus-visible),
+.len button:is(.form-select, .custom-select):focus:not(:focus-visible),
+.path-local-extendednav .modal select.custom-select:focus:not(:focus-visible),
+.path-local-extendednav .modal select.form-select:focus:not(:focus-visible),
+.path-local-extendednav .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.custom-select:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal select.form-select:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.custom-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal select.form-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal button:is(.form-select, .custom-select):focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.custom-select:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal select.form-select:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal button:is(.form-select, .custom-select):focus:not(:focus-visible) {
+    border-color: var(--dd-line-hover);
+}
+
+.len .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+.len .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled),
+.path-local-extendednav .modal .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+.path-local-extendednav .modal .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled),
+.path-admin-local-extendednav .modal .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+.path-admin-local-extendednav .modal .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled),
+#page-local-extendednav-manage .modal .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+#page-local-extendednav-manage .modal .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled) {
+    border-color: var(--dd-c);
+    background-color: var(--dd-c-soft-2);
+    box-shadow: none;
+    color: var(--dd-c-ink);
+}
+
+.len .btn.btn.btn-link:active:not(:disabled):not(.disabled),
+.path-local-extendednav .modal .btn.btn.btn-link:active:not(:disabled):not(.disabled),
+.path-admin-local-extendednav .modal .btn.btn.btn-link:active:not(:disabled):not(.disabled),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn.btn-link:active:not(:disabled):not(.disabled),
+#page-local-extendednav-manage .modal .btn.btn.btn-link:active:not(:disabled):not(.disabled) {
+    border-color: transparent;
+}
+
+.len .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled),
+.path-local-extendednav .modal .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled),
+.path-admin-local-extendednav .modal .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled),
+#page-admin-setting-local_extendednav_settings .modal .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled),
+#page-local-extendednav-manage .modal .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled) {
+    box-shadow: none;
+    filter: brightness(0.94);
+}
+
+.len input.form-check-input[type]:focus:not(:focus-visible),
+.len input[type=checkbox].form-check-input:focus:not(:focus-visible),
+.len input[type=radio].form-check-input:focus:not(:focus-visible),
+.path-local-extendednav .modal input.form-check-input[type]:focus:not(:focus-visible),
+.path-local-extendednav .modal input[type=checkbox].form-check-input:focus:not(:focus-visible),
+.path-local-extendednav .modal input[type=radio].form-check-input:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input.form-check-input[type]:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input[type=checkbox].form-check-input:focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input[type=radio].form-check-input:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input.form-check-input[type]:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input[type=checkbox].form-check-input:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input[type=radio].form-check-input:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input.form-check-input[type]:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input[type=checkbox].form-check-input:focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input[type=radio].form-check-input:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+.len input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+.len input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+.len input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible),
+.path-local-extendednav .modal input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+.path-local-extendednav .modal input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+.path-local-extendednav .modal input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+.path-admin-local-extendednav .modal input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings .modal input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+#page-local-extendednav-manage .modal input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible) {
+    border-color: var(--dd-line-hover);
+}
+
+.len input.form-check-input[type]:active,
+.len input[type=checkbox].form-check-input:active,
+.len input[type=radio].form-check-input:active,
+.path-local-extendednav .modal input.form-check-input[type]:active,
+.path-local-extendednav .modal input[type=checkbox].form-check-input:active,
+.path-local-extendednav .modal input[type=radio].form-check-input:active,
+.path-admin-local-extendednav .modal input.form-check-input[type]:active,
+.path-admin-local-extendednav .modal input[type=checkbox].form-check-input:active,
+.path-admin-local-extendednav .modal input[type=radio].form-check-input:active,
+#page-admin-setting-local_extendednav_settings .modal input.form-check-input[type]:active,
+#page-admin-setting-local_extendednav_settings .modal input[type=checkbox].form-check-input:active,
+#page-admin-setting-local_extendednav_settings .modal input[type=radio].form-check-input:active,
+#page-local-extendednav-manage .modal input.form-check-input[type]:active,
+#page-local-extendednav-manage .modal input[type=checkbox].form-check-input:active,
+#page-local-extendednav-manage .modal input[type=radio].form-check-input:active {
+    filter: none;
+}
+
+.len input.form-check-input[type]:focus-visible,
+.len input[type=checkbox].form-check-input:focus-visible,
+.len input[type=radio].form-check-input:focus-visible,
+.path-local-extendednav .modal input.form-check-input[type]:focus-visible,
+.path-local-extendednav .modal input[type=checkbox].form-check-input:focus-visible,
+.path-local-extendednav .modal input[type=radio].form-check-input:focus-visible,
+.path-admin-local-extendednav .modal input.form-check-input[type]:focus-visible,
+.path-admin-local-extendednav .modal input[type=checkbox].form-check-input:focus-visible,
+.path-admin-local-extendednav .modal input[type=radio].form-check-input:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal input.form-check-input[type]:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal input[type=checkbox].form-check-input:focus-visible,
+#page-admin-setting-local_extendednav_settings .modal input[type=radio].form-check-input:focus-visible,
+#page-local-extendednav-manage .modal input.form-check-input[type]:focus-visible,
+#page-local-extendednav-manage .modal input[type=checkbox].form-check-input:focus-visible,
+#page-local-extendednav-manage .modal input[type=radio].form-check-input:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before,
+.path-local-extendednav .modal .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before,
+.path-admin-local-extendednav .modal .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before,
+#page-admin-setting-local_extendednav_settings .modal .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before,
+#page-local-extendednav-manage .modal .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before {
+    box-shadow: none;
+}
+
+.len .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before,
+.path-local-extendednav .modal .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before,
+.path-admin-local-extendednav .modal .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before,
+#page-admin-setting-local_extendednav_settings .modal .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before,
+#page-local-extendednav-manage .modal .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before {
+    border-color: var(--dd-line-hover);
+}
+
+.len .custom-control-input:not(:disabled):active ~ .custom-control-label::before,
+.path-local-extendednav .modal .custom-control-input:not(:disabled):active ~ .custom-control-label::before,
+.path-admin-local-extendednav .modal .custom-control-input:not(:disabled):active ~ .custom-control-label::before,
+#page-admin-setting-local_extendednav_settings .modal .custom-control-input:not(:disabled):active ~ .custom-control-label::before,
+#page-local-extendednav-manage .modal .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+    border-color: var(--dd-primary);
+    background-color: var(--dd-primary-soft);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 0;
+    background-color: transparent;
+    box-shadow: inset 0 -1px 0 var(--dd-hairline);
+    scrollbar-width: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-item {
+    flex: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-link.nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--dd-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: box-shadow var(--dd-ease), color var(--dd-ease);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-link.nav-link:hover {
+    box-shadow: inset 0 -2px 0 var(--dd-line);
+    color: var(--dd-ink);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-link.nav-link:is(:focus, :focus-visible, :active, .focus):not(.active) {
+    /* stylelint-disable-next-line declaration-no-important */
+    outline: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    background: none !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    box-shadow: inset 0 -2px 0 var(--dd-line) !important;
+    color: var(--dd-ink);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-link.nav-link.active,
+#page-admin-setting-local_extendednav_settings #region-main .nav-tabs.nav-tabs .nav-link.nav-link.active:is(:hover, :focus, :focus-visible, :active, .focus) {
+    /* stylelint-disable-next-line declaration-no-important */
+    border: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    outline: 0 !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    background: none !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    box-shadow: inset 0 -3px 0 var(--dd-primary) !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--dd-primary-ink) !important;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .page-link.page-link:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .page-link.page-link:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .dropdown-item.dropdown-item:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .dropdown-item.dropdown-item:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .list-group-item-action.list-group-item-action:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main .list-group-item-action.list-group-item-action:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main button:is(.form-select, .custom-select):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main button:is(.form-select, .custom-select):active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main [data-menu-clear][data-menu-clear]:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main [data-menu-clear][data-menu-clear]:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main select.custom-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main select.custom-select:active:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main select.form-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main select.form-select:active:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main .page-link.page-link:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main .dropdown-item.dropdown-item:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main .list-group-item-action.list-group-item-action:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main button:is(.form-select, .custom-select):focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main [data-menu-clear][data-menu-clear]:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main select.custom-select:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main select.form-select:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main select.custom-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main select.form-select:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main button:is(.form-select, .custom-select):focus:not(:focus-visible) {
+    border-color: var(--dd-line-hover);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:is([class*=btn-outline-], .btn-link):active:not(:disabled):not(.disabled),
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:is([class*=btn-outline-], .btn-link).active:not(:disabled):not(.disabled) {
+    border-color: var(--dd-c);
+    background-color: var(--dd-c-soft-2);
+    box-shadow: none;
+    color: var(--dd-c-ink);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn.btn-link:active:not(:disabled):not(.disabled) {
+    border-color: transparent;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .btn.btn:is(.btn-primary, .btn-secondary, .btn-danger, .btn-success, .btn-warning, .btn-info):active:not(:disabled):not(.disabled) {
+    box-shadow: none;
+    filter: brightness(0.94);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main input.form-check-input[type]:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main input[type=checkbox].form-check-input:focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main input[type=radio].form-check-input:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main input.form-check-input[type]:not(:checked):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main input[type=checkbox].form-check-input:not(:checked):focus:not(:focus-visible),
+#page-admin-setting-local_extendednav_settings #region-main input[type=radio].form-check-input:not(:checked):focus:not(:focus-visible) {
+    border-color: var(--dd-line-hover);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main input.form-check-input[type]:active,
+#page-admin-setting-local_extendednav_settings #region-main input[type=checkbox].form-check-input:active,
+#page-admin-setting-local_extendednav_settings #region-main input[type=radio].form-check-input:active {
+    filter: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main input.form-check-input[type]:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main input[type=checkbox].form-check-input:focus-visible,
+#page-admin-setting-local_extendednav_settings #region-main input[type=radio].form-check-input:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .custom-control-input:focus:not(:focus-visible) ~ .custom-control-label::before {
+    box-shadow: none;
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .custom-control-input:not(:checked):focus:not(:focus-visible) ~ .custom-control-label::before {
+    border-color: var(--dd-line-hover);
+}
+
+#page-admin-setting-local_extendednav_settings #region-main .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
+    border-color: var(--dd-primary);
+    background-color: var(--dd-primary-soft);
 }

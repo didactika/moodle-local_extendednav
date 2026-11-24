@@ -110,6 +110,47 @@ class node_access {
      * @return bool
      */
     public static function is_allowed(\stdClass $node, ?int $userid = null): bool {
+        return self::is_allowed_by_rules($node, $userid) || self::is_seen_by_admin($node, $userid);
+    }
+
+    /**
+     * Whether the user is a site administrator who sees the node whatever its visibility says.
+     *
+     * An administrator sees every node by default, so no rule leaves a site without its administrator. The node, or the
+     * plugin for every node, can hide it from the administrators too.
+     *
+     * @param \stdClass $node Node record.
+     * @param int|null $userid User id, defaults to the current user.
+     * @return bool
+     */
+    public static function is_seen_by_admin(\stdClass $node, ?int $userid = null): bool {
+        global $USER;
+
+        if (!empty($node->hideadmins) || get_config('local_extendednav', 'hide_from_admins')) {
+            return false;
+        }
+        return is_siteadmin($userid ?? (int)$USER->id);
+    }
+
+    /**
+     * Whether the user sees the node only because they are a site administrator.
+     *
+     * @param \stdClass $node Node record.
+     * @param int|null $userid User id, defaults to the current user.
+     * @return bool
+     */
+    public static function is_admin_only(\stdClass $node, ?int $userid = null): bool {
+        return !self::is_allowed_by_rules($node, $userid) && self::is_seen_by_admin($node, $userid);
+    }
+
+    /**
+     * Whether visibility and roles allow the user this node, without the exception of the administrators.
+     *
+     * @param \stdClass $node Node record.
+     * @param int|null $userid User id, defaults to the current user.
+     * @return bool
+     */
+    public static function is_allowed_by_rules(\stdClass $node, ?int $userid = null): bool {
         global $USER;
 
         if (self::is_protected($node)) {

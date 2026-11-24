@@ -1,4 +1,4 @@
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -11,368 +11,259 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Management page: selection, bulk actions, delete confirmation and drag-and-drop ordering.
+ * The management page: the list of the nodes of a navigation, the scope of the changes and the settings. Every action changes
+ * the page in place through a web service; nothing reloads it but the choice of another navigation or scope.
  *
  * @module     local_extendednav/manage
  * @copyright  2026 Didactika.org
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
 import Ajax from 'core/ajax';
-import Notification from 'core/notification';
-import SortableList from 'core/sortable_list';
-import {getString} from 'core/str';
+import {get_strings as getStrings} from 'core/str';
+import List from 'local_extendednav/local/list';
+import {confirmDanger, debounce, toast, describeError} from 'local_extendednav/local/ui';
+import {init as fitTables} from 'local_extendednav/fit_tables';
+
+const call = (methodname, args) => Ajax.call([{methodname, args}])[0];
 
 /**
- * Shows the bulk actions bar while nodes are selected.
+ * Fills the placeholder of a string with a name.
  *
- * @param {HTMLInputElement[]} checkboxes Row checkboxes.
- * @param {HTMLInputElement|null} selectAll The "select all" checkbox.
+ * @param {string} text String with {$a}.
+ * @param {string} name What goes in it.
+ * @returns {string} The text.
  */
-const updateBulkBar = (checkboxes, selectAll) => {
-    const bar = document.getElementById('bulk-actions-bar');
-    const count = document.getElementById('bulk-count');
-    const selected = checkboxes.filter((checkbox) => checkbox.checked).length;
-    if (selectAll) {
-        selectAll.checked = checkboxes.length > 0 && selected === checkboxes.length;
-    }
-    if (bar && count) {
-        count.textContent = selected;
-        bar.classList.toggle('d-none', selected === 0);
-        // Keep the bulk actions on screen only while they can be used.
-        bar.closest('.local-extendednav-nodes-footer')?.classList.toggle('local-extendednav-nodes-footer-sticky', selected > 0);
-    }
-};
+const named = (text, name) => text.replace('{$a}', name);
 
 /**
- * Asks for confirmation before deleting.
+ * Wires the menu that chooses the scope of the changes.
  *
- * @param {String} questionKey String identifier of the question.
- * @param {HTMLElement} trigger Element that opened the dialogue.
- * @returns {Promise}
+ * @param {HTMLElement} root The page.
+ * @param {Object} config The page configuration.
  */
-const confirmDelete = async(questionKey, trigger) => {
-    const [title, question, label] = await Promise.all([
-        getString('delete', 'core'),
-        getString(questionKey, 'local_extendednav'),
-        getString('delete', 'core'),
-    ]);
-    return Notification.deleteCancelPromise(title, question, label, {triggerElement: trigger});
-};
-
-/**
- * Returns the name of a row for the move dialogue: its title, or its node key.
- *
- * @param {HTMLElement} row Table row.
- * @returns {String}
- */
-const getRowName = (row) => {
-    const title = row.querySelector('.local-extendednav-col-title a');
-    const key = row.querySelector('code');
-    return (title && title.textContent.trim()) || (key && key.textContent.trim()) || '';
-};
-
-/**
- * Returns the node key and parent key of a row.
- *
- * @param {HTMLElement|null} row Table row.
- * @returns {Object} With key and parent (empty for a top-level node).
- */
-const getRowInfo = (row) => {
-    const checkbox = row ? row.querySelector('input.node-checkbox') : null;
-    return {
-        key: checkbox ? checkbox.dataset.nodekey : '',
-        parent: checkbox ? checkbox.dataset.parentkey : '',
-    };
-};
-
-/**
- * Whether a row is a child of another row of the table.
- *
- * @param {HTMLElement} row Table row.
- * @returns {Boolean}
- */
-const isChild = (row) => getRowInfo(row).parent !== '';
-
-/**
- * Returns the rows of the table.
- *
- * @param {HTMLElement} tbody Table body.
- * @returns {HTMLElement[]}
- */
-const getRows = (tbody) => Array.from(tbody.children).filter((row) => row.querySelector('input.node-checkbox'));
-
-/**
- * Returns the child rows of a node.
- *
- * @param {HTMLElement} tbody Table body.
- * @param {String} key Key of the parent node.
- * @returns {HTMLElement[]}
- */
-const getChildren = (tbody, key) => getRows(tbody).filter((row) => getRowInfo(row).parent === key);
-
-/**
- * Returns the first top-level row after a row, skipping child rows.
- *
- * @param {HTMLElement} row Table row.
- * @returns {HTMLElement|null} The row, or null at the end of the table.
- */
-const getNextTopLevel = (row) => {
-    let next = row.nextElementSibling;
-    while (next && isChild(next)) {
-        next = next.nextElementSibling;
-    }
-    return next;
-};
-
-/**
- * Works out where a dragged row may go when core proposes to put it before another row.
- *
- * A top-level row moves with its children, so it only goes between groups: inside a group it
- * moves to the end of that group. A child row stays among its siblings.
- *
- * @param {HTMLElement} tbody Table body.
- * @param {HTMLElement} dragged Dragged row.
- * @param {HTMLElement|null} before Row core proposes to put it before, or null for the end.
- * @returns {HTMLElement|null|undefined} The row to put it before, null for the end, or undefined when not allowed.
- */
-const getAllowedBefore = (tbody, dragged, before) => {
-    const info = getRowInfo(dragged);
-    if (!info.parent) {
-        if (!before || !isChild(before) || getRowInfo(before).parent === info.key) {
-            // Its own children are hidden while it is dragged and follow it when it is dropped.
-            return before;
-        }
-        return getNextTopLevel(before);
-    }
-
-    const parentRow = getRows(tbody).find((row) => getRowInfo(row).key === info.parent);
-    if (!parentRow || before === parentRow) {
-        return undefined;
-    }
-    if (before && getRowInfo(before).parent === info.parent) {
-        return before;
-    }
-    return before === getNextTopLevel(parentRow) ? before : undefined;
-};
-
-/** @var {Number} Duration of the fade of child rows, as in styles.css. */
-const FADE_MS = 150;
-
-/**
- * Fades rows out, then hides them.
- *
- * @param {HTMLElement[]} rows Table rows.
- */
-const fadeOut = (rows) => {
-    rows.forEach((row) => row.classList.add('local-extendednav-fading'));
-    setTimeout(() => {
-        rows.filter((row) => row.classList.contains('local-extendednav-fading'))
-            .forEach((row) => row.classList.add('d-none'));
-    }, FADE_MS);
-};
-
-/**
- * Shows rows hidden by {@link fadeOut} and fades them in.
- *
- * @param {HTMLElement[]} rows Table rows.
- */
-const fadeIn = (rows) => {
-    rows.forEach((row) => row.classList.remove('d-none'));
-    // Apply the hidden state before removing it, so the opacity change is animated.
-    if (rows.length) {
-        rows[0].getBoundingClientRect();
-    }
-    requestAnimationFrame(() => rows.forEach((row) => row.classList.remove('local-extendednav-fading')));
-};
-
-/**
- * Builds the dragged copy of rows as a small table.
- *
- * The copy is positioned "fixed" outside the table layout, so every cell gets the width of the
- * cell it copies.
- *
- * @param {HTMLElement} table The table of nodes.
- * @param {HTMLElement[]} rows Rows to copy.
- * @returns {HTMLElement}
- */
-const buildProxy = (table, rows) => {
-    const widths = Array.from(rows[0].children).map((cell) => cell.getBoundingClientRect().width);
-    const proxy = document.createElement('table');
-    proxy.className = table.className + ' local-extendednav-drag-proxy';
-    proxy.style.width = rows[0].getBoundingClientRect().width + 'px';
-    proxy.style.tableLayout = 'fixed';
-    const body = document.createElement('tbody');
-    rows.forEach((row) => {
-        const copy = row.cloneNode(true);
-        copy.classList.remove('d-none', 'sortable-list-current-position', 'sortable-list-is-dragged');
-        copy.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-        copy.querySelectorAll('[name]').forEach((element) => element.removeAttribute('name'));
-        Array.from(copy.children).forEach((cell, index) => {
-            cell.style.width = widths[index] + 'px';
-        });
-        body.appendChild(copy);
-    });
-    proxy.appendChild(body);
-    return proxy;
-};
-
-/**
- * Enables drag-and-drop ordering of the rows, keeping children with their parent.
- *
- * @param {String} menu Menu key.
- */
-const initSortable = (menu) => {
-    const tbody = document.querySelector('#local-extendednav-manage tbody');
-    if (!tbody || !tbody.querySelector('[data-drag-type="move"]')) {
+const initScope = (root, config) => {
+    const menu = root.querySelector('[data-menu="scope"]');
+    if (!menu) {
         return;
     }
-    const table = tbody.closest('table');
-    const list = new SortableList(tbody, {moveHandlerSelector: '[data-drag-type="move"]'});
-    // Children of the dragged parent, which follow it when it is dropped.
-    let children = [];
-    // The same children while they are hidden, during a drag with the mouse.
-    let hiddenChildren = [];
-
-    list.getElementName = (element) => $.Deferred().resolve(getRowName(element[0]));
-
-    // Only move to positions allowed for the dragged row.
-    const moveElement = list.moveElement.bind(list);
-    list.moveElement = (parentElement, beforeElement) => {
-        const before = getAllowedBefore(tbody, list.info.element[0], beforeElement[0] || null);
-        if (before !== undefined) {
-            moveElement(parentElement, before ? $(before) : $());
+    const popup = menu.querySelector('.dropdown-menu');
+    const toggle = menu.querySelector('[data-menu-toggle]');
+    const search = menu.querySelector('[data-region="scopesearch"]');
+    const list = menu.querySelector('[data-region="scopelist"]');
+    const [site, exceptions, nothing] = [config.strings.wholesite, config.strings.exceptions, config.strings.noscopes];
+    const open = (show) => {
+        popup.hidden = !show;
+        toggle.setAttribute('aria-expanded', show ? 'true' : 'false');
+        if (show) {
+            search.focus();
+            load();
         }
     };
-
-    // The move dialogue only offers the allowed positions, named after groups for a parent.
-    const getDestinationsList = list.getDestinationsList.bind(list);
-    list.getDestinationsList = () => getDestinationsList().then((destinations) => {
-        const dragged = list.info.element[0];
-        const draggedInfo = getRowInfo(dragged);
-        const sameplace = draggedInfo.parent ? null : getNextTopLevel(dragged);
-        destinations.find('[data-core_sortable_list-quickmove]').each((index, link) => {
-            const before = $(link).data('before-element')[0] || null;
-            let allowed = getAllowedBefore(tbody, dragged, before) === before;
-            if (!draggedInfo.parent) {
-                allowed = allowed && (!before || !isChild(before)) && !(sameplace && before === sameplace);
-            }
-            if (!allowed) {
-                $(link).closest('li').remove();
-            }
-        });
-        return destinations;
-    });
-    const getDestinationName = list.getDestinationName.bind(list);
-    list.getDestinationName = (parentElement, afterElement) => {
-        const after = afterElement[0];
-        if (after && !isChild(list.info.element[0]) && isChild(after)) {
-            const parentRow = getRows(tbody).find((row) => getRowInfo(row).key === getRowInfo(after).parent);
-            if (parentRow) {
-                return getDestinationName(parentElement, $(parentRow));
-            }
+    const go = (contextid) => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('page');
+        if (contextid) {
+            url.searchParams.set('contextid', contextid);
+        } else {
+            url.searchParams.delete('contextid');
         }
-        return getDestinationName(parentElement, afterElement);
+        window.location.assign(url);
     };
-
-    // The dragged copy shows the row only, sized like the table.
-    const createProxy = list.createProxy.bind(list);
-    list.createProxy = () => {
-        createProxy();
-        const proxy = buildProxy(table, [list.info.element[0]]);
-        table.parentNode.appendChild(proxy);
-        list.proxy.remove();
-        list.proxy = $(proxy).addClass('sortable-list-is-dragged').css({position: 'fixed', left: 0, top: 0, margin: 0});
-        list.proxy.offset({
-            top: list.proxyDelta.y + list.lastEvent.pageY,
-            left: list.proxyDelta.x + list.lastEvent.pageX,
-        });
-        // The drag really starts now (a click only opens the move dialogue): hide the children.
-        hiddenChildren = children;
-        fadeOut(hiddenChildren);
-    };
-
-    // A parent is moved with its children: they are hidden while it is dragged and put back after it.
-    $(tbody).on(SortableList.EVENTS.DRAGSTART, 'tr', (event, info) => {
-        const draggedInfo = getRowInfo(info.element[0]);
-        children = draggedInfo.parent ? [] : getChildren(tbody, draggedInfo.key);
-    });
-    $(tbody).on(SortableList.EVENTS.DRAGEND, 'tr', () => {
-        fadeIn(hiddenChildren);
-        hiddenChildren = [];
-        children = [];
-    });
-
-    $(tbody).on(SortableList.EVENTS.DROP, 'tr', (event, info) => {
-        let previous = info.element[0];
-        children.forEach((row) => {
-            previous.after(row);
-            previous = row;
-        });
-        if (!info.positionChanged) {
-            return;
+    const option = (label, contextid, hint = '') => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'dropdown-item d-flex align-items-center justify-content-between gap-3';
+        button.setAttribute('role', 'option');
+        button.setAttribute('aria-selected', String(contextid === config.contextid));
+        const name = document.createElement('span');
+        name.textContent = label;
+        button.append(name);
+        if (hint) {
+            const badge = document.createElement('span');
+            badge.className = 'badge rounded-pill text-bg-secondary';
+            badge.textContent = hint;
+            button.append(badge);
         }
-        // The table already shows the new order; only save it.
-        const ids = getRows(tbody).map((row) => parseInt(row.querySelector('input.node-checkbox').value, 10));
-        Ajax.call([{methodname: 'local_extendednav_reorder_nodes', args: {menu, ids}}])[0]
-            .catch(Notification.exception);
+        button.addEventListener('click', () => go(contextid));
+        return button;
+    };
+    const load = async() => {
+        const {scopes} = await call('local_extendednav_get_scopes', {menu: config.menu, search: search.value.trim()});
+        const items = [option(site, 0)];
+        scopes.forEach((scope) => {
+            const hint = scope.exceptions ? named(exceptions, scope.exceptions) : '';
+            items.push(option(scope.name, scope.contextid, hint));
+        });
+        if (scopes.length === 0 && search.value.trim()) {
+            const empty = document.createElement('p');
+            empty.className = 'text-muted small px-3 py-2 mb-0';
+            empty.textContent = nothing;
+            items.push(empty);
+        }
+        list.replaceChildren(...items);
+    };
+    toggle.addEventListener('click', () => open(popup.hidden));
+    search.addEventListener('input', debounce(load, 300));
+    document.addEventListener('pointerdown', (event) => {
+        if (!menu.contains(event.target)) {
+            open(false);
+        }
     });
-
-    // Let the highlight of a dropped row play again on the next drop.
-    tbody.addEventListener('animationend', (event) => {
-        event.target.classList.remove('sortable-list-is-dropped');
+    menu.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !popup.hidden) {
+            event.preventDefault();
+            open(false);
+            toggle.focus();
+        }
     });
 };
 
 /**
- * Sets up the page.
+ * Starts the page.
  *
- * @param {Object} config Configuration.
- * @param {String} config.menu Menu key.
- * @param {Boolean} config.sortable Whether rows can be reordered.
+ * @param {string} selector Selector of the element of the page.
+ * @returns {Promise<List>}
  */
-export const init = ({menu, sortable}) => {
-    const form = document.getElementById('bulk-form');
-    const selectAll = document.getElementById('select-all-nodes');
-    const checkboxes = Array.from(document.querySelectorAll('.node-checkbox'));
+export const init = async(selector) => {
+    fitTables();
+    const page = document.querySelector(selector);
+    const config = JSON.parse(page.dataset.config);
+    const root = page.querySelector('[data-region="list"]');
 
-    selectAll?.addEventListener('change', () => {
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = selectAll.checked;
+    const keys = ['move_up', 'move_down', 'edit_node_named', 'delete_node_named', 'select_node_named', 'show_node_named',
+        'hide_node_named', 'delete_nodes_title', 'delete_nodes_text', 'delete', 'reset_nodes_title', 'reset_nodes_text', 'reset',
+        'empty_nodes_title', 'empty_nodes_text', 'nodes_changed', 'saved', 'applies_whole_site', 'exceptions_count', 'no_scopes'];
+    const texts = await getStrings(keys.map((key) => ({key, component: key === 'delete' ? 'moodle' : 'local_extendednav'})));
+    const t = Object.fromEntries(keys.map((key, index) => [key, texts[index]]));
+    config.strings = {wholesite: t.applies_whole_site, exceptions: t.exceptions_count, noscopes: t.no_scopes};
+
+    const editUrl = (row) => {
+        const url = new URL(`${M.cfg.wwwroot}/local/extendednav/edit.php`);
+        url.searchParams.set('menu', config.menu);
+        if (config.contextid) {
+            url.searchParams.set('contextid', config.contextid);
+        }
+        if (row && (!config.contextid || row.exception)) {
+            url.searchParams.set('id', row.id);
+        } else if (row) {
+            url.searchParams.set('nodekey', row.nodekey);
+        }
+        return url.toString();
+    };
+
+    const list = new List(root, {
+        method: 'local_extendednav_get_nodes',
+        template: 'local_extendednav/list/nodes_table',
+        defaults: {search: '', status: '', page: 0, perpage: 12},
+        args: (state) => ({
+            menu: config.menu,
+            contextid: config.contextid,
+            search: state.search,
+            visibility: state.status,
+            page: state.page,
+            perpage: state.perpage,
+        }),
+        context: (response) => ({
+            rows: response.rows.map((row) => ({
+                ...row,
+                selectable: true,
+                visible: row.visibility === 1,
+                canmove: response.reorderable,
+                editurl: editUrl(row),
+                moveup: t.move_up,
+                movedown: t.move_down,
+                editlabel: named(t.edit_node_named, row.title),
+                deletelabel: named(t.delete_node_named, row.title),
+                selectlabel: named(t.select_node_named, row.title),
+                showlabel: named(t.show_node_named, row.title),
+                hidelabel: named(t.hide_node_named, row.title),
+            })),
+        }),
+        empty: () => ({icon: 't/hide', title: t.empty_nodes_title, text: t.empty_nodes_text}),
+        isFiltered: (state) => Boolean(state.search) || Boolean(state.status),
+        cleared: {status: ''},
+        onRender: (response, instance) => {
+            const label = page.querySelector('[data-region="deletelabel"]');
+            if (label) {
+                label.textContent = config.contextid ? t.reset : t.delete;
+            }
+            instance.region('floatbar')?.classList.toggle('position-fixed', false);
+        },
+    });
+
+    const apply = async(task, count = 1) => {
+        try {
+            await task();
+            await list.load();
+            list.clearSelection();
+            toast(named(t.nodes_changed, count));
+        } catch (error) {
+            toast(describeError(error), 'danger');
+        }
+    };
+    const chosenKeys = () => list.rows.filter((row) => list.selected.has(row.id)).map((row) => row.nodekey);
+
+    root.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action]');
+        const action = button?.dataset.action;
+        if (action === 'move') {
+            apply(() => call('local_extendednav_move_node', {
+                menu: config.menu,
+                contextid: config.contextid,
+                nodekey: button.dataset.key,
+                direction: Number(button.dataset.direction),
+            }));
+        } else if (action === 'toggle') {
+            apply(() => call('local_extendednav_set_visibility', {
+                menu: config.menu,
+                contextid: config.contextid,
+                nodekeys: [button.dataset.key],
+                visibility: Number(button.dataset.visibility),
+            }));
+        } else if (action === 'bulkshow' || action === 'bulkhide') {
+            const nodekeys = chosenKeys();
+            apply(() => call('local_extendednav_set_visibility', {
+                menu: config.menu, contextid: config.contextid, nodekeys, visibility: action === 'bulkshow' ? 1 : 0,
+            }), nodekeys.length);
+        } else if (action === 'delete' || action === 'bulkdelete') {
+            const nodekeys = action === 'delete' ? [button.dataset.key] : chosenKeys();
+            const reset = Boolean(config.contextid);
+            const subject = action === 'delete' ? button.dataset.title : nodekeys.length;
+            confirmDanger({
+                title: named(reset ? t.reset_nodes_title : t.delete_nodes_title, subject),
+                text: reset ? t.reset_nodes_text : t.delete_nodes_text,
+                button: reset ? t.reset : t.delete,
+                trigger: button,
+                action: async() => {
+                    await call('local_extendednav_delete_nodes', {menu: config.menu, contextid: config.contextid, nodekeys});
+                    await list.load();
+                    list.clearSelection();
+                    toast(named(t.nodes_changed, nodekeys.length));
+                },
+            });
+        }
+    });
+
+    page.querySelector('[data-region="originselect"]')?.addEventListener('change', (event) => {
+        window.location.assign(event.target.value);
+    });
+    page.querySelectorAll('[data-setting]').forEach((input) => {
+        input.addEventListener('change', async() => {
+            try {
+                await call('local_extendednav_set_setting', {name: input.dataset.setting, value: input.checked});
+                toast(t.saved);
+            } catch (error) {
+                input.checked = !input.checked;
+                toast(describeError(error), 'danger');
+            }
         });
-        updateBulkBar(checkboxes, selectAll);
     });
-    checkboxes.forEach((checkbox) => checkbox.addEventListener('change', () => updateBulkBar(checkboxes, selectAll)));
+    initScope(page, config);
 
-    const bulkDelete = document.querySelector('[data-action="bulk-delete"]');
-    bulkDelete?.addEventListener('click', (event) => {
-        event.preventDefault();
-        confirmDelete('bulk_delete_confirm', bulkDelete)
-            .then(() => {
-                form.submit();
-                return null;
-            })
-            .catch(() => null);
-    });
-
-    document.querySelectorAll('[data-action="delete-node"]').forEach((link) => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            confirmDelete('delete_node_confirm', link)
-                .then(() => {
-                    window.location.href = link.href;
-                    return null;
-                })
-                .catch(() => null);
-        });
-    });
-
-    if (sortable) {
-        initSortable(menu);
-    }
+    await list.init();
+    return list;
 };

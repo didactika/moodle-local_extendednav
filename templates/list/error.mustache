@@ -1,0 +1,33 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/list/error
+
+    What a list shows where its rows were when they did not load, with the way to try again.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "message": "The list did not load: the server did not answer in time."
+    }
+}}
+<div class="alert alert-danger d-flex flex-wrap align-items-center justify-content-between" role="status">
+    <span>{{message}}</span>
+    <button type="button" class="btn btn-outline-danger btn-sm" data-action="retry">{{#str}}try_again, local_extendednav{{/str}}</button>
+</div>

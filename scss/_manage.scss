@@ -1,0 +1,55 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// The management page: the navigations to the left, a select on a narrow screen, and the list to the right.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+.len [data-region="layout"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+
+    @media (min-width: 768px) {
+        grid-template-columns: 15rem minmax(0, 1fr);
+        align-items: start;
+    }
+
+    & > [data-region="origin"] {
+        min-width: 0;
+    }
+
+    & [data-region="origins"] .list-group-item.active {
+        border-color: var(--dd-primary);
+        background-color: var(--dd-primary-soft);
+        color: var(--dd-primary-ink);
+        font-weight: 600;
+    }
+}
+
+// The menu that chooses the scope opens under its button, over the list, and keeps its width.
+.len [data-menu="scope"] {
+    position: relative;
+
+    & > .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1060;
+        min-width: 18rem;
+        max-height: 20rem;
+        margin-top: 2px;
+        overflow: auto;
+    }
+}
+
+// The cells of the list: the title and its key end with an ellipsis, and the link too, so no row grows taller.
+.len [data-region="tablewrap"] {
+    & th[data-column="title"] {
+        min-width: 12rem;
+    }
+
+    & td[data-column="actions"] {
+        width: 1%;
+    }
+}

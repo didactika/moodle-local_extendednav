@@ -120,7 +120,12 @@ class node_repository {
         $key = 'contexts_' . $menu;
         $contexts = $cache->get($key);
         if ($contexts === false) {
-            $ids = $DB->get_fieldset_select('local_extendednav', 'DISTINCT contextid', 'menu = :menu AND contextid <> 0', ['menu' => $menu]);
+            $ids = $DB->get_fieldset_select(
+                'local_extendednav',
+                'DISTINCT contextid',
+                'menu = :menu AND contextid <> 0',
+                ['menu' => $menu]
+            );
             $contexts = array_fill_keys(array_map('intval', $ids), 1);
             $cache->set($key, $contexts);
         }

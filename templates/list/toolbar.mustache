@@ -1,0 +1,67 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/list/toolbar
+
+    The toolbar of the list of nodes: the search, the menu of the visibilities, with the nodes of each, and the button that
+    clears every filter. It keeps one row.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "id": "len-nodes",
+        "searchlabel": "Search nodes"
+    }
+}}
+<div class="d-flex align-items-center justify-content-between gap-3 px-3 py-2 border-bottom" data-region="filters">
+    <div class="d-flex align-items-center gap-2 flex-grow-1">
+        <form class="position-relative d-flex align-items-center" role="search" data-region="searchform" aria-label="{{searchlabel}}">
+            {{#pix}}a/search, core{{/pix}}
+            <label class="sr-only visually-hidden" for="{{id}}-search">{{searchlabel}}</label>
+            <input class="form-control" type="search" id="{{id}}-search" data-region="search" placeholder="{{searchlabel}}" autocomplete="off">
+        </form>
+        <span class="dropdown d-inline-flex" data-menu="status">
+            <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                aria-label="{{#str}}visibility, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}visibility, local_extendednav{{/str}}">{{#str}}visibility, local_extendednav{{/str}}</span></button>
+            <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}"
+                aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+            <span class="dropdown-menu show" role="group" aria-label="{{#str}}visibility, local_extendednav{{/str}}" hidden>
+                <label class="dropdown-item" for="{{id}}-vis-1">
+                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-1" data-status="1">
+                    <span>{{#str}}vis_all, local_extendednav{{/str}}</span>
+                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="visible"></span>
+                </label>
+                <label class="dropdown-item" for="{{id}}-vis-2">
+                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-2" data-status="2">
+                    <span>{{#str}}vis_roles, local_extendednav{{/str}}</span>
+                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="roles"></span>
+                </label>
+                <label class="dropdown-item" for="{{id}}-vis-0">
+                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-0" data-status="0">
+                    <span>{{#str}}vis_hidden, local_extendednav{{/str}}</span>
+                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="hidden"></span>
+                </label>
+            </span>
+        </span>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled
+            title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}">{{#pix}}i/reload, core{{/pix}}</button>
+    </div>
+</div>

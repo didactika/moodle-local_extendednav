@@ -230,7 +230,12 @@ class node_importer {
 
         uasort($orders, static fn(array $a, array $b): int => $a <=> $b);
         $placed = array_map(static fn(string $nodekey): int => $ids[$nodekey], array_keys($orders));
-        $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey], '', 'id, nodekey, parentkey, sortorder');
+        $nodes = $DB->get_records(
+            'local_extendednav',
+            ['menu' => $menukey, 'contextid' => 0],
+            '',
+            'id, nodekey, parentkey, sortorder'
+        );
         $list = array_values(array_diff(
             array_map(static fn(\stdClass $node): int => (int)$node->id, node_manager::group_by_parent($nodes)),
             $placed

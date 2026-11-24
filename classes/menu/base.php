@@ -156,7 +156,7 @@ abstract class base {
     public function sync_native_nodes(bool $events = true): void {
         global $DB;
 
-        $existing = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
+        $existing = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key(), 'contextid' => 0], '', 'nodekey, id');
         foreach ($this->get_native_nodes() as $key => $native) {
             if (isset($existing[$key])) {
                 continue;

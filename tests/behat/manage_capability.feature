@@ -17,6 +17,7 @@ Feature: Let other roles manage the navigation
     And I visit "/admin/search.php?query=navigation"
     Then "Manage navigation" "link" should not exist in the "region-main" "region"
 
+  @javascript
   Scenario: Managers with the capability manage the nodes but not the settings
     Given the following "permission overrides" exist:
       | capability               | permission | role    | contextlevel | reference |
@@ -27,4 +28,4 @@ Feature: Let other roles manage the navigation
     And I should not see "Apply the navigation nodes and URL blocking"
     And I click on "Manage navigation" "link" in the "region-main" "region"
     And I should see "Primary navigation"
-    And I should see "myhome" in the "local-extendednav-manage" "table"
+    And I should see "myhome" in the "[data-region='tablewrap']" "css_element"

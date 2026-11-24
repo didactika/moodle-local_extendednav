@@ -1,0 +1,138 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// What stays Moodle: the dialogs of the plugin, with the radius, the shadow and the buttons of the design system.
+// Their layout is Moodle's, with a few adjustments so the date fields fit the dialog.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+#{$len-modal} {
+    & .modal-dialog.modal-lg {
+        max-width: 56rem;
+    }
+
+    // Moodle writes a no-break space between the selects of a date, and in a row that wraps each one takes room of its own, so
+    // the gaps came out uneven on a narrow dialog. The spaces are given no size and the row no column gap, which would count
+    // them as items; a margin after each select separates them, and the box that turns the date on takes a row of its own.
+    & .fdate_time_selector,
+    & .fdate_selector {
+        align-items: center;
+        column-gap: 0;
+        row-gap: 0.5rem;
+        font-size: 0;
+
+        & > .fitem {
+            margin: 0 0.5rem 0 0;
+            font-size: 0.9375rem;
+        }
+
+        & > .fitem:has(input[type="checkbox"]) {
+            flex-basis: 100%;
+        }
+
+        & select {
+            min-width: 0;
+        }
+    }
+}
+
+// The dialogs, as the design system draws them: a large radius and a deep shadow instead of the rules of Bootstrap, the
+// title in bold, room around the content, and the buttons of the foot apart from one another.
+#{$len-modal} {
+    & .modal-content {
+        overflow: hidden;
+        border: 1px solid var(--dd-hairline);
+        border-radius: 1.25rem;
+        background-color: var(--dd-surface);
+        box-shadow: var(--dd-shadow-lg);
+        color: var(--dd-ink);
+    }
+
+    // Moodle rings the whole dialog when it takes the focus as it opens; the dialog keeps its shape and its shadow instead.
+    & .modal-dialog:focus .modal-content,
+    & .modal-dialog.focus .modal-content {
+        border-radius: 1.25rem;
+        box-shadow: var(--dd-shadow-lg);
+    }
+
+    & .modal-header {
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.25rem 1.25rem 0.5rem 1.5rem;
+        border-bottom: 0;
+
+        & .close,
+        & .btn-close {
+            display: inline-grid;
+            place-items: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            margin: 0 0 0 auto;
+            padding: 0;
+            border-radius: 50%;
+            color: var(--dd-muted);
+            opacity: 1;
+            text-shadow: none;
+            transition: background-color var(--dd-ease), color var(--dd-ease);
+
+            &:hover,
+            &:focus-visible {
+                outline: 0;
+                background-color: var(--dd-surface-3);
+                color: var(--dd-ink);
+            }
+        }
+    }
+
+    & .modal-title {
+        color: var(--dd-ink);
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -0.011em;
+    }
+
+    & .modal-body {
+        padding: 0.5rem 1.5rem 1rem;
+        line-height: 1.55;
+    }
+
+    & .modal-footer {
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem 1.25rem;
+        border-top: 0;
+
+        & > * {
+            margin: 0;
+        }
+    }
+
+    & .modal-dialog-scrollable .modal-body {
+        border-top: 1px solid var(--dd-hairline);
+        border-bottom: 1px solid var(--dd-hairline);
+    }
+
+    &.show .modal-dialog {
+        animation: len-dialog 280ms cubic-bezier(0.2, 0, 0, 1);
+    }
+}
+
+@keyframes len-dialog {
+    from {
+        opacity: 0;
+        transform: translateY(0.75rem) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #{$len-modal} {
+        &.show .modal-dialog {
+            animation: none;
+        }
+    }
+}

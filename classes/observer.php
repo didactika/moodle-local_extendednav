@@ -113,7 +113,7 @@ class observer {
         $natives = $menu->get_native_nodes();
         $text = self::read_config($configname);
 
-        $existing = $DB->get_records('local_extendednav', ['menu' => $menu->get_key()], 'sortorder ASC, id ASC');
+        $existing = $DB->get_records('local_extendednav', ['menu' => $menu->get_key(), 'contextid' => 0], 'sortorder ASC, id ASC');
         $matched = [];
         $seenkeys = [];
         $depthkeys = [];

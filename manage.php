@@ -15,17 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Lists, orders and deletes the navigation nodes of a menu.
+ * Lists, orders, shows, hides and deletes the nodes of a navigation, for the whole site or as an exception for a category or a
+ * course. The rows load and change through web services, so the page does not reload.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
-use local_extendednav\local\node_text;
+use local_extendednav\local\node_list;
 use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -33,132 +31,74 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-$action = optional_param('action', '', PARAM_ALPHA);
-$id = optional_param('id', 0, PARAM_INT);
-$search = trim(optional_param('search', '', PARAM_TEXT));
-$parent = trim(optional_param('parent', '', PARAM_ALPHANUMEXT));
-$visibility = optional_param('visibility', '', PARAM_ALPHANUM);
-$visibility = in_array($visibility, ['0', '1', '2'], true) ? (int)$visibility : null;
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
+$contextid = optional_param('contextid', 0, PARAM_INT);
 
 $menu = menu_manager::get_menu($menukey);
 if ($menu === null) {
     $menukey = 'primary';
     $menu = menu_manager::get_menu($menukey);
 }
-
-$params = ['menu' => $menukey];
-if ($search !== '') {
-    $params['search'] = $search;
-}
-if ($parent !== '') {
-    $params['parent'] = $parent;
-}
-if ($visibility !== null) {
-    $params['visibility'] = $visibility;
-}
-$baseurl = new moodle_url('/local/extendednav/manage.php', $params);
-$PAGE->set_url($baseurl);
-
-$menu->ensure_synced();
-
-if ($action === 'delete' || $action === 'bulkdelete') {
-    require_sesskey();
-    $ids = $action === 'delete' ? [$id] : optional_param_array('nodeids', [], PARAM_INT);
-    $records = empty($ids) ? [] : $DB->get_records_list('local_extendednav', 'id', $ids);
-    $records = array_filter($records, static fn(\stdClass $record): bool => $record->menu === $menukey);
-    $deleted = node_manager::delete($records);
-    if ($deleted < count($records)) {
-        \core\notification::warning(get_string('native_cannot_delete', 'local_extendednav'));
-    }
-    if ($deleted > 0) {
-        redirect(
-            $baseurl,
-            get_string('nodes_deleted', 'local_extendednav', $deleted),
-            null,
-            \core\output\notification::NOTIFY_SUCCESS
-        );
-    }
-    redirect($baseurl);
-}
-
-$allnodes = node_repository::get_menu_nodes($menukey);
-$filtered = $search !== '' || $parent !== '' || $visibility !== null;
-$nodes = array_filter($allnodes, static function (\stdClass $node) use ($menu, $search, $parent, $visibility): bool {
-    if ($parent !== '' && $node->parentkey !== $parent) {
-        return false;
-    }
-    if ($visibility !== null && (int)$node->visibility !== $visibility) {
-        return false;
-    }
-    if ($search === '') {
-        return true;
-    }
-    $native = $menu->get_native_node($node->nodekey);
-    $haystack = implode(' ', [
-        $node->nodekey,
-        node_text::get_title($node, $native),
-        (string)($node->url ?? '') !== '' ? $node->url : ($native->action ?? ''),
-    ]);
-    return core_text::strpos(core_text::strtolower($haystack), core_text::strtolower($search)) !== false;
-});
-
-// Parent filter options: every key used as a parent in this menu, in menu order.
-$parents = [];
-foreach ($allnodes as $node) {
-    if (!empty($node->parentkey) && !isset($parents[$node->parentkey])) {
-        $parents[$node->parentkey] = ['value' => $node->parentkey, 'name' => $node->parentkey,
-            'selected' => $node->parentkey === $parent];
+$hasscopes = node_list::supports_scopes($menukey);
+$scopename = get_string('applies_whole_site', 'local_extendednav');
+if ($contextid !== 0) {
+    $context = $hasscopes ? context::instance_by_id($contextid, IGNORE_MISSING) : false;
+    if ($context && in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE], true)) {
+        $scopename = $context->contextlevel === CONTEXT_COURSE
+            ? format_string(get_course($context->instanceid)->fullname, true, ['context' => $context])
+            : (core_course_category::get($context->instanceid, IGNORE_MISSING, true)?->get_formatted_name()
+                ?? $context->get_context_name(false, true));
+    } else {
+        $contextid = 0;
     }
 }
-$visibilities = [];
-foreach (['vis_all' => 1, 'vis_roles' => 2, 'vis_hidden' => 0] as $string => $value) {
-    $visibilities[] = ['value' => $value, 'name' => get_string($string, 'local_extendednav'),
-        'selected' => $visibility === $value];
+
+$pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []));
+$PAGE->set_url($pageurl);
+
+// The navigations, in groups: the ones of the site, of a course, of an activity, of a category and of the administration.
+$groups = [
+    'origin_group_site' => ['primary', 'usermenu'],
+    'origin_group_course' => ['course', 'frontpage'],
+    'origin_group_activity' => ['activity'],
+    'origin_group_category' => ['category'],
+    'origin_group_admin' => ['admin'],
+];
+$origins = [];
+$originoptions = [];
+foreach ($groups as $string => $keys) {
+    $items = [];
+    foreach ($keys as $key) {
+        $item = menu_manager::get_menu($key);
+        $url = (new moodle_url('/local/extendednav/manage.php', ['menu' => $key]))->out(false);
+        $items[] = ['key' => $key, 'name' => $item->get_name(), 'url' => $url, 'active' => $key === $menukey];
+        $originoptions[] = ['name' => $item->get_name(), 'url' => $url, 'selected' => $key === $menukey];
+    }
+    $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];
 }
 
-$tabs = [];
-foreach (menu_manager::get_menus() as $key => $tabmenu) {
-    $tabs[] = [
-        'name' => $tabmenu->get_name(),
-        'url' => (new moodle_url('/local/extendednav/manage.php', ['menu' => $key]))->out(false),
-        'active' => $key === $menukey,
-    ];
-}
+$scopeparams = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []);
+$config = json_encode(['menu' => $menukey, 'contextid' => $contextid]);
+$syscontext = context_system::instance();
 
 echo $OUTPUT->header();
-echo html_writer::tag('p', get_string('manage_nodes_desc', 'local_extendednav'), ['class' => 'mb-4']);
-
-echo $OUTPUT->render_from_template('local_extendednav/manage_toolbar', [
-    'tabs' => $tabs,
-    'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey]))->out(false),
+echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
+    'id' => 'len-nodes',
+    'config' => $config,
+    'name' => $menu->get_name(),
+    'origins' => $origins,
+    'originoptions' => $originoptions,
+    'cansettings' => has_capability('moodle/site:config', $syscontext),
+    'enabled' => (bool)get_config('local_extendednav', 'enable_plugin'),
+    'hideadmins' => (bool)get_config('local_extendednav', 'hide_from_admins'),
+    'hasscopes' => $hasscopes,
+    'scopename' => $scopename,
+    'canadd' => !node_list::is_order_only($menukey),
+    'addurl' => (new moodle_url('/local/extendednav/edit.php', $scopeparams))->out(false),
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
     'exporturl' => (new moodle_url('/local/extendednav/export.php', ['all' => 1, 'menu' => $menukey]))->out(false),
     'activityurl' => (new moodle_url('/local/extendednav/activity.php', ['menu' => $menukey]))->out(false),
+    'searchlabel' => get_string('search_nodes', 'local_extendednav'),
 ]);
-
-echo $OUTPUT->render_from_template('local_extendednav/manage_filters', [
-    'menu' => $menukey,
-    'search' => $search,
-    'parents' => array_values($parents),
-    'visibilities' => $visibilities,
-    'clearurl' => (new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]))->out(false),
-]);
-
-$table = new \local_extendednav\table\nodes_table($menu, $baseurl, $filtered);
-ob_start();
-$table->display(node_manager::group_by_parent($nodes));
-$tablehtml = ob_get_clean();
-
-$count = count($nodes);
-echo $OUTPUT->render_from_template('local_extendednav/manage_nodes', [
-    'sesskey' => sesskey(),
-    'menu' => $menukey,
-    'exporturl' => (new moodle_url('/local/extendednav/export.php'))->out(false),
-    'table' => $tablehtml,
-    'count' => $count === 1 ? get_string('nodes_count_one', 'local_extendednav')
-        : get_string('nodes_count', 'local_extendednav', $count),
-]);
-
-$PAGE->requires->js_call_amd('local_extendednav/manage', 'init', [['menu' => $menukey, 'sortable' => !$filtered]]);
+$PAGE->requires->js_call_amd('local_extendednav/manage', 'init', ['[data-region="manage"]']);
 echo $OUTPUT->footer();
