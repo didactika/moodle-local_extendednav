@@ -41,11 +41,13 @@ Feature: Shape the site administration
     Then I should see "Staff guide"
 
   @javascript
-  Scenario: A node without a link is a category of the plugin, and Add node starts in the level open
+  Scenario: A category of the plugin holds a page, and Add node starts in the level open
     When I follow "Add node"
     And I set the following fields to these values:
+      | Type     | Category        |
       | Node key | didactika       |
       | Title    | Didactika tools |
+    And "#fitem_id_url" "css_element" should not be visible
     And I press "Save changes"
     And I click on "Open Users" "button"
     And I follow "Add node"

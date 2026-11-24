@@ -154,6 +154,9 @@ final class admintree_test extends \advanced_testcase {
             $data = ['nodekey' => $key, 'title' => $title, 'url' => $url, 'parentkey' => $parent];
             manager::create(manager::prepare($data, admintree::KEY));
         }
+        // The rows of the tree are synchronised on every page: the categories of the plugin, which have no address, stay.
+        menu_manager::get_menu(admintree::KEY)->ensure_synced();
+        $this->assertNotEmpty(repository::get_menu_nodes_by_key(admintree::KEY)['exttools'] ?? null);
 
         admintree::reset();
         $root = admin_get_root(true, false);

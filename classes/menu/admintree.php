@@ -208,16 +208,12 @@ class admintree extends base {
         if (!empty($new)) {
             $DB->insert_records('local_extendednav', $new);
         }
-        // A row that is neither a node of the tree nor a link of the plugin (which has a title and an address) is left from a
-        // page that is not in the tree any more, such as one of a plugin that was removed.
+        // A row that is not a node of the tree and has no title is left from a page that is not in the tree any more, such as
+        // one of a plugin that was removed. The links and the categories of the plugin always have a title, so they stay.
         $orphans = array_filter($existing, static fn(\stdClass $row): bool => !isset($natives[$row->nodekey]));
         if (!empty($orphans)) {
             [$in, $params] = $DB->get_in_or_equal(array_keys($orphans), SQL_PARAMS_NAMED);
-            $DB->delete_records_select(
-                'local_extendednav',
-                "id $in AND (title IS NULL OR title = '' OR url IS NULL OR url = '')",
-                $params
-            );
+            $DB->delete_records_select('local_extendednav', "id $in AND (title IS NULL OR title = '')", $params);
         }
         if (!empty($new) || !empty($existing)) {
             repository::purge();
