@@ -16,13 +16,13 @@
 
 namespace local_extendednav\local\navigation;
 
+use local_extendednav\menu\activity;
 use local_extendednav\menu\secondary;
 use local_extendednav\menu_manager;
 use local_extendednav\local\node\access;
 use local_extendednav\local\node\display;
 use local_extendednav\local\node\repository;
 use local_extendednav\local\node\text;
-use local_extendednav\local\support\url_helper;
 
 /**
  * Applies the nodes of the plugin to the secondary navigation of the page: the one of a course, of the site home, of an
@@ -46,7 +46,7 @@ class injector {
         if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin') || !$PAGE->has_secondary_navigation()) {
             return;
         }
-        $origin = self::get_origin($PAGE->context, (int)$PAGE->course->id);
+        $origin = self::get_origin($PAGE->context, (int)$PAGE->course->id, $PAGE->cm ? (string)$PAGE->cm->modname : null);
         if ($origin === null) {
             return;
         }
@@ -54,40 +54,43 @@ class injector {
             return;
         }
         $menu = menu_manager::get_menu($origin);
+        if ($menu === null) {
+            return;
+        }
         $view = $PAGE->secondarynav;
 
-        $seen = [];
-        foreach ($view->children as $child) {
-            if (!$child->key || $child->key === 'modulepage') {
-                continue;
-            }
-            $seen[$child->key] = (object)[
-                'text' => trim(strip_tags((string)$child->text)),
-                'action' => $child->action instanceof \moodle_url
-                    ? (url_helper::to_site_path($child->action->out(false)) ?? '') : '',
-            ];
-        }
-        $menu->record_seen($seen);
+        $children = secondary::children_of($view);
+        $menu->record_seen(secondary::describe($children));
 
-        $nodes = repository::get_scoped_nodes($origin, $PAGE->context);
+        // Until the changes of the single navigation of the activities are given to each kind (a task after the upgrade to
+        // 2.0), the pages of the activities keep them.
+        $source = $menu instanceof activity && get_config('local_extendednav', 'legacyactivity') ? activity::LEGACY : $origin;
+        $nodes = repository::get_scoped_nodes($source, $PAGE->context);
         if (!empty($nodes)) {
-            self::inject($menu, $nodes, $view);
+            self::inject($menu, $nodes, $view, $children);
         }
     }
 
     /**
-     * Returns the navigation a page belongs to.
+     * Returns the navigation a page belongs to: the one of its kind of activity on the page of an activity.
      *
      * @param \context $context Context of the page.
      * @param int $courseid Course of the page.
-     * @return string|null An origin key, or null when the page has none of them.
+     * @param string|null $modname Module of the activity of the page, read from the context when it is not given.
+     * @return string|null A navigation key, or null when the page has none of them.
      */
-    public static function get_origin(\context $context, int $courseid): ?string {
+    public static function get_origin(\context $context, int $courseid, ?string $modname = null): ?string {
+        global $DB;
+
         switch ($context->contextlevel) {
             case CONTEXT_COURSE:
                 return $courseid === (int)SITEID ? 'frontpage' : 'course';
             case CONTEXT_MODULE:
-                return 'activity';
+                $modname ??= (string)$DB->get_field_sql(
+                    'SELECT m.name FROM {modules} m JOIN {course_modules} cm ON cm.module = m.id WHERE cm.id = :cmid',
+                    ['cmid' => $context->instanceid]
+                );
+                return $modname === '' ? null : activity::key_for($modname);
             case CONTEXT_COURSECAT:
                 return 'category';
             default:
@@ -101,14 +104,20 @@ class injector {
      * @param secondary $menu Handler of the navigation.
      * @param \stdClass[] $nodes Records keyed by node key, in the order they must have.
      * @param \core\navigation\views\secondary $view The navigation of the page.
+     * @param \navigation_node[] $children The nodes of the navigation, by the key they keep on every page.
      */
-    private static function inject(secondary $menu, array $nodes, \core\navigation\views\secondary $view): void {
+    private static function inject(
+        secondary $menu,
+        array $nodes,
+        \core\navigation\views\secondary $view,
+        array $children
+    ): void {
         global $PAGE;
 
         $needsscript = false;
         $shown = [];
         foreach ($nodes as $key => $record) {
-            $node = $view->get($key);
+            $node = $children[$key] ?? null;
             if (!access::is_shown($record)) {
                 if ($node) {
                     $node->remove();
@@ -156,13 +165,18 @@ class injector {
             $shown[$key] = $node;
         }
 
-        // Order the navigation as the nodes are; the nodes the plugin does not know keep their place, after them.
+        // Order the navigation as the nodes are; the nodes the plugin does not know keep their place, after them. The page of
+        // the activity itself stays the first one, as Moodle puts it.
         $others = [];
         foreach ($view->children as $child) {
-            $others[$child->key !== '' && $child->key !== null ? $child->key : 'o' . spl_object_id($child)] = $child;
+            $others[secondary::key_of($child) ?? 'o' . spl_object_id($child)] = $child;
         }
         foreach ($others as $child) {
             $child->remove();
+        }
+        if (isset($others['modulepage'])) {
+            $view->add_node($others['modulepage']);
+            unset($others['modulepage']);
         }
         foreach ($shown as $key => $node) {
             $view->add_node($node);

@@ -77,6 +77,8 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'hasscopes' => $hasscopes,
     'exceptionsurl' => (new moodle_url('/local/extendednav/exceptions.php', ['menu' => $menukey]))->out(false),
     'canadd' => true,
+    // The navigation of a kind of activity can be looked for in the activities of the site.
+    'candiscover' => $menu instanceof \local_extendednav\menu\activity,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', $scopeparams))->out(false),
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
     'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey]))->out(false),

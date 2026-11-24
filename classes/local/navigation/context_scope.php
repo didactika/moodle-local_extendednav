@@ -16,42 +16,42 @@
 
 namespace local_extendednav\local\navigation;
 
+use local_extendednav\menu\activity;
+use local_extendednav\menu_manager;
+
 /**
- * A category or a course whose navigations are changed in place: which navigations it can change, who may change them and
- * the page where it is done. Everything inside the context follows its changes, and the rest follows the site.
+ * A category, a course or an activity whose navigations are changed in place: which navigations it can change, who may
+ * change them and the page where it is done. Everything inside the context follows its changes, and the rest follows the site.
+ *
+ * A category changes its own navigation, the one of the courses inside it and the one of each kind of activity; a course
+ * changes its own navigation and the one of each kind of activity it has; an activity changes its own navigation.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class context_scope {
-    /** @var string[] Navigations a category changes: its own and the ones of the courses and activities inside it. */
-    private const CATEGORY_MENUS = ['category', 'course', 'activity'];
-
-    /** @var string[] Navigations a course changes: its own and the ones of its activities. */
-    private const COURSE_MENUS = ['course', 'activity'];
-
-    /** @var \context The category or the course. */
+    /** @var \context The category, the course or the activity. */
     private \context $context;
 
     /**
      * Creates the scope of a context.
      *
-     * @param \context $context A category or a course context.
+     * @param \context $context The category, the course or the activity.
      */
     private function __construct(\context $context) {
         $this->context = $context;
     }
 
     /**
-     * The scope of a context, or null when the context is not a category or a course (the site course is not one).
+     * Returns the scope of a context, or null when the context is not a category, a course or an activity of the site.
      *
      * @param int $contextid Context id.
      * @return self|null
      */
     public static function from_id(int $contextid): ?self {
         $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if (!$context || !in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE], true)) {
+        if (!$context || !in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE], true)) {
             return null;
         }
         if ($context->contextlevel === CONTEXT_COURSE && (int)$context->instanceid === (int)SITEID) {
@@ -61,7 +61,7 @@ final class context_scope {
     }
 
     /**
-     * The context.
+     * Returns the context.
      *
      * @return \context
      */
@@ -70,7 +70,7 @@ final class context_scope {
     }
 
     /**
-     * Whether it is a course.
+     * Whether the scope is a course.
      *
      * @return bool
      */
@@ -79,11 +79,60 @@ final class context_scope {
     }
 
     /**
-     * The name of the category or the course, ready to show.
+     * Whether the scope is an activity.
+     *
+     * @return bool
+     */
+    public function is_activity(): bool {
+        return $this->context->contextlevel === CONTEXT_MODULE;
+    }
+
+    /**
+     * Returns the kind of the scope: category, course or activity.
+     *
+     * @return string
+     */
+    public function kind(): string {
+        return match ($this->context->contextlevel) {
+            CONTEXT_COURSE => 'course',
+            CONTEXT_MODULE => 'activity',
+            default => 'category',
+        };
+    }
+
+    /**
+     * Returns the activity of the scope, or null when the scope is not an activity.
+     *
+     * @return \cm_info|null
+     */
+    public function cm(): ?\cm_info {
+        if (!$this->is_activity()) {
+            return null;
+        }
+        [, $cm] = get_course_and_cm_from_cmid($this->context->instanceid);
+        return $cm;
+    }
+
+    /**
+     * Returns the course of the scope, or null for a category.
+     *
+     * @return \stdClass|null
+     */
+    public function course(): ?\stdClass {
+        $coursecontext = $this->context->get_course_context(false);
+        return $coursecontext ? get_course($coursecontext->instanceid) : null;
+    }
+
+    /**
+     * Returns the name of the category, the course or the activity.
      *
      * @return string
      */
     public function name(): string {
+        if ($this->is_activity()) {
+            $cm = $this->cm();
+            return format_string($cm->name, true, ['context' => $this->context]);
+        }
         if ($this->is_course()) {
             return format_string(get_course($this->context->instanceid)->fullname, true, ['context' => $this->context]);
         }
@@ -92,17 +141,49 @@ final class context_scope {
     }
 
     /**
-     * The navigations this context can change.
+     * Returns the navigations the scope can change: an activity its own; a course its own and the one of each kind of
+     * activity it has; a category its own, the one of the courses and the one of each kind of activity of the site.
      *
      * @return string[] Navigation keys.
      */
     public function menus(): array {
-        return $this->is_course() ? self::COURSE_MENUS : self::CATEGORY_MENUS;
+        if ($this->is_activity()) {
+            return [activity::key_for($this->cm()->modname)];
+        }
+        if ($this->is_course()) {
+            $kinds = array_keys(get_fast_modinfo($this->context->instanceid)->get_used_module_names());
+            return array_merge(['course'], array_values(array_filter(
+                array_map(static fn(string $modname): string => activity::key_for($modname), $kinds),
+                static fn(string $key): bool => menu_manager::get_menu($key) !== null
+            )));
+        }
+        return array_merge(['category', 'course'], array_map(
+            static fn(string $modname): string => activity::key_for($modname),
+            array_keys(activity::types())
+        ));
     }
 
     /**
-     * Whether a user may change the navigations of this context: whoever manages the whole navigation, or holds the
-     * capability in this context.
+     * Logs the user in the context, as its own pages do: in the activity, in the course, or in the site with the category as
+     * the context of the page.
+     */
+    public function login(): void {
+        global $PAGE;
+
+        if ($this->is_activity()) {
+            $cm = $this->cm();
+            require_login($cm->course, false, $cm);
+        } else if ($this->is_course()) {
+            require_login($this->context->instanceid);
+        } else {
+            require_login();
+            $PAGE->set_context($this->context);
+            $PAGE->set_category_by_id($this->context->instanceid);
+        }
+    }
+
+    /**
+     * Whether the current user may change the navigations of the scope.
      *
      * @return bool
      */
@@ -112,7 +193,7 @@ final class context_scope {
     }
 
     /**
-     * Requires the user to be able to change the navigations of this context.
+     * Stops the page or the service unless the current user may change the navigations of the scope.
      */
     public function require_manage(): void {
         if (!has_capability('local/extendednav:manage', \context_system::instance())) {
@@ -121,9 +202,9 @@ final class context_scope {
     }
 
     /**
-     * The page where the navigations of this context are changed.
+     * Returns the page of the navigations of the scope.
      *
-     * @param string $menu Navigation key, or empty for the first one.
+     * @param string $menu Navigation shown, or empty for the first one.
      * @return \moodle_url
      */
     public function url(string $menu = ''): \moodle_url {

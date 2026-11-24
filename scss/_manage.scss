@@ -196,3 +196,21 @@
         box-shadow: inset 0 -2px 0 var(--dd-primary);
     }
 }
+
+// The kinds of activity the site does not use are folded under a button: its arrow points down while they are open.
+.len [data-region="origins"] [data-region="originsmore"] {
+    & .icon {
+        margin-right: 0;
+        transition: transform var(--dd-ease);
+    }
+
+    &.collapsed .icon {
+        transform: rotate(-90deg);
+    }
+}
+
+// The icon of a kind of activity is drawn as an image: it takes the size of the icons of Moodle beside it.
+.len [data-region="origins"] img.icon {
+    width: 1rem;
+    height: 1rem;
+}

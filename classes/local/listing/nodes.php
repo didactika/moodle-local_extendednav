@@ -405,12 +405,13 @@ class nodes {
     }
 
     /**
-     * Whether a navigation can have exceptions for a category or a course.
+     * Whether a navigation can have exceptions for a category, a course or an activity: the ones of the courses, of the
+     * categories and of each kind of activity.
      *
      * @param string $menukey Navigation key.
      * @return bool
      */
     public static function supports_scopes(string $menukey): bool {
-        return in_array($menukey, ['course', 'activity', 'category'], true);
+        return in_array($menukey, ['course', 'category'], true) || \local_extendednav\menu\activity::from_key($menukey) !== null;
     }
 }

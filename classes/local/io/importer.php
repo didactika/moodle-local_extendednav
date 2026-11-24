@@ -61,6 +61,7 @@ class importer {
         $errors = [];
         $warnings = [];
         $counts = ['created' => 0, 'updated' => 0, 'skipped' => 0];
+        $items = $this->expand_legacy_activities($items, $warnings, $counts);
 
         $existing = [];
         foreach (repository::get_all() as $node) {
@@ -197,6 +198,42 @@ class importer {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
         return ['errors' => [], 'warnings' => $warnings, 'counts' => $counts];
+    }
+
+    /**
+     * Gives each node of the single navigation of the activities, in a file of a version before 2.0, to the navigation of each
+     * kind of activity: a node of Moodle to every kind that has it (none has it: it is left out with a warning), a node added
+     * to every kind.
+     *
+     * @param array $items Nodes read from the file.
+     * @param string[] $warnings Warnings, to which the nodes left out are added.
+     * @param int[] $counts Counts, whose skipped grows with the nodes left out.
+     * @return array The nodes, with the ones of the old navigation given to each kind.
+     */
+    private function expand_legacy_activities(array $items, array &$warnings, array &$counts): array {
+        $kinds = array_map(static fn(string $modname): \local_extendednav\menu\activity =>
+            new \local_extendednav\menu\activity($modname), array_keys(\local_extendednav\menu\activity::types()));
+        $expanded = [];
+        foreach ($items as $item) {
+            $menukey = is_array($item) ? (trim((string)($item['menu'] ?? '')) ?: $this->defaultmenu) : '';
+            if ($menukey !== \local_extendednav\menu\activity::LEGACY) {
+                $expanded[] = $item;
+                continue;
+            }
+            $nodekey = trim((string)($item['nodekey'] ?? ''));
+            $given = 0;
+            foreach ($kinds as $kind) {
+                if (empty($item['native']) || $kind->is_native($nodekey)) {
+                    $expanded[] = ['menu' => $kind->get_key()] + $item;
+                    $given++;
+                }
+            }
+            if ($given === 0) {
+                $warnings[] = $menukey . '/' . $nodekey . ': ' . get_string('warn_import_absent', 'local_extendednav');
+                $counts['skipped']++;
+            }
+        }
+        return $expanded;
     }
 
     /**

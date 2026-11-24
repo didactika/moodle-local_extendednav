@@ -235,7 +235,7 @@ final class node_services_test extends \advanced_testcase {
         change_nodes::set_enabled('course', false);
 
         $this->assertFalse(\local_extendednav\menu_manager::is_enabled('course'));
-        $this->assertTrue(\local_extendednav\menu_manager::is_enabled('activity'), 'The others stay on.');
+        $this->assertTrue(\local_extendednav\menu_manager::is_enabled('mod_forum'), 'The others stay on.');
         change_nodes::set_enabled('course', true);
         $this->assertTrue(\local_extendednav\menu_manager::is_enabled('course'));
 

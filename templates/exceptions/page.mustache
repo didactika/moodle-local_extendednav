@@ -17,7 +17,7 @@
 {{!
     @template local_extendednav/exceptions/page
 
-    The overview of the categories and courses that change a navigation: a search, a menu of the kinds with the number of
+    The overview of the categories, courses and activities that change a navigation: a search, a menu of the kinds with the number of
     each, and the list, page by page, each row with the navigations it changes and the way to its page. The rows are loaded by
     local_extendednav/exceptions.
 
@@ -56,6 +56,11 @@
                                     <input type="checkbox" class="form-check-input" id="{{id}}-kind-course" data-option="course">
                                     <span>{{#str}}courses{{/str}}</span>
                                     <span class="badge text-bg-secondary ms-auto ml-auto" data-count="course"></span>
+                                </label>
+                                <label class="dropdown-item" for="{{id}}-kind-activity">
+                                    <input type="checkbox" class="form-check-input" id="{{id}}-kind-activity" data-option="activity">
+                                    <span>{{#str}}activities{{/str}}</span>
+                                    <span class="badge text-bg-secondary ms-auto ml-auto" data-count="activity"></span>
                                 </label>
                             </span>
                         </span>

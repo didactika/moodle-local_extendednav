@@ -39,7 +39,12 @@ final class get_exceptions extends node_service {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'search' => new external_value(PARAM_RAW, 'Part of the name of a category or a course.', VALUE_DEFAULT, ''),
-            'kind' => new external_value(PARAM_TEXT, 'category and course, separated by commas, or empty.', VALUE_DEFAULT, ''),
+            'kind' => new external_value(
+                PARAM_TEXT,
+                'category, course and activity, separated by commas, or empty.',
+                VALUE_DEFAULT,
+                ''
+            ),
             'page' => new external_value(PARAM_INT, 'Page, from 0.', VALUE_DEFAULT, 0),
             'perpage' => new external_value(PARAM_INT, 'Rows per page, from 1 to 100.', VALUE_DEFAULT, 12),
         ]);
@@ -71,16 +76,19 @@ final class get_exceptions extends node_service {
     public static function execute_returns(): external_single_structure {
         $text = static fn(string $description): external_value => new external_value(PARAM_RAW, $description);
         return new external_single_structure([
-            'total' => new external_value(PARAM_INT, 'Categories and courses that match.'),
+            'total' => new external_value(PARAM_INT, 'Categories, courses and activities that match.'),
             'counts' => new external_single_structure([
                 'category' => new external_value(PARAM_INT, 'Categories that match.'),
                 'course' => new external_value(PARAM_INT, 'Courses that match.'),
+                'activity' => new external_value(PARAM_INT, 'Activities that match.'),
             ]),
             'rows' => new external_multiple_structure(new external_single_structure([
-                'contextid' => new external_value(PARAM_INT, 'Context of the category or the course.'),
-                'name' => $text('Name of the category or the course.'),
-                'path' => $text('The categories around it, from the top.'),
-                'kind' => new external_value(PARAM_ALPHA, 'category or course.'),
+                'contextid' => new external_value(PARAM_INT, 'Context of the category, the course or the activity.'),
+                'name' => $text('Name of the category, the course or the activity.'),
+                'path' => $text('The categories around it, from the top, and the course of an activity.'),
+                'kind' => new external_value(PARAM_ALPHA, 'category, course or activity.'),
+                'icon' => $text('Icon of the kind: the one of the module for an activity.'),
+                'component' => $text('Component of the icon.'),
                 'total' => new external_value(PARAM_INT, 'Nodes it changes.'),
                 'navigations' => new external_multiple_structure(new external_single_structure([
                     'name' => $text('Name of the navigation.'),

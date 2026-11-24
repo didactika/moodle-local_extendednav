@@ -56,6 +56,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
+    'local_extendednav_discover_nodes' => [
+        'classname' => \local_extendednav\external\discover_nodes::class,
+        'methodname' => 'execute',
+        'description' => 'Looks at the activities of one kind for the items of their navigation.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
     'local_extendednav_get_exceptions' => [
         'classname' => \local_extendednav\external\get_exceptions::class,
         'methodname' => 'execute',

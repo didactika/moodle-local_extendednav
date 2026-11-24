@@ -42,6 +42,7 @@
         "exporturl": "#",
         "exporteverythingurl": "#",
         "canadd": true,
+        "candiscover": false,
         "searchlabel": "Search nodes",
         "id": "len-nodes"
     }
@@ -51,7 +52,7 @@
     {{^sitewide}}<p class="text-muted mb-0">{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}</p>{{/sitewide}}
 
     <div data-region="layout" {{#compact}}data-compact="1"{{/compact}}>
-        {{> local_extendednav/manage/origins }}
+        {{^single}}{{> local_extendednav/manage/origins }}{{/single}}
 
         <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -68,6 +69,9 @@
                     {{#canadd}}
                         <a class="btn btn-primary" href="{{addurl}}">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
                     {{/canadd}}
+                    {{#candiscover}}
+                        <button type="button" class="btn btn-outline-secondary" data-action="discover" title="{{#str}}discover_help, local_extendednav{{/str}}">{{#pix}}i/search, core{{/pix}} {{#str}}discover, local_extendednav{{/str}}</button>
+                    {{/candiscover}}
                     {{#sitewide}}
                     <a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>
                     <span class="dropdown d-inline-flex position-relative" data-menu="export">

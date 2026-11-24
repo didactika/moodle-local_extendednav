@@ -17,9 +17,10 @@
 {{!
     @template local_extendednav/manage/origins
 
-    The navigations in groups, as a column of links, and as a select on a narrow screen. A page of few navigations (compact),
-    such as the one of a course, has the select only. The select opens the address of the
-    navigation chosen.
+    The navigations in groups, as a column of links, and as a select with the same groups on a narrow screen. A page of few
+    navigations (compact), such as the one of a course, has the select only. Under Activities, the kinds of activity the site
+    uses come first and the others are folded under a button that opens them. The select opens the address of the navigation
+    chosen.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,16 +28,26 @@
     Example context (json):
     {
         "origins": [
-            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true, "icon": "i/course", "off": false}]}
+            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "title": "Course navigation", "url": "#",
+                "active": true, "icon": "i/course", "component": "core", "off": false}], "more": [], "hasmore": false},
+            {"label": "Activities", "items": [{"key": "mod_forum", "name": "Forum", "title": "Forum navigation", "url": "#",
+                "active": false, "icon": "monologo", "component": "mod_forum", "off": false}],
+                "more": [{"key": "mod_book", "name": "Book", "title": "Book navigation", "url": "#", "active": false,
+                "icon": "monologo", "component": "mod_book", "off": false}], "hasmore": true, "moreopen": false,
+                "morelabel": "Other kinds (1)", "moreid": "len-origins-activity"}
         ],
-        "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}]
+        "originoptions": [{"label": "Courses", "options": [{"name": "Course navigation", "url": "#", "selected": true}]}]
     }
 }}
 <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
     <div {{^compact}}class="d-lg-none"{{/compact}}>
         <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
         <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
-            {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
+            {{#originoptions}}
+                <optgroup label="{{label}}">
+                    {{#options}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/options}}
+                </optgroup>
+            {{/originoptions}}
         </select>
     </div>
     {{^compact}}
@@ -44,13 +55,18 @@
         {{#origins}}
             <p class="small fw-bold text-uppercase text-muted mb-0 px-3 pt-3 pb-1">{{label}}</p>
             <div class="list-group list-group-flush">
-                {{#items}}
-                    <a class="list-group-item list-group-item-action d-flex align-items-center gap-2 {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>
-                        {{#pix}}{{icon}}, core{{/pix}}
-                        <span class="text-truncate">{{name}}</span>
-                        <span class="badge rounded-pill text-bg-secondary ms-auto ml-auto" {{^off}}hidden{{/off}}>{{#str}}navigation_off, local_extendednav{{/str}}</span>
-                    </a>
-                {{/items}}
+                {{#items}}{{> local_extendednav/manage/origin_item }}{{/items}}
+                {{#hasmore}}
+                    <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 text-muted {{^moreopen}}collapsed{{/moreopen}}" data-toggle="collapse" data-bs-toggle="collapse" data-target="#{{moreid}}" data-bs-target="#{{moreid}}" aria-controls="{{moreid}}" aria-expanded="{{#moreopen}}true{{/moreopen}}{{^moreopen}}false{{/moreopen}}" data-region="originsmore">
+                        {{#pix}}t/expanded, core{{/pix}}
+                        <span class="text-truncate">{{morelabel}}</span>
+                    </button>
+                    <div class="collapse {{#moreopen}}show{{/moreopen}}" id="{{moreid}}">
+                        <div class="list-group list-group-flush">
+                            {{#more}}{{> local_extendednav/manage/origin_item }}{{/more}}
+                        </div>
+                    </div>
+                {{/hasmore}}
             </div>
         {{/origins}}
     </div>

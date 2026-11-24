@@ -49,6 +49,42 @@ Feature: Change the navigations of a course from the course
     And I navigate to "Navigation" in current page administration
     And I click on "Hide Participants" "button" in the "Participants" "table_row"
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"
-    When I navigate to "Appearance > Extended navigation > Exceptions of categories and courses" in site administration
+    When I navigate to "Appearance > Extended navigation > Exceptions of categories, courses and activities" in site administration
     Then I should see "Course 1" in the "[data-region='tablewrap']" "css_element"
     And I should see "Course navigation · 1" in the "[data-region='tablewrap']" "css_element"
+
+  @javascript
+  Scenario: A teacher hides an item of one forum from the page of the forum
+    Given the following "activities" exist:
+      | activity | name         | course | idnumber |
+      | forum    | Class forum  | C1     | forum1   |
+      | forum    | Other forum  | C1     | forum2   |
+    And I log in as "admin"
+    And I am on the "Class forum" "forum activity" page
+    And I am on the "Other forum" "forum activity" page
+    And I log out
+    And I log in as "teacher1"
+    And I change window size to "large"
+    And I am on the "Class forum" "forum activity" page
+    When I navigate to "Navigation" in current page administration
+    Then I should see "Forum navigation"
+    And I click on "Hide Subscriptions" "button" in the "Subscriptions" "table_row"
+    And I click on "Hide" "button" in the "Hide Subscriptions?" "dialogue"
+    And I should see "Exception" in the "Subscriptions" "table_row"
+    And I am on the "Class forum" "forum activity" page
+    And I should not see "Subscriptions" in the ".secondary-navigation" "css_element"
+    And I am on the "Other forum" "forum activity" page
+    And I should see "Subscriptions" in the ".secondary-navigation" "css_element"
+
+  @javascript
+  Scenario: The site lists the navigation of each kind of activity
+    Given the following "activities" exist:
+      | activity | name        | course | idnumber |
+      | forum    | Class forum | C1     | forum1   |
+    And I log in as "admin"
+    And I change window size to "large"
+    And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
+    When I click on "Forum" "link" in the "[data-region='origins']" "css_element"
+    Then I should see "Forum navigation"
+    And I press "Find items"
+    And I should see "Subscriptions" in the "[data-region='tablewrap']" "css_element"

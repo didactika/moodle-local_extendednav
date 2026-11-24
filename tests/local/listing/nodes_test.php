@@ -113,7 +113,9 @@ final class nodes_test extends \advanced_testcase {
      */
     public function test_which_navigations_have_scopes(): void {
         $this->assertTrue(nodes::supports_scopes('course'));
-        $this->assertTrue(nodes::supports_scopes('activity'));
+        $this->assertTrue(nodes::supports_scopes('mod_forum'));
+        $this->assertFalse(nodes::supports_scopes('activity'), 'The single navigation of the activities is gone.');
+        $this->assertFalse(nodes::supports_scopes('mod_nothing'));
         $this->assertTrue(nodes::supports_scopes('category'));
         $this->assertFalse(nodes::supports_scopes('primary'));
         $this->assertFalse(nodes::supports_scopes('admin'));
@@ -130,7 +132,8 @@ final class nodes_test extends \advanced_testcase {
 
         $this->assertSame('course', injector::get_origin(\context_course::instance($course->id), (int)$course->id));
         $this->assertSame('frontpage', injector::get_origin(\context_course::instance(SITEID), SITEID));
-        $this->assertSame('activity', injector::get_origin(\context_module::instance($page->cmid), (int)$course->id));
+        $this->assertSame('mod_page', injector::get_origin(\context_module::instance($page->cmid), (int)$course->id));
+        $this->assertSame('mod_page', injector::get_origin(\context_module::instance($page->cmid), (int)$course->id, 'page'));
         $this->assertSame('category', injector::get_origin(\context_coursecat::instance($category->id), 0));
         // The site administration is shaped through its tree, not through its bar.
         $this->assertNull(injector::get_origin(\context_system::instance(), SITEID));
