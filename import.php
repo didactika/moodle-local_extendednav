@@ -67,6 +67,12 @@ if ($form->is_cancelled()) {
     $importer = new node_importer($menukey, $data->conflict_action === 'overwrite');
     $result = $importer->import($parsed['nodes']);
     if (empty($result['errors'])) {
+        // A file of several navigations also says which of them are on.
+        foreach ((array)($parsed['navigations'] ?? []) as $key => $state) {
+            if (menu_manager::get_menu((string)$key) !== null && is_array($state) && isset($state['enabled'])) {
+                set_config('enabled_' . $key, empty($state['enabled']) ? 0 : 1, 'local_extendednav');
+            }
+        }
         foreach ($result['warnings'] as $warning) {
             \core\notification::warning($warning);
         }
@@ -90,7 +96,6 @@ if (!empty($problems)) {
 }
 
 echo $OUTPUT->render_from_template('local_extendednav/import_intro', [
-    'backurl' => $manageurl->out(false),
     'docurl' => (new moodle_url('/local/extendednav/documentation.php', ['menu' => $menukey]))->out(false),
 ]);
 $form->display();

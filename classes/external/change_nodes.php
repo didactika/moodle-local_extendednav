@@ -183,43 +183,90 @@ final class change_nodes extends node_service {
     }
 
     /**
-     * Describes set_setting().
+     * Describes place().
      *
      * @return external_function_parameters
      */
-    public static function set_setting_parameters(): external_function_parameters {
+    public static function place_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'name' => new external_value(PARAM_ALPHANUMEXT, 'enable_plugin or hide_from_admins.'),
+            'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
+            'contextid' => new external_value(PARAM_INT, 'Context of the scope, 0 for the whole site.', VALUE_DEFAULT, 0),
+            'nodekey' => new external_value(PARAM_ALPHANUMEXT, 'Key of the node that moves.'),
+            'beforekey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling it goes before, or empty.', VALUE_DEFAULT, ''),
+            'afterkey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling it goes after, instead of before.', VALUE_DEFAULT, ''),
+        ]);
+    }
+
+    /**
+     * Places a node before or after another one among its siblings, as when it is dragged.
+     *
+     * @param string $menu Navigation key.
+     * @param int $contextid Context of the scope.
+     * @param string $nodekey Key of the node that moves.
+     * @param string $beforekey Key of the sibling it goes before, or empty.
+     * @param string $afterkey Key of the sibling it goes after, or empty.
+     * @return array The number of nodes moved.
+     */
+    public static function place(
+        string $menu,
+        int $contextid,
+        string $nodekey,
+        string $beforekey = '',
+        string $afterkey = ''
+    ): array {
+        $params = self::validate_parameters(
+            self::place_parameters(),
+            compact('menu', 'contextid', 'nodekey', 'beforekey', 'afterkey')
+        );
+        self::require_manage();
+        self::validate_scope($params['menu'], $params['contextid']);
+        node_manager::place($params['menu'], $params['contextid'], $params['nodekey'], $params['beforekey'], $params['afterkey']);
+        return ['count' => 1];
+    }
+
+    /**
+     * Describes place()'s result.
+     *
+     * @return external_single_structure
+     */
+    public static function place_returns(): external_single_structure {
+        return self::count_returns();
+    }
+
+    /**
+     * Describes set_enabled().
+     *
+     * @return external_function_parameters
+     */
+    public static function set_enabled_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
             'value' => new external_value(PARAM_BOOL, 'On or off.'),
         ]);
     }
 
     /**
-     * Turns one of the settings of the plugin on or off.
+     * Turns the changes of one navigation on or off, so Moodle shows it as it draws it.
      *
-     * @param string $name Setting.
+     * @param string $menu Navigation key.
      * @param bool $value On or off.
-     * @return array The value saved.
+     * @return array 1 when it is on, 0 when it is off.
      */
-    public static function set_setting(string $name, bool $value): array {
-        $params = self::validate_parameters(self::set_setting_parameters(), compact('name', 'value'));
-        $context = \context_system::instance();
-        self::validate_context($context);
-        require_capability('moodle/site:config', $context);
-        if (!in_array($params['name'], ['enable_plugin', 'hide_from_admins'], true)) {
-            throw new \invalid_parameter_exception('Unknown setting.');
-        }
-        set_config($params['name'], $params['value'] ? 1 : 0, 'local_extendednav');
+    public static function set_enabled(string $menu, bool $value): array {
+        $params = self::validate_parameters(self::set_enabled_parameters(), compact('menu', 'value'));
+        self::require_manage();
+        self::validate_scope($params['menu'], 0);
+        set_config('enabled_' . $params['menu'], $params['value'] ? 1 : 0, 'local_extendednav');
         node_repository::purge();
         return ['count' => $params['value'] ? 1 : 0];
     }
 
     /**
-     * Describes set_setting()'s result.
+     * Describes set_enabled()'s result.
      *
      * @return external_single_structure
      */
-    public static function set_setting_returns(): external_single_structure {
+    public static function set_enabled_returns(): external_single_structure {
         return self::count_returns();
     }
 }

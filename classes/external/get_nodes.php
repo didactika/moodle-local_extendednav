@@ -110,6 +110,10 @@ final class get_nodes extends node_service {
             ]),
             'rows' => new external_multiple_structure(self::row_structure()),
             'reorderable' => new external_value(PARAM_BOOL, 'Whether the list can be reordered as it is.'),
+            'path' => new external_multiple_structure(new external_single_structure([
+                'key' => new external_value(PARAM_ALPHANUMEXT, 'Key of a category.'),
+                'title' => new external_value(PARAM_RAW, 'Title of the category.'),
+            ]), 'The categories from the top of the tree to the level listed.'),
         ]);
     }
 }

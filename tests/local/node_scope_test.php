@@ -130,6 +130,21 @@ final class node_scope_test extends \advanced_testcase {
     }
 
     /**
+     * A node is placed before a sibling, or after the last one, and only among its siblings.
+     */
+    public function test_a_node_is_placed_before_a_sibling(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->see_nodes(['one', 'two', 'three']);
+
+        node_manager::place('course', 0, 'three', 'one');
+        $this->assertSame(['three', 'one', 'two'], array_keys(node_list::get_scope_nodes('course', 0)));
+
+        node_manager::place('course', 0, 'three', '');
+        $this->assertSame(['one', 'two', 'three'], array_keys(node_list::get_scope_nodes('course', 0)));
+    }
+
+    /**
      * Moving a node in a scope gives the scope the order, and the site keeps its own.
      */
     public function test_moving_in_a_scope_sets_the_order_of_the_scope(): void {

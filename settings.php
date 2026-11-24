@@ -33,27 +33,19 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
     // so administrators and managers find the plugin in the same place.
     $ADMIN->add('appearance', new admin_category('local_extendednav_cat', get_string('pluginname', 'local_extendednav')));
 
-    $settings = new admin_settingpage('local_extendednav_settings', get_string('settings_page', 'local_extendednav'));
-    if ($ADMIN->fulltree) {
-        $settings->add(new admin_setting_configcheckbox(
-            'local_extendednav/enable_plugin',
-            get_string('enable_plugin', 'local_extendednav'),
-            get_string('enable_plugin_desc', 'local_extendednav'),
-            1
-        ));
-        $settings->add(new admin_setting_configcheckbox(
-            'local_extendednav/hide_from_admins',
-            get_string('hide_from_admins', 'local_extendednav'),
-            get_string('hide_from_admins_desc', 'local_extendednav'),
-            0
-        ));
-    }
-    $ADMIN->add('local_extendednav_cat', $settings);
-
     $ADMIN->add('local_extendednav_cat', new admin_externalpage(
         'local_extendednav_manage',
         get_string('manage_nodes', 'local_extendednav'),
         new moodle_url('/local/extendednav/manage.php'),
         'local/extendednav:manage'
     ));
+}
+
+// The site administration as the plugin shapes it: names, hidden pages and the order of each category. Moodle is building the
+// tree now, so the menus it draws from it already show the changes; the pages of the plugins loaded later are reached before
+// the page is sent. An upgrade that has not added the fields of the plugin yet leaves the tree as it is.
+try {
+    \local_extendednav\menu\admintree::apply($ADMIN);
+} catch (\dml_exception $e) {
+    debugging('Extended navigation could not shape the site administration: ' . $e->getMessage(), DEBUG_DEVELOPER);
 }

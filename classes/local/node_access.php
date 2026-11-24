@@ -116,8 +116,8 @@ class node_access {
     /**
      * Whether the user is a site administrator who sees the node whatever its visibility says.
      *
-     * An administrator sees every node by default, so no rule leaves a site without its administrator. The node, or the
-     * plugin for every node, can hide it from the administrators too.
+     * An administrator sees every node by default, so no rule leaves a site without its administrator. A node can hide itself
+     * from the administrators too.
      *
      * @param \stdClass $node Node record.
      * @param int|null $userid User id, defaults to the current user.
@@ -126,7 +126,7 @@ class node_access {
     public static function is_seen_by_admin(\stdClass $node, ?int $userid = null): bool {
         global $USER;
 
-        if (!empty($node->hideadmins) || get_config('local_extendednav', 'hide_from_admins')) {
+        if (!empty($node->hideadmins)) {
             return false;
         }
         return is_siteadmin($userid ?? (int)$USER->id);

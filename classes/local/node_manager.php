@@ -303,9 +303,10 @@ class node_manager {
      * both by sortorder. A node whose parent is not in the list is treated as top-level.
      *
      * @param \stdClass[] $nodes Nodes of one menu, in any order.
+     * @param int $maxdepth Deepest level kept: 2 for the menus, which have two levels of submenus; more for a tree.
      * @return \stdClass[] The same nodes, grouped.
      */
-    public static function group_by_parent(array $nodes): array {
+    public static function group_by_parent(array $nodes, int $maxdepth = 2): array {
         $nodes = array_values($nodes);
         usort($nodes, static fn(\stdClass $a, \stdClass $b): int =>
             [(int)$a->sortorder, (int)$a->id] <=> [(int)$b->sortorder, (int)$b->id]);
@@ -326,9 +327,9 @@ class node_manager {
         }
 
         $ordered = [];
-        $add = static function (\stdClass $node, int $depth) use (&$add, &$ordered, $children): void {
+        $add = static function (\stdClass $node, int $depth) use (&$add, &$ordered, $children, $maxdepth): void {
             $ordered[] = $node;
-            if ($depth < 2) {
+            if ($depth < $maxdepth) {
                 foreach ($children[$node->nodekey] ?? [] as $child) {
                     $add($child, $depth + 1);
                 }
@@ -403,11 +404,12 @@ class node_manager {
      * Orders nodes as they are shown, keyed by node key.
      *
      * @param \stdClass[] $nodes Nodes of one menu, in any order.
+     * @param int $maxdepth Deepest level kept.
      * @return \stdClass[] The same nodes, grouped, keyed by node key.
      */
-    public static function group_by_parent_keyed(array $nodes): array {
+    public static function group_by_parent_keyed(array $nodes, int $maxdepth = 2): array {
         $keyed = [];
-        foreach (self::group_by_parent($nodes) as $node) {
+        foreach (self::group_by_parent($nodes, $maxdepth) as $node) {
             $keyed[$node->nodekey] = $node;
         }
         return $keyed;
@@ -504,6 +506,56 @@ class node_manager {
             }
         }
         self::save_order($menu, $contextid, $order);
+        if ($menu === \local_extendednav\menu\admintree::KEY) {
+            \local_extendednav\menu\admintree::mark_ordered($parent);
+        }
+    }
+
+    /**
+     * Places a node right before another one among its siblings, or after the last of them.
+     *
+     * @param string $menu Menu key.
+     * @param int $contextid Context of the scope, 0 for the whole site.
+     * @param string $nodekey Key of the node that moves.
+     * @param string $beforekey Key of the sibling it goes before, or empty to go after the last sibling.
+     * @param string $afterkey Key of the sibling it goes after, instead of a sibling it goes before.
+     */
+    public static function place(string $menu, int $contextid, string $nodekey, string $beforekey, string $afterkey = ''): void {
+        $nodes = node_list::get_scope_nodes($menu, $contextid);
+        if (!isset($nodes[$nodekey])) {
+            throw new \invalid_parameter_exception('Unknown node.');
+        }
+        $parent = (string)($nodes[$nodekey]->parentkey ?? '');
+        if ($afterkey !== '') {
+            // Right after a sibling is right before the sibling that follows it, or at the end.
+            if (!isset($nodes[$afterkey]) || (string)($nodes[$afterkey]->parentkey ?? '') !== $parent) {
+                throw new \invalid_parameter_exception('A node goes among its siblings.');
+            }
+            $siblings = array_values(array_filter(
+                array_keys($nodes),
+                static fn(string $key): bool => $key !== $nodekey && (string)($nodes[$key]->parentkey ?? '') === $parent
+            ));
+            $beforekey = $siblings[array_search($afterkey, $siblings, true) + 1] ?? '';
+        }
+        if ($beforekey !== '' && (!isset($nodes[$beforekey]) || (string)($nodes[$beforekey]->parentkey ?? '') !== $parent)) {
+            throw new \invalid_parameter_exception('A node goes among its siblings.');
+        }
+        $keys = array_values(array_diff(array_keys($nodes), [$nodekey]));
+        if ($beforekey !== '') {
+            $at = array_search($beforekey, $keys, true);
+        } else {
+            $at = 0;
+            foreach ($keys as $index => $key) {
+                if ((string)($nodes[$key]->parentkey ?? '') === $parent) {
+                    $at = $index + 1;
+                }
+            }
+        }
+        array_splice($keys, (int)$at, 0, [$nodekey]);
+        self::save_order($menu, $contextid, $keys);
+        if ($menu === \local_extendednav\menu\admintree::KEY) {
+            \local_extendednav\menu\admintree::mark_ordered($parent);
+        }
     }
 
     /**
@@ -514,10 +566,13 @@ class node_manager {
      * @param string[] $nodekeys Node keys in their new order.
      */
     public static function save_order(string $menu, int $contextid, array $nodekeys): void {
+        global $DB;
+
+        // The rows the scope already has are read at once; only the missing ones are made one by one.
+        $rows = $DB->get_records_menu('local_extendednav', ['menu' => $menu, 'contextid' => $contextid], '', 'nodekey, id');
         $ids = [];
         foreach ($nodekeys as $nodekey) {
-            $row = self::ensure_row($menu, (string)$nodekey, $contextid);
-            $ids[] = (int)$row->id;
+            $ids[] = isset($rows[$nodekey]) ? (int)$rows[$nodekey] : (int)self::ensure_row($menu, (string)$nodekey, $contextid)->id;
         }
         self::reorder($menu, $ids, $contextid);
     }

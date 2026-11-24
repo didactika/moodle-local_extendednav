@@ -29,12 +29,12 @@ use local_extendednav\menu_manager;
 class node_importer {
     /** @var string[] Keys written for each node, in order. */
     public const EXPORT_FIELDS = [
-        'nodekey', 'menu', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
+        'nodekey', 'menu', 'native', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
         'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
     ];
 
     /** @var string[] Fields written as whole numbers. */
-    private const INT_FIELDS = ['order', 'visibility', 'blockaccess', 'display', 'placement', 'hideadmins'];
+    private const INT_FIELDS = ['native', 'order', 'visibility', 'blockaccess', 'display', 'placement', 'hideadmins'];
 
     /** @var string[] Fields written as whole numbers, or empty when not set. */
     private const OPTIONAL_INT_FIELDS = ['popupwidth', 'popupheight'];
@@ -57,16 +57,81 @@ class node_importer {
     }
 
     /**
+     * Builds the file of one navigation or of several, in the one format the import reads.
+     *
+     * Every node names its navigation and, when it is one, says it is a node of Moodle; the file also says which navigations
+     * are on. In the site administration only the nodes that were changed are written, and the ones of a category that was
+     * ordered by hand, so the file does not repeat hundreds of pages as Moodle draws them.
+     *
+     * @param string[] $menukeys Navigation keys.
+     * @return string|null The YAML text, or null when there is nothing to export.
+     */
+    public static function export_file(array $menukeys): ?string {
+        global $DB;
+
+        $nodes = [];
+        $navigations = [];
+        foreach ($menukeys as $menukey) {
+            $menu = menu_manager::get_menu($menukey);
+            if ($menu === null) {
+                continue;
+            }
+            $menu->ensure_synced();
+            $rows = $DB->get_records('local_extendednav', ['menu' => $menukey], 'contextid ASC, sortorder ASC, id ASC');
+            if ($menukey === \local_extendednav\menu\admintree::KEY) {
+                $ordered = \local_extendednav\menu\admintree::get_ordered_parents();
+                $rows = array_filter($rows, static fn(\stdClass $row): bool => !self::is_untouched($row, $menu)
+                    || isset($ordered[(string)($row->parentkey ?? '')]));
+            }
+            $site = array_filter($rows, static fn(\stdClass $row): bool => (int)$row->contextid === 0);
+            $depth = $menukey === \local_extendednav\menu\admintree::KEY ? 20 : 2;
+            array_push($nodes, ...self::export_nodes($rows, $site, $depth));
+            $navigations[$menukey] = ['enabled' => menu_manager::is_enabled($menukey) ? 1 : 0];
+        }
+        if (empty($nodes)) {
+            return null;
+        }
+        return \local_extendednav\yaml::dump(['format' => 2, 'navigations' => $navigations, 'nodes' => $nodes]);
+    }
+
+    /**
+     * Whether a row is a node of Moodle that nothing has changed.
+     *
+     * @param \stdClass $row Row.
+     * @param \local_extendednav\menu\base $menu Its navigation.
+     * @return bool
+     */
+    private static function is_untouched(\stdClass $row, $menu): bool {
+        foreach (['title', 'tooltip', 'url', 'icon', 'roles', 'langs'] as $field) {
+            if (trim((string)($row->$field ?? '')) !== '') {
+                return false;
+            }
+        }
+        return $menu->is_native($row->nodekey) && (int)$row->visibility === node_access::VISIBILITY_ALL
+            && empty($row->blockaccess) && empty($row->display) && empty($row->placement) && empty($row->hideadmins)
+            && (int)$row->contextid === 0;
+    }
+
+    /**
      * Returns the exported form of nodes of one menu, with their position in the menu.
      *
      * @param \stdClass[] $nodes Nodes to export.
      * @param \stdClass[] $menunodes Every node of their menu, to number the positions as the management page lists them.
+     * @param int $depth Depth of the menu: 2 for a menu, more for the tree of the site administration, whose nodes are numbered
+     *     among the others of their category, since a tree has a different number of pages on each site.
      * @return array[]
      */
-    public static function export_nodes(array $nodes, array $menunodes): array {
+    public static function export_nodes(array $nodes, array $menunodes, int $depth = 2): array {
         $positions = [];
-        foreach (node_manager::group_by_parent($menunodes) as $index => $node) {
-            $positions[(int)$node->id] = $index + 1;
+        $siblings = [];
+        foreach (node_manager::group_by_parent($menunodes, $depth) as $index => $node) {
+            if ($depth > 2) {
+                $parent = (string)($node->parentkey ?? '');
+                $siblings[$parent] = ($siblings[$parent] ?? 0) + 1;
+                $positions[(int)$node->id] = $siblings[$parent];
+            } else {
+                $positions[(int)$node->id] = $index + 1;
+            }
         }
         // The exceptions of a category or a course are numbered among themselves.
         $ranks = [];
@@ -85,7 +150,11 @@ class node_importer {
         foreach ($nodes as $node) {
             $exported[] = self::export_node($node, $positions[(int)$node->id] ?? $ranks[(int)$node->id] ?? null);
         }
-        usort($exported, static fn(array $a, array $b): int => [$a['scope'], $a['order']] <=> [$b['scope'], $b['order']]);
+        usort(
+            $exported,
+            static fn(array $a, array $b): int => [$a['menu'], $a['scope'], $a['parentkey'], $a['order']]
+                <=> [$b['menu'], $b['scope'], $b['parentkey'], $b['order']]
+        );
         return $exported;
     }
 
@@ -146,6 +215,8 @@ class node_importer {
         $node = clone $node;
         $node->order = $order ?? 0;
         $node->scope = self::describe_scope((int)($node->contextid ?? 0));
+        $menu = menu_manager::get_menu((string)$node->menu);
+        $node->native = $menu !== null && $menu->is_native((string)$node->nodekey) ? 1 : 0;
         $data = [];
         foreach (self::EXPORT_FIELDS as $field) {
             $value = $node->$field ?? null;
@@ -175,6 +246,29 @@ class node_importer {
         $existing = [];
         foreach (node_repository::get_all() as $node) {
             $existing[$node->menu][$node->nodekey] = $node;
+        }
+
+        // The nodes of Moodle in the file are known as such before they are checked. A secondary navigation learns them from
+        // the file, as it would from a page; a node of Moodle this site does not have (a page of a plugin that is not
+        // installed) is left out with a warning, and the rest of the file is imported.
+        $seen = [];
+        foreach ($items as $index => $item) {
+            if (!is_array($item) || empty($item['native']) || trim((string)($item['nodekey'] ?? '')) === '') {
+                continue;
+            }
+            $menukey = trim((string)($item['menu'] ?? '')) ?: $this->defaultmenu;
+            $menu = menu_manager::get_menu($menukey);
+            $nodekey = trim((string)$item['nodekey']);
+            if ($menu instanceof \local_extendednav\menu\secondary) {
+                $seen[$menukey][$nodekey] = (object)['text' => '', 'action' => ''];
+            } else if ($menu !== null && !$menu->is_native($nodekey)) {
+                $warnings[] = $menukey . '/' . $nodekey . ': ' . get_string('warn_import_absent', 'local_extendednav');
+                $counts['skipped']++;
+                unset($items[$index]);
+            }
+        }
+        foreach ($seen as $menukey => $nodes) {
+            menu_manager::get_menu($menukey)->record_seen($nodes);
         }
 
         // The nodes of a category or a course are checked with the rest and saved after the ones of the site.
@@ -275,7 +369,9 @@ class node_importer {
                 }
                 $ids[$nodekey] = (int)$record->id;
             }
-            if (!empty($orders[$menukey])) {
+            if (!empty($orders[$menukey]) && $menukey === \local_extendednav\menu\admintree::KEY) {
+                self::apply_sibling_orders($menukey, $orders[$menukey]);
+            } else if (!empty($orders[$menukey])) {
                 self::apply_orders($menukey, $orders[$menukey], $ids);
             }
         }
@@ -389,5 +485,47 @@ class node_importer {
             array_splice($list, min($order - 1, count($list)), 0, [$ids[$nodekey]]);
         }
         node_manager::reorder($menukey, $list);
+    }
+
+    /**
+     * Moves imported nodes of a tree to their position among the others of their category, and remembers that those
+     * categories are ordered by hand.
+     *
+     * @param string $menukey Menu key.
+     * @param array[] $orders Position among the siblings and file index, keyed by node key.
+     */
+    private static function apply_sibling_orders(string $menukey, array $orders): void {
+        $nodes = node_list::get_scope_nodes($menukey, 0);
+        $groups = [];
+        foreach ($nodes as $key => $node) {
+            $groups[(string)($node->parentkey ?? '')][] = $key;
+        }
+        $touched = [];
+        foreach ($groups as $parent => $keys) {
+            $placed = array_values(array_intersect($keys, array_keys($orders)));
+            if (empty($placed)) {
+                continue;
+            }
+            usort($placed, static fn(string $a, string $b): int => $orders[$a] <=> $orders[$b]);
+            $list = array_values(array_diff($keys, $placed));
+            foreach ($placed as $key) {
+                array_splice($list, min($orders[$key][0] - 1, count($list)), 0, [$key]);
+            }
+            $groups[$parent] = $list;
+            $touched[] = (string)$parent;
+        }
+        if (empty($touched)) {
+            return;
+        }
+        // The whole tree in its new order: each category keeps its place and its children take the order of the file.
+        $order = [];
+        $queues = $groups;
+        foreach ($nodes as $key => $node) {
+            $order[] = array_shift($queues[(string)($node->parentkey ?? '')]);
+        }
+        node_manager::save_order($menukey, 0, $order);
+        foreach ($touched as $parent) {
+            \local_extendednav\menu\admintree::mark_ordered($parent);
+        }
     }
 }

@@ -35,6 +35,9 @@
 function xmldb_local_extendednav_install() {
     global $USER;
 
+    // The plugin starts on, and each navigation can be turned off from the management page.
+    set_config('enable_plugin', 1, 'local_extendednav');
+
     // Moodle has no list of its primary navigation items: it adds them while it builds the navigation, depending
     // on the site settings and on the user (the Dashboard needs a logged-in user, Site administration the
     // capability). From the command line nobody is logged in, so they are found as the main administrator, who

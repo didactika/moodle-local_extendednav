@@ -54,7 +54,6 @@ foreach (node_importer::EXPORT_FIELDS as $field) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_extendednav/documentation', [
-    'backurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
     'downloadurl' => (new moodle_url('/local/extendednav/documentation.php', ['example' => 1]))->out(false),
     'fields' => $fields,
     'example' => $example,

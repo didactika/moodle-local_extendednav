@@ -17,7 +17,7 @@
 {{!
     @template local_extendednav/manage/page
 
-    The management page: the navigations to the left (a select on a narrow screen), and to the right the settings, the scope
+    The management page: the navigations to the left (a select on a narrow screen), and to the right the name with its On and Off button, the scope
     of the changes, the actions and the list of the nodes of the navigation chosen.
 
     @copyright  2026 Didactika.org
@@ -31,14 +31,13 @@
             {"label": "Course", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true}]}
         ],
         "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}],
-        "cansettings": true,
         "enabled": true,
-        "hideadmins": false,
         "hasscopes": true,
         "scopename": "Whole site",
         "addurl": "#",
         "importurl": "#",
         "exporturl": "#",
+        "exporteverythingurl": "#",
         "activityurl": "#",
         "canadd": true,
         "searchlabel": "Search nodes",
@@ -46,21 +45,7 @@
     }
 }}
 <div class="len" data-region="manage" data-config="{{config}}">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-        <p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>
-        {{#cansettings}}
-            <div class="d-flex flex-wrap align-items-center gap-4" data-region="settings">
-                <div class="form-check form-switch custom-control custom-switch mb-0">
-                    <input type="checkbox" class="form-check-input custom-control-input" id="len-setting-enable" role="switch" data-setting="enable_plugin" {{#enabled}}checked{{/enabled}}>
-                    <label class="form-check-label custom-control-label" for="len-setting-enable">{{#str}}enable_plugin, local_extendednav{{/str}}</label>
-                </div>
-                <div class="form-check form-switch custom-control custom-switch mb-0">
-                    <input type="checkbox" class="form-check-input custom-control-input" id="len-setting-admins" role="switch" data-setting="hide_from_admins" {{#hideadmins}}checked{{/hideadmins}}>
-                    <label class="form-check-label custom-control-label" for="len-setting-admins">{{#str}}hide_from_admins, local_extendednav{{/str}}</label>
-                </div>
-            </div>
-        {{/cansettings}}
-    </div>
+    <p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>
 
     <div data-region="layout">
         <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
@@ -86,13 +71,31 @@
 
         <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+                    <button type="button" class="btn btn-sm {{#enabled}}btn-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
+                        <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
+                        <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/invalid, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
+                    </button>
+                </div>
                 <div class="d-flex flex-wrap align-items-center gap-2" data-region="actions">
                     {{#canadd}}
                         <a class="btn btn-primary" href="{{addurl}}">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
                     {{/canadd}}
                     <a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>
-                    <a class="btn btn-outline-secondary" href="{{exporturl}}">{{#pix}}t/download, core{{/pix}} {{#str}}export_all_btn, local_extendednav{{/str}}</a>
+                    <span class="dropdown d-inline-flex position-relative" data-menu="export">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-menu-toggle aria-haspopup="true" aria-expanded="false">{{#pix}}t/download, core{{/pix}} {{#str}}export, local_extendednav{{/str}}</button>
+                        <span class="dropdown-menu dropdown-menu-end dropdown-menu-right show" hidden>
+                            <a class="dropdown-item" href="{{exporturl}}">
+                                <span class="d-block fw-bold">{{#str}}export_this, local_extendednav{{/str}}</span>
+                                <span class="d-block small text-muted">{{name}}</span>
+                            </a>
+                            <a class="dropdown-item" href="{{exporteverythingurl}}">
+                                <span class="d-block fw-bold">{{#str}}export_everything, local_extendednav{{/str}}</span>
+                                <span class="d-block small text-muted">{{#str}}export_everything_help, local_extendednav{{/str}}</span>
+                            </a>
+                        </span>
+                    </span>
                     <a class="btn btn-outline-secondary" href="{{activityurl}}">{{#pix}}i/report, core{{/pix}} {{#str}}activity_log, local_extendednav{{/str}}</a>
                 </div>
             </div>
@@ -116,6 +119,9 @@
             <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{searchlabel}}">
                 <div class="card">
                     {{> local_extendednav/list/toolbar }}
+                    <nav class="px-3 py-2 border-bottom" data-region="path" aria-label="{{#str}}tree_path, local_extendednav{{/str}}" hidden>
+                        <ol class="breadcrumb mb-0"></ol>
+                    </nav>
                     <div class="table-responsive" data-region="tablewrap" aria-busy="true">
                         <table class="table">
                             <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>

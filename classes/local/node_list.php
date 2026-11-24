@@ -16,7 +16,7 @@
 
 namespace local_extendednav\local;
 
-use local_extendednav\menu\secondary;
+use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
 
 /**
@@ -43,7 +43,9 @@ class node_list {
      */
     public static function get_scope_nodes(string $menukey, int $contextid): array {
         if ($contextid === 0) {
-            return node_manager::group_by_parent_keyed(node_repository::get_menu_nodes_by_key($menukey));
+            // The administration is a tree of any depth; the menus have two levels of submenus.
+            $depth = $menukey === admintree::KEY ? 20 : 2;
+            return node_manager::group_by_parent_keyed(node_repository::get_menu_nodes_by_key($menukey), $depth);
         }
         $context = \context::instance_by_id($contextid, MUST_EXIST);
         return node_repository::get_scoped_nodes($menukey, $context);
@@ -56,10 +58,11 @@ class node_list {
      * @param int $contextid Context of the scope, 0 for the whole site.
      * @param string $search Text to find in the key, the title and the URL.
      * @param string $visibility 0, 1 and 2, separated by commas, to list those visibilities, or empty for all of them.
-     * @param string $parent Key of a parent node, or empty for every node.
+     * @param string $parent Key of a parent node, or empty for every node. In the site administration, which is a tree, the
+     *     list is always one level of it: the children of this category, or the top level when it is empty.
      * @param int $page Page, from 0.
      * @param int $perpage Rows in a page, 0 for all of them.
-     * @return array With total, counts, rows and reorderable.
+     * @return array With total, counts, rows, reorderable and path.
      */
     public static function get(
         string $menukey,
@@ -77,8 +80,11 @@ class node_list {
         // Moodle's own nodes are found before they are listed, so the list shows what Moodle shows.
         $menu->ensure_synced();
 
-        $nodes = self::get_scope_nodes($menukey, $contextid);
-        $nodes = self::filter($menu, $nodes, $search, $parent);
+        $istree = $menu instanceof admintree;
+        $all = self::get_scope_nodes($menukey, $contextid);
+        // In the tree a search looks in every level; without one, the list is the level chosen.
+        $level = $istree && trim($search) === '';
+        $nodes = self::filter($menu, $all, $search, $istree && !$level ? '' : $parent, $level);
 
         $counts = ['all' => count($nodes), 'visible' => 0, 'roles' => 0, 'hidden' => 0];
         foreach ($nodes as $node) {
@@ -96,17 +102,28 @@ class node_list {
         $perpage = $perpage === 0 ? max($total, 1) : min($perpage, self::MAX_PAGE_SIZE);
         $slice = array_slice($nodes, $page * $perpage, $perpage);
 
-        $siblings = self::siblings(self::get_scope_nodes($menukey, $contextid));
+        $siblings = self::siblings($all);
+        $parents = [];
+        foreach ($all as $node) {
+            if ((string)($node->parentkey ?? '') !== '') {
+                $parents[(string)$node->parentkey] = true;
+            }
+        }
         $rows = [];
         foreach ($slice as $node) {
-            $rows[] = self::export_row($menu, $node, $contextid, $siblings);
+            $row = self::export_row($menu, $node, $contextid, $siblings);
+            $row['haschildren'] = $istree && isset($parents[$node->nodekey]);
+            $row['depth'] = $istree ? self::depth_of($all, $node) : ($row['child'] ? 1 : 0);
+            $rows[] = $row;
         }
+        // Moving a node only makes sense in a whole list, not in a part of it; in the tree, the whole level shown.
+        $reorderable = trim($search) === '' && $visibility === '' && ($istree || $parent === '');
         return [
             'total' => $total,
             'counts' => $counts,
             'rows' => $rows,
-            // Moving a node only makes sense in the whole list, not in a part of it.
-            'reorderable' => $search === '' && $visibility === '' && $parent === '',
+            'reorderable' => $reorderable,
+            'path' => $istree ? self::path_of($menu, $all, $parent) : [],
         ];
     }
 
@@ -117,12 +134,13 @@ class node_list {
      * @param \stdClass[] $nodes Nodes keyed by node key.
      * @param string $search Text to find in the key, the title and the URL.
      * @param string $parent Key of a parent node, or empty.
+     * @param bool $exact Whether an empty parent means the top level, as in a tree, instead of every node.
      * @return \stdClass[]
      */
-    private static function filter($menu, array $nodes, string $search, string $parent): array {
+    private static function filter($menu, array $nodes, string $search, string $parent, bool $exact = false): array {
         $search = trim($search);
-        return array_filter($nodes, static function (\stdClass $node) use ($menu, $search, $parent): bool {
-            if ($parent !== '' && (string)$node->parentkey !== $parent) {
+        return array_filter($nodes, static function (\stdClass $node) use ($menu, $search, $parent, $exact): bool {
+            if (($parent !== '' || $exact) && (string)($node->parentkey ?? '') !== $parent) {
                 return false;
             }
             if ($search === '') {
@@ -136,6 +154,42 @@ class node_list {
             ]);
             return \core_text::strpos(\core_text::strtolower($haystack), \core_text::strtolower($search)) !== false;
         });
+    }
+
+    /**
+     * Returns how deep a node is in the tree, 0 being the top level.
+     *
+     * @param \stdClass[] $all Every node, keyed by node key.
+     * @param \stdClass $node The node.
+     * @return int
+     */
+    private static function depth_of(array $all, \stdClass $node): int {
+        $depth = 0;
+        $parent = (string)($node->parentkey ?? '');
+        while ($parent !== '' && isset($all[$parent]) && $depth < 20) {
+            $depth++;
+            $parent = (string)($all[$parent]->parentkey ?? '');
+        }
+        return $depth;
+    }
+
+    /**
+     * Returns the categories from the top of the tree to a category, for the breadcrumb of the list.
+     *
+     * @param \local_extendednav\menu\base $menu The navigation.
+     * @param \stdClass[] $all Every node, keyed by node key.
+     * @param string $parent Key of the category, or empty for the top level.
+     * @return array[] Each with key and title, from the top down.
+     */
+    private static function path_of($menu, array $all, string $parent): array {
+        $path = [];
+        while ($parent !== '' && isset($all[$parent]) && count($path) < 20) {
+            $node = $all[$parent];
+            $title = node_text::get_title($node, $menu->get_native_node($parent)) ?: $parent;
+            array_unshift($path, ['key' => $parent, 'title' => $title]);
+            $parent = (string)($node->parentkey ?? '');
+        }
+        return $path;
     }
 
     /**
@@ -184,7 +238,34 @@ class node_list {
         ];
         [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[node_access::VISIBILITY_HIDDEN];
 
+        // What narrows the visibility, one short line each, in the order that matters.
+        $details = [];
+        if ($visibility === node_access::VISIBILITY_ROLES && !empty($roles)) {
+            $details[] = get_string('visibility_roles_line', 'local_extendednav', implode(', ', $roles));
+        }
+        if (!empty($langs)) {
+            $details[] = get_string('visibility_langs_line', 'local_extendednav', implode(', ', $langs));
+        }
+        if (!empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL) {
+            $details[] = get_string('badge_blocked', 'local_extendednav');
+        }
+        if (!empty($node->hideadmins)) {
+            $details[] = get_string('hidden_from_admins', 'local_extendednav');
+        } else if (node_access::is_admin_only($node)) {
+            $details[] = get_string('admin_only', 'local_extendednav');
+        }
+        if ($menu instanceof \local_extendednav\menu\primary && $native !== null && !$menu->is_shown_by_moodle($node->nodekey)) {
+            $details[] = get_string('badge_unavailable', 'local_extendednav');
+        }
+        if ($placement !== 0) {
+            $details[] = get_string($placement === 1 ? 'placement_more' : 'placement_main', 'local_extendednav');
+        }
+        if (!empty($native->moodlehidden)) {
+            $details[] = get_string('hidden_by_moodle', 'local_extendednav');
+        }
+
         return [
+            'details' => $details,
             'id' => (int)$node->id,
             'nodekey' => (string)$node->nodekey,
             'title' => node_text::get_title($node, $native) ?: (string)$node->nodekey,
@@ -242,16 +323,5 @@ class node_list {
      */
     public static function supports_scopes(string $menukey): bool {
         return in_array($menukey, ['course', 'activity', 'category'], true);
-    }
-
-    /**
-     * Whether a navigation only lets a node be hidden and ordered.
-     *
-     * @param string $menukey Navigation key.
-     * @return bool
-     */
-    public static function is_order_only(string $menukey): bool {
-        $menu = menu_manager::get_menu($menukey);
-        return $menu instanceof secondary && $menu->is_order_only();
     }
 }

@@ -1952,6 +1952,22 @@
     font-weight: 600;
 }
 
+.len [data-menu=export] > .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 1060;
+    width: 20rem;
+    max-width: calc(100vw - 2rem);
+    margin-top: 2px;
+}
+
+.len [data-menu=export] > .dropdown-menu .dropdown-item {
+    display: block;
+    white-space: normal;
+}
+
 .len [data-menu=scope] {
     position: relative;
 }
@@ -1967,12 +1983,59 @@
     overflow: auto;
 }
 
+.len [data-region=tablewrap] table {
+    width: 100%;
+}
+
+.len [data-region=tablewrap] :is(th, td)[data-column=handle],
+.len [data-region=tablewrap] :is(th, td)[data-column=select] {
+    width: 2.75rem;
+    padding-right: 0;
+}
+
 .len [data-region=tablewrap] th[data-column=title] {
     min-width: 12rem;
 }
 
+.len [data-region=tablewrap] [data-depth=1] {
+    padding-left: 1.25rem;
+}
+
+.len [data-region=tablewrap] [data-depth=2] {
+    padding-left: 2.5rem;
+}
+
+.len [data-region=tablewrap] [data-depth=3] {
+    padding-left: 3.75rem;
+}
+
+.len [data-region=tablewrap] [data-depth=4] {
+    padding-left: 5rem;
+}
+
+.len [data-region=tablewrap] [data-depth=5] {
+    padding-left: 6.25rem;
+}
+
 .len [data-region=tablewrap] td[data-column=actions] {
     width: 1%;
+}
+
+.len [data-region=tablewrap] [data-region=handle] {
+    cursor: grab;
+    touch-action: none;
+}
+
+.len [data-region=tablewrap] [data-region=handle]:active {
+    cursor: grabbing;
+}
+
+.len [data-region=tablewrap] tr[data-drop=before] > * {
+    box-shadow: inset 0 2px 0 var(--dd-primary);
+}
+
+.len [data-region=tablewrap] tr[data-drop=after] > * {
+    box-shadow: inset 0 -2px 0 var(--dd-primary);
 }
 
 /*

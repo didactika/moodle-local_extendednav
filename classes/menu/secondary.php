@@ -17,8 +17,8 @@
 namespace local_extendednav\menu;
 
 /**
- * One of the secondary navigations of Moodle: the one of a course, of the site home, of an activity, of a category
- * and of the site administration.
+ * One of the secondary navigations of Moodle: the one of a course, of the site home, of an activity and of a category.
+ * The site administration is a tree of its own, see {@see admintree}.
  *
  * Moodle has no list of the items of these navigations: they depend on the page, the user and the plugins. The plugin
  * does not build any page to find them. It records the items it sees when a page shows the navigation, once per item,
@@ -36,11 +36,7 @@ class secondary extends base {
         'frontpage' => 'secondary_frontpage',
         'activity' => 'secondary_activity',
         'category' => 'secondary_category',
-        'admin' => 'secondary_admin',
     ];
-
-    /** @var string[] Origins in which a node can only be hidden and ordered, never renamed, re-linked or added. */
-    public const ORDER_ONLY = ['admin'];
 
     /**
      * Creates the handler of one navigation.
@@ -69,15 +65,6 @@ class secondary extends base {
      */
     public function get_name(): string {
         return get_string(self::ORIGINS[$this->key], 'local_extendednav');
-    }
-
-    /**
-     * Whether nodes of this navigation can only be hidden and ordered.
-     *
-     * @return bool
-     */
-    public function is_order_only(): bool {
-        return in_array($this->key, self::ORDER_ONLY, true);
     }
 
     /**
@@ -113,7 +100,9 @@ class secondary extends base {
      */
     public function record_seen(array $seen): bool {
         $stored = $this->get_stored_nodes();
-        $new = array_diff_key($seen, $stored);
+        // A node is new when it was never seen, or when it came from an imported file and a page now gives its link.
+        $new = array_filter($seen, static fn(\stdClass $node, string $key): bool => !isset($stored[$key])
+            || ($stored[$key]['action'] === '' && (string)$node->action !== ''), ARRAY_FILTER_USE_BOTH);
         if (empty($new)) {
             return false;
         }

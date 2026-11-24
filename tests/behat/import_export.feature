@@ -24,7 +24,7 @@ Feature: Import and export nodes as YAML
     And I press "Import"
     Then I should see "Nothing was imported."
     And I should see "This kind of URL is not allowed."
-    And I follow "Back to navigation"
+    And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
     And I should not see "good_node" in the "[data-region='tablewrap']" "css_element"
 
   Scenario: The documentation lists every field

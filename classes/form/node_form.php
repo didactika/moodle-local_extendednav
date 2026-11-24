@@ -55,6 +55,9 @@ class node_form extends \moodleform {
         $nodes = node_repository::get_menu_nodes_by_key($menukey);
         $isnative = $current !== null && $menu->is_native($currentkey);
         $issecondary = $menu instanceof \local_extendednav\menu\secondary;
+        $istree = $menu instanceof \local_extendednav\menu\admintree;
+        // A page of the site administration keeps its address and its look: only its name and who sees it change.
+        $istreepage = $istree && $isnative;
         $isparent = false;
         foreach ($nodes as $node) {
             if ($currentkey !== '' && $node->parentkey === $currentkey) {
@@ -70,11 +73,15 @@ class node_form extends \moodleform {
         $mform->addElement('hidden', 'contextid', $contextid);
         $mform->setType('contextid', PARAM_INT);
 
+        // The node: what it is called and where it leads.
+        $mform->addElement('header', 'nodeheader', get_string('form_section_node', 'local_extendednav'));
+        $mform->setExpanded('nodeheader', true);
         $mform->addElement(
             'static',
             'menudisplay',
             get_string('menu_type', 'local_extendednav'),
-            \html_writer::tag('strong', $menu->get_name())
+            \html_writer::tag('strong', $menu->get_name()) . ($contextid ? ' · '
+                . s(\local_extendednav\local\node_importer::describe_scope($contextid)) : '')
         );
 
         $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => 30, 'maxlength' => 50]);
@@ -102,36 +109,53 @@ class node_form extends \moodleform {
         $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'title', 'local_extendednav');
 
-        $mform->addElement('text', 'tooltip', get_string('tooltip', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
-        $mform->setType('tooltip', PARAM_TEXT);
-        $mform->addHelpButton('tooltip', 'tooltip', 'local_extendednav');
-
-        $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => 60]);
-        $mform->setType('url', PARAM_TEXT);
-        $mform->addHelpButton('url', 'url', 'local_extendednav');
-        if ($isparent) {
-            $mform->addElement('static', 'urlnotice', '', \html_writer::div(
-                get_string('parenturlunused', 'local_extendednav'),
-                'alert alert-warning mb-0'
-            ));
+        if ($istreepage) {
+            $mform->addElement(
+                'static',
+                'urlinfo',
+                get_string('url', 'local_extendednav'),
+                \html_writer::tag('code', s((string)($menu->get_native_node($currentkey)->action ?? '')))
+            );
+        } else {
+            $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => 60]);
+            $mform->setType('url', PARAM_TEXT);
+            $mform->addHelpButton('url', 'url', 'local_extendednav');
+            if ($isparent) {
+                $mform->addElement('static', 'urlnotice', '', \html_writer::div(
+                    get_string('parenturlunused', 'local_extendednav'),
+                    'alert alert-warning mb-0'
+                ));
+            }
         }
 
-        $mform->addElement('select', 'display', get_string('display', 'local_extendednav'), node_display::get_options());
-        $mform->setDefault('display', node_display::CURRENT);
-        $mform->addHelpButton('display', 'display', 'local_extendednav');
-        $sizes = ['popupwidth' => node_display::DEFAULT_WIDTH, 'popupheight' => node_display::DEFAULT_HEIGHT];
-        foreach ($sizes as $field => $default) {
-            $mform->addElement('text', $field, get_string($field, 'local_extendednav'), ['size' => 5]);
-            $mform->setType($field, PARAM_INT);
-            $mform->setDefault($field, $default);
-            $mform->hideIf($field, 'display', 'neq', node_display::POPUP);
+        // How it looks and how it opens. The pages of the administration are drawn by Moodle and keep their look.
+        if (!$istree) {
+            $mform->addElement('header', 'lookheader', get_string('form_section_look', 'local_extendednav'));
+            $mform->setExpanded('lookheader', false);
+            $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
+            $mform->setType('icon', PARAM_TEXT);
+            $mform->addHelpButton('icon', 'icon', 'local_extendednav');
+            $PAGE->requires->js_call_amd('local_extendednav/icon_picker', 'init', ['icon']);
+
+            $mform->addElement('text', 'tooltip', get_string('tooltip', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
+            $mform->setType('tooltip', PARAM_TEXT);
+            $mform->addHelpButton('tooltip', 'tooltip', 'local_extendednav');
+
+            $mform->addElement('select', 'display', get_string('display', 'local_extendednav'), node_display::get_options());
+            $mform->setDefault('display', node_display::CURRENT);
+            $mform->addHelpButton('display', 'display', 'local_extendednav');
+            $sizes = ['popupwidth' => node_display::DEFAULT_WIDTH, 'popupheight' => node_display::DEFAULT_HEIGHT];
+            foreach ($sizes as $field => $default) {
+                $mform->addElement('text', $field, get_string($field, 'local_extendednav'), ['size' => 5]);
+                $mform->setType($field, PARAM_INT);
+                $mform->setDefault($field, $default);
+                $mform->hideIf($field, 'display', 'neq', node_display::POPUP);
+            }
         }
 
-        $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
-        $mform->setType('icon', PARAM_TEXT);
-        $mform->addHelpButton('icon', 'icon', 'local_extendednav');
-        $PAGE->requires->js_call_amd('local_extendednav/icon_picker', 'init', ['icon']);
-
+        // Who sees it.
+        $mform->addElement('header', 'accessheader', get_string('form_section_access', 'local_extendednav'));
+        $mform->setExpanded('accessheader', true);
         $mform->addElement('select', 'visibility', get_string('visibility', 'local_extendednav'), [
             node_access::VISIBILITY_ALL => get_string('vis_all', 'local_extendednav'),
             node_access::VISIBILITY_ROLES => get_string('vis_roles', 'local_extendednav'),
@@ -151,10 +175,13 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', node_access::VISIBILITY_ROLES);
 
-        $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
-        $mform->setDefault('blockaccess', 1);
-        $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
-        $mform->hideIf('blockaccess', 'visibility', 'eq', node_access::VISIBILITY_ALL);
+        // The pages of the administration are never blocked: Moodle checks their capabilities.
+        if (!$istree) {
+            $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
+            $mform->setDefault('blockaccess', 1);
+            $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
+            $mform->hideIf('blockaccess', 'visibility', 'eq', node_access::VISIBILITY_ALL);
+        }
 
         $mform->addElement(
             'autocomplete',
@@ -174,7 +201,13 @@ class node_form extends \moodleform {
             ['id' => 'local_extendednav_langs_notice', 'hidden' => 'hidden']
         ));
 
-        if ($issecondary && !$menu->is_order_only()) {
+        $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
+        $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
+
+        // Where it goes.
+        $mform->addElement('header', 'placeheader', get_string('form_section_place', 'local_extendednav'));
+        $mform->setExpanded('placeheader', $istree && !$isnative);
+        if ($issecondary) {
             // Where the node goes in the navigation: where Moodle puts it, the More menu or the bar.
             $mform->addElement('select', 'placement', get_string('placement', 'local_extendednav'), [
                 0 => get_string('placement_default', 'local_extendednav'),
@@ -184,10 +217,30 @@ class node_form extends \moodleform {
             $mform->addHelpButton('placement', 'placement', 'local_extendednav');
         }
 
-        $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
-        $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
-
-        if ($issecondary) {
+        if ($istreepage) {
+            // A page of the administration stays in its category.
+            $native = $menu->get_native_node($currentkey);
+            $parentname = $native && $native->parentkey !== '' ? ($menu->get_native_node($native->parentkey)->text ?? '') : '';
+            $mform->addElement(
+                'static',
+                'parentkeyinfo',
+                get_string('category_of_page', 'local_extendednav'),
+                s($parentname !== '' ? $parentname : get_string('tree_top', 'local_extendednav'))
+            );
+            $mform->addElement('hidden', 'parentkey', (string)($native->parentkey ?? ''));
+            $mform->setType('parentkey', PARAM_ALPHANUMEXT);
+        } else if ($istree) {
+            // A link of the plugin goes in a category of the administration.
+            $mform->addElement(
+                'select',
+                'parentkey',
+                get_string('category_of_page', 'local_extendednav'),
+                ['' => get_string('choosedots')] + $this->get_tree_categories($menu)
+            );
+            $mform->setType('parentkey', PARAM_ALPHANUMEXT);
+            $mform->addRule('parentkey', get_string('required'), 'required', null, 'client');
+            $mform->addHelpButton('parentkey', 'category_of_page', 'local_extendednav');
+        } else if ($issecondary) {
             // The secondary navigations have no submenus.
             $mform->addElement('hidden', 'parentkey', '');
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
@@ -261,6 +314,15 @@ class node_form extends \moodleform {
         $result = node_validator::validate($record, $others);
         $errors += $result['errors'];
 
+        // A link added to the site administration needs the category it goes in.
+        $menu = menu_manager::get_menu($menukey);
+        if ($menu instanceof \local_extendednav\menu\admintree && !$menu->is_native((string)$record->nodekey)) {
+            $categories = $this->get_tree_categories($menu);
+            if (!isset($categories[(string)($record->parentkey ?? '')])) {
+                $errors['parentkey'] = get_string('err_tree_category', 'local_extendednav');
+            }
+        }
+
         if (
             $contextid === 0 && empty($errors)
                 && access_guard::check_fallbacks(node_manager::get_all_with($record, (int)($current->id ?? 0)))
@@ -269,6 +331,22 @@ class node_form extends \moodleform {
             $errors['blockaccess'] = get_string('err_fallbacks_blocked', 'local_extendednav');
         }
         return $errors;
+    }
+
+    /**
+     * Returns the categories of the site administration, indented as the tree has them.
+     *
+     * @param \local_extendednav\menu\admintree $menu The site administration.
+     * @return array Names keyed by node key.
+     */
+    private function get_tree_categories($menu): array {
+        $options = [];
+        foreach ($menu->get_native_nodes() as $key => $node) {
+            if ($node->category) {
+                $options[$key] = str_repeat('— ', $node->depth) . $node->text;
+            }
+        }
+        return $options;
     }
 
     /**

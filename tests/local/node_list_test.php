@@ -103,7 +103,7 @@ final class node_list_test extends \advanced_testcase {
     }
 
     /**
-     * Only the navigations of a course, an activity and a category have exceptions, and only the administration is order only.
+     * Only the navigations of a course, an activity and a category have exceptions.
      */
     public function test_which_navigations_have_scopes(): void {
         $this->assertTrue(node_list::supports_scopes('course'));
@@ -111,8 +111,6 @@ final class node_list_test extends \advanced_testcase {
         $this->assertTrue(node_list::supports_scopes('category'));
         $this->assertFalse(node_list::supports_scopes('primary'));
         $this->assertFalse(node_list::supports_scopes('admin'));
-        $this->assertTrue(node_list::is_order_only('admin'));
-        $this->assertFalse(node_list::is_order_only('course'));
     }
 
     /**
@@ -128,7 +126,8 @@ final class node_list_test extends \advanced_testcase {
         $this->assertSame('frontpage', secondary_navigation::get_origin(\context_course::instance(SITEID), SITEID));
         $this->assertSame('activity', secondary_navigation::get_origin(\context_module::instance($page->cmid), (int)$course->id));
         $this->assertSame('category', secondary_navigation::get_origin(\context_coursecat::instance($category->id), 0));
-        $this->assertSame('admin', secondary_navigation::get_origin(\context_system::instance(), SITEID));
+        // The site administration is shaped through its tree, not through its bar.
+        $this->assertNull(secondary_navigation::get_origin(\context_system::instance(), SITEID));
         $this->assertNull(secondary_navigation::get_origin(\context_user::instance(get_admin()->id), SITEID));
     }
 }

@@ -21,7 +21,6 @@
 
     Context variables required for this template:
     * tabs - Menus, each with name, url and active
-    * backurl - URL of the management page
 
     Example context (json):
     {
@@ -29,7 +28,6 @@
             {"name": "Primary navigation", "url": "https://example.com/local/extendednav/activity.php?menu=primary", "active": true},
             {"name": "User menu", "url": "https://example.com/local/extendednav/activity.php?menu=usermenu", "active": false}
         ],
-        "backurl": "https://example.com/local/extendednav/manage.php?menu=primary"
     }
 }}
 <div class="d-flex flex-wrap align-items-end mb-3 local-extendednav-toolbar">
@@ -40,7 +38,4 @@
             </li>
         {{/tabs}}
     </ul>
-    <div class="d-flex flex-wrap local-extendednav-actions">
-        <a href="{{backurl}}" class="btn btn-outline-secondary">{{#pix}} t/left, core {{/pix}}{{#str}} back_to_nodes, local_extendednav {{/str}}</a>
-    </div>
 </div>

@@ -44,7 +44,7 @@ final class settings_test extends \advanced_testcase {
     }
 
     /**
-     * Users with the manage capability reach the management page but not the settings.
+     * Users with the manage capability reach the management page.
      */
     public function test_manager_with_capability(): void {
         $this->resetAfterTest();
@@ -59,7 +59,6 @@ final class settings_test extends \advanced_testcase {
         $this->assertInstanceOf(\admin_externalpage::class, $manage);
         $this->assertTrue($manage->check_access());
         $this->assertNotNull($root->locate('appearance')->locate('local_extendednav_cat'));
-        $this->assertFalse($root->locate('local_extendednav_settings')->check_access());
     }
 
     /**
@@ -73,7 +72,7 @@ final class settings_test extends \advanced_testcase {
     }
 
     /**
-     * Administrators reach both pages.
+     * Administrators reach the management page.
      */
     public function test_admin(): void {
         $this->resetAfterTest();
@@ -81,7 +80,6 @@ final class settings_test extends \advanced_testcase {
 
         $root = $this->load_admin_tree();
         $this->assertTrue($root->locate('local_extendednav_manage')->check_access());
-        $this->assertTrue($root->locate('local_extendednav_settings')->check_access());
         $this->assertNotNull($root->locate('appearance')->locate('local_extendednav_cat'));
     }
 }
