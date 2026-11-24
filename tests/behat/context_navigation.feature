@@ -51,7 +51,7 @@ Feature: Change the navigations of a course from the course
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"
     When I navigate to "Appearance > Extended navigation > Exceptions" in site administration
     Then I should see "Course 1" in the "[data-region='tablewrap']" "css_element"
-    And I should see "Course navigation · 1" in the "[data-region='tablewrap']" "css_element"
+    And I should see "Course · 1" in the "[data-region='tablewrap']" "css_element"
 
   @javascript
   Scenario: A teacher hides an item of one forum from the page of the forum
