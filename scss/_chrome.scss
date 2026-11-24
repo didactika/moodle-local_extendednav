@@ -1,0 +1,438 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// The chrome of the lists of the plugin, as the design system draws it, written as overrides of the Bootstrap components the
+// markup uses (card, nav-tabs, table, list-group) and as the design system's own pieces (dd-*), always inside .len so
+// nothing reaches the rest of Moodle. Buttons, fields, dialogs and alerts stay the ones of Moodle.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+.len {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    min-width: 0;
+
+    // A stack of the page (d-grid) is one column as wide as its box: a long name or email that ends with an ellipsis never makes it
+    // wider than the screen.
+    & .d-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    // The cards of a details page: side by side from 992 px, one under the other below. The row of Bootstrap takes its gutters
+    // from negative margins that go past the column of a narrow page; a grid with a gap keeps the cards inside it.
+    & > [data-region="cards"].row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.25rem;
+        margin: 0;
+
+        // Bootstrap 5 gives a column half the width of its row; in the grid it takes the width of its cell.
+        & > [class*="col-"] {
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        @media (min-width: 992px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    // The cards of the accounts a person may open: one column on a phone, two from 576 px and three from 1200 px, in a grid with a
+    // gap, so no negative margin of the row of Bootstrap goes past the page.
+    & [data-region="account-cards"].row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        margin: 0;
+
+        & > li {
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        @media (min-width: 576px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (min-width: 1200px) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    // What each permission does: four columns on a computer, two on a tablet and one on a phone, in a grid for the same reason.
+    & > [data-region="legend"].row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.5rem 1.5rem;
+        margin: 0;
+
+        & > [class*="col-"] {
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        @media (min-width: 576px) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (min-width: 992px) {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    // The people of a cell, as the pictures of Moodle overlapped: each one has a ring of the surface, so the edge of the next
+    // one shows, and the last one may say how many more there are. The mark is doubled to weigh more than the person of a row.
+    & [data-region="accounts"][data-region="accounts"] {
+        display: inline-flex;
+        align-items: center;
+
+        & > .userinitials,
+        & > .userpicture {
+            flex: none;
+            margin: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--dd-surface);
+        }
+
+        & > * + .userinitials,
+        & > * + .userpicture {
+            margin-inline-start: -0.25rem;
+        }
+    }
+
+    @include dd-tabs;
+
+    // Cards: a thin line and the radius of the system, no shadow. A list is a card with its toolbar, table and pager.
+    & .card {
+        overflow: hidden;
+        border: 1px solid var(--dd-hairline);
+        border-radius: var(--dd-radius-lg);
+        background: var(--dd-surface);
+        box-shadow: none;
+    }
+
+    & .card-body {
+        padding: 1.25rem;
+    }
+
+    & .card-title {
+        margin-bottom: 0.75rem;
+        color: var(--dd-ink);
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    // A toolbar of filters keeps one row: the search shrinks down to its own room, the menus keep their width beside it and the
+    // button that clears them stays at the end. On a phone the search gives up room down to 7rem.
+    & [data-region="filters"] {
+        flex-wrap: nowrap;
+
+        & > :first-child {
+            flex: 1 1 auto;
+            flex-wrap: nowrap;
+            min-width: 0;
+
+            & > [role="search"] {
+                flex: 1 1 10rem;
+                min-width: 10rem;
+            }
+        }
+
+        & > :last-child:not(:first-child) {
+            flex: none;
+        }
+
+        @media (max-width: 400px) {
+            & > :first-child > [role="search"] {
+                min-width: 7rem;
+            }
+        }
+    }
+
+    // Tables: quiet lines, a small header in capitals, and room to breathe.
+    & .table-responsive {
+        margin: 0;
+        transition: opacity var(--dd-ease);
+
+        &[aria-busy="true"] {
+            opacity: 0.6;
+        }
+
+        // A list keeps the same height whatever it holds: with few rows there is empty space below them, with many it scrolls
+        // and the header stays in view.
+        &[data-region="tablewrap"] {
+            block-size: var(--dd-table-h);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+
+            & thead th {
+                position: sticky;
+                inset-block-start: 0;
+                z-index: 1;
+                background-color: var(--dd-surface);
+            }
+        }
+    }
+
+    // The empty and error states take the height of the table and of the pager they replace, so the card does not change height
+    // when a search finds nothing.
+    & [data-region="empty"]:not([hidden]),
+    & [data-region="error"]:not([hidden]) {
+        display: grid;
+        min-block-size: calc(var(--dd-table-h) + var(--dd-foot-h, 0px));
+        place-content: center;
+    }
+
+    & .table {
+        margin-bottom: 0;
+        color: var(--dd-ink);
+        font-size: 0.9375rem;
+
+        & th,
+        & td {
+            padding: 0.75rem 1rem;
+            border-color: var(--dd-hairline);
+            vertical-align: middle;
+        }
+
+        & thead th {
+            border-top: 0;
+            border-bottom: 1px solid var(--dd-line);
+            color: var(--dd-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        & tbody th {
+            font-weight: 600;
+        }
+
+        & tbody tr:hover > * {
+            background-color: color-mix(in srgb, var(--dd-primary) 5%, var(--dd-surface));
+        }
+
+        // The last row keeps its line under it, also with Bootstrap 4, which draws the line of a cell above the cell.
+        & tbody tr:last-child > * {
+            border-bottom: 1px solid var(--dd-hairline);
+        }
+
+        & tbody tr.table-active > * {
+            background-color: var(--dd-primary-soft);
+            // Bootstrap 5 paints an active row with a grey inset shadow over its background; the tint is the one colour.
+            box-shadow: none;
+        }
+
+        & [data-column="select"] {
+            width: 2.75rem;
+            padding-right: 0;
+
+            // Bootstrap 4 places a check absolutely, beside a label; in a cell it stands on its own.
+            & .form-check-input {
+                position: static;
+                display: block;
+                width: 1.125rem;
+                height: 1.125rem;
+                margin: 0;
+                cursor: pointer;
+            }
+        }
+
+        & [data-column="actions"] {
+            width: 1%;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        // A person in a row: the name and, under it, the email, cut when the column is narrow.
+        & .userpicture,
+        & .userinitials {
+            flex: none;
+            margin: 0 0.75rem 0 0;
+        }
+
+        & .text-truncate {
+            max-width: 16rem;
+        }
+    }
+
+    & thead th > .btn.btn-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        cursor: pointer;
+
+        &::after {
+            content: "";
+            flex: none;
+            width: 0.4375rem;
+            height: 0.4375rem;
+            border: solid currentColor;
+            border-width: 0 2px 2px 0;
+            opacity: 0.35;
+            transform: translateY(-2px) rotate(45deg);
+            transition: transform 200ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms;
+        }
+
+        &:hover {
+            color: var(--dd-ink);
+
+            &::after {
+                opacity: 0.8;
+            }
+        }
+
+        &:focus-visible {
+            outline: 0;
+            border-radius: 0.25rem;
+            box-shadow: 0 0 0 3px var(--dd-ring);
+        }
+    }
+
+    & th[aria-sort] {
+        color: var(--dd-ink);
+
+        & > .btn.btn-link {
+            color: var(--dd-primary-ink);
+
+            &::after {
+                opacity: 1;
+                color: var(--dd-primary);
+            }
+        }
+    }
+
+    & th[aria-sort="ascending"] > .btn.btn-link::after {
+        transform: translateY(2px) rotate(-135deg);
+    }
+
+    // Rows of the right height while a list loads, as the placeholder of Bootstrap, with a quiet shimmer.
+    & .placeholder {
+        display: block;
+        min-height: 0;
+        opacity: 1;
+        cursor: default;
+        height: 0.875rem;
+        border-radius: 0.375rem;
+        background: linear-gradient(90deg, var(--dd-hairline) 0%, var(--dd-surface-3) 50%, var(--dd-hairline) 100%);
+        background-size: 200% 100%;
+        animation: len-shimmer 1.4s linear infinite;
+    }
+
+    // The alert of a list that did not load sits where its rows were.
+    & .card > .alert {
+        margin: 1rem;
+    }
+}
+
+@keyframes len-shimmer {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .len .placeholder {
+        animation: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .len {
+        & [role="search"] {
+            max-width: none;
+        }
+
+    }
+}
+
+// Narrow screens: the cells keep one line and the table scrolls sideways inside its box, with its first column fixed so each row
+// keeps its name in view; tabs and chips keep one row that scrolls sideways instead of piling up.
+@media (max-width: 767.98px) {
+    .len {
+        // The column of the page is never wider than the screen, whatever a row of tabs or chips holds.
+        grid-template-columns: minmax(0, 1fr);
+
+        & .table-responsive .table {
+            & th,
+            & td {
+                white-space: nowrap;
+            }
+
+            & th:first-child,
+            & td:first-child {
+                position: sticky;
+                inset-inline-start: 0;
+                z-index: 1;
+                background-color: var(--dd-surface);
+                box-shadow: inset -1px 0 0 var(--dd-hairline, rgba(0, 0, 0, 0.08));
+            }
+
+            & thead th:first-child {
+                z-index: 2;
+            }
+
+            // When the first column is the one of the checkboxes, the name beside it stays in view too: the checkbox keeps a
+            // column of its own width with room after it, and the line that marks the fixed columns moves after the name.
+            & th[data-column="select"],
+            & td[data-column="select"] {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                max-width: 2.75rem;
+                box-shadow: none;
+            }
+
+            & :is(th, td)[data-column="select"] + :is(th, td) {
+                position: sticky;
+                inset-inline-start: 2.75rem;
+                z-index: 1;
+                padding-inline-start: 0.5rem;
+                background-color: var(--dd-surface);
+                box-shadow: inset -1px 0 0 var(--dd-hairline, rgba(0, 0, 0, 0.08));
+            }
+
+            & thead th[data-column="select"] + th {
+                z-index: 2;
+            }
+
+            // A fixed column never takes the whole width: a long name or email ends with an ellipsis, so the rest of the row
+            // always has room to scroll beside it.
+            & th:first-child:not([data-column="select"]),
+            & td:first-child:not([data-column="select"]),
+            & :is(th, td)[data-column="select"] + :is(th, td) {
+                max-width: 12rem;
+                overflow: hidden;
+
+                & .d-flex.flex-column {
+                    min-width: 0;
+
+                    & > * {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+        }
+
+    }
+}

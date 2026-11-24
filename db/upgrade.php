@@ -65,5 +65,18 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112400, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112500) {
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('local_extendednav');
+
+        // A node can be hidden from the site administrators too, who see every node by default.
+        $field = new xmldb_field('hideadmins', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'placement');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026112500, 'local', 'extendednav');
+    }
+
     return true;
 }

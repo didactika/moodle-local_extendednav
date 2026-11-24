@@ -1,0 +1,148 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage/page
+
+    The management page: the navigations to the left (a select on a narrow screen), and to the right the settings, the scope
+    of the changes, the actions and the list of the nodes of the navigation chosen.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "config": "{}",
+        "name": "Course navigation",
+        "origins": [
+            {"label": "Course", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true}]}
+        ],
+        "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}],
+        "cansettings": true,
+        "enabled": true,
+        "hideadmins": false,
+        "hasscopes": true,
+        "scopename": "Whole site",
+        "addurl": "#",
+        "importurl": "#",
+        "exporturl": "#",
+        "activityurl": "#",
+        "canadd": true,
+        "searchlabel": "Search nodes",
+        "id": "len-nodes"
+    }
+}}
+<div class="len" data-region="manage" data-config="{{config}}">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>
+        {{#cansettings}}
+            <div class="d-flex flex-wrap align-items-center gap-4" data-region="settings">
+                <div class="form-check form-switch custom-control custom-switch mb-0">
+                    <input type="checkbox" class="form-check-input custom-control-input" id="len-setting-enable" role="switch" data-setting="enable_plugin" {{#enabled}}checked{{/enabled}}>
+                    <label class="form-check-label custom-control-label" for="len-setting-enable">{{#str}}enable_plugin, local_extendednav{{/str}}</label>
+                </div>
+                <div class="form-check form-switch custom-control custom-switch mb-0">
+                    <input type="checkbox" class="form-check-input custom-control-input" id="len-setting-admins" role="switch" data-setting="hide_from_admins" {{#hideadmins}}checked{{/hideadmins}}>
+                    <label class="form-check-label custom-control-label" for="len-setting-admins">{{#str}}hide_from_admins, local_extendednav{{/str}}</label>
+                </div>
+            </div>
+        {{/cansettings}}
+    </div>
+
+    <div data-region="layout">
+        <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
+            <div class="d-md-none">
+                <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
+                <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
+                    {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
+                </select>
+            </div>
+            <div class="d-none d-md-grid gap-3">
+                {{#origins}}
+                    <div>
+                        <p class="small fw-bold text-uppercase text-muted mb-1 px-2">{{label}}</p>
+                        <div class="list-group">
+                            {{#items}}
+                                <a class="list-group-item list-group-item-action {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>{{name}}</a>
+                            {{/items}}
+                        </div>
+                    </div>
+                {{/origins}}
+            </div>
+        </nav>
+
+        <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+                <div class="d-flex flex-wrap align-items-center gap-2" data-region="actions">
+                    {{#canadd}}
+                        <a class="btn btn-primary" href="{{addurl}}">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
+                    {{/canadd}}
+                    <a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>
+                    <a class="btn btn-outline-secondary" href="{{exporturl}}">{{#pix}}t/download, core{{/pix}} {{#str}}export_all_btn, local_extendednav{{/str}}</a>
+                    <a class="btn btn-outline-secondary" href="{{activityurl}}">{{#pix}}i/report, core{{/pix}} {{#str}}activity_log, local_extendednav{{/str}}</a>
+                </div>
+            </div>
+
+            {{#hasscopes}}
+                <div class="d-flex flex-wrap align-items-center gap-2" data-region="scope">
+                    <span class="fw-bold">{{#str}}applies_to, local_extendednav{{/str}}</span>
+                    <span class="dropdown d-inline-flex" data-menu="scope">
+                        <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"><span data-region="menu-label">{{scopename}}</span></button>
+                        <span class="dropdown-menu show" hidden>
+                            <span class="d-block px-3 pt-2 pb-1">
+                                <input type="search" class="form-control" data-region="scopesearch" autocomplete="off" aria-label="{{#str}}scope_search, local_extendednav{{/str}}" placeholder="{{#str}}scope_search, local_extendednav{{/str}}">
+                            </span>
+                            <span class="d-block" data-region="scopelist" role="listbox"></span>
+                        </span>
+                    </span>
+                    <span class="small text-muted">{{#str}}applies_to_help, local_extendednav{{/str}}</span>
+                </div>
+            {{/hasscopes}}
+
+            <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{searchlabel}}">
+                <div class="card">
+                    {{> local_extendednav/list/toolbar }}
+                    <div class="table-responsive" data-region="tablewrap" aria-busy="true">
+                        <table class="table">
+                            <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>
+                            <tbody>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div data-region="empty" hidden></div>
+                    <div data-region="error" hidden></div>
+                    {{> local_extendednav/list/pager }}
+                </div>
+                <div class="card" data-region="floatbar" hidden role="region" aria-label="{{#str}}selection, local_extendednav{{/str}}">
+                    <div class="d-flex flex-wrap align-items-center gap-3 px-3 py-2">
+                        <span class="fw-bold" role="status" data-region="selectedcount"></span>
+                        <button type="button" class="btn btn-link" data-action="selectall" hidden></button>
+                        <div class="d-flex flex-wrap gap-2 ms-auto ml-auto">
+                            <button type="button" class="btn btn-secondary btn-tonal btn-sm" data-action="bulkshow">{{#pix}}t/show, core{{/pix}} {{#str}}show_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-secondary btn-tonal btn-sm" data-action="bulkhide">{{#pix}}t/hide, core{{/pix}} {{#str}}hide_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-danger btn-tonal btn-sm" data-action="bulkdelete">{{#pix}}t/delete, core{{/pix}} <span data-region="deletelabel"></span></button>
+                        </div>
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="clearselection" title="{{#str}}clear, moodle{{/str}}" aria-label="{{#str}}clear, moodle{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+</div>

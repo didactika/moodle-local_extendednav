@@ -55,7 +55,8 @@ class secondary_navigation {
             }
             $seen[$child->key] = (object)[
                 'text' => trim(strip_tags((string)$child->text)),
-                'action' => $child->action instanceof \moodle_url ? (url_helper::to_site_path($child->action->out(false)) ?? '') : '',
+                'action' => $child->action instanceof \moodle_url
+                    ? (url_helper::to_site_path($child->action->out(false)) ?? '') : '',
             ];
         }
         $menu->record_seen($seen);
@@ -116,7 +117,13 @@ class secondary_navigation {
                 if ($orderonly || $menu->is_native($key) || $title === '' || $url === null) {
                     continue;
                 }
-                $node = \navigation_node::create(format_string($title), new \moodle_url($url), \navigation_node::TYPE_CUSTOM, null, $key);
+                $node = \navigation_node::create(
+                    format_string($title),
+                    new \moodle_url($url),
+                    \navigation_node::TYPE_CUSTOM,
+                    null,
+                    $key
+                );
                 $node->showinsecondarynavigation = true;
                 $view->add_node($node);
             } else {

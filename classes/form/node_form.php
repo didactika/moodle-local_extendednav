@@ -51,8 +51,10 @@ class node_form extends \moodleform {
         $menu = menu_manager::get_menu($menukey);
         $current = $this->_customdata['node'] ?? null;
         $currentkey = $current ? (string)$current->nodekey : '';
+        $contextid = (int)($this->_customdata['contextid'] ?? 0);
         $nodes = node_repository::get_menu_nodes_by_key($menukey);
         $isnative = $current !== null && $menu->is_native($currentkey);
+        $issecondary = $menu instanceof \local_extendednav\menu\secondary;
         $isparent = false;
         foreach ($nodes as $node) {
             if ($currentkey !== '' && $node->parentkey === $currentkey) {
@@ -65,6 +67,8 @@ class node_form extends \moodleform {
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'menu', $menukey);
         $mform->setType('menu', PARAM_ALPHANUMEXT);
+        $mform->addElement('hidden', 'contextid', $contextid);
+        $mform->setType('contextid', PARAM_INT);
 
         $mform->addElement(
             'static',
@@ -170,7 +174,24 @@ class node_form extends \moodleform {
             ['id' => 'local_extendednav_langs_notice', 'hidden' => 'hidden']
         ));
 
-        if ($isparent || ($menukey === 'primary' && $currentkey === 'siteadminnode')) {
+        if ($issecondary && !$menu->is_order_only()) {
+            // Where the node goes in the navigation: where Moodle puts it, the More menu or the bar.
+            $mform->addElement('select', 'placement', get_string('placement', 'local_extendednav'), [
+                0 => get_string('placement_default', 'local_extendednav'),
+                1 => get_string('placement_more', 'local_extendednav'),
+                2 => get_string('placement_main', 'local_extendednav'),
+            ]);
+            $mform->addHelpButton('placement', 'placement', 'local_extendednav');
+        }
+
+        $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
+        $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
+
+        if ($issecondary) {
+            // The secondary navigations have no submenus.
+            $mform->addElement('hidden', 'parentkey', '');
+            $mform->setType('parentkey', PARAM_ALPHANUMEXT);
+        } else if ($isparent || ($menukey === 'primary' && $currentkey === 'siteadminnode')) {
             // This node cannot be placed in a submenu: explain why instead of an empty, locked select.
             $reason = $isparent ? 'opt_invalid_has_submenus' : 'opt_invalid_admin_submenu';
             $mform->addElement(
@@ -193,7 +214,7 @@ class node_form extends \moodleform {
 
         $this->add_action_buttons(true, get_string('savechanges'));
 
-        $customkeys = array_values(array_diff(array_keys($nodes), [$currentkey]));
+        $customkeys = $contextid ? [] : array_values(array_diff(array_keys($nodes), [$currentkey]));
         $required = \html_writer::span(
             $OUTPUT->pix_icon('req', get_string('requiredelement', 'form')),
             'req text-danger',
@@ -225,7 +246,10 @@ class node_form extends \moodleform {
         }
         $record = node_manager::prepare($data, $menukey);
 
-        $others = node_repository::get_menu_nodes_by_key($menukey);
+        $contextid = (int)($data['contextid'] ?? 0);
+        // The nodes of a category or a course are checked against its own: they repeat the key of a node of the site on purpose.
+        $others = $contextid === 0 ? node_repository::get_menu_nodes_by_key($menukey)
+            : array_column(node_repository::get_exceptions($menukey, $contextid), null, 'nodekey');
         if ($current !== null) {
             foreach ($others as $key => $other) {
                 if ((int)$other->id === (int)$current->id) {
@@ -238,7 +262,8 @@ class node_form extends \moodleform {
         $errors += $result['errors'];
 
         if (
-            empty($errors) && access_guard::check_fallbacks(node_manager::get_all_with($record, (int)($current->id ?? 0)))
+            $contextid === 0 && empty($errors)
+                && access_guard::check_fallbacks(node_manager::get_all_with($record, (int)($current->id ?? 0)))
                 === access_guard::FALLBACKS_BLOCKED
         ) {
             $errors['blockaccess'] = get_string('err_fallbacks_blocked', 'local_extendednav');

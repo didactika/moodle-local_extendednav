@@ -1,0 +1,98 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/list/nodes_table
+
+    One page of the nodes of a navigation: the order buttons, the title with its key and what is special about it, the visibility,
+    the link and the actions of each node. The first column stays when a narrow screen scrolls the table.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "reorderable": true,
+        "rows": [
+            {
+                "id": 3, "nodekey": "grades", "title": "Grades", "native": true, "url": "/grade/report/?id=2", "icon": "",
+                "visibility": 1, "visibilitylabel": "Visible to everyone", "tone": "success", "roles": "", "langs": "",
+                "child": false, "blocked": false, "unavailable": false, "unknownroles": "", "adminonly": false, "hideadmins": false, "placementlabel": "",
+                "exception": false, "inherited": false, "candelete": false, "first": false, "last": false,
+                "isselected": false, "editurl": "#", "moveup": "Move up", "movedown": "Move down", "editlabel": "Edit Grades",
+                "deletelabel": "Delete Grades", "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": true, "canmove": true
+            }
+        ]
+    }
+}}
+<table class="table">
+    <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>
+    <thead>
+        <tr>
+            <th scope="col" data-column="select"><input type="checkbox" class="form-check-input" data-region="selectpage" aria-label="{{#str}}selectall, moodle{{/str}}"></th>
+            <th scope="col" data-column="title">{{#str}}title, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{#str}}visibility, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-lg-table-cell">{{#str}}url, local_extendednav{{/str}}</th>
+            <th scope="col" class="text-end text-right text-nowrap" data-column="actions"><span class="sr-only visually-hidden">{{#str}}actions, moodle{{/str}}</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#rows}}
+            <tr {{#isselected}}class="table-active"{{/isselected}} data-key="{{nodekey}}">
+                <td data-column="select"><input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}></td>
+                <th scope="row" data-column="title">
+                    <span class="d-flex align-items-center gap-2 {{#child}}ps-4 pl-4{{/child}}">
+                        {{#icon}}<span class="text-muted">{{{icon}}}</span>{{/icon}}
+                        <span class="d-flex flex-column min-w-0">
+                            <span class="d-flex flex-wrap align-items-center gap-2">
+                                <a class="fw-bold" href="{{editurl}}">{{title}}</a>
+                                {{#adminonly}}<span class="badge rounded-pill text-bg-warning" title="{{#str}}admin_only_help, local_extendednav{{/str}}">{{#str}}admin_only, local_extendednav{{/str}}</span>{{/adminonly}}
+                                {{#exception}}<span class="badge rounded-pill text-bg-info">{{#str}}exception, local_extendednav{{/str}}</span>{{/exception}}
+                                {{#inherited}}<span class="badge rounded-pill text-bg-secondary">{{#str}}inherited, local_extendednav{{/str}}</span>{{/inherited}}
+                            </span>
+                            <span class="small text-muted text-truncate"><code>{{nodekey}}</code></span>
+                        </span>
+                    </span>
+                </th>
+                <td class="d-none d-md-table-cell">
+                    <span class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge rounded-pill text-bg-{{tone}}">{{visibilitylabel}}</span>
+                        {{#roles}}<span class="small text-muted text-truncate">{{roles}}</span>{{/roles}}
+                        {{#hideadmins}}<span class="badge rounded-pill text-bg-secondary">{{#str}}hidden_from_admins, local_extendednav{{/str}}</span>{{/hideadmins}}
+                        {{#unavailable}}<span class="badge rounded-pill text-bg-secondary" title="{{#str}}badge_unavailable_help, local_extendednav{{/str}}">{{#str}}badge_unavailable, local_extendednav{{/str}}</span>{{/unavailable}}
+                        {{#blocked}}<span class="badge rounded-pill text-bg-dark">{{#str}}badge_blocked, local_extendednav{{/str}}</span>{{/blocked}}
+                        {{#unknownroles}}<span class="badge rounded-pill text-bg-danger">{{unknownroles}}</span>{{/unknownroles}}
+                        {{#langs}}<span class="badge rounded-pill text-bg-info">{{langs}}</span>{{/langs}}
+                        {{#placementlabel}}<span class="badge rounded-pill text-bg-secondary">{{placementlabel}}</span>{{/placementlabel}}
+                    </span>
+                </td>
+                <td class="d-none d-lg-table-cell"><span class="text-truncate d-block">{{url}}</span></td>
+                <td class="text-end text-right text-nowrap" data-column="actions">
+                    {{#canmove}}
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="move" data-direction="-1" data-key="{{nodekey}}" title="{{moveup}}" aria-label="{{moveup}}" {{#first}}disabled{{/first}}>{{#pix}}t/up, core{{/pix}}</button>
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="move" data-direction="1" data-key="{{nodekey}}" title="{{movedown}}" aria-label="{{movedown}}" {{#last}}disabled{{/last}}>{{#pix}}t/down, core{{/pix}}</button>
+                    {{/canmove}}
+                    {{#visible}}<button type="button" class="btn btn-link btn-icon btn-sm" data-action="toggle" data-key="{{nodekey}}" data-visibility="0" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/visible}}
+                    {{^visible}}<button type="button" class="btn btn-link btn-icon btn-sm" data-action="toggle" data-key="{{nodekey}}" data-visibility="1" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/visible}}
+                    <a class="btn btn-link btn-icon btn-sm" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
+                    {{#candelete}}
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>
+                    {{/candelete}}
+                </td>
+            </tr>
+        {{/rows}}
+    </tbody>
+</table>

@@ -14,8 +14,8 @@ Feature: Import and export nodes as YAML
     And I upload "local/extendednav/tests/fixtures/import_valid.yaml" file to "YAML file" filemanager
     And I press "Import"
     Then I should see "Import finished: 2 created, 0 replaced, 0 kept."
-    And I should see "help_en" in the "local-extendednav-manage" "table"
-    And I should see "help_es" in the "local-extendednav-manage" "table"
+    And I should see "help_en" in the "[data-region='tablewrap']" "css_element"
+    And I should see "help_es" in the "[data-region='tablewrap']" "css_element"
 
   @javascript
   Scenario: A file with an invalid node imports nothing
@@ -25,7 +25,7 @@ Feature: Import and export nodes as YAML
     Then I should see "Nothing was imported."
     And I should see "This kind of URL is not allowed."
     And I follow "Back to navigation"
-    And I should not see "good_node" in the "local-extendednav-manage" "table"
+    And I should not see "good_node" in the "[data-region='tablewrap']" "css_element"
 
   Scenario: The documentation lists every field
     When I follow "Import"

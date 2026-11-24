@@ -35,7 +35,7 @@ class node_manager {
     /** @var string[] Fields an administrator can set on a node. */
     public const EDITABLE_FIELDS = [
         'nodekey', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight',
+        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
     ];
 
     /**
@@ -87,6 +87,13 @@ class node_manager {
         $record->popupwidth = $popup ? $size($data['popupwidth'] ?? null) : null;
         $record->popupheight = $popup ? $size($data['popupheight'] ?? null) : null;
 
+        $placement = isset($data['placement']) && is_numeric($data['placement']) ? (int)$data['placement'] : 0;
+        $record->placement = in_array($placement, [0, 1, 2], true) ? $placement : 0;
+        $record->hideadmins = empty($data['hideadmins']) ? 0 : 1;
+        if (isset($data['contextid']) && is_numeric($data['contextid']) && (int)$data['contextid'] > 0) {
+            $record->contextid = (int)$data['contextid'];
+        }
+
         $record->blockaccess = 0;
         if (!empty($data['blockaccess']) && $record->visibility !== node_access::VISIBILITY_ALL) {
             $record->blockaccess = empty(access_guard::get_node_paths($record)) ? 0 : 1;
@@ -108,8 +115,8 @@ class node_manager {
         unset($record->id);
         if (!isset($record->sortorder)) {
             $max = $DB->get_field_sql(
-                'SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = :menu',
-                ['menu' => $record->menu]
+                'SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = :menu AND contextid = :contextid',
+                ['menu' => $record->menu, 'contextid' => (int)($record->contextid ?? 0)]
             );
             $record->sortorder = $max === null || $max === false ? 0 : (int)$max + 1;
         }
@@ -176,7 +183,8 @@ class node_manager {
         }
 
         // Read every node of the affected menus once, to keep the order shown and find the orphaned children.
-        $menunodes = $DB->get_records_list('local_extendednav', 'menu', array_keys($bymenu));
+        [$menuin, $menuparams] = $DB->get_in_or_equal(array_keys($bymenu), SQL_PARAMS_NAMED);
+        $menunodes = $DB->get_records_select('local_extendednav', 'contextid = 0 AND menu ' . $menuin, $menuparams);
         $orders = [];
         $children = [];
         foreach ($bymenu as $menukey => $menurecords) {
@@ -193,6 +201,16 @@ class node_manager {
         }
 
         $DB->delete_records_list('local_extendednav', 'id', array_keys($todelete));
+        // The exceptions of a node that is deleted go with it.
+        foreach ($todelete as $record) {
+            if ((int)($record->contextid ?? 0) === 0) {
+                $DB->delete_records_select(
+                    'local_extendednav',
+                    'menu = :menu AND nodekey = :nodekey AND contextid <> 0',
+                    ['menu' => $record->menu, 'nodekey' => $record->nodekey]
+                );
+            }
+        }
 
         // The children of a deleted parent become top-level nodes, where the parent was.
         if (!empty($children)) {
@@ -244,11 +262,17 @@ class node_manager {
      *
      * @param string $menu Menu key.
      * @param int[] $ids Node ids in their new order.
+     * @param int $contextid Context the nodes apply to, 0 for the whole site.
      */
-    public static function reorder(string $menu, array $ids): void {
+    public static function reorder(string $menu, array $ids, int $contextid = 0): void {
         global $DB;
 
-        $current = $DB->get_records('local_extendednav', ['menu' => $menu], 'sortorder ASC, id ASC', 'id, sortorder');
+        $current = $DB->get_records(
+            'local_extendednav',
+            ['menu' => $menu, 'contextid' => $contextid],
+            'sortorder ASC, id ASC',
+            'id, sortorder'
+        );
         $ordered = [];
         foreach ($ids as $id) {
             $id = (int)$id;
@@ -325,7 +349,12 @@ class node_manager {
     public static function get_grouped_ids(string $menu): array {
         global $DB;
 
-        $nodes = $DB->get_records('local_extendednav', ['menu' => $menu], '', 'id, nodekey, parentkey, sortorder');
+        $nodes = $DB->get_records(
+            'local_extendednav',
+            ['menu' => $menu, 'contextid' => 0],
+            '',
+            'id, nodekey, parentkey, sortorder'
+        );
         return array_map(static fn(\stdClass $node): int => (int)$node->id, self::group_by_parent($nodes));
     }
 
@@ -341,7 +370,12 @@ class node_manager {
     public static function place_after_parent_change(\stdClass $before, string $newparent): void {
         global $DB;
 
-        $nodes = $DB->get_records('local_extendednav', ['menu' => $before->menu], '', 'id, nodekey, parentkey, sortorder');
+        $nodes = $DB->get_records(
+            'local_extendednav',
+            ['menu' => $before->menu, 'contextid' => 0],
+            '',
+            'id, nodekey, parentkey, sortorder'
+        );
         if (!isset($nodes[$before->id])) {
             return;
         }
@@ -363,6 +397,129 @@ class node_manager {
             array_splice($ordered, $position, 0, [(int)$before->id]);
         }
         self::reorder($before->menu, $ordered);
+    }
+
+    /**
+     * Orders nodes as they are shown, keyed by node key.
+     *
+     * @param \stdClass[] $nodes Nodes of one menu, in any order.
+     * @return \stdClass[] The same nodes, grouped, keyed by node key.
+     */
+    public static function group_by_parent_keyed(array $nodes): array {
+        $keyed = [];
+        foreach (self::group_by_parent($nodes) as $node) {
+            $keyed[$node->nodekey] = $node;
+        }
+        return $keyed;
+    }
+
+    /**
+     * Returns the row a node has in a context, making it as a copy of the node the context sees when it has none.
+     *
+     * A category or a course changes a node of the site, or of a category around it, with an exception: a row of its own
+     * that starts as a copy of the node it replaces and is changed from there.
+     *
+     * @param string $menu Menu key.
+     * @param string $nodekey Node key.
+     * @param int $contextid Context of the exception, 0 for the whole site.
+     * @return \stdClass The row, saved.
+     */
+    public static function ensure_row(string $menu, string $nodekey, int $contextid): \stdClass {
+        global $DB;
+
+        $row = $DB->get_record('local_extendednav', ['menu' => $menu, 'nodekey' => $nodekey, 'contextid' => $contextid]);
+        if ($row) {
+            return $row;
+        }
+        if ($contextid === 0) {
+            return self::create(self::prepare(['nodekey' => $nodekey, 'visibility' => node_access::VISIBILITY_ALL], $menu), false);
+        }
+        $seen = node_list::get_scope_nodes($menu, $contextid)[$nodekey] ?? null;
+        $defaults = ['nodekey' => $nodekey, 'visibility' => node_access::VISIBILITY_ALL];
+        $copy = $seen === null ? self::prepare($defaults, $menu) : clone $seen;
+        unset($copy->id, $copy->timecreated, $copy->timemodified);
+        $copy->contextid = $contextid;
+        $copy->sortorder = $seen === null ? null : $seen->sortorder;
+        if ($copy->sortorder === null) {
+            unset($copy->sortorder);
+        }
+        return self::create($copy, false);
+    }
+
+    /**
+     * Sets the visibility of nodes in a scope, making an exception of each node that the scope only inherits.
+     *
+     * @param string $menu Menu key.
+     * @param int $contextid Context of the scope, 0 for the whole site.
+     * @param string[] $nodekeys Node keys.
+     * @param int $visibility One of the visibilities of node_access.
+     * @return int Number of nodes changed.
+     */
+    public static function set_visibility(string $menu, int $contextid, array $nodekeys, int $visibility): int {
+        $changed = 0;
+        foreach (array_unique($nodekeys) as $nodekey) {
+            $row = self::ensure_row($menu, (string)$nodekey, $contextid);
+            if (node_access::is_protected($row)) {
+                continue;
+            }
+            $values = ['id' => $row->id, 'visibility' => $visibility];
+            $values['roles'] = $visibility === node_access::VISIBILITY_ROLES ? $row->roles : null;
+            self::update((object)$values);
+            $changed++;
+        }
+        return $changed;
+    }
+
+    /**
+     * Moves a node one place up or down among its siblings in a scope.
+     *
+     * @param string $menu Menu key.
+     * @param int $contextid Context of the scope, 0 for the whole site.
+     * @param string $nodekey Node key.
+     * @param int $direction -1 to move it up, 1 to move it down.
+     */
+    public static function move(string $menu, int $contextid, string $nodekey, int $direction): void {
+        $keys = array_keys(node_list::get_scope_nodes($menu, $contextid));
+        $nodes = node_list::get_scope_nodes($menu, $contextid);
+        $parent = (string)($nodes[$nodekey]->parentkey ?? '');
+        // The siblings of the node, in order, and the position of the node among them.
+        $siblings = array_values(array_filter(
+            $keys,
+            static fn(string $key): bool => (string)($nodes[$key]->parentkey ?? '') === $parent
+        ));
+        $at = array_search($nodekey, $siblings, true);
+        $to = $at === false ? false : $at + ($direction < 0 ? -1 : 1);
+        if ($to === false || !isset($siblings[$to])) {
+            return;
+        }
+        [$siblings[$at], $siblings[$to]] = [$siblings[$to], $siblings[$at]];
+        // The order of the list with the siblings swapped: every group keeps its place, the siblings take the new order.
+        $order = [];
+        $queue = $siblings;
+        foreach ($keys as $key) {
+            if ((string)($nodes[$key]->parentkey ?? '') === $parent) {
+                $order[] = array_shift($queue);
+            } else {
+                $order[] = $key;
+            }
+        }
+        self::save_order($menu, $contextid, $order);
+    }
+
+    /**
+     * Saves the order of the nodes of a scope, making an exception of each node a category or a course only inherits.
+     *
+     * @param string $menu Menu key.
+     * @param int $contextid Context of the scope, 0 for the whole site.
+     * @param string[] $nodekeys Node keys in their new order.
+     */
+    public static function save_order(string $menu, int $contextid, array $nodekeys): void {
+        $ids = [];
+        foreach ($nodekeys as $nodekey) {
+            $row = self::ensure_row($menu, (string)$nodekey, $contextid);
+            $ids[] = (int)$row->id;
+        }
+        self::reorder($menu, $ids, $contextid);
     }
 
     /**

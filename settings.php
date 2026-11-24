@@ -41,6 +41,12 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
             get_string('enable_plugin_desc', 'local_extendednav'),
             1
         ));
+        $settings->add(new admin_setting_configcheckbox(
+            'local_extendednav/hide_from_admins',
+            get_string('hide_from_admins', 'local_extendednav'),
+            get_string('hide_from_admins_desc', 'local_extendednav'),
+            0
+        ));
     }
     $ADMIN->add('local_extendednav_cat', $settings);
 
