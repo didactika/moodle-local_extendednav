@@ -11,10 +11,21 @@ MOODLE_XXX_STABLE branch, it uses everything under the "## [<that release>]" hea
 Keep an "## [Unreleased]" section above the latest release and rename it when the next release is cut.
 -->
 
+### Changed
+
+- The badge of a node that an administrator sees only for being one says Only admins.
+- The actions of every row are in fixed places (show or hide, edit, delete), so each action is in one column, and every title starts on the same line.
+- An item that Moodle numbers is known by the path of its address, the same on every page.
+- Whoever manages the navigation of the site changes a course or an activity without being enrolled in it.
+
 ## [Unreleased]
 
 ### Added
 
+- Each kind of activity has a navigation of its own (forums, assignments, quizzes...), listed under Activities: the kinds the site uses first, the others folded under Other kinds. A task looks through the most recent activities of each kind every night, and Find items does it at once for one kind, so the items a plugin adds to some activities only can be changed before anyone opens one. The changes of the single navigation of the activities go to each kind that has the item when the site is upgraded.
+- Each activity changes its own navigation on its page, Navigation, in its menu; a course changes its own and the one of each kind of activity it has. The changes of an activity travel in its backup and in the backup of its course, with their grades and activities mapped on restore.
+- Every badge of the visibility explains its restriction when the pointer is over it, and opens the dialog Who sees with every restriction of the node.
+- The form of a node follows the design system: its selects open the menu of the system, the icon is chosen and never typed, the notice of a node of Moodle opens its section, and a node outside a course offers no condition on grades or completion.
 - A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list as wide as the page and of fixed height, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
 - Nodes are ordered by dragging them by their handle, or with the arrow keys on the handle; the nodes selected among its siblings move with it. The lists have no pages, and the head checkbox selects every row.
 - The bar of the selection offers Show, Hide and Delete only when a selected node allows them, and asks before acting, listing the nodes left as they are. Hiding asks whether to hide from administrators too, which is on by default in the site administration.
