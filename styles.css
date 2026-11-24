@@ -195,6 +195,9 @@
     --dd-primary-soft: color-mix(in srgb, var(--dd-primary) 10%, var(--dd-surface));
     --dd-primary-soft-2: color-mix(in srgb, var(--dd-primary) 18%, var(--dd-surface));
     --dd-primary-ink: color-mix(in srgb, var(--dd-primary) 78%, var(--dd-ink));
+    --dd-check: url([[pix:local_extendednav|mark_check]]);
+    --dd-dot: url([[pix:local_extendednav|mark_dot]]);
+    --dd-dash: url([[pix:local_extendednav|mark_dash]]);
     color: var(--dd-ink);
 }
 
@@ -842,6 +845,98 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
+
+.len :not(.form-switch) > .form-check-input,
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input,
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input,
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input,
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.1875rem;
+    border: 1.5px solid var(--dd-line);
+    border-radius: 0.3rem;
+    background-color: var(--dd-surface);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    appearance: none;
+    transition: background-color var(--dd-ease), border-color var(--dd-ease), box-shadow var(--dd-ease);
+}
+
+.len :not(.form-switch) > .form-check-input[type=radio],
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input[type=radio],
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input[type=radio],
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input[type=radio],
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input[type=radio] {
+    border-radius: 50%;
+}
+
+.len :not(.form-switch) > .form-check-input:hover:not(:disabled),
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:hover:not(:disabled),
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:hover:not(:disabled),
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:hover:not(:disabled),
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:hover:not(:disabled) {
+    border-color: var(--dd-line-hover);
+}
+
+.len :not(.form-switch) > .form-check-input:checked,
+.len :not(.form-switch) > .form-check-input:indeterminate,
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:checked,
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:indeterminate,
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:checked,
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:indeterminate,
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:checked,
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:indeterminate,
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:checked,
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:indeterminate {
+    border-color: var(--dd-primary);
+    background-color: var(--dd-primary);
+}
+
+.len :not(.form-switch) > .form-check-input:checked[type=checkbox],
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:checked[type=checkbox],
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:checked[type=checkbox],
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:checked[type=checkbox],
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:checked[type=checkbox] {
+    background-image: var(--dd-check);
+}
+
+.len :not(.form-switch) > .form-check-input:indeterminate[type=checkbox],
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:indeterminate[type=checkbox],
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:indeterminate[type=checkbox],
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:indeterminate[type=checkbox],
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:indeterminate[type=checkbox] {
+    background-image: var(--dd-dash);
+}
+
+.len :not(.form-switch) > .form-check-input:checked[type=radio],
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:checked[type=radio],
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:checked[type=radio],
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:checked[type=radio],
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:checked[type=radio] {
+    background-image: var(--dd-dot);
+}
+
+.len :not(.form-switch) > .form-check-input:disabled,
+.path-local-extendednav .modal :not(.form-switch) > .form-check-input:disabled,
+.path-admin-local-extendednav .modal :not(.form-switch) > .form-check-input:disabled,
+#page-admin-setting-local_extendednav_settings .modal :not(.form-switch) > .form-check-input:disabled,
+#page-local-extendednav-manage .modal :not(.form-switch) > .form-check-input:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.len .form-check-label,
+.path-local-extendednav .modal .form-check-label,
+.path-admin-local-extendednav .modal .form-check-label,
+#page-admin-setting-local_extendednav_settings .modal .form-check-label,
+#page-local-extendednav-manage .modal .form-check-label {
+    color: var(--dd-ink);
+    cursor: pointer;
 }
 
 .len [role=search],
@@ -1781,6 +1876,19 @@
     box-shadow: none;
 }
 
+.len .dropdown-menu[role=listbox] > [role=search],
+.path-local-extendednav .modal .dropdown-menu[role=listbox] > [role=search],
+.path-admin-local-extendednav .modal .dropdown-menu[role=listbox] > [role=search],
+#page-admin-setting-local_extendednav_settings .modal .dropdown-menu[role=listbox] > [role=search],
+#page-local-extendednav-manage .modal .dropdown-menu[role=listbox] > [role=search] {
+    position: sticky;
+    inset-block-start: -0.375rem;
+    z-index: 1;
+    margin: -0.375rem -0.375rem 0.25rem;
+    padding: 0.375rem;
+    background-color: var(--dd-surface);
+}
+
 .path-local-extendednav .modal .modal-dialog.modal-lg,
 .path-admin-local-extendednav .modal .modal-dialog.modal-lg,
 #page-admin-setting-local_extendednav_settings .modal .modal-dialog.modal-lg,
@@ -2196,10 +2304,14 @@
 }
 
 .len [data-region=origins] select:is(.form-select, .custom-select) {
+    width: auto;
+    min-width: 10rem;
+    max-width: 12rem;
     min-height: var(--dd-h);
+    padding-left: 1rem;
     padding-right: 2.5rem;
     border-color: var(--dd-line);
-    border-radius: var(--dd-radius-sm);
+    border-radius: 999px;
     background-color: var(--dd-surface);
     color: var(--dd-ink);
     font-size: 0.9375rem;
