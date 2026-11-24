@@ -102,7 +102,7 @@ final class admintree_test extends \advanced_testcase {
         manager::update((object)['id' => $rows['users']->id, 'title' => 'People']);
         manager::update((object)['id' => $rows['accounts']->id, 'visibility' => access::VISIBILITY_HIDDEN,
             'hideadmins' => 1]);
-        manager::place(admintree::KEY, 0, 'users', '', 'courses');
+        manager::place(admintree::KEY, 0, ['users'], '', 'courses');
 
         admintree::reset();
         $root = admin_get_root(true, false);

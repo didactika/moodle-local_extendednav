@@ -6,6 +6,7 @@ Feature: Edit navigation nodes
 
   Background:
     Given I log in as "admin"
+    And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
 
   @javascript
@@ -125,7 +126,7 @@ Feature: Edit navigation nodes
     Given the following config values are set as admin:
       | enabledashboard | 0 |
     And I reload the page
-    Then I should see "Currently unavailable" in the "myhome" "table_row"
+    Then I should see "Unavailable" in the "myhome" "table_row"
     And "Delete" "button" should not exist in the "siteadminnode" "table_row"
     And I click on "Delete" "button" in the "myhome" "table_row"
     And I click on "Delete" "button" in the "Delete myhome?" "dialogue"

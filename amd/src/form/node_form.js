@@ -99,16 +99,14 @@ const isExternal = (value, wwwroot) => {
 };
 
 /**
- * Sets up the form.
- *
- * @param {Object} config Configuration.
- * @param {Object} config.placeholders Core titles and URLs keyed by node key.
- * @param {Array} config.customKeys Keys used by the other nodes of the menu.
- * @param {String} config.requiredHtml HTML of the "required" icon.
- * @param {String} config.wwwroot Site root URL.
- * @param {String} config.currentKey Key of the node being edited, used when the key cannot be changed.
+ * Sets up the form. The form writes in the element nodeformdata, as JSON: the titles and links of the nodes of Moodle by key
+ * (placeholders), the keys of the other nodes of the navigation (customKeys), the icon of a required field (requiredHtml), the
+ * root of the site (wwwroot) and the key of the node edited, when it cannot be changed (currentKey).
  */
-export const init = ({placeholders, customKeys, requiredHtml, wwwroot, currentKey}) => {
+export const init = () => {
+    // The form writes what the script needs in an element of its own: the keys of a navigation can be hundreds.
+    const data = document.querySelector('script[data-region="nodeformdata"]');
+    const {placeholders, customKeys, requiredHtml, wwwroot, currentKey} = JSON.parse(data?.textContent || '{}');
     const title = document.querySelector('form.mform input[name="title"]');
     const form = title ? title.closest('form') : null;
     const url = form ? form.querySelector('input[name="url"]') : null;

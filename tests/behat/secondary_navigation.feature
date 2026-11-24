@@ -22,13 +22,13 @@ Feature: Customise the navigation of a course
   Scenario: A node is hidden and another renamed for a teacher
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    Then I should see "Marks" in the ".moremenu" "css_element"
-    And I should not see "Participants" in the ".moremenu" "css_element"
+    Then I should see "Marks" in the ".secondary-navigation" "css_element"
+    And I should not see "Participants" in the ".secondary-navigation" "css_element"
 
   Scenario: An administrator sees every node, as the plugin says it by default
     When I log in as "admin"
     And I am on "Course 1" course homepage
-    Then I should see "Participants" in the ".moremenu" "css_element"
+    Then I should see "Participants" in the ".secondary-navigation" "css_element"
 
   Scenario: An administrator is held to the rules when the node says so
     Given the following "local_extendednav > nodes" exist:
@@ -36,11 +36,11 @@ Feature: Customise the navigation of a course
       | course | editsettings | 0     | 1          |
     When I log in as "admin"
     And I am on "Course 1" course homepage
-    Then I should not see "Settings" in the ".moremenu" "css_element"
+    Then I should not see "Settings" in the ".secondary-navigation" "css_element"
 
   Scenario: A navigation that is turned off is shown as Moodle draws it
     Given the following config values are set as admin:
       | enabled_course | 0 | local_extendednav |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    Then I should see "Participants" in the ".moremenu" "css_element"
+    Then I should see "Participants" in the ".secondary-navigation" "css_element"

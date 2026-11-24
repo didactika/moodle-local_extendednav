@@ -34,7 +34,7 @@ const ACTIONS = {
     // Moodle names its eyes by what they do: t/hide is the open eye, t/show the crossed one.
     show: {allowed: 'canshow', icon: 't/hide', tone: 'primary'},
     hide: {allowed: 'canhide', icon: 't/show', tone: 'secondary'},
-    delete: {allowed: 'candelete', icon: 't/delete', tone: 'danger'},
+    'delete': {allowed: 'candelete', icon: 't/delete', tone: 'danger'},
 };
 
 /**
@@ -89,7 +89,7 @@ export const init = ({root, list, config, t}) => {
         const texts = {
             show: [t.show_nodes_title, t.show_nodes_text, t.show],
             hide: [t.hide_nodes_title, t.hide_nodes_text, t.hide],
-            delete: reset ? [t.reset_nodes_title, t.reset_nodes_text, t.reset]
+            'delete': reset ? [t.reset_nodes_title, t.reset_nodes_text, t.reset]
                 : [t.delete_nodes_title, t.delete_nodes_text, t.delete],
         }[name];
         confirmAction({
