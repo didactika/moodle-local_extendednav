@@ -114,7 +114,7 @@ final class exceptions {
                 $menu = menu_manager::get_menu($menukey);
                 if ($menu !== null) {
                     $navigations[] = [
-                        'name' => $menu->get_name(),
+                        'name' => $menu->get_short_name(),
                         'count' => $count,
                         'url' => $scope->url($menukey)->out(false),
                     ];
