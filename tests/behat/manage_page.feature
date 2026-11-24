@@ -39,6 +39,7 @@ Feature: Order, hide and select nodes on the management page
   @javascript
   Scenario: The list is searched and filtered by visibility
     When I set the field "Search nodes" to "Second"
+    And I press key "13" in the field "Search nodes"
     Then I should see "Second" in the "[data-region='tablewrap']" "css_element"
     And I should not see "First" in the "[data-region='tablewrap']" "css_element"
     And I click on "Clear filters" "button"

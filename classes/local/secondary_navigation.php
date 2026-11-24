@@ -77,7 +77,7 @@ class secondary_navigation {
     public static function get_origin(\context $context, int $courseid): ?string {
         switch ($context->contextlevel) {
             case CONTEXT_COURSE:
-                return $courseid === SITEID ? 'frontpage' : 'course';
+                return $courseid === (int)SITEID ? 'frontpage' : 'course';
             case CONTEXT_MODULE:
                 return 'activity';
             case CONTEXT_COURSECAT:
