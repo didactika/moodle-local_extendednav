@@ -57,7 +57,7 @@
             {{#picker}}
                 <div class="px-3 pb-3 pt-1" data-region="originpicker" {{#pickeractive}}data-active="1"{{/pickeractive}}>
                     <label class="sr-only visually-hidden" for="len-origin-kinds">{{label}}</label>
-                    <select class="custom-select form-select w-100 {{#pickeractive}}border-primary{{/pickeractive}}" id="len-origin-kinds" data-region="originselect" data-searchable
+                    <select class="custom-select form-select {{#pickeractive}}border-primary{{/pickeractive}}" id="len-origin-kinds" data-region="originselect" data-searchable
                         data-search-label="{{#str}}search_kinds, local_extendednav{{/str}}" data-noresults="{{#str}}noresults, local_extendednav{{/str}}">
                         <option value="" hidden {{^pickeractive}}selected{{/pickeractive}}>{{#str}}choose_kind, local_extendednav{{/str}}</option>
                         {{#pickergroups}}

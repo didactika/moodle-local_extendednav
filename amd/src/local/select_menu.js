@@ -22,7 +22,8 @@
  * Keyboard: Enter, Space and the arrows open it; the arrows, Home and End move, Enter and Space choose, a letter jumps to the
  * next option that starts with it, Escape and Tab close it.
  *
- * A select with many options (data-searchable) opens with a search field at the top of its menu, which keeps the options that
+ * A select with many options (more than SEARCH_FROM, or marked data-searchable) opens with a search field fixed at the top of
+ * its menu, above the options that scroll, which keeps the options that
  * hold every word typed, whatever their case and accents. Its label and the text shown when nothing matches come from the
  * select (data-search-label, data-noresults). The arrow down goes from the field to the options, Enter chooses the first one.
  *
@@ -30,6 +31,8 @@
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+import {get_strings as getStrings} from 'core/str';
 
 /** The selects that open the menu: single selects of the screens and dialogs of the plugin. */
 const SELECTOR = ':is(.len, .modal) select:is(.form-select, .custom-select)';
@@ -41,6 +44,12 @@ const SELECTOR = ':is(.len, .modal) select:is(.form-select, .custom-select)';
  * @returns {string}
  */
 const fold = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/** Options from which a select offers a search, whatever page or form it is in. */
+const SEARCH_FROM = 10;
+
+/** The words of the search when the select does not give its own. */
+const words = {search: '', noresults: ''};
 
 /** Room kept between the menu and the edge of the window. */
 const MARGIN = 8;
@@ -171,21 +180,25 @@ const open = (select) => {
         parent.append(button);
         entries.push({option, button});
     };
+    // Each group with its header and its entries, so a search hides the header of a group it leaves empty.
+    const groups = [];
     Array.from(select.children).forEach((child) => {
         if (child instanceof HTMLOptGroupElement) {
             const header = document.createElement('h6');
             header.className = 'dropdown-header';
             header.textContent = child.label;
             menu.append(header);
+            const first = entries.length;
             Array.from(child.children).forEach((option) => add(option, menu));
+            groups.push({header, entries: entries.slice(first)});
         } else if (child instanceof HTMLOptionElement) {
             add(child, menu);
         }
     });
     let field = null;
-    if (select.dataset.searchable !== undefined) {
+    if (select.dataset.searchable !== undefined || entries.length > SEARCH_FROM) {
         const box = document.createElement('div');
-        box.className = 'position-relative d-flex align-items-center p-1';
+        box.className = 'd-flex align-items-center p-1';
         box.setAttribute('role', 'search');
         // The magnifier of the search fields of the page, drawn by the theme, so the field looks like them.
         const icon = scope.querySelector('[role="search"] .icon');
@@ -196,22 +209,25 @@ const open = (select) => {
         field.type = 'search';
         field.className = 'form-control form-control-sm';
         field.autocomplete = 'off';
-        field.placeholder = select.dataset.searchLabel || '';
+        field.placeholder = select.dataset.searchLabel || words.search;
         field.setAttribute('aria-label', field.placeholder);
         box.append(field);
         menu.prepend(box);
         const none = document.createElement('p');
         none.className = 'text-muted small px-3 py-2 mb-0';
         none.setAttribute('role', 'status');
-        none.textContent = select.dataset.noresults || '';
+        none.textContent = select.dataset.noresults || words.noresults;
         none.hidden = true;
         menu.append(none);
         field.addEventListener('input', () => {
-            const words = fold(field.value).split(/\s+/).filter(Boolean);
+            const terms = fold(field.value).split(/\s+/).filter(Boolean);
             let shown = 0;
             entries.forEach((entry) => {
-                entry.button.hidden = !words.every((word) => fold(entry.button.textContent).includes(word));
+                entry.button.hidden = !terms.every((term) => fold(entry.button.textContent).includes(term));
                 shown += entry.button.hidden ? 0 : 1;
+            });
+            groups.forEach((group) => {
+                group.header.hidden = !group.entries.some((entry) => !entry.button.hidden);
             });
             none.hidden = shown > 0;
         });
@@ -293,6 +309,11 @@ export const init = () => {
         return;
     }
     installed = true;
+    getStrings([{key: 'search', component: 'core'}, {key: 'noresults', component: 'local_extendednav'}]).then(([search, none]) => {
+        words.search = search;
+        words.noresults = none;
+        return null;
+    }).catch(() => null);
     // On mousedown, before the browser opens its own list.
     document.addEventListener('mousedown', (event) => {
         const target = event.target instanceof Element ? event.target : null;

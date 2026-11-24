@@ -197,13 +197,17 @@
     }
 }
 
-// The selects of the navigations, as the design system draws them: the one of a narrow screen and the one of the kinds of
-// activity. The select of the kinds is tinted while the navigation shown is one of them.
+// The selects of the navigations, drawn as the menus of the toolbar of a list: a pill as tall as the search, as wide as what it
+// says. The select of the kinds of activity is tinted while the navigation shown is one of them.
 .len [data-region="origins"] select:is(.form-select, .custom-select) {
+    width: auto;
+    min-width: 10rem;
+    max-width: 12rem;
     min-height: var(--dd-h);
+    padding-left: 1rem;
     padding-right: 2.5rem;
     border-color: var(--dd-line);
-    border-radius: var(--dd-radius-sm);
+    border-radius: 999px;
     background-color: var(--dd-surface);
     color: var(--dd-ink);
     font-size: 0.9375rem;
