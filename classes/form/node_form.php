@@ -132,7 +132,7 @@ class node_form extends \moodleform {
         // How it looks and how it opens. The pages of the administration are drawn by Moodle and keep their look.
         if (!$istree) {
             $mform->addElement('header', 'lookheader', get_string('form_section_look', 'local_extendednav'));
-            $mform->setExpanded('lookheader', false);
+            $mform->setExpanded('lookheader', true);
             $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
             $mform->setType('icon', PARAM_TEXT);
             $mform->addHelpButton('icon', 'icon', 'local_extendednav');
@@ -276,13 +276,20 @@ class node_form extends \moodleform {
             'req text-danger',
             ['title' => get_string('requiredelement', 'form')]
         );
-        $PAGE->requires->js_call_amd('local_extendednav/form/node_form', 'init', [[
+        // What the script of the form needs goes in the page, not in the call: the keys of a navigation can be hundreds.
+        $data = [
             'placeholders' => $menu->get_placeholders(),
             'customKeys' => $customkeys,
             'requiredHtml' => $required,
             'wwwroot' => (new \moodle_url('/'))->out(false),
             'currentKey' => $currentkey,
-        ]]);
+        ];
+        $mform->addElement('html', \html_writer::tag(
+            'script',
+            json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES),
+            ['type' => 'application/json', 'data-region' => 'nodeformdata']
+        ));
+        $PAGE->requires->js_call_amd('local_extendednav/form/node_form', 'init');
     }
 
     /**

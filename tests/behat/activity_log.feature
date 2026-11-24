@@ -6,6 +6,7 @@ Feature: Read the activity log of a navigation
 
   Background:
     Given I log in as "admin"
+    And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
     And I follow "Add node"
     And I set the following fields to these values:

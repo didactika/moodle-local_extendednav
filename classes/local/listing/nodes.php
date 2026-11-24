@@ -66,11 +66,11 @@ class nodes {
      * @param int $contextid Context of the scope, 0 for the whole site.
      * @param string $search Text to find in the key, the title and the URL.
      * @param string $visibility 0, 1 and 2, separated by commas, to list those visibilities, or empty for all of them.
-     * @param string $origin native (nodes of Moodle) and custom (nodes added), separated by commas, or empty for both.
      * @param string $parent Key of a parent node, or empty for every node. In the site administration, which is a tree, the
      *     list is always one level of it: the children of this category, or the top level when it is empty.
      * @param int $page Page, from 0.
      * @param int $perpage Rows in a page, 0 for all of them.
+     * @param string $origin native (nodes of Moodle) and custom (nodes added), separated by commas, or empty for both.
      * @return array With total, counts, rows, reorderable and path.
      */
     public static function get(

@@ -138,10 +138,10 @@ final class scope_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->see_nodes(['one', 'two', 'three']);
 
-        manager::place('course', 0, 'three', 'one');
+        manager::place('course', 0, ['three'], 'one');
         $this->assertSame(['three', 'one', 'two'], array_keys(nodes::get_scope_nodes('course', 0)));
 
-        manager::place('course', 0, 'three', '');
+        manager::place('course', 0, ['three'], '');
         $this->assertSame(['one', 'two', 'three'], array_keys(nodes::get_scope_nodes('course', 0)));
     }
 

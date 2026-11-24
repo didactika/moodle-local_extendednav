@@ -73,7 +73,10 @@ final class nodes_test extends \advanced_testcase {
 
         $all = nodes::get('course', 0);
         $this->assertSame(3, $all['total']);
-        $this->assertSame(['all' => 3, 'visible' => 2, 'roles' => 0, 'hidden' => 1], $all['counts']);
+        $this->assertSame(
+            ['all' => 3, 'visible' => 2, 'roles' => 0, 'hidden' => 1, 'native' => 3, 'custom' => 0],
+            $all['counts']
+        );
         $this->assertTrue($all['reorderable']);
 
         $found = nodes::get('course', 0, 'grad');

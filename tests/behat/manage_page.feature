@@ -10,6 +10,7 @@ Feature: Order, hide and select nodes on the management page
       | first   | First  | /course/ |
       | second  | Second | /badges/ |
     And I log in as "admin"
+    And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
 
   @javascript
