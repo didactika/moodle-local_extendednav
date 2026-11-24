@@ -146,6 +146,38 @@
         max-width: 0;
     }
 
+    // The icon of a title has a slot of one width in every row, empty or not, so every title starts at one line.
+    & [data-region="nodeicon"] {
+        display: inline-flex;
+        flex: 0 0 1.25rem;
+        justify-content: center;
+
+        & .icon {
+            margin: 0;
+        }
+    }
+
+    // A badge of the visibility is a button: it says its restriction under the pointer and opens the dialog of all of them.
+    & button.badge {
+        border: 0;
+        cursor: pointer;
+        transition: box-shadow var(--dd-ease);
+
+        &:hover {
+            box-shadow: 0 0 0 2px var(--dd-hairline);
+        }
+
+        &:focus:not(:focus-visible) {
+            outline: 0;
+            box-shadow: none;
+        }
+
+        &:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 3px var(--dd-ring);
+        }
+    }
+
     // The handle moves a row: it is grabbed, and the row it is dropped on shows where it goes.
     & [data-region="handle"] {
         cursor: grab;

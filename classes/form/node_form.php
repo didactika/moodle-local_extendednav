@@ -77,6 +77,12 @@ class node_form extends \moodleform {
         // The node: what it is called and where it leads.
         $mform->addElement('header', 'nodeheader', get_string('form_section_node', 'local_extendednav'));
         $mform->setExpanded('nodeheader', true);
+        // The notice of a node of Moodle opens the section, so it is read before any field; the script shows it.
+        $mform->addElement('html', \html_writer::div(
+            get_string('coreoverridealert', 'local_extendednav'),
+            'alert alert-info',
+            ['id' => 'core_node_alert', 'hidden' => 'hidden']
+        ));
         $mform->addElement(
             'static',
             'menudisplay',
@@ -95,16 +101,11 @@ class node_form extends \moodleform {
         }
 
         $alerts = \html_writer::div(
-            get_string('coreoverridealert', 'local_extendednav'),
-            'alert alert-warning mt-2 mb-0',
-            ['id' => 'core_node_alert', 'hidden' => 'hidden']
-        );
-        $alerts .= \html_writer::div(
             get_string('err_duplicate_key_alert', 'local_extendednav'),
             'alert alert-danger mt-2 mb-0',
             ['id' => 'duplicate_node_alert', 'hidden' => 'hidden']
         );
-        // In the column of the fields, with no row of its own: while both alerts are hidden it takes no room.
+        // In the column of the fields, with no row of its own: while the alert is hidden it takes no room.
         $mform->addElement('html', \html_writer::div(\html_writer::div($alerts, 'col-md-9 offset-md-3'), 'row'));
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
@@ -134,9 +135,14 @@ class node_form extends \moodleform {
         if (!$istree) {
             $mform->addElement('header', 'lookheader', get_string('form_section_look', 'local_extendednav'));
             $mform->setExpanded('lookheader', true);
-            $mform->addElement('text', 'icon', get_string('icon', 'local_extendednav'), ['size' => 30, 'maxlength' => 100]);
+            // The icon is chosen from a list, never typed: the value goes in a hidden field and the picker shows it.
+            $mform->addElement('hidden', 'icon');
             $mform->setType('icon', PARAM_TEXT);
-            $mform->addHelpButton('icon', 'icon', 'local_extendednav');
+            $mform->addElement('static', 'iconpicker', get_string('icon', 'local_extendednav'), \html_writer::div('', '', [
+                'data-region' => 'iconfield',
+                'data-native' => $isnative ? '1' : '0',
+            ]));
+            $mform->addHelpButton('iconpicker', 'icon', 'local_extendednav');
             $PAGE->requires->js_call_amd('local_extendednav/form/icon_picker', 'init', ['icon']);
 
             $mform->addElement('text', 'tooltip', get_string('tooltip', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
@@ -218,7 +224,12 @@ class node_form extends \moodleform {
                 'd-flex justify-content-center py-3',
                 'availabilityconditions-loading'
             ));
-            \core_availability\frontend::include_all_javascript($this->course_for_conditions($contextid));
+            $course = $this->course_for_conditions($contextid);
+            \core_availability\frontend::include_all_javascript($course);
+            // A grade or the completion of an activity needs the activities of one course: outside a course they are not offered.
+            if ((int)$course->id === (int)SITEID) {
+                $PAGE->requires->js_call_amd('local_extendednav/form/conditions', 'init', [['grade', 'completion']]);
+            }
         }
 
         $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
@@ -347,6 +358,11 @@ class node_form extends \moodleform {
         if (isset($errors['availability'])) {
             $errors['availabilityconditionsjson'] = $errors['availability'];
             unset($errors['availability']);
+        }
+        // The icon is a hidden field: its error is shown under the picker.
+        if (isset($errors['icon'])) {
+            $errors['iconpicker'] = $errors['icon'];
+            unset($errors['icon']);
         }
 
         // A link added to the site administration needs the category it goes in.

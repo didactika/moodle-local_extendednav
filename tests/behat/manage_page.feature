@@ -31,6 +31,14 @@ Feature: Order, hide and select nodes on the management page
     And I should see "Visible to everyone" in the "First" "table_row"
 
   @javascript
+  Scenario: A badge of the visibility explains every restriction of the node
+    When I click on "Hide First" "button" in the "First" "table_row"
+    And I click on "Hide" "button" in the "Hide First?" "dialogue"
+    And I click on "Not visible" "button" in the "First" "table_row"
+    Then I should see "Shown to nobody." in the "Who sees First" "dialogue"
+    And "Edit node" "link" should exist in the "Who sees First" "dialogue"
+
+  @javascript
   Scenario: Selecting nodes shows the bulk actions
     Then ".card[data-region='floatbar']" "css_element" should not be visible
     And I click on "tr[data-key='first'] [data-region='selectrow']" "css_element"

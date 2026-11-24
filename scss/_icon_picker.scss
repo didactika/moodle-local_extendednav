@@ -1,42 +1,11 @@
 // This file is part of Moodle - https://moodle.org/
 // Moodle is free software under the GNU General Public License, version 3 or later.
 
-// The icon picker of the form of a node: beside the field, a square button that shows the icon chosen (dashed while there is
-// none); in its dialog, a grid of Bootstrap buttons, one per icon, the one chosen marked as active. Every rule targets a
+// The dialog of the icon picker of the form of a node (the control in the form is in _node_form.scss): a grid of Bootstrap
+// buttons, one per icon, the one chosen marked as active. Every rule targets a
 // Bootstrap class under a region that the script marks.
 // @copyright 2026 Didactika.org
 // @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-
-.mform [data-region="iconfield"] {
-    flex: 0 0 100%;
-
-    & > .form-control {
-        flex: 0 1 20rem;
-        width: auto;
-    }
-
-    & > .btn[data-region="icontile"] {
-        display: inline-flex;
-        flex: none;
-        align-items: center;
-        justify-content: center;
-        width: 2.375rem;
-        height: 2.375rem;
-        padding: 0;
-        border-radius: var(--dd-radius-sm, 0.5rem);
-
-        &[data-empty="1"] {
-            border-style: dashed;
-        }
-
-        & .icon {
-            width: auto;
-            height: auto;
-            margin: 0;
-            font-size: 1.15rem;
-        }
-    }
-}
 
 // The list of the dialogs is nested, so each of its selectors gets the region (interpolated, only the last one would).
 #{$len-modal} {

@@ -18,7 +18,10 @@
     @template local_extendednav/list/nodes_table
 
     The nodes of a navigation: the handle that moves a node (or every node selected with it), the title with its key, the
-    visibility with a badge for each kind of restriction (a tooltip gives the details), the link and the actions of each node.
+    visibility with a badge for each kind of restriction, the link and the actions of each node. The icon of every title has
+    a slot of one width, empty or not, so the titles start at one line. Each badge says its restriction when the pointer is
+    over it and opens the dialog of every restriction of the node. The actions have a slot each, in one order (visibility,
+    edit, delete): an action a node does not have leaves its slot empty, so the actions of one kind are always in one column.
     A group of the list, such as General in the site administration, only opens its level.
 
     @copyright  2026 Didactika.org
@@ -30,7 +33,8 @@
             {
                 "id": 3, "nodekey": "grades", "title": "Grades", "url": "/grade/report/?id=2", "icon": "", "parentkey": "",
                 "visibility": 2, "visibilitylabel": "Restricted", "tone": "warning", "child": false,
-                "flags": [{"label": "Roles"}], "details": ["Roles: teacher"], "hasdetails": true,
+                "flags": [{"label": "Roles", "detail": "Roles: teacher"}], "details": ["Roles: teacher"], "hasdetails": true,
+                "visibilitydetail": "Shown only to the roles chosen.",
                 "exception": false, "inherited": false, "candelete": false, "canhide": true, "canshow": true,
                 "isselected": false, "editurl": "#", "depth": 0, "haschildren": false, "virtual": false,
                 "openlabel": "Open Grades", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
@@ -65,10 +69,10 @@
                 </td>
                 <th scope="row" data-column="title">
                     <span class="d-flex align-items-center gap-2" data-depth="{{depth}}">
-                        {{#icon}}<span class="text-muted">{{{icon}}}</span>{{/icon}}
+                        <span class="text-muted" data-region="nodeicon">{{#icon}}{{{icon}}}{{/icon}}{{^icon}}{{#haschildren}}{{#pix}}i/folder, core{{/pix}}{{/haschildren}}{{/icon}}</span>
                         <span class="d-flex flex-column overflow-hidden">
                             {{#haschildren}}
-                                <button type="button" class="btn btn-link p-0 fw-bold text-start text-left text-truncate" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{#pix}}i/folder, core{{/pix}} {{title}}</button>
+                                <button type="button" class="btn btn-link p-0 fw-bold text-start text-left text-truncate" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{title}}</button>
                             {{/haschildren}}
                             {{^haschildren}}
                                 <a class="fw-bold text-truncate" href="{{editurl}}">{{title}}</a>
@@ -82,21 +86,22 @@
                 </th>
                 <td class="d-none d-md-table-cell" data-column="visibility">
                     {{^virtual}}
-                        <span class="d-inline-flex flex-wrap align-items-center gap-1" {{#hasdetails}}tabindex="0" data-toggle="tooltip" data-bs-toggle="tooltip" data-html="true" data-bs-html="true" title="{{#details}}{{.}}<br>{{/details}}"{{/hasdetails}}>
-                            <span class="badge rounded-pill text-bg-{{tone}}">{{visibilitylabel}}</span>
-                            {{#flags}}<span class="badge rounded-pill text-bg-light">{{label}}</span>{{/flags}}
+                        <span class="d-inline-flex flex-wrap align-items-center gap-1">
+                            <button type="button" class="badge rounded-pill text-bg-{{tone}}" data-action="restrictions" data-key="{{nodekey}}" data-toggle="tooltip" data-bs-toggle="tooltip" title="{{visibilitydetail}}">{{visibilitylabel}}</button>
+                            {{#flags}}<button type="button" class="badge rounded-pill text-bg-light" data-action="restrictions" data-key="{{nodekey}}" data-toggle="tooltip" data-bs-toggle="tooltip" title="{{detail}}">{{label}}</button>{{/flags}}
                         </span>
                     {{/virtual}}
                 </td>
                 <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block">{{url}}</span></td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
                     {{^virtual}}
-                        {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-body" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
-                        {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{/canhide}}
-                        <a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
-                        {{#candelete}}
-                            <button type="button" class="btn btn-link btn-icon btn-sm text-danger" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>
-                        {{/candelete}}
+                        <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">
+                            {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-body" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
+                            {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{^canshow}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/canshow}}{{/canhide}}
+                            <a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
+                            {{#candelete}}<button type="button" class="btn btn-link btn-icon btn-sm text-danger" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>{{/candelete}}
+                            {{^candelete}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/candelete}}
+                        </span>
                     {{/virtual}}
                 </td>
             </tr>

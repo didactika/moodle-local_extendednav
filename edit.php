@@ -152,5 +152,9 @@ if ($form->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+// In the container of the plugin, so the fields, the selects and their menus follow the design system.
+echo html_writer::start_div('len');
 $form->display();
+echo html_writer::end_div();
+$PAGE->requires->js_call_amd('local_extendednav/local/select_menu', 'init');
 echo $OUTPUT->footer();

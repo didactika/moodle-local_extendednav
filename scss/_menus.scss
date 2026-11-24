@@ -213,3 +213,9 @@
         }
     }
 }
+
+// The list a select opens (local/select_menu): the option reached is shown by its tint, never by a ring of focus as well.
+.len .dropdown-menu[role="listbox"] .dropdown-item.dropdown-item:is(:focus, :focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
