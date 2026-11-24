@@ -1,0 +1,63 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/activity/table
+
+    One page of the activity log of a navigation: when, the node, the action, who and from where. The time sorts the rows.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "rows": [
+            {
+                "id": 41, "time": "24/11/26, 10:42", "user": "Admin User", "userurl": "#", "action": "updated",
+                "actionlabel": "Updated", "tone": "info", "nodekey": "myhome", "editurl": "#", "ip": "192.0.2.1"
+            }
+        ]
+    }
+}}
+<table class="table">
+    <caption class="sr-only visually-hidden">{{#str}}list_caption_activity, local_extendednav{{/str}}</caption>
+    <thead>
+        <tr>
+            <th scope="col" data-sort="time"><button type="button" class="btn btn-link" data-focuskey="sort-time">{{#str}}time{{/str}}</button></th>
+            <th scope="col">{{#str}}activity_node, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{#str}}action{{/str}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{#str}}user{{/str}}</th>
+            <th scope="col" class="d-none d-lg-table-cell">{{#str}}ip_address{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#rows}}
+            <tr>
+                <td class="text-nowrap">{{time}}</td>
+                <th scope="row">
+                    <span class="d-flex flex-column overflow-hidden">
+                        {{#editurl}}<a class="text-truncate" href="{{editurl}}"><code>{{nodekey}}</code></a>{{/editurl}}
+                        {{^editurl}}<code class="text-truncate">{{nodekey}}</code>{{/editurl}}
+                        <span class="d-flex d-md-none align-items-center gap-2 small text-muted text-truncate"><span class="badge rounded-pill text-bg-{{tone}}">{{actionlabel}}</span> {{user}}</span>
+                    </span>
+                </th>
+                <td class="d-none d-md-table-cell"><span class="badge rounded-pill text-bg-{{tone}}">{{actionlabel}}</span></td>
+                <td class="d-none d-md-table-cell text-nowrap">{{#userurl}}<a href="{{userurl}}">{{user}}</a>{{/userurl}}{{^userurl}}-{{/userurl}}</td>
+                <td class="d-none d-lg-table-cell text-nowrap">{{ip}}{{^ip}}-{{/ip}}</td>
+            </tr>
+        {{/rows}}
+    </tbody>
+</table>

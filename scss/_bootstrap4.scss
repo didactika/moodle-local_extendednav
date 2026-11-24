@@ -27,6 +27,12 @@
         display: grid !important;
     }
 
+    @media (min-width: 992px) {
+        & .d-lg-grid {
+            display: grid !important;
+        }
+    }
+
     & .fw-normal {
         font-weight: 400 !important;
     }

@@ -15,13 +15,17 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ### Added
 
-- A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list of fixed height with a pager, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
-- Nodes are moved with arrow buttons that work with the keyboard, instead of by dragging.
-- Site administrators see every node by default, even one that is hidden or restricted to roles they do not have, and their row says so. A setting of the plugin and an option of each node apply the rules to administrators too.
-- A node of a secondary navigation can be kept in the More menu or in the bar.
-- The export and the import include the exceptions of categories and courses (`scope`), and the new fields `placement` and `hideadmins`.
-- The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity, of a category and of the site administration (this one only to hide and order).
+- A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list as wide as the page and of fixed height with a pager, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
+- Nodes are ordered by dragging them by their handle, or with the arrow keys on the handle.
+- The column Visibility shows a badge and, under it, what narrows the node: its roles, its languages, a blocked address, or that only administrators see it.
+- One On and Off button next to the name of each navigation applies its changes or leaves the navigation as Moodle draws it. The settings page of the plugin is gone.
+- Site administrators see every node by default, even one that is hidden or restricted to roles they do not have, and their row says so. An option of each node applies its rules to administrators too.
+- The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity and of a category.
+- The whole site administration can be shaped: every category and every page, at any depth, can be renamed, hidden and ordered, and links of your own can be added to a category. The tree is browsed one level at a time, with a breadcrumb, and a search looks in every level.
 - A node can be an exception for a category or a course, and everything inside it: the nearest one to the page wins.
+- The menu Export offers this navigation or every navigation in one file. Both have one format, which the import reads: the navigations and whether each one is on, the exceptions of categories and courses (`scope`), the nodes of Moodle (`native`), and the fields `placement` and `hideadmins`. A node of Moodle that the site does not have is left out with a warning.
+- The form of a node is in sections (the node, its look, who sees it, where it goes) and asks only what applies to the navigation.
+- The activity log in the design system: the navigations in a column, a search by node key or person, a menu of the actions with their counts, a menu of the date with presets, the newest changes first, and the same list and pager, without reloading the page.
 - The nodes of each navigation are found when a page shows them, once per node, so listing them adds no page build, no query when nothing is customised and no measurable time to a page.
 
 ## [1.0.0-m503] - 2026-10-19

@@ -127,17 +127,20 @@ export default class List {
         const menu = this.root.querySelector('[data-menu="status"]');
         if (menu) {
             document.addEventListener('pointerdown', (event) => {
-                if (!menu.contains(event.target)) {
+                if (event.target instanceof Node && !menu.contains(event.target)) {
                     this.openStatusMenu(false);
                 }
             });
-            menu.addEventListener('keydown', (event) => {
+            // Escape closes it in the capture phase of the window: Bootstrap 5 listens to the keys of every dropdown menu of
+            // the document and fails on one that has no button of its own.
+            window.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && !menu.querySelector('.dropdown-menu').hidden) {
                     event.preventDefault();
+                    event.stopPropagation();
                     this.openStatusMenu(false);
                     menu.querySelector('[data-menu-toggle]').focus();
                 }
-            });
+            }, true);
         }
         const perpage = this.region('perpage');
         if (perpage) {

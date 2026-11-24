@@ -10,7 +10,7 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
 
-    @media (min-width: 768px) {
+    @media (min-width: 992px) {
         grid-template-columns: 15rem minmax(0, 1fr);
         align-items: start;
     }
@@ -73,8 +73,27 @@
         padding-right: 0;
     }
 
-    & th[data-column="title"] {
+    // The title takes what the other columns leave, at least 12rem, and a long one ends with an ellipsis.
+    & thead th[data-column="title"] {
         min-width: 12rem;
+    }
+
+    & tbody th[data-column="title"] {
+        max-width: 0;
+    }
+
+    // On a narrow screen the handle is hidden (a touch screen does not drag) and the title gives up its width, so the actions
+    // of the row stay on the screen.
+    @media (max-width: 767.98px) {
+        &.table-responsive .table thead th[data-column="title"] {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        &.table-responsive .table tbody th[data-column="title"] {
+            max-width: 0;
+        }
     }
 
     // A submenu item, or a node deep in the tree found by a search, starts further in.
@@ -86,6 +105,15 @@
 
     & td[data-column="actions"] {
         width: 1%;
+    }
+
+    // The link takes a share of the row and ends with an ellipsis, so a long one never pushes the actions out of the box.
+    & th[data-column="url"] {
+        width: 25%;
+    }
+
+    & td[data-column="url"] {
+        max-width: 0;
     }
 
     // The handle moves a row: it is grabbed, and the row it is dropped on shows where it goes.

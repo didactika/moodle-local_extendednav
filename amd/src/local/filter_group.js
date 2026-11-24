@@ -50,22 +50,28 @@ export const init = (toolbar) => {
     toggle.addEventListener('click', () => open(list.hidden));
     // The list of a select inside the group floats outside it; a click there does not close the group.
     document.addEventListener('pointerdown', (event) => {
-        if (!group.contains(event.target) && !event.target.closest('.dropdown-menu, .dropdown-menu')) {
+        if (event.target instanceof Element && !group.contains(event.target) && !event.target.closest('.dropdown-menu')) {
             open(false);
         }
     });
-    document.addEventListener('keydown', (event) => {
+    // Escape closes it in the capture phase of the window, before Bootstrap 5 looks at the keys of every dropdown menu.
+    window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && !list.hidden && !panel.querySelector('.dropdown-menu:not([hidden])')) {
+            event.stopPropagation();
             open(false);
             toggle.focus();
         }
-    });
+    }, true);
 
     const paint = () => {
         const label = toggle.querySelector('[data-region="menu-label"]');
         label.textContent = state.count > 0 ? `${label.dataset.label} (${state.count})` : label.dataset.label;
         toggle.classList.toggle('border-primary', state.count > 0);
     };
+
+    // While the menus are grouped, the button that clears every filter is the last thing of the group.
+    const reset = toolbar.querySelector('[data-action="clearfilters"]')?.parentElement;
+    const resetHome = reset?.parentElement;
 
     const fit = () => {
         const row = box.parentElement;
@@ -75,15 +81,22 @@ export const init = (toolbar) => {
             const filters = Array.from(box.children).filter((child) => child !== group);
             const width = filters.reduce((sum, child) => sum + child.offsetWidth, 0) + gap * Math.max(0, filters.length - 1);
             if (width > room) {
-                state.needed = width;
+                // The row gains the room of the button when it goes into the group; it is counted back before ungrouping.
+                state.needed = width + (reset ? reset.offsetWidth + gap : 0);
                 state.grouped = true;
                 filters.forEach((child) => panel.appendChild(child));
+                if (reset) {
+                    panel.appendChild(reset);
+                }
                 group.hidden = false;
             }
         } else if (room >= state.needed) {
             state.grouped = false;
             open(false);
-            Array.from(panel.children).forEach((child) => box.insertBefore(child, group));
+            Array.from(panel.children).filter((child) => child !== reset).forEach((child) => box.insertBefore(child, group));
+            if (reset) {
+                resetHome.appendChild(reset);
+            }
             group.hidden = true;
         }
         paint();
