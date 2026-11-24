@@ -24,6 +24,7 @@
         <FIELD NAME="popupheight" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Height of the pop-up window in pixels, when display is 2"/>
         <FIELD NAME="placement" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Where a secondary navigation node goes: 0 = where Moodle puts it, 1 = always in the More menu, 2 = never in the More menu"/>
         <FIELD NAME="hideadmins" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to hide the node from site administrators too. By default an administrator sees every node"/>
+        <FIELD NAME="availability" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Conditions of the node as Moodle's Restrict access writes them (JSON), or null when it has none"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

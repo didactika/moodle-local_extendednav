@@ -157,5 +157,6 @@ class repository {
      */
     public static function purge(): void {
         \cache::make('local_extendednav', 'nodes')->purge();
+        availability::reset();
     }
 }

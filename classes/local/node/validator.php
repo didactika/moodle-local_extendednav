@@ -152,6 +152,15 @@ class validator {
 
         $errors += self::validate_parent($node, $others);
 
+        // The conditions are Moodle's: a tree that its availability API reads.
+        if (!empty($node->availability)) {
+            try {
+                availability::clean((string)$node->availability);
+            } catch (\Throwable $e) {
+                $errors['availability'] = get_string('err_conditions', 'local_extendednav');
+            }
+        }
+
         if (access::is_protected($node)) {
             if (
                 $visibility !== access::VISIBILITY_ALL || !empty($node->blockaccess)

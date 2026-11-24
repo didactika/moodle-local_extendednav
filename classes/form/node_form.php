@@ -18,6 +18,7 @@ namespace local_extendednav\form;
 
 use local_extendednav\local\navigation\access_guard;
 use local_extendednav\local\node\access;
+use local_extendednav\local\node\availability;
 use local_extendednav\local\node\display;
 use local_extendednav\local\node\manager;
 use local_extendednav\local\node\repository;
@@ -44,7 +45,7 @@ class node_form extends \moodleform {
      * Form definition.
      */
     public function definition() {
-        global $OUTPUT, $PAGE;
+        global $CFG, $OUTPUT, $PAGE;
 
         $mform = $this->_form;
         $menukey = $this->_customdata['menu'] ?? 'primary';
@@ -202,6 +203,24 @@ class node_form extends \moodleform {
             ['id' => 'local_extendednav_langs_notice', 'hidden' => 'hidden']
         ));
 
+        // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
+        // has. Its editor is drawn by Moodle's script in place of this field.
+        if (!empty($CFG->enableavailability)) {
+            $mform->addElement(
+                'textarea',
+                'availabilityconditionsjson',
+                get_string('accessrestrictions', 'availability'),
+                ['class' => 'd-none']
+            );
+            $mform->addHelpButton('availabilityconditionsjson', 'conditions', 'local_extendednav');
+            $mform->addElement('html', $OUTPUT->container(
+                $OUTPUT->render_from_template('core/loading', []),
+                'd-flex justify-content-center py-3',
+                'availabilityconditions-loading'
+            ));
+            \core_availability\frontend::include_all_javascript($this->course_for_conditions($contextid));
+        }
+
         $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
         $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
         // A node of the site administration is hidden from administrators too, unless they choose otherwise.
@@ -307,6 +326,7 @@ class node_form extends \moodleform {
         if ($current !== null && menu_manager::get_menu($menukey)->is_native($current->nodekey)) {
             $data['nodekey'] = $current->nodekey;
         }
+        $data['availability'] = self::conditions_of($data['availabilityconditionsjson'] ?? '');
         $record = manager::prepare($data, $menukey);
 
         $contextid = (int)($data['contextid'] ?? 0);
@@ -323,6 +343,11 @@ class node_form extends \moodleform {
 
         $result = validator::validate($record, $others);
         $errors += $result['errors'];
+        // The conditions are shown and checked in the field of Moodle's editor.
+        if (isset($errors['availability'])) {
+            $errors['availabilityconditionsjson'] = $errors['availability'];
+            unset($errors['availability']);
+        }
 
         // A link added to the site administration needs the category it goes in.
         $menu = menu_manager::get_menu($menukey);
@@ -341,6 +366,61 @@ class node_form extends \moodleform {
             $errors['blockaccess'] = get_string('err_fallbacks_blocked', 'local_extendednav');
         }
         return $errors;
+    }
+
+    /**
+     * Shows the conditions of the node in the field of Moodle's editor.
+     *
+     * @param \stdClass|array $defaultvalues The values of the form.
+     */
+    public function set_data($defaultvalues) {
+        if (is_object($defaultvalues) && property_exists($defaultvalues, 'availability')) {
+            $defaultvalues->availabilityconditionsjson = (string)($defaultvalues->availability ?? '');
+        }
+        parent::set_data($defaultvalues);
+    }
+
+    /**
+     * Returns the values of the form, with the conditions of the editor as the availability of the node.
+     *
+     * @return \stdClass|null
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        if ($data !== null) {
+            $data->availability = self::conditions_of($data->availabilityconditionsjson ?? '');
+        }
+        return $data;
+    }
+
+    /**
+     * The conditions the editor wrote, or none when it wrote an empty set of them.
+     *
+     * @param string $json What the editor wrote.
+     * @return string The conditions, or empty.
+     */
+    private static function conditions_of(string $json): string {
+        try {
+            return (string)availability::clean($json);
+        } catch (\Throwable $e) {
+            // The validator says why they are not valid.
+            return $json;
+        }
+    }
+
+    /**
+     * The course the conditions are written for: the course of the exception, so its groups and groupings are offered, or
+     * the site course.
+     *
+     * @param int $contextid Context of the exception, 0 for the whole site.
+     * @return \stdClass
+     */
+    private function course_for_conditions(int $contextid): \stdClass {
+        global $SITE;
+
+        $context = $contextid ? \context::instance_by_id($contextid, IGNORE_MISSING) : false;
+        $coursecontext = $context ? $context->get_course_context(false) : false;
+        return $coursecontext ? get_course($coursecontext->instanceid) : $SITE;
     }
 
     /**

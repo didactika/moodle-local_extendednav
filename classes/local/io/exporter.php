@@ -33,6 +33,7 @@ final class exporter {
     public const EXPORT_FIELDS = [
         'nodekey', 'menu', 'native', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
         'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
+        'availability',
     ];
 
     /** @var string[] Fields written as whole numbers. */
@@ -87,7 +88,7 @@ final class exporter {
      * @return bool
      */
     private static function is_untouched(\stdClass $row, $menu): bool {
-        foreach (['title', 'tooltip', 'url', 'icon', 'roles', 'langs'] as $field) {
+        foreach (['title', 'tooltip', 'url', 'icon', 'roles', 'langs', 'availability'] as $field) {
             if (trim((string)($row->$field ?? '')) !== '') {
                 return false;
             }
