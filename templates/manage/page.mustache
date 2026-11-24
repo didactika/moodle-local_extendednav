@@ -50,7 +50,7 @@
     {{#sitewide}}<p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>{{/sitewide}}
     {{^sitewide}}<p class="text-muted mb-0">{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}</p>{{/sitewide}}
 
-    <div data-region="layout">
+    <div data-region="layout" {{#compact}}data-compact="1"{{/compact}}>
         {{> local_extendednav/manage/origins }}
 
         <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">

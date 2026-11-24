@@ -1976,9 +1976,16 @@
 @media (min-width: 992px) {
 
     .len [data-region=layout] {
-        grid-template-columns: 15rem minmax(0, 1fr);
         align-items: start;
     }
+
+    .len [data-region=layout]:not([data-compact]) {
+        grid-template-columns: 15rem minmax(0, 1fr);
+    }
+}
+
+.len [data-region=layout][data-compact] [data-region=originselect] {
+    max-width: 20rem;
 }
 
 .len [data-region=layout] > [data-region=origin] {

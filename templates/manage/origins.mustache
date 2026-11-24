@@ -17,7 +17,8 @@
 {{!
     @template local_extendednav/manage/origins
 
-    The navigations in groups, as a column of links, and as a select on a narrow screen. The select opens the address of the
+    The navigations in groups, as a column of links, and as a select on a narrow screen. A page of few navigations (compact),
+    such as the one of a course, has the select only. The select opens the address of the
     navigation chosen.
 
     @copyright  2026 Didactika.org
@@ -32,12 +33,13 @@
     }
 }}
 <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
-    <div class="d-lg-none">
+    <div {{^compact}}class="d-lg-none"{{/compact}}>
         <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
         <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
             {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
         </select>
     </div>
+    {{^compact}}
     <div class="card d-none d-lg-block">
         {{#origins}}
             <p class="small fw-bold text-uppercase text-muted mb-0 px-3 pt-3 pb-1">{{label}}</p>
@@ -52,4 +54,5 @@
             </div>
         {{/origins}}
     </div>
+    {{/compact}}
 </nav>
