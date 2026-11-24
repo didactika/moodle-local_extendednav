@@ -191,12 +191,15 @@ final class node_services_test extends \advanced_testcase {
         $roleid = $this->getDataGenerator()->create_role();
         assign_capability('local/extendednav:managecontext', CAP_ALLOW, $roleid, \context_course::instance($course->id));
         role_assign($roleid, $teacher->id, \context_course::instance($course->id));
+        // Enrolled in both courses, so only the capability tells them apart.
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'student');
+        $this->getDataGenerator()->enrol_user($teacher->id, $other->id, 'student');
         $this->setUser($teacher);
 
         $own = \context_course::instance($course->id)->id;
         $this->assertSame(1, change_nodes::set_visibility('course', $own, ['one'], access::VISIBILITY_HIDDEN)['count']);
 
-        $this->expectException(equired_capability_exception::class);
+        $this->expectException(\required_capability_exception::class);
         change_nodes::set_visibility('course', \context_course::instance($other->id)->id, ['one'], access::VISIBILITY_HIDDEN);
     }
 
