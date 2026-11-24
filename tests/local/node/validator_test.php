@@ -227,6 +227,22 @@ final class validator_test extends \advanced_testcase {
     }
 
     /**
+     * A protected category of the site administration keeps the children Moodle gives it; only Site administration of the
+     * primary navigation stays a single item.
+     */
+    public function test_protected_category_of_the_tree_keeps_its_children(): void {
+        $this->resetAfterTest();
+        $record = manager::prepare(['nodekey' => 'appearance', 'visibility' => 1], 'admin');
+        $others = ['local_extendednav_cat' => (object)[
+            'menu' => 'admin', 'nodekey' => 'local_extendednav_cat', 'parentkey' => 'appearance', 'visibility' => 1,
+        ]];
+
+        $errors = validator::validate($record, $others)['errors'];
+
+        $this->assertArrayNotHasKey('parentkey', $errors);
+    }
+
+    /**
      * User menu titles cannot break Moodle's "text|url" lines.
      */
     public function test_usermenu_title_characters(): void {
