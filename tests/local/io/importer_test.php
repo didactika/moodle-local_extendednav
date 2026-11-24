@@ -30,6 +30,7 @@ use local_extendednav\local\node\repository;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\local\io\importer
+ * @covers     \local_extendednav\local\io\exporter
  */
 final class importer_test extends \advanced_testcase {
     /**
@@ -65,7 +66,7 @@ final class importer_test extends \advanced_testcase {
         manager::reorder('primary', array_merge([(int)$help->id], array_map('intval', $others)));
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary'], 'sortorder ASC');
-        $before = importer::export_nodes($nodes, $nodes);
+        $before = exporter::export_nodes($nodes, $nodes);
         $yamltext = yaml::dump(['nodes' => $before], false);
         $this->assertSame(1, $before[0]['order']);
         $this->assertSame('help_es', $before[0]['nodekey']);
@@ -80,7 +81,7 @@ final class importer_test extends \advanced_testcase {
         $this->assertSame(1, $result['counts']['created']);
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary']);
-        $after = importer::export_nodes($nodes, $nodes);
+        $after = exporter::export_nodes($nodes, $nodes);
         $this->assertEquals($before, $after, 'Same values, in the same order.');
     }
 

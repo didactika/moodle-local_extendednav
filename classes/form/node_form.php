@@ -81,7 +81,7 @@ class node_form extends \moodleform {
             'menudisplay',
             get_string('menu_type', 'local_extendednav'),
             \html_writer::tag('strong', $menu->get_name()) . ($contextid ? ' · '
-                . s(\local_extendednav\local\io\importer::describe_scope($contextid)) : '')
+                . s(\local_extendednav\local\io\scope::describe($contextid)) : '')
         );
 
         $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => 30, 'maxlength' => 50]);
