@@ -26,12 +26,44 @@
 /**
  * Runs the upgrade steps for this plugin.
  *
- * There are no upgrade steps yet: 1.0.0 is the first public release and its
- * schema is created by db/install.xml.
+ * Version 1.1.0 adds the context a node applies to and where a node of the secondary navigations goes.
  *
  * @param int $oldversion The version being upgraded from.
  * @return bool
  */
 function xmldb_local_extendednav_upgrade($oldversion) {
+    global $DB;
+
+    if ($oldversion < 2026112400) {
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('local_extendednav');
+
+        // The context a node applies to: the whole site, or a category or a course as an exception.
+        $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'menu');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Where a node of the secondary navigations goes: where Moodle puts it, or always or never in the More menu.
+        $field = new xmldb_field('placement', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'popupheight');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $old = new xmldb_index('menu_nodekey', XMLDB_INDEX_UNIQUE, ['menu', 'nodekey']);
+        if ($dbman->index_exists($table, $old)) {
+            $dbman->drop_index($table, $old);
+        }
+        $new = new xmldb_index('menu_nodekey_context', XMLDB_INDEX_UNIQUE, ['menu', 'nodekey', 'contextid']);
+        if (!$dbman->index_exists($table, $new)) {
+            $dbman->add_index($table, $new);
+        }
+        $lookup = new xmldb_index('menu_context', XMLDB_INDEX_NOTUNIQUE, ['menu', 'contextid']);
+        if (!$dbman->index_exists($table, $lookup)) {
+            $dbman->add_index($table, $lookup);
+        }
+
+        upgrade_plugin_savepoint(true, 2026112400, 'local', 'extendednav');
+    }
+
     return true;
 }

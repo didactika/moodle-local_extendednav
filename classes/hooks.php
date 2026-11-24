@@ -22,6 +22,7 @@ use core\hook\output\before_standard_head_html_generation;
 use core\hook\output\before_standard_top_of_body_html_generation;
 use local_extendednav\local\access_guard;
 use local_extendednav\local\node_repository;
+use local_extendednav\local\secondary_navigation;
 
 /**
  * Hook callbacks.
@@ -61,6 +62,7 @@ class hooks {
     public static function before_http_headers(before_http_headers $hook): void {
         global $PAGE;
         access_guard::check($PAGE);
+        secondary_navigation::apply();
     }
 
     /**

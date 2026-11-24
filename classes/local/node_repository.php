@@ -29,7 +29,10 @@ class node_repository {
     private const CACHE_KEY = 'allnodes';
 
     /**
-     * Returns every node of every menu, ordered by menu, sortorder and id.
+     * Returns every node of every menu that applies to the whole site, ordered by menu, sortorder and id.
+     *
+     * The nodes that are exceptions for a category or a course are not here: there can be many, and a page
+     * needs only the ones of its own contexts, see {@see get_scoped_nodes()}.
      *
      * @return \stdClass[] Records keyed by id.
      */
@@ -39,7 +42,7 @@ class node_repository {
         $cache = \cache::make('local_extendednav', 'nodes');
         $nodes = $cache->get(self::CACHE_KEY);
         if ($nodes === false) {
-            $nodes = $DB->get_records('local_extendednav', null, 'menu ASC, sortorder ASC, id ASC');
+            $nodes = $DB->get_records('local_extendednav', ['contextid' => 0], 'menu ASC, sortorder ASC, id ASC');
             $cache->set(self::CACHE_KEY, $nodes);
         }
         return $nodes;
@@ -67,6 +70,81 @@ class node_repository {
             $bykey[$node->nodekey] = $node;
         }
         return $bykey;
+    }
+
+    /**
+     * Returns the nodes of one menu that apply to a context, one for each node key.
+     *
+     * A node can be set for the whole site and, as an exception, for a category or a course, and everything inside
+     * it. The node of the context nearest to the page wins, so a course can differ from its category and the category
+     * from the site. Nothing but the cache is read when the menu has no exception, which is the usual case.
+     *
+     * @param string $menu Menu key.
+     * @param \context $context Context of the page.
+     * @return \stdClass[] Records keyed by node key, ordered as the nearest context orders them.
+     */
+    public static function get_scoped_nodes(string $menu, \context $context): array {
+        $nodes = self::get_menu_nodes_by_key($menu);
+        $withexceptions = self::get_exception_contexts($menu);
+        if (empty($withexceptions)) {
+            return $nodes;
+        }
+        // From the outermost context to the page, so the nearest one is applied last.
+        $path = array_reverse($context->get_parent_context_ids(true));
+        foreach ($path as $contextid) {
+            if (!isset($withexceptions[$contextid])) {
+                continue;
+            }
+            $exceptions = self::get_exceptions($menu, (int)$contextid);
+            foreach ($exceptions as $node) {
+                $nodes[$node->nodekey] = $node;
+            }
+            // The context that sets any node sets the order of the navigation.
+            $order = array_map(static fn(\stdClass $node): string => $node->nodekey, $exceptions);
+            $nodes = array_replace(array_flip($order), $nodes);
+            $nodes = array_filter($nodes, static fn($node): bool => $node instanceof \stdClass);
+        }
+        return $nodes;
+    }
+
+    /**
+     * Returns the contexts that have exceptions in a menu.
+     *
+     * @param string $menu Menu key.
+     * @return int[] Context ids as keys.
+     */
+    public static function get_exception_contexts(string $menu): array {
+        global $DB;
+
+        $cache = \cache::make('local_extendednav', 'nodes');
+        $key = 'contexts_' . $menu;
+        $contexts = $cache->get($key);
+        if ($contexts === false) {
+            $ids = $DB->get_fieldset_select('local_extendednav', 'DISTINCT contextid', 'menu = :menu AND contextid <> 0', ['menu' => $menu]);
+            $contexts = array_fill_keys(array_map('intval', $ids), 1);
+            $cache->set($key, $contexts);
+        }
+        return $contexts;
+    }
+
+    /**
+     * Returns the exceptions one context sets in a menu, ordered by sortorder and id.
+     *
+     * @param string $menu Menu key.
+     * @param int $contextid Context id.
+     * @return \stdClass[] Records.
+     */
+    public static function get_exceptions(string $menu, int $contextid): array {
+        global $DB;
+
+        $cache = \cache::make('local_extendednav', 'nodes');
+        $key = 'exceptions_' . $menu . '_' . $contextid;
+        $nodes = $cache->get($key);
+        if ($nodes === false) {
+            $nodes = $DB->get_records('local_extendednav', ['menu' => $menu, 'contextid' => $contextid], 'sortorder ASC, id ASC');
+            $cache->set($key, $nodes);
+        }
+        return $nodes;
     }
 
     /**

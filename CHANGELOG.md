@@ -13,6 +13,24 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+### Added
+
+- The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity, of a category and of the site administration (this one only to hide and order).
+- A node can be an exception for a category or a course, and everything inside it: the nearest one to the page wins.
+- The nodes of each navigation are found when a page shows them, once per node, so listing them adds no page build, no query when nothing is customised and no measurable time to a page.
+
+## [1.0.0-m503] - 2026-10-19
+
+### Added
+
+- First public release for Moodle 5.3, with every feature of 1.0.0-m405.
+
+### Fixed
+
+- Icons and "New window" or "Pop-up" items in the primary navigation: Moodle 5.3 draws it with React, which prints
+  the text of top-level items as plain text, so they showed as code. They are shown again in the browser, also when
+  they move into the "More" menu.
+
 ## [1.0.0-m405] - 2026-10-15
 
 ### Added
