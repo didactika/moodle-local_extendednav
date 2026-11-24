@@ -80,9 +80,14 @@
             font-weight: 600;
             cursor: pointer;
 
+            // The tag reached with the keyboard has the ring; Moodle marks the last one chosen as reached even after a click.
             &[data-active-selection="true"] {
-                box-shadow: 0 0 0 2px var(--dd-ring);
+                box-shadow: none;
             }
+        }
+
+        &:focus-visible > [role="option"][data-active-selection="true"] {
+            box-shadow: 0 0 0 2px var(--dd-ring);
         }
     }
 
@@ -132,10 +137,14 @@
                 margin-top: 2px;
             }
 
+            // The suggestion reached is shown by its tint, with no frame and in the weight of the others.
             &:hover,
             &[aria-selected="true"] {
+                outline: 0;
+                box-shadow: none;
                 background-color: var(--dd-surface-2);
                 color: var(--dd-ink);
+                font-weight: inherit;
             }
         }
     }
