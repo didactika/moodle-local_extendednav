@@ -26,6 +26,7 @@ $len-settings: "#page-admin-setting-local_extendednav_settings #region-main";
 @import 'scss/manage';
 @import 'scss/states';
 @import 'scss/icon_picker';
+@import 'scss/node_form';
 
 .len,
 #{$len-modal} {

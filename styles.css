@@ -2240,6 +2240,11 @@
     height: 1px;
 }
 
+#page-local-extendednav-edit .availability-eye,
+#page-local-extendednav-edit .availability-eye-disabled {
+    display: none;
+}
+
 .len .btn.btn:focus:not(:focus-visible),
 .len .btn.btn:active:focus:not(:focus-visible),
 .len .page-link.page-link:focus:not(:focus-visible),
