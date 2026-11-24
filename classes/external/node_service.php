@@ -83,12 +83,13 @@ abstract class node_service extends external_api {
         if (!nodes::supports_scopes($menu)) {
             throw new \invalid_parameter_exception('This navigation has no exceptions.');
         }
-        $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if (!$context || !in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE], true)) {
-            throw new \invalid_parameter_exception('An exception applies to a category or a course.');
+        // A category, a course or an activity changes the navigations its page lists, and no other.
+        $scope = \local_extendednav\local\navigation\context_scope::from_id($contextid);
+        if ($scope === null) {
+            throw new \invalid_parameter_exception('An exception applies to a category, a course or an activity.');
         }
-        if ($menu === 'category' && $context->contextlevel !== CONTEXT_COURSECAT) {
-            throw new \invalid_parameter_exception('The navigation of a category has exceptions for categories only.');
+        if (!in_array($menu, $scope->menus(), true)) {
+            throw new \invalid_parameter_exception('This context does not change this navigation.');
         }
     }
 

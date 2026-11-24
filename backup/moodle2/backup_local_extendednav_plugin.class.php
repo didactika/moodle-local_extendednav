@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The exceptions of a course travel in its backup: what the course changes in its navigations.
+ * The exceptions of a course and of its activities travel in their backups: what they change in their navigations.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -28,6 +28,24 @@ class backup_local_extendednav_plugin extends backup_local_plugin {
      * @return backup_plugin_element
      */
     protected function define_course_plugin_structure() {
+        return $this->define_nodes();
+    }
+
+    /**
+     * Adds the nodes the activity sets in its navigation to the backup of the activity.
+     *
+     * @return backup_plugin_element
+     */
+    protected function define_module_plugin_structure() {
+        return $this->define_nodes();
+    }
+
+    /**
+     * Describes the nodes of the context backed up: the course or the activity.
+     *
+     * @return backup_plugin_element
+     */
+    private function define_nodes() {
         $plugin = $this->get_plugin_element();
         $wrapper = new backup_nested_element($this->get_recommended_name());
         $plugin->add_child($wrapper);

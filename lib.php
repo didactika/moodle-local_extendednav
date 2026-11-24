@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The ways into the navigations of a course and of a category, from their own menus.
+ * The ways into the navigations of a category, a course and an activity, from their own menus.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -58,6 +58,31 @@ function local_extendednav_extend_navigation_category_settings(navigation_node $
         return;
     }
     $navigation->add(
+        get_string('context_navigation', 'local_extendednav'),
+        $scope->url(),
+        navigation_node::TYPE_SETTING,
+        null,
+        'local_extendednav',
+        new pix_icon('i/navigationitem', '')
+    );
+}
+
+/**
+ * Adds Navigation to the menu of an activity, for whoever may change the navigation of the activity.
+ *
+ * @param settings_navigation $navigation The settings of the page.
+ * @param context $context Context of the page.
+ */
+function local_extendednav_extend_settings_navigation(settings_navigation $navigation, context $context): void {
+    if ($context->contextlevel !== CONTEXT_MODULE) {
+        return;
+    }
+    $settings = $navigation->find('modulesettings', navigation_node::TYPE_SETTING);
+    $scope = $settings ? context_scope::from_id((int)$context->id) : null;
+    if ($scope === null || !$scope->can_manage()) {
+        return;
+    }
+    $settings->add(
         get_string('context_navigation', 'local_extendednav'),
         $scope->url(),
         navigation_node::TYPE_SETTING,

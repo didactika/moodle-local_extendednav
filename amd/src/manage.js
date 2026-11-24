@@ -42,7 +42,8 @@ const STRINGS = ['drag_node_named', 'drag_nodes_named', 'navigation_on_help', 'n
     'reset_nodes_title', 'reset_nodes_text', 'reset', 'empty_nodes_title', 'empty_nodes_text', 'empty_level_title',
     'empty_level_text', 'nodes_changed', 'saved', 'open_level_named',
     'tree_top', 'hide_nodes_title', 'hide_nodes_text', 'hide_nodes_admins', 'hide_nodes_admins_help', 'show_nodes_title',
-    'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found', 'restrictions_title', 'edit_node'];
+    'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found', 'restrictions_title', 'edit_node',
+    'discover_done', 'discover_none'];
 const CORE_STRINGS = ['delete', 'show', 'hide'];
 
 /**
@@ -184,11 +185,36 @@ export const init = async(selector) => {
         }
     };
 
+    /**
+     * Looks at the activities of the kind of the navigation for the items of their navigation, and draws the list again.
+     *
+     * @param {HTMLButtonElement} button The button pressed.
+     * @returns {Promise<void>}
+     */
+    const discover = async(button) => {
+        button.disabled = true;
+        try {
+            const result = await Ajax.call([{methodname: 'local_extendednav_discover_nodes', args: {menu: config.menu}}])[0];
+            await list.load();
+            toast(result.activities ? t.discover_done.replace('{$a->found}', result.found)
+                .replace('{$a->activities}', result.activities) : t.discover_none);
+        } catch (error) {
+            toast(describeError(error), 'danger');
+        } finally {
+            button.disabled = false;
+        }
+    };
+
     actions = initActions({root, list, config, t});
     root.addEventListener('click', (event) => {
         const sample = event.target.closest('[data-action="loadsample"]');
         if (sample) {
             findNodes(sample);
+            return;
+        }
+        const discovering = event.target.closest('[data-action="discover"]');
+        if (discovering) {
+            discover(discovering);
             return;
         }
         const button = event.target.closest('[data-action="openlevel"]');

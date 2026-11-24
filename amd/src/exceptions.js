@@ -48,7 +48,6 @@ export const init = async(selector) => {
         context: (response) => ({
             rows: response.rows.map((row) => ({
                 ...row,
-                iscourse: row.kind === 'course',
                 openlabel: open.replace('{$a}', row.name),
             })),
         }),

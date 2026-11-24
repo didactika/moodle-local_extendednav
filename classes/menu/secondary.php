@@ -16,9 +16,11 @@
 
 namespace local_extendednav\menu;
 
+use local_extendednav\local\support\url_helper;
+
 /**
- * One of the secondary navigations of Moodle: the one of a course, of the site home, of an activity and of a category.
- * The site administration is a tree of its own, see {@see admintree}.
+ * One of the secondary navigations of Moodle: the one of a course, of the site home and of a category. Each kind of activity
+ * has one of its own, see {@see activity}; the site administration is a tree of its own, see {@see admintree}.
  *
  * Moodle has no list of the items of these navigations: they depend on the page, the user and the plugins. The plugin
  * does not build any page to find them. It records the items it sees when a page shows the navigation, once per item,
@@ -34,19 +36,90 @@ class secondary extends base {
     public const ORIGINS = [
         'course' => 'secondary_course',
         'frontpage' => 'secondary_frontpage',
-        'activity' => 'secondary_activity',
         'category' => 'secondary_category',
     ];
+
+    /** @var int Longest node key, the size of its column. */
+    private const KEY_LENGTH = 50;
 
     /**
      * Creates the handler of one navigation.
      *
-     * @param string $key One of the keys of {@see ORIGINS}.
+     * @param string $key One of the keys of {@see ORIGINS}, or the key of the navigation of a kind of activity.
      */
     public function __construct(
-        /** @var string $key Origin key. */
-        private readonly string $key
+        /** @var string $key Navigation key. */
+        protected readonly string $key
     ) {
+    }
+
+    /**
+     * Returns the key of a node of a secondary navigation, the same on every page and for every user.
+     *
+     * Moodle numbers the nodes that a plugin adds without a key (the Reports and the Export of a forum, for example), and the
+     * number changes from page to page. Such a node is known by the address it leads to instead: its path, written as a key
+     * ("/mod/forum/report/summary/index.php" is "mod_forum_report_summary_index"). A node with neither has no key.
+     *
+     * @param \navigation_node $node A node of the navigation.
+     * @return string|null
+     */
+    public static function key_of(\navigation_node $node): ?string {
+        $key = (string)$node->key;
+        if ($key !== '' && !ctype_digit($key)) {
+            return $key;
+        }
+        if (!$node->action instanceof \moodle_url) {
+            return null;
+        }
+        return self::key_of_path((string)url_helper::to_site_path($node->action->out(false)));
+    }
+
+    /**
+     * Returns the nodes of a secondary navigation that can be changed, by the key that is the same on every page. The page of
+     * the activity itself and the way into this plugin are left as they are.
+     *
+     * @param \navigation_node $view The navigation.
+     * @return \navigation_node[]
+     */
+    public static function children_of(\navigation_node $view): array {
+        $children = [];
+        foreach ($view->children as $child) {
+            $key = self::key_of($child);
+            if ($key !== null && !in_array($key, ['modulepage', 'local_extendednav'], true)) {
+                $children[$key] = $child;
+            }
+        }
+        return $children;
+    }
+
+    /**
+     * Describes nodes as they are recorded: the text and the address in the site.
+     *
+     * @param \navigation_node[] $children Nodes by key.
+     * @return \stdClass[] By key, with text and action (a site path, or empty).
+     */
+    public static function describe(array $children): array {
+        $seen = [];
+        foreach ($children as $key => $child) {
+            $seen[$key] = (object)[
+                'text' => trim(strip_tags((string)$child->text)),
+                'action' => $child->action instanceof \moodle_url
+                    ? (url_helper::to_site_path($child->action->out(false)) ?? '') : '',
+            ];
+        }
+        return $seen;
+    }
+
+    /**
+     * Writes the path of an address of the site as a node key.
+     *
+     * @param string $path Site path of the address, such as /mod/forum/export.php?id=4.
+     * @return string|null The key, or null when the path says nothing.
+     */
+    public static function key_of_path(string $path): ?string {
+        $path = preg_replace('/\.php$/', '', (string)parse_url($path, PHP_URL_PATH));
+        $key = trim((string)preg_replace('/[^a-z0-9]+/', '_', strtolower($path)), '_');
+        return $key === '' ? null : substr($key, 0, self::KEY_LENGTH);
     }
 
     /**

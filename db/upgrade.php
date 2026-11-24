@@ -23,6 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/upgradelib.php');
+
 /**
  * Runs the upgrade steps for this plugin.
  *
@@ -113,6 +117,14 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2026112505, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112600) {
+        // The items Moodle numbered are known by the path of their address, and each kind of activity has its own navigation.
+        local_extendednav_upgrade_numbered_keys(['course', 'frontpage', 'category', 'activity']);
+        local_extendednav_upgrade_split_activities();
+
+        upgrade_plugin_savepoint(true, 2026112600, 'local', 'extendednav');
     }
 
     return true;

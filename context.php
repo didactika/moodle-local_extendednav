@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The navigations of one category or course: what it changes for itself and for everything inside it, starting from what
- * the site and the categories around it set. Reached from the menu of the course or of the category.
+ * The navigations of one category, course or activity: what it changes for itself and for everything inside it, starting
+ * from what the site and the contexts around it set. Reached from the menu of the category, the course or the activity.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -34,13 +34,11 @@ $scope = context_scope::from_id($contextid);
 if ($scope === null) {
     throw new moodle_exception('err_scope_context', 'local_extendednav');
 }
-$context = $scope->context();
-if ($scope->is_course()) {
-    require_login($context->instanceid);
-} else {
-    require_login();
-    $PAGE->set_context($context);
-    $PAGE->set_category_by_id($context->instanceid);
+// In the activity, in the course, or in the site with the category as the context of the page.
+require_login($scope->course(), false, $scope->cm());
+if ($scope->kind() === 'category') {
+    $PAGE->set_context($scope->context());
+    $PAGE->set_category_by_id($scope->context()->instanceid);
 }
 $scope->require_manage();
 
@@ -52,7 +50,12 @@ if (!in_array($menukey, $menus, true)) {
 $menu = menu_manager::get_menu($menukey);
 
 $PAGE->set_url($scope->url($menukey));
-$PAGE->set_pagelayout('admin');
+// The page of an activity keeps the layout of the pages of the activity, with its header and its navigation.
+$PAGE->set_pagelayout($scope->is_activity() ? 'incourse' : 'admin');
+if ($scope->is_activity()) {
+    // The description of the activity says nothing about its navigation.
+    $PAGE->activityheader->set_attrs(['description' => '', 'hidecompletion' => true]);
+}
 $PAGE->set_title(get_string('context_navigation', 'local_extendednav') . ' - ' . $scope->name());
 $PAGE->set_heading($scope->name());
 $PAGE->navbar->add(get_string('context_navigation', 'local_extendednav'), $PAGE->url);
@@ -73,8 +76,10 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'origins' => $groups['origins'],
     'originoptions' => $groups['originoptions'],
     'sitewide' => false,
-    // A course has two navigations and a category three: a select, so the list keeps the width of the page.
+    // A select, so the list keeps the width of the page beside the index of the course.
     'compact' => true,
+    // An activity has one navigation: there is nothing to choose.
+    'single' => count($menus) === 1,
     'scopename' => $scope->name(),
     'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),

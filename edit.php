@@ -54,16 +54,11 @@ if ($contextid !== 0 && !nodes::supports_scopes($menukey)) {
     $contextid = 0;
 }
 
-// A node of a category or a course is changed by whoever manages the navigations of that context, on its pages; the nodes
-// of the site, in the site administration.
+// A node of a category, a course or an activity is changed by whoever manages the navigations of that context, on its pages;
+// the nodes of the site, in the site administration.
 $scope = $contextid ? context_scope::from_id($contextid) : null;
 if ($scope !== null) {
-    if ($scope->is_course()) {
-        require_login($scope->context()->instanceid);
-    } else {
-        require_login();
-        $PAGE->set_context($scope->context());
-    }
+    $scope->login();
     $scope->require_manage();
     $PAGE->set_pagelayout('admin');
 } else {

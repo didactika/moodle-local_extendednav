@@ -43,19 +43,20 @@ final class sample_page {
             case 'category':
                 $categoryid = $DB->get_field_sql('SELECT MIN(id) FROM {course_categories}');
                 return $categoryid ? new \moodle_url('/course/index.php', ['categoryid' => $categoryid]) : null;
-            case 'activity':
-                $module = $DB->get_record_sql(
-                    'SELECT cm.id, m.name
+            default:
+                $menu = \local_extendednav\menu\activity::from_key($menukey);
+                if ($menu === null) {
+                    return null;
+                }
+                // An activity of that kind in a course, the first one created.
+                $cmid = $DB->get_field_sql(
+                    'SELECT MIN(cm.id)
                        FROM {course_modules} cm
                        JOIN {modules} m ON m.id = cm.module
-                      WHERE cm.course <> :site AND cm.deletioninprogress = 0
-                   ORDER BY cm.id',
-                    ['site' => SITEID],
-                    IGNORE_MULTIPLE
+                      WHERE m.name = :modname AND cm.course <> :site AND cm.deletioninprogress = 0',
+                    ['modname' => $menu->get_modname(), 'site' => SITEID]
                 );
-                return $module ? new \moodle_url('/mod/' . $module->name . '/view.php', ['id' => $module->id]) : null;
-            default:
-                return null;
+                return $cmid ? new \moodle_url('/mod/' . $menu->get_modname() . '/view.php', ['id' => $cmid]) : null;
         }
     }
 }
