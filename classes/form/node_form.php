@@ -103,7 +103,8 @@ class node_form extends \moodleform {
             'alert alert-danger mt-2 mb-0',
             ['id' => 'duplicate_node_alert', 'hidden' => 'hidden']
         );
-        $mform->addElement('static', 'corealert', '', $alerts);
+        // In the column of the fields, with no row of its own: while both alerts are hidden it takes no room.
+        $mform->addElement('html', \html_writer::div(\html_writer::div($alerts, 'col-md-9 offset-md-3'), 'row'));
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
         $mform->setType('title', PARAM_TEXT);

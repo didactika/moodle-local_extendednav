@@ -58,23 +58,8 @@ $pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey] 
 $PAGE->set_url($pageurl);
 
 // The navigations, in groups: the ones of the whole site, the ones of the courses and the site administration.
-$groups = [
-    'origin_group_site' => ['primary', 'usermenu', 'frontpage'],
-    'origin_group_course' => ['course', 'activity', 'category'],
-    'origin_group_admin' => ['admin'],
-];
-$origins = [];
-$originoptions = [];
-foreach ($groups as $string => $keys) {
-    $items = [];
-    foreach ($keys as $key) {
-        $item = menu_manager::get_menu($key);
-        $url = (new moodle_url('/local/extendednav/manage.php', ['menu' => $key]))->out(false);
-        $items[] = ['key' => $key, 'name' => $item->get_name(), 'url' => $url, 'active' => $key === $menukey];
-        $originoptions[] = ['name' => $item->get_name(), 'url' => $url, 'selected' => $key === $menukey];
-    }
-    $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];
-}
+$groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/manage.php');
+['origins' => $origins, 'originoptions' => $originoptions] = $groups;
 
 $scopeparams = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []);
 $config = json_encode(['menu' => $menukey, 'contextid' => $contextid, 'tree' => $menukey === admintree::KEY]);

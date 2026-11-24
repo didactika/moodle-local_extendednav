@@ -48,26 +48,7 @@
     <p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>
 
     <div data-region="layout">
-        <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
-            <div class="d-md-none">
-                <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
-                <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
-                    {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
-                </select>
-            </div>
-            <div class="d-none d-md-grid gap-3">
-                {{#origins}}
-                    <div>
-                        <p class="small fw-bold text-uppercase text-muted mb-1 px-2">{{label}}</p>
-                        <div class="list-group">
-                            {{#items}}
-                                <a class="list-group-item list-group-item-action {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>{{name}}</a>
-                            {{/items}}
-                        </div>
-                    </div>
-                {{/origins}}
-            </div>
-        </nav>
+        {{> local_extendednav/manage/origins }}
 
         <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">

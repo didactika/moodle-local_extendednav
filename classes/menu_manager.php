@@ -88,4 +88,36 @@ class menu_manager {
         }
         return null;
     }
+
+    /**
+     * The navigations in groups, as the column of a page lists them: the ones of the whole site, the ones of the courses and the
+     * site administration. Each one links to the same page for that navigation.
+     *
+     * @param string $current Key of the navigation shown.
+     * @param string $script Page the links open, such as /local/extendednav/manage.php.
+     * @return array The groups (origins) and the same navigations as options of a select (originoptions).
+     */
+    public static function get_origin_groups(string $current, string $script): array {
+        $groups = [
+            'origin_group_site' => ['primary', 'usermenu', 'frontpage'],
+            'origin_group_course' => ['course', 'activity', 'category'],
+            'origin_group_admin' => ['admin'],
+        ];
+        $origins = [];
+        $options = [];
+        foreach ($groups as $string => $keys) {
+            $items = [];
+            foreach ($keys as $key) {
+                $menu = self::get_menu($key);
+                if ($menu === null) {
+                    continue;
+                }
+                $url = (new \moodle_url($script, ['menu' => $key]))->out(false);
+                $items[] = ['key' => $key, 'name' => $menu->get_name(), 'url' => $url, 'active' => $key === $current];
+                $options[] = ['name' => $menu->get_name(), 'url' => $url, 'selected' => $key === $current];
+            }
+            $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];
+        }
+        return ['origins' => $origins, 'originoptions' => $options];
+    }
 }

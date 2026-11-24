@@ -1,0 +1,132 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/activity/page
+
+    The activity log of a navigation: the navigations to the left (a select on a narrow screen) and, to the right, the search,
+    the menu of the actions, with the rows of each, the menu of the date and the rows. The rows are loaded by
+    local_extendednav/activity.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "id": "len-activity",
+        "config": "{\"menu\":\"primary\"}",
+        "name": "Primary navigation",
+        "origins": [
+            {"label": "Site", "items": [{"key": "primary", "name": "Primary navigation", "url": "#", "active": true}]}
+        ],
+        "originoptions": [{"name": "Primary navigation", "url": "#", "selected": true}]
+    }
+}}
+<div class="len" data-region="activity">
+    <div data-region="layout">
+        {{> local_extendednav/manage/origins }}
+
+        <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
+            <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+
+            <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{#str}}activity_log, local_extendednav{{/str}}">
+                <div class="card">
+                    <div class="d-flex align-items-center justify-content-between gap-3 px-3 py-2 border-bottom" data-region="filters">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1">
+                            <form class="position-relative d-flex align-items-center" role="search" data-region="searchform" aria-label="{{#str}}activity_search, local_extendednav{{/str}}">
+                                {{#pix}}a/search, core{{/pix}}
+                                <label class="sr-only visually-hidden" for="{{id}}-search">{{#str}}activity_search, local_extendednav{{/str}}</label>
+                                <input class="form-control" type="search" id="{{id}}-search" data-region="search" placeholder="{{#str}}activity_search, local_extendednav{{/str}}" autocomplete="off">
+                            </form>
+                            <div class="d-flex align-items-center gap-2" data-region="filter-menus">
+                                <span class="dropdown d-inline-flex" data-menu="status">
+                                    <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                                        aria-label="{{#str}}activity_filter_action, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}activity_filter_action, local_extendednav{{/str}}">{{#str}}activity_filter_action, local_extendednav{{/str}}</span></button>
+                                    <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_action, local_extendednav{{/str}}"
+                                        aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_action, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                                    <span class="dropdown-menu show" role="group" aria-label="{{#str}}activity_filter_action, local_extendednav{{/str}}" hidden>
+                                        <label class="dropdown-item" for="{{id}}-act-created">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-created" data-status="created">
+                                            <span>{{#str}}action_created, local_extendednav{{/str}}</span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="created"></span>
+                                        </label>
+                                        <label class="dropdown-item" for="{{id}}-act-updated">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-updated" data-status="updated">
+                                            <span>{{#str}}action_updated, local_extendednav{{/str}}</span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="updated"></span>
+                                        </label>
+                                        <label class="dropdown-item" for="{{id}}-act-deleted">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-deleted" data-status="deleted">
+                                            <span>{{#str}}action_deleted, local_extendednav{{/str}}</span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="deleted"></span>
+                                        </label>
+                                    </span>
+                                </span>
+                                <span class="dropdown d-inline-flex" data-menu="date">
+                                    <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                                        aria-label="{{#str}}activity_filter_date, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}activity_filter_date, local_extendednav{{/str}}">{{#str}}activity_filter_date, local_extendednav{{/str}}</span></button>
+                                    <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_date, local_extendednav{{/str}}"
+                                        aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_date, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                                    <span class="dropdown-menu show" role="group" aria-label="{{#str}}activity_filter_date, local_extendednav{{/str}}" hidden>
+                                        <button type="button" class="dropdown-item" data-preset="today">{{#str}}filter_date_today, local_extendednav{{/str}}</button>
+                                        <button type="button" class="dropdown-item" data-preset="week">{{#str}}filter_date_week, local_extendednav{{/str}}</button>
+                                        <button type="button" class="dropdown-item" data-preset="month">{{#str}}filter_date_month, local_extendednav{{/str}}</button>
+                                        <button type="button" class="dropdown-item" data-preset="last30">{{#str}}filter_date_last30, local_extendednav{{/str}}</button>
+                                        <span class="dropdown-divider d-block"></span>
+                                        <span class="d-flex gap-2 px-3 pt-1 pb-2">
+                                            <span class="d-block flex-fill">
+                                                <label class="small mb-1" for="{{id}}-from">{{#str}}activity_from, local_extendednav{{/str}}</label>
+                                                <input class="form-control form-control-sm" type="date" id="{{id}}-from" name="datefrom">
+                                            </span>
+                                            <span class="d-block flex-fill">
+                                                <label class="small mb-1" for="{{id}}-to">{{#str}}activity_to, local_extendednav{{/str}}</label>
+                                                <input class="form-control form-control-sm" type="date" id="{{id}}-to" name="dateto">
+                                            </span>
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="dropdown d-inline-flex" data-menu="filters" hidden>
+                                    <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                                        aria-label="{{#str}}filters{{/str}}">{{#pix}}i/filter, core{{/pix}} <span data-region="menu-label" data-label="{{#str}}filters{{/str}}">{{#str}}filters{{/str}}</span></button>
+                                    <span class="dropdown-menu show dropdown-menu-end dropdown-menu-right" role="group" aria-label="{{#str}}filters{{/str}}" hidden>
+                                        <span class="d-grid" data-region="filter-panel"></span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled
+                                title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}">{{#pix}}i/reload, core{{/pix}}</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive" data-region="tablewrap" aria-busy="true">
+                        <table class="table">
+                            <caption class="sr-only visually-hidden">{{#str}}list_caption_activity, local_extendednav{{/str}}</caption>
+                            <tbody>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div data-region="empty" hidden></div>
+                    <div data-region="error" hidden></div>
+                    {{> local_extendednav/list/pager }}
+                </div>
+            </section>
+        </section>
+    </div>
+</div>

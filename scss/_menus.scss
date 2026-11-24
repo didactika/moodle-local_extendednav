@@ -195,5 +195,21 @@
             min-width: 0;
             max-width: none;
         }
+
+        // The list of a menu in the group is as wide as its menu, so on a phone it never goes past the edge of the screen; the
+        // two days of a period then stack.
+        & .dropdown > .dropdown-menu {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        & .dropdown > .dropdown-menu > .d-flex {
+            flex-wrap: wrap;
+
+            & > .flex-fill {
+                flex: 1 1 8rem;
+            }
+        }
     }
 }

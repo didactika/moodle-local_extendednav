@@ -36,6 +36,17 @@
     display: grid !important;
 }
 
+@media (min-width: 992px) {
+
+    .len .d-lg-grid,
+    .path-local-extendednav .modal .d-lg-grid,
+    .path-admin-local-extendednav .modal .d-lg-grid,
+    #page-admin-setting-local_extendednav_settings .modal .d-lg-grid,
+    #page-local-extendednav-manage .modal .d-lg-grid {
+        display: grid !important;
+    }
+}
+
 .len .fw-normal,
 .path-local-extendednav .modal .fw-normal,
 .path-admin-local-extendednav .modal .fw-normal,
@@ -1723,6 +1734,20 @@
     max-width: none;
 }
 
+.len [data-region=filter-panel] .dropdown > .dropdown-menu {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.len [data-region=filter-panel] .dropdown > .dropdown-menu > .d-flex {
+    flex-wrap: wrap;
+}
+
+.len [data-region=filter-panel] .dropdown > .dropdown-menu > .d-flex > .flex-fill {
+    flex: 1 1 8rem;
+}
+
 .path-local-extendednav .modal .modal-dialog.modal-lg,
 .path-admin-local-extendednav .modal .modal-dialog.modal-lg,
 #page-admin-setting-local_extendednav_settings .modal .modal-dialog.modal-lg,
@@ -1933,7 +1958,7 @@
     gap: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
 
     .len [data-region=layout] {
         grid-template-columns: 15rem minmax(0, 1fr);
@@ -1993,8 +2018,25 @@
     padding-right: 0;
 }
 
-.len [data-region=tablewrap] th[data-column=title] {
+.len [data-region=tablewrap] thead th[data-column=title] {
     min-width: 12rem;
+}
+
+.len [data-region=tablewrap] tbody th[data-column=title] {
+    max-width: 0;
+}
+
+@media (max-width: 767.98px) {
+
+    .len [data-region=tablewrap].table-responsive .table thead th[data-column=title] {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+    }
+
+    .len [data-region=tablewrap].table-responsive .table tbody th[data-column=title] {
+        max-width: 0;
+    }
 }
 
 .len [data-region=tablewrap] [data-depth=1] {
@@ -2019,6 +2061,14 @@
 
 .len [data-region=tablewrap] td[data-column=actions] {
     width: 1%;
+}
+
+.len [data-region=tablewrap] th[data-column=url] {
+    width: 25%;
+}
+
+.len [data-region=tablewrap] td[data-column=url] {
+    max-width: 0;
 }
 
 .len [data-region=tablewrap] [data-region=handle] {

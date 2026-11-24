@@ -48,6 +48,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
+    'local_extendednav_get_activity' => [
+        'classname' => \local_extendednav\external\get_activity::class,
+        'methodname' => 'execute',
+        'description' => 'Returns one page of the activity log of a navigation, with the rows of each action.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
     'local_extendednav_get_scopes' => [
         'classname' => \local_extendednav\external\get_scopes::class,
         'methodname' => 'execute',

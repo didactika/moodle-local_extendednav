@@ -1,0 +1,53 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage/origins
+
+    The navigations in groups, as a column of links, and as a select on a narrow screen. The select opens the address of the
+    navigation chosen.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "origins": [
+            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true}]}
+        ],
+        "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}]
+    }
+}}
+<nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
+    <div class="d-lg-none">
+        <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
+        <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
+            {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
+        </select>
+    </div>
+    <div class="d-none d-lg-grid gap-3">
+        {{#origins}}
+            <div>
+                <p class="small fw-bold text-uppercase text-muted mb-1 px-2">{{label}}</p>
+                <div class="list-group">
+                    {{#items}}
+                        <a class="list-group-item list-group-item-action {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>{{name}}</a>
+                    {{/items}}
+                </div>
+            </div>
+        {{/origins}}
+    </div>
+</nav>
