@@ -231,7 +231,9 @@ class validator {
             }
         }
 
-        $isadmin = access::is_protected($node);
+        // Site administration in the primary navigation stays a single item; the protected categories of the site
+        // administration tree keep the children Moodle gives them.
+        $isadmin = $node->menu === 'primary' && access::is_protected($node);
         if ($isadmin && $haschildren) {
             return ['parentkey' => get_string('err_admin_parent', 'local_extendednav')];
         }
