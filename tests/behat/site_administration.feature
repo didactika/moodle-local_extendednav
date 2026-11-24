@@ -35,7 +35,7 @@ Feature: Shape the site administration
       | Node key | staffguide   |
       | Title    | Staff guide  |
       | URL      | /my/         |
-    And I set the field "Category" to "Users"
+    And I set the field "Parent" to "Users"
     And I press "Save changes"
     And I visit "/admin/category.php?category=users"
     Then I should see "Staff guide"

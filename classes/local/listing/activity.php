@@ -193,6 +193,8 @@ final class activity {
             $editurl = (new \moodle_url('/local/extendednav/edit.php', ['id' => $node->id, 'menu' => $node->menu]))->out(false);
         }
         $hasuser = (int)$record->userid > 0 && $record->firstname !== null;
+        // What the change did, field by field; the events of the versions before 2.0 did not keep it.
+        $changes = \local_extendednav\local\node\changes::describe(is_array($other['changes'] ?? null) ? $other['changes'] : []);
         return [
             'id' => (int)$record->id,
             'time' => userdate((int)$record->timecreated, get_string('strftimedatetimeshort', 'core_langconfig')),
@@ -204,6 +206,8 @@ final class activity {
             'nodekey' => clean_param((string)($other['nodekey'] ?? ''), PARAM_ALPHANUMEXT),
             'editurl' => $editurl,
             'ip' => (string)($record->ip ?? ''),
+            'changes' => $changes,
+            'changedfields' => implode(', ', array_column($changes, 'field')),
         ];
     }
 

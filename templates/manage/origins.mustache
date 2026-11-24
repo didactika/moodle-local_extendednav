@@ -17,10 +17,10 @@
 {{!
     @template local_extendednav/manage/origins
 
-    The navigations in groups, as a column of links, and as a select with the same groups on a narrow screen. A page of few
-    navigations (compact), such as the one of a course, has the select only. Under Activities, the kinds of activity the site
-    uses come first and the others are folded under a button that opens them. The select opens the address of the navigation
-    chosen.
+    The navigations in groups, as a column of links, and as one select with the same groups on a narrow screen. A page of few
+    navigations (compact), such as the one of a course, has the select only. The kinds of activity are many: the column chooses
+    them in a select with a search (picker), the kinds the site uses in a group of their own; the one shown is tinted. Each
+    select opens the address of the navigation chosen, and lists the navigations by their short names.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,21 +28,21 @@
     Example context (json):
     {
         "origins": [
-            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "title": "Course navigation", "url": "#",
-                "active": true, "icon": "i/course", "component": "core", "off": false}], "more": [], "hasmore": false},
-            {"label": "Activities", "items": [{"key": "mod_forum", "name": "Forum", "title": "Forum navigation", "url": "#",
-                "active": false, "icon": "monologo", "component": "mod_forum", "off": false}],
-                "more": [{"key": "mod_book", "name": "Book", "title": "Book navigation", "url": "#", "active": false,
-                "icon": "monologo", "component": "mod_book", "off": false}], "hasmore": true, "moreopen": false,
-                "morelabel": "Other kinds (1)", "moreid": "len-origins-activity"}
+            {"label": "Courses", "picker": false, "items": [{"key": "course", "name": "Course navigation", "short": "Course",
+                "url": "#", "active": true, "icon": "i/course", "component": "core", "off": false}]},
+            {"label": "Activities", "picker": true, "pickeractive": false, "pickeroff": false, "pickergroups": [
+                {"label": "Used on the site", "options": [{"name": "Forum", "url": "#", "selected": false}]},
+                {"label": "Other kinds", "options": [{"name": "Book", "url": "#", "selected": false}]}
+            ]}
         ],
-        "originoptions": [{"label": "Courses", "options": [{"name": "Course navigation", "url": "#", "selected": true}]}]
+        "originoptions": [{"label": "Courses", "options": [{"name": "Course", "url": "#", "selected": true}]}]
     }
 }}
 <nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
     <div {{^compact}}class="d-lg-none"{{/compact}}>
         <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
-        <select class="custom-select form-select" id="len-origin-select" data-region="originselect">
+        <select class="custom-select form-select" id="len-origin-select" data-region="originselect" data-searchable
+            data-search-label="{{#str}}search_navigations, local_extendednav{{/str}}" data-noresults="{{#str}}noresults, local_extendednav{{/str}}">
             {{#originoptions}}
                 <optgroup label="{{label}}">
                     {{#options}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/options}}
@@ -54,20 +54,26 @@
     <div class="card d-none d-lg-block">
         {{#origins}}
             <p class="small fw-bold text-uppercase text-muted mb-0 px-3 pt-3 pb-1">{{label}}</p>
-            <div class="list-group list-group-flush">
-                {{#items}}{{> local_extendednav/manage/origin_item }}{{/items}}
-                {{#hasmore}}
-                    <button type="button" class="list-group-item list-group-item-action d-flex align-items-center gap-2 text-muted {{^moreopen}}collapsed{{/moreopen}}" data-toggle="collapse" data-bs-toggle="collapse" data-target="#{{moreid}}" data-bs-target="#{{moreid}}" aria-controls="{{moreid}}" aria-expanded="{{#moreopen}}true{{/moreopen}}{{^moreopen}}false{{/moreopen}}" data-region="originsmore">
-                        {{#pix}}t/expanded, core{{/pix}}
-                        <span class="text-truncate">{{morelabel}}</span>
-                    </button>
-                    <div class="collapse {{#moreopen}}show{{/moreopen}}" id="{{moreid}}">
-                        <div class="list-group list-group-flush">
-                            {{#more}}{{> local_extendednav/manage/origin_item }}{{/more}}
-                        </div>
-                    </div>
-                {{/hasmore}}
-            </div>
+            {{#picker}}
+                <div class="px-3 pb-3 pt-1" data-region="originpicker" {{#pickeractive}}data-active="1"{{/pickeractive}}>
+                    <label class="sr-only visually-hidden" for="len-origin-kinds">{{label}}</label>
+                    <select class="custom-select form-select w-100 {{#pickeractive}}border-primary{{/pickeractive}}" id="len-origin-kinds" data-region="originselect" data-searchable
+                        data-search-label="{{#str}}search_kinds, local_extendednav{{/str}}" data-noresults="{{#str}}noresults, local_extendednav{{/str}}">
+                        <option value="" hidden {{^pickeractive}}selected{{/pickeractive}}>{{#str}}choose_kind, local_extendednav{{/str}}</option>
+                        {{#pickergroups}}
+                            <optgroup label="{{label}}">
+                                {{#options}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/options}}
+                            </optgroup>
+                        {{/pickergroups}}
+                    </select>
+                    {{#pickeroff}}<span class="badge rounded-pill text-bg-secondary mt-2">{{#str}}navigation_off, local_extendednav{{/str}}</span>{{/pickeroff}}
+                </div>
+            {{/picker}}
+            {{^picker}}
+                <div class="list-group list-group-flush">
+                    {{#items}}{{> local_extendednav/manage/origin_item }}{{/items}}
+                </div>
+            {{/picker}}
         {{/origins}}
     </div>
     {{/compact}}

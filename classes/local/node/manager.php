@@ -137,7 +137,7 @@ class manager {
 
         repository::purge();
         if ($events) {
-            node_created::create_from_record($record)->trigger();
+            node_created::create_from_record($record, null, changes::between(null, $record))->trigger();
         }
         return $record;
     }
@@ -203,8 +203,9 @@ class manager {
             if (isset($unchanged[$key])) {
                 continue;
             }
+            $before = !empty($record->id) ? ($current[(int)$record->id] ?? null) : null;
             $event = !empty($record->id) ? node_updated::class : node_created::class;
-            $event::create_from_record($saved[$key])->trigger();
+            $event::create_from_record($saved[$key], null, changes::between($before, $saved[$key]))->trigger();
         }
         return $saved;
     }
@@ -243,12 +244,13 @@ class manager {
 
         $record = clone $record;
         $record->timemodified = time();
+        $before = $events ? $DB->get_record('local_extendednav', ['id' => $record->id]) : null;
         $DB->update_record('local_extendednav', $record);
 
         $saved = $DB->get_record('local_extendednav', ['id' => $record->id], '*', MUST_EXIST);
         repository::purge();
         if ($events) {
-            node_updated::create_from_record($saved)->trigger();
+            node_updated::create_from_record($saved, null, changes::between($before ?: null, $saved))->trigger();
         }
         return $saved;
     }
@@ -326,12 +328,13 @@ class manager {
 
         if ($events) {
             foreach ($todelete as $record) {
-                node_deleted::create_from_record($record)->trigger();
+                node_deleted::create_from_record($record, null, changes::between($record, null))->trigger();
             }
             foreach ($children as $child) {
+                $before = clone $child;
                 $child->parentkey = null;
                 $child->timemodified = $now;
-                node_updated::create_from_record($child)->trigger();
+                node_updated::create_from_record($child, null, changes::between($before, $child))->trigger();
             }
         }
         foreach ($bymenu as $menukey => $menurecords) {

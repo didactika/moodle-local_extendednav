@@ -44,6 +44,15 @@ abstract class base {
     abstract public function get_name(): string;
 
     /**
+     * Returns the short name of the navigation, as a select that lists several of them in groups says it.
+     *
+     * @return string
+     */
+    public function get_short_name(): string {
+        return $this->get_name();
+    }
+
+    /**
      * Returns the core nodes of this menu.
      *
      * Each node is an object with key, text (a title or an "identifier,component"

@@ -124,6 +124,12 @@ final class get_activity extends node_service {
                 'nodekey' => new external_value(PARAM_ALPHANUMEXT, 'Key of the node.'),
                 'editurl' => $text('Form of the node, while it exists, or empty.'),
                 'ip' => $text('IP address.'),
+                'changes' => new external_multiple_structure(new external_single_structure([
+                    'field' => $text('Field changed, as the form of a node names it.'),
+                    'before' => $text('Its value before, in words.'),
+                    'after' => $text('Its value after, in words.'),
+                ]), 'The fields the change touched.'),
+                'changedfields' => $text('The names of the fields changed, in one line.'),
             ])),
         ]);
     }

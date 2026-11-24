@@ -51,7 +51,7 @@ final class discovery {
             return ['activities' => 0, 'found' => 0];
         }
         $before = count($menu->get_native_nodes());
-        $cmids = $DB->get_fieldset_sql(
+        $cmids = array_keys($DB->get_records_sql(
             'SELECT cm.id
                FROM {course_modules} cm
                JOIN {modules} m ON m.id = cm.module
@@ -60,7 +60,7 @@ final class discovery {
             ['modname' => $modname, 'site' => SITEID],
             0,
             $limit
-        );
+        ));
         $started = microtime(true);
         $seen = [];
         $looked = 0;

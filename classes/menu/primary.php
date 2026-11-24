@@ -51,6 +51,15 @@ class primary extends base {
     }
 
     /**
+     * Returns the short name of the navigation, as the selects and the column of the navigations list it.
+     *
+     * @return string
+     */
+    public function get_short_name(): string {
+        return get_string('primary_short', 'local_extendednav');
+    }
+
+    /**
      * Returns the Moodle setting that defines custom primary menu items.
      *
      * @return string|null

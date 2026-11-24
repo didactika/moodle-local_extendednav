@@ -101,13 +101,14 @@ export const init = async(selector) => {
         method: 'local_extendednav_get_nodes',
         template: 'local_extendednav/list/nodes_table',
         // The whole list is drawn, so it can be ordered: a navigation has tens of nodes, a level of the tree a few more.
-        defaults: {search: '', status: '', origin: '', parent: '', page: 0, perpage: 0},
+        defaults: {search: '', status: '', origin: '', restriction: '', parent: '', page: 0, perpage: 0},
         args: (state) => ({
             menu: config.menu,
             contextid: config.contextid,
             search: state.search,
             visibility: state.status,
             origin: state.origin,
+            restriction: state.restriction,
             parent: config.tree ? state.parent : '',
             page: 0,
             perpage: 0,
@@ -133,7 +134,7 @@ export const init = async(selector) => {
             ? {icon: 'i/folder', title: t.empty_level_title, text: t.empty_level_text}
             : {icon: 't/hide', title: t.empty_nodes_title, text: t.empty_nodes_text, sampleurl: config.sampleurl}),
         onRender: (response, instance) => {
-            group?.count(['status', 'origin'].filter((key) => instance.state[key]).length);
+            group?.count(['status', 'origin', 'restriction'].filter((key) => instance.state[key]).length);
             renderPath(root.querySelector('[data-region="path"]'), response.path || [], t.tree_top,
                 !config.tree || Boolean(instance.state.search));
             enableDragging(instance.region('tablewrap'), {
@@ -206,15 +207,12 @@ export const init = async(selector) => {
     };
 
     actions = initActions({root, list, config, t});
+    // The button that looks for the items of a kind of activity is in the head of the page, above the list.
+    page.querySelector('[data-action="discover"]')?.addEventListener('click', (event) => discover(event.currentTarget));
     root.addEventListener('click', (event) => {
         const sample = event.target.closest('[data-action="loadsample"]');
         if (sample) {
             findNodes(sample);
-            return;
-        }
-        const discovering = event.target.closest('[data-action="discover"]');
-        if (discovering) {
-            discover(discovering);
             return;
         }
         const button = event.target.closest('[data-action="openlevel"]');
@@ -227,8 +225,12 @@ export const init = async(selector) => {
             list.update({parent: button.dataset.key, search: '', page: 0});
         }
     });
-    page.querySelector('[data-region="originselect"]')?.addEventListener('change', (event) => {
-        window.location.assign(event.target.value);
+    // Each select of the navigations (the one of a narrow screen, the one of the kinds of activity) opens the one chosen.
+    page.addEventListener('change', (event) => {
+        const select = event.target.closest('[data-region="originselect"]');
+        if (select?.value) {
+            window.location.assign(select.value);
+        }
     });
 
     initPower(page, config.menu, {onhelp: t.navigation_on_help, offhelp: t.navigation_off_help, saved: t.saved});

@@ -70,9 +70,10 @@ final class node_deleted extends \core\event\base {
      *
      * @param \stdClass $record Database record object.
      * @param int|null $actorid User id who performed the action.
+     * @param array $changes The fields that changed, with their values before and after (see changes::between).
      * @return self
      */
-    public static function create_from_record(\stdClass $record, ?int $actorid = null): self {
+    public static function create_from_record(\stdClass $record, ?int $actorid = null, array $changes = []): self {
         global $USER;
         $actorid = $actorid ?? (int)($USER->id ?? 0);
         return self::create([
@@ -86,6 +87,7 @@ final class node_deleted extends \core\event\base {
                 'url' => (string)($record->url ?? ''),
                 'visibility' => (int)($record->visibility ?? 1),
                 'parentkey' => (string)($record->parentkey ?? ''),
+                'changes' => $changes,
             ],
         ]);
     }

@@ -141,6 +141,15 @@ class secondary extends base {
     }
 
     /**
+     * Returns the short name of the navigation: the word of Moodle for what it belongs to.
+     *
+     * @return string
+     */
+    public function get_short_name(): string {
+        return get_string(['course' => 'course', 'category' => 'category', 'frontpage' => 'sitehome'][$this->key] ?? 'course');
+    }
+
+    /**
      * Returns the nodes Moodle has shown in this navigation, as recorded so far.
      *
      * @return \stdClass[] Keyed by node key, with key, text, action and icon.

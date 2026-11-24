@@ -75,9 +75,26 @@ final class nodes_test extends \advanced_testcase {
         $this->assertSame(3, $all['total']);
         $this->assertSame(
             ['all' => 3, 'visible' => 2, 'roles' => 0, 'hidden' => 1, 'native' => 3, 'custom' => 0],
-            $all['counts']
+            array_intersect_key($all['counts'], array_flip(['all', 'visible', 'roles', 'hidden', 'native', 'custom']))
         );
         $this->assertTrue($all['reorderable']);
+
+        // The kinds of restriction are counted and filtered too.
+        manager::set_visibility('course', 0, ['grades'], access::VISIBILITY_ROLES);
+        $DB = $GLOBALS['DB'];
+        $DB->set_field('local_extendednav', 'roles', 'teacher', ['menu' => 'course', 'nodekey' => 'grades', 'contextid' => 0]);
+        $DB->set_field('local_extendednav', 'langs', 'es', ['menu' => 'course', 'nodekey' => 'participants', 'contextid' => 0]);
+        \local_extendednav\local\node\repository::purge();
+        $restricted = nodes::get('course', 0, '', '', '', 0, 0, '', 'roles,langs');
+        $this->assertSame(['participants', 'grades'], array_column($restricted['rows'], 'nodekey'));
+        $this->assertSame(1, $restricted['counts']['r_roles']);
+        $this->assertSame(1, $restricted['counts']['r_langs']);
+        $this->assertSame(0, $restricted['counts']['r_blocked']);
+        $this->assertFalse($restricted['reorderable'], 'A part of the list is not moved.');
+        $this->assertSame(['grades'], array_column(nodes::get('course', 0, '', '', '', 0, 0, '', 'roles')['rows'], 'nodekey'));
+        manager::set_visibility('course', 0, ['grades'], access::VISIBILITY_ALL);
+        $DB->set_field('local_extendednav', 'langs', null, ['menu' => 'course', 'nodekey' => 'participants', 'contextid' => 0]);
+        \local_extendednav\local\node\repository::purge();
 
         $found = nodes::get('course', 0, 'grad');
         $this->assertSame(['grades'], array_column($found['rows'], 'nodekey'));

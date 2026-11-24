@@ -37,6 +37,19 @@ class nodes {
     /** @var int Most rows a page of the list holds. */
     public const MAX_PAGE_SIZE = 100;
 
+    /** @var string[] Kinds of restriction the list filters by, with the string that names each one, as its badges say. */
+    public const RESTRICTIONS = [
+        'roles' => 'flag_roles',
+        'langs' => 'flag_langs',
+        'blocked' => 'badge_blocked',
+        'hideadmins' => 'flag_hideadmins',
+        'conditions' => 'flag_conditions',
+        'scheduled' => 'flag_scheduled',
+        'ended' => 'flag_ended',
+        'placement' => 'flag_placement',
+        'protected' => 'flag_protected',
+    ];
+
     /** @var int Longest search, in characters. */
     public const MAX_SEARCH = 255;
 
@@ -72,6 +85,7 @@ class nodes {
      * @param int $page Page, from 0.
      * @param int $perpage Rows in a page, 0 for all of them.
      * @param string $origin native (nodes of Moodle) and custom (nodes added), separated by commas, or empty for both.
+     * @param string $restriction Kinds of restriction (see RESTRICTIONS), separated by commas: the nodes with any of them.
      * @return array With total, counts, rows, reorderable and path.
      */
     public static function get(
@@ -82,7 +96,8 @@ class nodes {
         string $parent = '',
         int $page = 0,
         int $perpage = 0,
-        string $origin = ''
+        string $origin = '',
+        string $restriction = ''
     ): array {
         $menu = menu_manager::get_menu($menukey);
         if ($menu === null) {
@@ -106,9 +121,22 @@ class nodes {
         }
 
         $counts = ['all' => count($nodes), 'visible' => 0, 'roles' => 0, 'hidden' => 0, 'native' => 0, 'custom' => 0];
+        $counts += array_fill_keys(array_map(static fn(string $kind): string => 'r_' . $kind, array_keys(self::RESTRICTIONS)), 0);
+        $kinds = [];
         foreach ($nodes as $node) {
             $counts[['hidden', 'visible', 'roles'][(int)$node->visibility] ?? 'hidden']++;
             $counts[$menu->is_native($node->nodekey) ? 'native' : 'custom']++;
+            $kinds[$node->nodekey] = self::restrictions_of($node);
+            foreach ($kinds[$node->nodekey] as $kind) {
+                $counts['r_' . $kind]++;
+            }
+        }
+        $restrictions = array_values(array_intersect(array_keys(self::RESTRICTIONS), explode(',', $restriction)));
+        if ($restrictions) {
+            $nodes = array_filter(
+                $nodes,
+                static fn(\stdClass $node): bool => (bool)array_intersect($kinds[$node->nodekey] ?? [], $restrictions)
+            );
         }
         $origins = array_intersect(['native', 'custom'], explode(',', $origin));
         if (count($origins) === 1) {
@@ -135,7 +163,7 @@ class nodes {
             }
         }
         $rows = [];
-        if ($level && $parent === '' && !empty($general) && empty($wanted) && count($origins) !== 1) {
+        if ($level && $parent === '' && !empty($general) && empty($wanted) && count($origins) !== 1 && !$restrictions) {
             $rows[] = self::general_row();
         }
         foreach ($slice as $node) {
@@ -145,7 +173,8 @@ class nodes {
             $rows[] = $row;
         }
         // Moving a node only makes sense in a whole list, not in a part of it; in the tree, the whole level shown.
-        $reorderable = trim($search) === '' && $visibility === '' && count($origins) !== 1 && ($istree || $parent === '');
+        $reorderable = trim($search) === '' && $visibility === '' && count($origins) !== 1 && !$restrictions
+            && ($istree || $parent === '');
         $path = [];
         if ($ingeneral) {
             $path = [['key' => admintree::GENERAL, 'title' => get_string('general')]];
@@ -402,6 +431,56 @@ class nodes {
             $names = array_fill_keys(array_map(static fn(\stdClass $role): string => $role->shortname, get_all_roles()), true);
         }
         return $names;
+    }
+
+    /**
+     * Returns the kinds of restriction a node has, as the menu Restriction of the list filters them.
+     *
+     * @param \stdClass $node The node.
+     * @return string[] Keys of RESTRICTIONS.
+     */
+    public static function restrictions_of(\stdClass $node): array {
+        $visibility = (int)$node->visibility;
+        $kinds = [];
+        if ($visibility === access::VISIBILITY_ROLES && !empty(access::split_list($node->roles ?? ''))) {
+            $kinds[] = 'roles';
+        }
+        if (!empty(access::split_list($node->langs ?? ''))) {
+            $kinds[] = 'langs';
+        }
+        if (!empty($node->blockaccess) && $visibility !== access::VISIBILITY_ALL) {
+            $kinds[] = 'blocked';
+        }
+        if (!empty($node->hideadmins) && $visibility !== access::VISIBILITY_ALL) {
+            $kinds[] = 'hideadmins';
+        }
+        if (trim((string)($node->availability ?? '')) !== '') {
+            $kinds[] = 'conditions';
+            $period = availability::period($node);
+            if ($period && in_array($period['state'], ['scheduled', 'ended'], true)) {
+                $kinds[] = $period['state'];
+            }
+        }
+        if ((int)($node->placement ?? 0) !== 0) {
+            $kinds[] = 'placement';
+        }
+        if (access::is_protected($node)) {
+            $kinds[] = 'protected';
+        }
+        return $kinds;
+    }
+
+    /**
+     * Returns the options of the menu Restriction: each kind of restriction with its name.
+     *
+     * @return array Each with key and label.
+     */
+    public static function restriction_options(): array {
+        $options = [];
+        foreach (self::RESTRICTIONS as $key => $string) {
+            $options[] = ['key' => $key, 'label' => get_string($string, 'local_extendednav')];
+        }
+        return $options;
     }
 
     /**

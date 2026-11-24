@@ -84,6 +84,8 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
+    // The kinds of restriction the menu Restriction of the list offers.
+    'restrictions' => \local_extendednav\local\listing\nodes::restriction_options(),
 ]);
 $PAGE->requires->js_call_amd('local_extendednav/manage', 'init', ['[data-region="manage"]']);
 echo $OUTPUT->footer();

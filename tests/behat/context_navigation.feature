@@ -26,7 +26,7 @@ Feature: Change the navigations of a course from the course
     And I change window size to "large"
     And I am on "Course 1" course homepage
     When I navigate to "Navigation" in current page administration
-    Then I should see "Course navigation" in the "[data-region='origins']" "css_element"
+    Then I should see "Course navigation" in the "[data-region='origin']" "css_element"
     And I should not see "Import"
     And I click on "Hide Participants" "button" in the "Participants" "table_row"
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"
@@ -49,7 +49,7 @@ Feature: Change the navigations of a course from the course
     And I navigate to "Navigation" in current page administration
     And I click on "Hide Participants" "button" in the "Participants" "table_row"
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"
-    When I navigate to "Appearance > Extended navigation > Exceptions of categories, courses and activities" in site administration
+    When I navigate to "Appearance > Extended navigation > Exceptions" in site administration
     Then I should see "Course 1" in the "[data-region='tablewrap']" "css_element"
     And I should see "Course navigation · 1" in the "[data-region='tablewrap']" "css_element"
 
@@ -84,7 +84,7 @@ Feature: Change the navigations of a course from the course
     And I log in as "admin"
     And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
-    When I click on "Forum" "link" in the "[data-region='origins']" "css_element"
+    When I set the field "len-origin-kinds" to "Forum"
     Then I should see "Forum navigation"
     And I press "Find items"
     And I should see "Subscriptions" in the "[data-region='tablewrap']" "css_element"

@@ -79,6 +79,21 @@
                     </label>
                 </span>
             </span>
+            <span class="dropdown d-inline-flex" data-menu="restriction" data-filter="restriction">
+                <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                    aria-label="{{#str}}restriction, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}restriction, local_extendednav{{/str}}">{{#str}}restriction, local_extendednav{{/str}}</span></button>
+                <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}restriction, local_extendednav{{/str}}"
+                    aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}restriction, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                <span class="dropdown-menu show" role="group" aria-label="{{#str}}restriction, local_extendednav{{/str}}" hidden>
+                    {{#restrictions}}
+                    <label class="dropdown-item" for="{{id}}-restriction-{{key}}">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-restriction-{{key}}" data-option="{{key}}">
+                        <span>{{label}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="r_{{key}}"></span>
+                    </label>
+                    {{/restrictions}}
+                </span>
+            </span>
             <span class="dropdown" data-menu="filters" hidden>
                 <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
                     aria-label="{{#str}}filters{{/str}}">{{#pix}}i/filter, core{{/pix}} <span data-region="menu-label" data-label="{{#str}}filters{{/str}}">{{#str}}filters{{/str}}</span></button>
