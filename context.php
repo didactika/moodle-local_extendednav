@@ -40,7 +40,7 @@ if ($scope->kind() === 'category') {
     $PAGE->set_context($scope->context());
     $PAGE->set_category_by_id($scope->context()->instanceid);
 }
-$scope->require_manage();
+$scope->require_view();
 
 $menus = $scope->menus();
 $menukey = optional_param('menu', reset($menus), PARAM_ALPHANUMEXT);
@@ -81,10 +81,12 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     // An activity has one navigation: there is nothing to choose.
     'single' => count($menus) === 1,
     'scopename' => $scope->name(),
-    'canadd' => true,
+    // Adding, importing and exporting take the capabilities that change the navigations of the context.
+    'canadd' => $scope->can('addnodes'),
     'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
     // What this category, course or activity changes, to a file and from one.
-    'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
+    'importurl' => $scope->can_manage()
+        ? (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false) : '',
     'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
     // The kinds of restriction the menu Restriction of the list offers.

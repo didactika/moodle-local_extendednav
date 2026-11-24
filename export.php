@@ -61,7 +61,7 @@ raise_memory_limit(MEMORY_EXTRA);
 if ($scope !== null) {
     // What one category, course or activity changes, from its own page.
     require_login($scope->course(), false, $scope->cm());
-    $scope->require_manage();
+    $scope->require_view();
     local_extendednav_send_export(
         exporter::export_file($scope->menus(), [$contextid]),
         $scope->kind() . $scope->context()->instanceid,

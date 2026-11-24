@@ -44,6 +44,12 @@ if ($scope !== null) {
         $PAGE->set_category_by_id($scope->context()->instanceid);
     }
     $scope->require_manage();
+    // A file can change anything of the context: importing takes every capability of the changes.
+    foreach ($scope->abilities() as $change => $allowed) {
+        if (!$allowed) {
+            require_capability('local/extendednav:' . $change, $scope->context());
+        }
+    }
     if (!in_array($menukey, $scope->menus(), true)) {
         $menukey = $scope->menus()[0];
     }

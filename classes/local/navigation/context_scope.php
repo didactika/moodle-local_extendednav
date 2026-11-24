@@ -31,6 +31,16 @@ use local_extendednav\menu_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class context_scope {
+    /** @var string[] The fields of a node each kind of change touches, by the capability that allows it (local/extendednav:...). */
+    public const CHANGES = [
+        'changevisibility' => ['visibility'],
+        'changeorder' => ['parentkey', 'placement'],
+        'changetitles' => ['title', 'tooltip'],
+        'changeicons' => ['icon', 'display', 'popupwidth', 'popupheight'],
+        'changelinks' => ['url'],
+        'changeconditions' => ['roles', 'langs', 'blockaccess', 'hideadmins', 'availability'],
+    ];
+
     /** @var \context The category, the course or the activity. */
     private \context $context;
 
@@ -180,6 +190,68 @@ final class context_scope {
             $PAGE->set_context($this->context);
             $PAGE->set_category_by_id($this->context->instanceid);
         }
+    }
+
+    /**
+     * Whether the current user may see the navigations of the scope: whoever may change them, or holds
+     * local/extendednav:viewcontext there.
+     *
+     * @return bool
+     */
+    public function can_view(): bool {
+        return $this->can_manage() || has_capability('local/extendednav:viewcontext', $this->context);
+    }
+
+    /**
+     * Stops the page unless the current user may see the navigations of the scope.
+     */
+    public function require_view(): void {
+        if (!$this->can_view()) {
+            require_capability('local/extendednav:viewcontext', $this->context);
+        }
+    }
+
+    /**
+     * Whether the current user may make one kind of change in the scope: whoever manages the navigation of the site may make
+     * every one; in the context, it takes local/extendednav:managecontext and the capability of that change.
+     *
+     * @param string $change A key of CHANGES, or addnodes or deletenodes.
+     * @return bool
+     */
+    public function can(string $change): bool {
+        if (has_capability('local/extendednav:manage', \context_system::instance())) {
+            return true;
+        }
+        return has_capability('local/extendednav:managecontext', $this->context)
+            && has_capability('local/extendednav:' . $change, $this->context);
+    }
+
+    /**
+     * Returns what the current user may do in the scope, by kind of change.
+     *
+     * @return bool[] Keyed by the keys of CHANGES, addnodes and deletenodes.
+     */
+    public function abilities(): array {
+        $abilities = [];
+        foreach (array_merge(array_keys(self::CHANGES), ['addnodes', 'deletenodes']) as $change) {
+            $abilities[$change] = $this->can($change);
+        }
+        return $abilities;
+    }
+
+    /**
+     * Returns the fields of a node the current user may not change in the scope.
+     *
+     * @return string[]
+     */
+    public function locked_fields(): array {
+        $locked = [];
+        foreach (self::CHANGES as $change => $fields) {
+            if (!$this->can($change)) {
+                array_push($locked, ...$fields);
+            }
+        }
+        return $locked;
     }
 
     /**

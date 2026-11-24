@@ -327,6 +327,14 @@ class node_form extends \moodleform {
             'wwwroot' => (new \moodle_url('/'))->out(false),
             'currentKey' => $currentkey,
         ];
+        // The fields of the changes the user may not make in this category, course or activity are shown, not changed.
+        foreach ($this->_customdata['locked'] ?? [] as $field) {
+            $element = $field === 'availability' ? 'availabilityconditionsjson' : $field;
+            if ($mform->elementExists($element)) {
+                $mform->hardFreeze($element);
+            }
+        }
+
         $mform->addElement('html', \html_writer::tag(
             'script',
             json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES),

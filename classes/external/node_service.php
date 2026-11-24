@@ -44,13 +44,16 @@ abstract class node_service extends external_api {
     }
 
     /**
-     * Requires the right to change a navigation in a scope: the whole site needs the capability that manages the navigation;
-     * a category or a course needs it, or the capability that manages the navigation of that context.
+     * Requires the right to see or change a navigation in a scope: the whole site needs the capability that manages the
+     * navigation; a category, a course or an activity needs it, or, in that context, the capability that shows its navigations
+     * (to read them) or the one that manages them and the one of the kind of change.
      *
      * @param string $menu Navigation key.
      * @param int $contextid Context of the scope, 0 for the whole site.
+     * @param string $change view to read; a kind of change (changevisibility, changeorder, deletenodes...) to change; or
+     *     empty to change with no kind of its own.
      */
-    protected static function require_scope(string $menu, int $contextid): void {
+    protected static function require_scope(string $menu, int $contextid, string $change = ''): void {
         if ($contextid === 0) {
             self::require_manage();
             self::validate_scope($menu, 0);
@@ -62,7 +65,16 @@ abstract class node_service extends external_api {
             self::validate_context(\context_system::instance());
         } else {
             self::validate_context($context);
-            require_capability('local/extendednav:managecontext', $context);
+            if ($change === 'view') {
+                if (!has_capability('local/extendednav:managecontext', $context)) {
+                    require_capability('local/extendednav:viewcontext', $context);
+                }
+            } else {
+                require_capability('local/extendednav:managecontext', $context);
+                if ($change !== '') {
+                    require_capability('local/extendednav:' . $change, $context);
+                }
+            }
         }
         self::validate_scope($menu, $contextid);
     }
@@ -142,6 +154,7 @@ abstract class node_service extends external_api {
             'last' => $flag('Whether it is the last among its siblings.'),
             'canhide' => $flag('Whether the node can be hidden.'),
             'canshow' => $flag('Whether the node can be shown to everyone.'),
+            'canedit' => $flag('Whether the current user may open the form of the node.'),
             'flags' => new external_multiple_structure(new external_single_structure([
                 'label' => $text('Kind of restriction, in a word or two.'),
                 'detail' => $text('The restriction, in a sentence.'),

@@ -68,12 +68,12 @@
                     <a class="btn btn-primary" href="{{addurl}}" data-action="addnode">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
                 {{/canadd}}
                 {{#candiscover}}
-                    <button type="button" class="btn btn-outline-secondary" data-action="discover" title="{{#str}}discover_help, local_extendednav{{/str}}">{{#pix}}i/search, core{{/pix}} {{#str}}discover, local_extendednav{{/str}}</button>
+                    <button type="button" class="btn btn-outline-secondary" data-action="discover" title="{{#str}}discover_help, local_extendednav{{/str}}" aria-label="{{#str}}discover, local_extendednav{{/str}}">{{#pix}}i/search, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}discover, local_extendednav{{/str}}</span></button>
                 {{/candiscover}}
                 {{#sitewide}}
-                <a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>
+                <a class="btn btn-outline-secondary" href="{{importurl}}" title="{{#str}}import, local_extendednav{{/str}}" aria-label="{{#str}}import, local_extendednav{{/str}}">{{#pix}}i/import, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}import, local_extendednav{{/str}}</span></a>
                 <span class="dropdown d-inline-flex position-relative" data-menu="export">
-                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-menu-toggle aria-haspopup="true" aria-expanded="false">{{#pix}}t/download, core{{/pix}} {{#str}}export, local_extendednav{{/str}}</button>
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-menu-toggle aria-haspopup="true" aria-expanded="false" title="{{#str}}export, local_extendednav{{/str}}" aria-label="{{#str}}export, local_extendednav{{/str}}">{{#pix}}t/download, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}export, local_extendednav{{/str}}</span></button>
                     <span class="dropdown-menu dropdown-menu-end dropdown-menu-right show" hidden>
                         <a class="dropdown-item" href="{{exporturl}}">
                             <span class="d-block fw-bold">{{#str}}export_this, local_extendednav{{/str}}</span>
@@ -93,8 +93,8 @@
                 </span>
                 {{/sitewide}}
                 {{^sitewide}}
-                    {{#importurl}}<a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>{{/importurl}}
-                    {{#exporturl}}<a class="btn btn-outline-secondary" href="{{exporturl}}">{{#pix}}t/download, core{{/pix}} {{#str}}export, local_extendednav{{/str}}</a>{{/exporturl}}
+                    {{#importurl}}<a class="btn btn-outline-secondary" href="{{importurl}}" title="{{#str}}import, local_extendednav{{/str}}" aria-label="{{#str}}import, local_extendednav{{/str}}">{{#pix}}i/import, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}import, local_extendednav{{/str}}</span></a>{{/importurl}}
+                    {{#exporturl}}<a class="btn btn-outline-secondary" href="{{exporturl}}" title="{{#str}}export, local_extendednav{{/str}}" aria-label="{{#str}}export, local_extendednav{{/str}}">{{#pix}}t/download, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}export, local_extendednav{{/str}}</span></a>{{/exporturl}}
                 {{/sitewide}}
             </div>
         </div>
