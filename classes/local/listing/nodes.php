@@ -311,7 +311,7 @@ class nodes {
             $restrict('flag_langs', get_string('visibility_langs_line', 'local_extendednav', implode(', ', $langs)));
         }
         if (!empty($node->blockaccess) && $visibility !== access::VISIBILITY_ALL) {
-            $restrict('badge_blocked', get_string('badge_blocked', 'local_extendednav'));
+            $restrict('badge_blocked', get_string('badge_blocked_detail', 'local_extendednav'));
         }
         if (!empty($node->hideadmins) && $visibility !== access::VISIBILITY_ALL) {
             $restrict('flag_hideadmins', get_string('hidden_from_admins', 'local_extendednav'));
@@ -323,10 +323,10 @@ class nodes {
         }
         if ($placement !== 0) {
             $where = $placement === 1 ? 'placement_more' : 'placement_main';
-            $restrict($where, get_string($where, 'local_extendednav'));
+            $restrict($where, get_string($where . '_detail', 'local_extendednav'));
         }
         if (!empty($native->moodlehidden)) {
-            $restrict('hidden_by_moodle', get_string('hidden_by_moodle', 'local_extendednav'));
+            $restrict('hidden_by_moodle', get_string('hidden_by_moodle_detail', 'local_extendednav'));
         }
         // The conditions of Moodle's Restrict access, in its words; a node with dates says whether it is still to come or over.
         $conditions = availability::describe($node);
