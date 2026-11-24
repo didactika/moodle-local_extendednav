@@ -87,10 +87,14 @@ const createIcon = (classes) => {
  * Describes the value of the field: which string explains it, with its parameter.
  *
  * @param {String} value Icon field value.
+ * @param {Boolean} native Whether the node is one of Moodle, which has an icon of its own.
  * @returns {Array} String identifier and parameter.
  */
-const describe = (value) => {
-    if (value === '' || ['none', 'null'].includes(value.toLowerCase())) {
+const describe = (value, native) => {
+    if (value === '') {
+        return [native ? 'icon_info_default' : 'icon_info_none', null];
+    }
+    if (['none', 'null'].includes(value.toLowerCase())) {
         return ['icon_info_none', null];
     }
     if (isFontAwesome(value)) {
@@ -108,12 +112,13 @@ const describe = (value) => {
  * @param {HTMLElement} tile Tile that shows the icon.
  * @param {HTMLElement} info Line below the field.
  * @param {String} value Icon field value.
+ * @param {Boolean} native Whether the node is one of Moodle.
  */
-const updatePreview = async(tile, info, value) => {
+const updatePreview = async(tile, info, value, native) => {
     value = value.trim();
     tile.dataset.value = value;
-    const [identifier, param] = describe(value);
-    const empty = identifier === 'icon_info_none' || identifier === 'icon_info_invalid';
+    const [identifier, param] = describe(value, native);
+    const empty = ['icon_info_none', 'icon_info_default', 'icon_info_invalid'].includes(identifier);
     tile.dataset.empty = empty ? '1' : '';
     tile.replaceChildren();
     getString(identifier, 'local_extendednav', param).then((text) => {
@@ -121,9 +126,9 @@ const updatePreview = async(tile, info, value) => {
         return text;
     }).catch(Notification.exception);
 
-    if (identifier === 'icon_info_none' || identifier === 'icon_info_invalid') {
-        // An empty tile shows that it can be clicked to choose an icon; "none" shows that the icon is removed.
-        tile.appendChild(createIcon(value === '' ? 'icon fa fa-plus fa-fw text-muted' : 'icon fa fa-ban fa-fw text-muted'));
+    if (empty) {
+        // An empty tile shows that an icon can be chosen; "none" shows that the icon is removed.
+        tile.appendChild(createIcon(value === '' ? 'icon fa fa-image fa-fw text-muted' : 'icon fa fa-ban fa-fw text-muted'));
         return;
     }
     if (isFontAwesome(value)) {
@@ -244,12 +249,18 @@ const openPicker = async(field, onPick) => {
         const list = lists[tab] || [];
         matches = query === '' ? list : list.filter((icon) => icon.value.toLowerCase().includes(query) ||
             icon.aliases.some((alias) => alias.includes(query)));
+        // An icon the lists do not hold, written as a FontAwesome class or a Moodle icon, is offered as it is.
+        const typed = search.value.trim();
+        if ((isFontAwesome(typed) || MOODLE.test(typed)) && !matches.some((icon) => icon.value === typed)) {
+            matches = [{value: typed, label: typed, aliases: [], classes: isFontAwesome(typed) ? `icon fa ${typed} fa-fw`
+                : 'icon fa fa-image fa-fw'}, ...matches];
+        }
         shown = 0;
         grid.replaceChildren(sentinel);
         grid.scrollTop = 0;
         showMore();
         unavailable.hidden = list.length > 0;
-        empty.hidden = list.length === 0 || matches.length > 0;
+        empty.hidden = matches.length > 0 || (list.length === 0 && query === '');
         root.querySelectorAll('[data-tab]').forEach((button) => {
             const active = button.dataset.tab === tab;
             button.classList.toggle('active', active);
@@ -282,54 +293,68 @@ const openPicker = async(field, onPick) => {
 };
 
 /**
- * Puts the icon field in a row with a tile that shows its icon and opens the picker, and a line saying what it is.
+ * Builds the control of the icon in its place of the form: a button that shows the icon chosen and its name and opens the
+ * picker, and the buttons that go back to the icon of Moodle or remove the icon. The value lives in a hidden field.
  *
- * @param {String} fieldName Name of the icon field.
+ * @param {String} fieldName Name of the hidden icon field.
  */
 export const init = async(fieldName) => {
     const field = document.querySelector(`form.mform input[name="${fieldName}"]`);
-    if (!field) {
+    const place = document.querySelector('form.mform [data-region="iconfield"]');
+    if (!field || !place) {
         return;
     }
-    const [choose, clear] = await Promise.all([
+    const [choose, clear, remove, removeCustom] = await Promise.all([
         getString('icon_choose', 'local_extendednav'),
         getString('icon_clear', 'local_extendednav'),
+        getString('icon_remove', 'local_extendednav'),
+        getString('icon_clear_custom', 'local_extendednav'),
     ]);
 
     const row = document.createElement('div');
-    row.className = 'd-flex flex-wrap align-items-center gap-2 w-100';
-    row.dataset.region = 'iconfield';
-    const tile = document.createElement('button');
-    tile.type = 'button';
-    tile.className = 'btn btn-outline-secondary';
+    row.className = 'd-flex flex-wrap align-items-center gap-2';
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'btn btn-outline-secondary d-inline-flex align-items-center gap-2';
+    open.dataset.region = 'iconopen';
+    const tile = document.createElement('span');
     tile.dataset.region = 'icontile';
-    tile.title = choose;
-    tile.setAttribute('aria-label', choose);
+    tile.setAttribute('aria-hidden', 'true');
+    const name = document.createElement('span');
+    open.append(tile, name);
     const clearButton = document.createElement('button');
     clearButton.type = 'button';
     clearButton.className = 'btn btn-link';
-    clearButton.textContent = clear;
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-link';
+    removeButton.textContent = remove;
     const info = document.createElement('div');
-    info.className = 'form-text text-muted w-100';
+    info.className = 'form-text text-muted';
     info.setAttribute('aria-live', 'polite');
-    field.before(row);
-    row.append(tile, field, clearButton);
-    row.after(info);
+    row.append(open, clearButton, removeButton);
+    place.replaceChildren(row, info);
 
-    const refreshPreview = () => {
-        // There is only something to clear when the field has a value.
-        clearButton.hidden = field.value.trim() === '';
-        updatePreview(tile, info, field.value);
+    // A node of Moodle has an icon of its own: going back to it and removing it are two choices. A node added has none.
+    const isNative = () => place.dataset.native === '1' || document.getElementById('core_node_alert')?.hidden === false;
+    const refresh = () => {
+        const value = field.value.trim();
+        const native = isNative();
+        name.textContent = value === '' || value === 'none' ? choose : value;
+        clearButton.textContent = native ? clear : removeCustom;
+        clearButton.hidden = value === '';
+        removeButton.hidden = !native || value === 'none';
+        updatePreview(tile, info, value, native);
     };
     const setValue = (value) => {
         field.value = value;
         field.dispatchEvent(new Event('change', {bubbles: true}));
-        refreshPreview();
-        field.focus();
+        refresh();
+        open.focus();
     };
-    const open = () => openPicker(field, setValue).catch(Notification.exception);
-    field.addEventListener('input', refreshPreview);
-    tile.addEventListener('click', open);
+    open.addEventListener('click', () => openPicker(field, setValue).catch(Notification.exception));
     clearButton.addEventListener('click', () => setValue(''));
-    refreshPreview();
+    removeButton.addEventListener('click', () => setValue('none'));
+    document.querySelector('form.mform input[name="nodekey"]')?.addEventListener('input', () => setTimeout(refresh));
+    refresh();
 };

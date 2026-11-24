@@ -26,6 +26,8 @@
  */
 
 import Ajax from 'core/ajax';
+import Modal from 'core/modal';
+import Templates from 'core/templates';
 import {confirmAction} from 'local_extendednav/local/action_dialog';
 import {describeError, toast} from 'local_extendednav/local/ui';
 
@@ -112,10 +114,34 @@ export const init = ({root, list, config, t}) => {
         });
     };
 
+    /**
+     * Opens the dialog that explains who sees a node: each badge of its visibility with its restriction in a sentence.
+     *
+     * @param {Object} row The row of the node.
+     */
+    const explain = async(row) => {
+        const items = [{label: row.visibilitylabel, tone: row.tone, detail: row.visibilitydetail},
+            ...row.flags.map((flag) => ({label: flag.label, tone: 'light', detail: flag.detail}))];
+        const footer = Object.assign(document.createElement('a'), {className: 'btn btn-primary', href: row.editurl,
+            textContent: t.edit_node});
+        const modal = await Modal.create({
+            title: t.restrictions_title.replace('{$a}', row.title),
+            body: Templates.render('local_extendednav/dialog/restrictions', {items}),
+            footer: footer.outerHTML,
+            removeOnClose: true,
+        });
+        modal.show();
+    };
+
     root.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
         const action = button?.dataset.action;
-        if (action === 'show') {
+        if (action === 'restrictions') {
+            const row = list.rows.find((item) => item.nodekey === button.dataset.key);
+            if (row) {
+                explain(row).catch((error) => toast(describeError(error), 'danger'));
+            }
+        } else if (action === 'show') {
             // Showing a node only takes it back: it asks nothing.
             run('show', [button.dataset.key]).catch((error) => toast(describeError(error), 'danger'));
         } else if (action === 'hide' || action === 'delete') {

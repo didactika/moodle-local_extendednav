@@ -121,6 +121,7 @@ abstract class node_service extends external_api {
             'icon' => $text('Icon, drawn.'),
             'visibility' => new external_value(PARAM_INT, '0 hidden, 1 everyone, 2 roles.'),
             'visibilitylabel' => $text('Visibility, in words.'),
+            'visibilitydetail' => $text('Who sees the node, in a sentence.'),
             'tone' => new external_value(PARAM_ALPHA, 'Colour of the visibility.'),
             'roles' => $text('Roles that see the node.'),
             'langs' => $text('Languages that see the node.'),
@@ -142,7 +143,8 @@ abstract class node_service extends external_api {
             'canshow' => $flag('Whether the node can be shown to everyone.'),
             'flags' => new external_multiple_structure(new external_single_structure([
                 'label' => $text('Kind of restriction, in a word or two.'),
-            ]), 'Kinds of restriction, each explained by a line of details.'),
+                'detail' => $text('The restriction, in a sentence.'),
+            ]), 'Kinds of restriction, each with its sentence.'),
             'virtual' => $flag('Whether the row is a group of the list and not a node.'),
         ]);
     }

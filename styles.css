@@ -1763,6 +1763,11 @@
     flex: 1 1 8rem;
 }
 
+.len .dropdown-menu[role=listbox] .dropdown-item.dropdown-item:is(:focus, :focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
 .path-local-extendednav .modal .modal-dialog.modal-lg,
 .path-admin-local-extendednav .modal .modal-dialog.modal-lg,
 #page-admin-setting-local_extendednav_settings .modal .modal-dialog.modal-lg,
@@ -2113,6 +2118,36 @@
     max-width: 0;
 }
 
+.len [data-region=tablewrap] [data-region=nodeicon] {
+    display: inline-flex;
+    flex: 0 0 1.25rem;
+    justify-content: center;
+}
+
+.len [data-region=tablewrap] [data-region=nodeicon] .icon {
+    margin: 0;
+}
+
+.len [data-region=tablewrap] button.badge {
+    border: 0;
+    cursor: pointer;
+    transition: box-shadow var(--dd-ease);
+}
+
+.len [data-region=tablewrap] button.badge:hover {
+    box-shadow: 0 0 0 2px var(--dd-hairline);
+}
+
+.len [data-region=tablewrap] button.badge:focus:not(:focus-visible) {
+    outline: 0;
+    box-shadow: none;
+}
+
+.len [data-region=tablewrap] button.badge:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
 .len [data-region=tablewrap] [data-region=handle] {
     cursor: grab;
     touch-action: none;
@@ -2128,37 +2163,6 @@
 
 .len [data-region=tablewrap] tr[data-drop=after] > * {
     box-shadow: inset 0 -2px 0 var(--dd-primary);
-}
-
-.mform [data-region=iconfield] {
-    flex: 0 0 100%;
-}
-
-.mform [data-region=iconfield] > .form-control {
-    flex: 0 1 20rem;
-    width: auto;
-}
-
-.mform [data-region=iconfield] > .btn[data-region=icontile] {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 2.375rem;
-    height: 2.375rem;
-    padding: 0;
-    border-radius: var(--dd-radius-sm, 0.5rem);
-}
-
-.mform [data-region=iconfield] > .btn[data-region=icontile][data-empty=1] {
-    border-style: dashed;
-}
-
-.mform [data-region=iconfield] > .btn[data-region=icontile] .icon {
-    width: auto;
-    height: auto;
-    margin: 0;
-    font-size: 1.15rem;
 }
 
 .path-local-extendednav .modal [data-region=iconpicker] > [data-region=grid],
@@ -2250,6 +2254,145 @@
 #page-local-extendednav-edit .availability-eye,
 #page-local-extendednav-edit .availability-eye-disabled {
     display: none;
+}
+
+.len .mform :is(.form-control, .form-select, .custom-select) {
+    min-height: var(--dd-h);
+    border-color: var(--dd-line);
+    border-radius: var(--dd-radius-sm);
+    background-color: var(--dd-surface);
+    box-shadow: none;
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    transition: border-color var(--dd-ease), box-shadow var(--dd-ease);
+}
+
+.len .mform :is(.form-control, .form-select, .custom-select):hover:not(:disabled):not([readonly]) {
+    border-color: var(--dd-line-hover);
+}
+
+.len .mform :is(.form-control, .form-select, .custom-select):focus,
+.len .mform :is(.form-control, .form-select, .custom-select)[aria-expanded=true] {
+    border-color: var(--dd-primary);
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--dd-ring);
+}
+
+.len .mform :is(.form-control, .form-select, .custom-select)::placeholder {
+    color: var(--dd-muted);
+}
+
+.len .mform select:is(.form-select, .custom-select) {
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.len .mform .form-autocomplete-selection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 0;
+    margin-bottom: 0.5rem;
+}
+
+.len .mform .form-autocomplete-selection > span:not([role=option]) {
+    /* stylelint-disable-next-line declaration-no-important */
+    margin: 0 !important;
+    color: var(--dd-muted);
+    font-size: 0.875rem;
+}
+
+.len .mform .form-autocomplete-selection > [role=option] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    /* stylelint-disable-next-line declaration-no-important */
+    margin: 0 !important;
+    padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+    border-radius: 999px;
+    /* stylelint-disable-next-line declaration-no-important */
+    background-color: var(--dd-primary-soft) !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    color: var(--dd-primary-ink) !important;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.len .mform .form-autocomplete-selection > [role=option][data-active-selection=true] {
+    box-shadow: 0 0 0 2px var(--dd-ring);
+}
+
+.len .mform .form-autocomplete-input > .form-control {
+    min-width: 14rem;
+    padding-right: 2.5rem;
+}
+
+.len .mform .form-autocomplete-downarrow {
+    /* stylelint-disable-next-line declaration-no-important */
+    top: 50% !important;
+    /* stylelint-disable-next-line declaration-no-important */
+    right: 1rem !important;
+    width: 0.5rem;
+    height: 0.5rem;
+    /* stylelint-disable-next-line declaration-no-important */
+    padding: 0 !important;
+    border-right: 2px solid var(--dd-muted);
+    border-bottom: 2px solid var(--dd-muted);
+    color: transparent;
+    font-size: 0;
+    transform: translateY(-70%) rotate(45deg);
+    cursor: pointer;
+}
+
+.len .mform .form-autocomplete-suggestions {
+    z-index: 1060;
+    min-width: 14rem;
+    max-height: 17rem;
+    margin-top: 2px;
+    padding: 0.25rem;
+    border: 1px solid var(--dd-hairline);
+    border-radius: var(--dd-radius);
+    background-color: var(--dd-surface);
+    box-shadow: var(--dd-shadow-md);
+    list-style: none;
+}
+
+.len .mform .form-autocomplete-suggestions > li {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--dd-ink);
+    cursor: pointer;
+}
+
+.len .mform .form-autocomplete-suggestions > li + li {
+    margin-top: 2px;
+}
+
+.len .mform .form-autocomplete-suggestions > li:hover,
+.len .mform .form-autocomplete-suggestions > li[aria-selected=true] {
+    background-color: var(--dd-surface-2);
+    color: var(--dd-ink);
+}
+
+.len .mform [data-region=iconopen] {
+    min-height: var(--dd-h);
+    border-radius: var(--dd-radius-sm);
+}
+
+.len .mform [data-region=iconopen] [data-region=icontile] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+}
+
+.len .mform [data-region=iconopen] [data-region=icontile] .icon {
+    width: auto;
+    height: auto;
+    margin: 0;
+    font-size: 1.1rem;
 }
 
 .len .btn.btn:focus:not(:focus-visible),

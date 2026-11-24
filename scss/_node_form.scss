@@ -12,3 +12,151 @@
         display: none;
     }
 }
+
+// The fields of the form, as the design system draws them: the height, the line, the radius and the ring of focus of the
+// system. A select opens the menu of the system (local/select_menu); its arrow is Bootstrap's.
+.len .mform {
+    & :is(.form-control, .form-select, .custom-select) {
+        min-height: var(--dd-h);
+        border-color: var(--dd-line);
+        border-radius: var(--dd-radius-sm);
+        background-color: var(--dd-surface);
+        box-shadow: none;
+        color: var(--dd-ink);
+        font-size: 0.9375rem;
+        transition: border-color var(--dd-ease), box-shadow var(--dd-ease);
+
+        &:hover:not(:disabled):not([readonly]) {
+            border-color: var(--dd-line-hover);
+        }
+
+        &:focus,
+        &[aria-expanded="true"] {
+            border-color: var(--dd-primary);
+            outline: 0;
+            box-shadow: 0 0 0 3px var(--dd-ring);
+        }
+
+        &::placeholder {
+            color: var(--dd-muted);
+        }
+    }
+
+    & select:is(.form-select, .custom-select) {
+        padding-right: 2.5rem;
+        cursor: pointer;
+    }
+
+    // Moodle's autocomplete (languages, roles): the values chosen are the tags of the system, the field to search them has the
+    // chevron of a select instead of the triangle Moodle writes, and its list of suggestions is a menu of the system.
+    & .form-autocomplete-selection {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.375rem;
+        min-height: 0;
+        margin-bottom: 0.5rem;
+
+        & > span:not([role="option"]) {
+            /* stylelint-disable-next-line declaration-no-important */
+            margin: 0 !important;
+            color: var(--dd-muted);
+            font-size: 0.875rem;
+        }
+
+        & > [role="option"] {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            /* stylelint-disable-next-line declaration-no-important */
+            margin: 0 !important;
+            padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+            border-radius: 999px;
+            /* stylelint-disable-next-line declaration-no-important */
+            background-color: var(--dd-primary-soft) !important;
+            /* stylelint-disable-next-line declaration-no-important */
+            color: var(--dd-primary-ink) !important;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+
+            &[data-active-selection="true"] {
+                box-shadow: 0 0 0 2px var(--dd-ring);
+            }
+        }
+    }
+
+    & .form-autocomplete-input {
+        & > .form-control {
+            min-width: 14rem;
+            padding-right: 2.5rem;
+        }
+    }
+
+    & .form-autocomplete-downarrow {
+        /* stylelint-disable-next-line declaration-no-important */
+        top: 50% !important;
+        /* stylelint-disable-next-line declaration-no-important */
+        right: 1rem !important;
+        width: 0.5rem;
+        height: 0.5rem;
+        /* stylelint-disable-next-line declaration-no-important */
+        padding: 0 !important;
+        border-right: 2px solid var(--dd-muted);
+        border-bottom: 2px solid var(--dd-muted);
+        color: transparent;
+        font-size: 0;
+        transform: translateY(-70%) rotate(45deg);
+        cursor: pointer;
+    }
+
+    & .form-autocomplete-suggestions {
+        z-index: 1060;
+        min-width: 14rem;
+        max-height: 17rem;
+        margin-top: 2px;
+        padding: 0.25rem;
+        border: 1px solid var(--dd-hairline);
+        border-radius: var(--dd-radius);
+        background-color: var(--dd-surface);
+        box-shadow: var(--dd-shadow-md);
+        list-style: none;
+
+        & > li {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            color: var(--dd-ink);
+            cursor: pointer;
+
+            & + li {
+                margin-top: 2px;
+            }
+
+            &:hover,
+            &[aria-selected="true"] {
+                background-color: var(--dd-surface-2);
+                color: var(--dd-ink);
+            }
+        }
+    }
+}
+
+// The control of the icon: a button that shows the icon chosen and its name, and the buttons that change it.
+.len .mform [data-region="iconopen"] {
+    min-height: var(--dd-h);
+    border-radius: var(--dd-radius-sm);
+
+    & [data-region="icontile"] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+
+        & .icon {
+            width: auto;
+            height: auto;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+    }
+}

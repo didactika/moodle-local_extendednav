@@ -42,7 +42,7 @@ const STRINGS = ['drag_node_named', 'drag_nodes_named', 'navigation_on_help', 'n
     'reset_nodes_title', 'reset_nodes_text', 'reset', 'empty_nodes_title', 'empty_nodes_text', 'empty_level_title',
     'empty_level_text', 'nodes_changed', 'saved', 'open_level_named',
     'tree_top', 'hide_nodes_title', 'hide_nodes_text', 'hide_nodes_admins', 'hide_nodes_admins_help', 'show_nodes_title',
-    'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found'];
+    'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found', 'restrictions_title', 'edit_node'];
 const CORE_STRINGS = ['delete', 'show', 'hide'];
 
 /**

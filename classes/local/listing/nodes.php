@@ -171,7 +171,8 @@ class nodes {
         $title = get_string('general');
         return [
             'details' => [], 'flags' => [], 'id' => 0, 'nodekey' => admintree::GENERAL, 'title' => $title, 'native' => true,
-            'url' => '', 'icon' => '', 'visibility' => access::VISIBILITY_ALL, 'visibilitylabel' => '', 'tone' => 'secondary',
+            'url' => '', 'icon' => '', 'visibility' => access::VISIBILITY_ALL, 'visibilitylabel' => '',
+            'visibilitydetail' => '', 'tone' => 'secondary',
             'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
             'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
@@ -300,7 +301,7 @@ class nodes {
         $flags = [];
         $details = [];
         $restrict = static function (string $flag, string $detail) use (&$flags, &$details): void {
-            $flags[] = ['label' => get_string($flag, 'local_extendednav')];
+            $flags[] = ['label' => get_string($flag, 'local_extendednav'), 'detail' => $detail];
             $details[] = $detail;
         };
         if ($visibility === access::VISIBILITY_ROLES && !empty($roles)) {
@@ -329,8 +330,10 @@ class nodes {
         }
         // The conditions of Moodle's Restrict access, in its words; a node with dates says whether it is still to come or over.
         $conditions = availability::describe($node);
+        // The badge of the visibility says who sees the node; a node for everyone with conditions says them there.
+        $visibilitydetail = get_string($visibilitystring . '_detail', 'local_extendednav');
         if ($conditions !== '' && $visibility === access::VISIBILITY_ALL) {
-            // The badge of the visibility already says With conditions; the tooltip gives them.
+            $visibilitydetail .= ' ' . $conditions;
             $details[] = $conditions;
         } else if ($conditions !== '') {
             $restrict('flag_conditions', $conditions);
@@ -355,6 +358,7 @@ class nodes {
             'icon' => icon::render((string)($node->icon ?? '')),
             'visibility' => $visibility,
             'visibilitylabel' => get_string($visibilitystring, 'local_extendednav'),
+            'visibilitydetail' => $visibilitydetail,
             'tone' => $tone,
             'roles' => implode(', ', $roles),
             'langs' => implode(', ', $langs),
