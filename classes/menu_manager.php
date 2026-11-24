@@ -39,10 +39,15 @@ class menu_manager {
      * @return \local_extendednav\menu\base[]
      */
     public static function get_menus(): array {
-        return [
+        $menus = [
             'primary' => new \local_extendednav\menu\primary(),
             'usermenu' => new \local_extendednav\menu\usermenu(),
         ];
+        // The secondary navigations: course, site home, activity, category and site administration.
+        foreach (array_keys(\local_extendednav\menu\secondary::ORIGINS) as $origin) {
+            $menus[$origin] = new \local_extendednav\menu\secondary($origin);
+        }
+        return $menus;
     }
 
     /**

@@ -13,6 +13,12 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+### Added
+
+- The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity, of a category and of the site administration (this one only to hide and order).
+- A node can be an exception for a category or a course, and everything inside it: the nearest one to the page wins.
+- The nodes of each navigation are found when a page shows them, once per node, so listing them adds no page build, no query when nothing is customised and no measurable time to a page.
+
 ## [1.0.0-m503] - 2026-10-19
 
 ### Added
