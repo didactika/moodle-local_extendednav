@@ -1,14 +1,16 @@
 ---
 title: Activity log
-summary: See who created, changed or deleted each node of a navigation, and when.
+summary: See who created, changed or deleted each node of a navigation, when, and what each change did.
 order: 60
 ---
 
-Go to **Site administration > Reports > Extended navigation activity**. The column to the left chooses the navigation, as on the management page.
+Go to **Site administration > Reports > Extended navigation > Activity log**. The column to the left chooses the navigation, as on the management page.
 
 <Screenshot src="asset:activity.webp" alt="The activity log of the primary navigation, with the time, the node, the action, the person and the IP address of each change" caption="The activity log: one row per change, the newest first." url="/local/extendednav/activity.php" />
 
-Each row shows when the change was made, the node (a link to its form while it exists), the action (**Created**, **Updated** or **Deleted**), who made it and from which IP address. Select the column **Time** to put the oldest changes first.
+Each row shows when the change was made, the node (a link to its form while it exists) with the fields the change touched under it, the action (**Created**, **Updated** or **Deleted**), who made it and from which IP address. Select the fields to open **Changes of**, which lists each field with its value before and after: the title, the link, the visibility in words, the roles, the conditions and the rest. Select the column **Time** to put the oldest changes first.
+
+<Screenshot src="asset:activity-changes.webp" alt="The dialog Changes of a node, with the title, the visibility and the roles before and after" caption="What a change did, field by field." url="/local/extendednav/activity.php" />
 
 | Filter | What it does |
 |---|---|

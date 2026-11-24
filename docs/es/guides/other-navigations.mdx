@@ -10,7 +10,7 @@ Además de la navegación principal y el menú de usuario, el plugin cambia las 
 
 ## Elegir la navegación
 
-En la página de gestión, la columna de la izquierda enumera las navegaciones en cuatro grupos: **Sitio** (navegación principal, menú de usuario y página principal), **Cursos** (curso y categoría), **Actividades** (una navegación para cada tipo de actividad) y **Administración**. En **Actividades**, primero aparecen los tipos que usa el sitio; los demás están en **Otros tipos**, que los muestra. En una pantalla estrecha, la columna es un selector sobre la lista, con los mismos grupos.
+En la página de gestión, la columna de la izquierda enumera las navegaciones en cuatro grupos, cada una por su nombre corto: **Sitio** (navegación principal, menú de usuario y página principal), **Cursos** (curso y categoría), **Actividades** y **Administración**. Los tipos de actividad son muchos, por lo que **Actividades** es un selector con búsqueda: escriba una parte del nombre (**fo** encuentra **Foro**). Enumera primero los tipos que usa el sitio, en **En uso en el sitio**, y después los demás, en **Otros tipos**; se resalta mientras la navegación mostrada es uno de ellos. En una pantalla estrecha, y en la página de una categoría o un curso, la columna es un único selector con búsqueda y los mismos grupos.
 
 Cada tipo de actividad tiene su propia navegación porque cada tipo tiene sus propios elementos: un foro tiene **Suscripciones**, una tarea tiene **Entregas**, y un plugin puede añadir un elemento a un solo tipo. Un cambio hecho en la navegación de los foros se aplica a todos los foros y a ningún otro tipo.
 
@@ -41,10 +41,11 @@ Mientras la lista de una navegación está vacía, seleccione **Buscar los nodos
 
 ## La lista
 
-La lista muestra todos los nodos de la navegación, sin páginas, de modo que toda la navegación se puede ordenar. Busque por título, clave o enlace. Dos menús reducen la lista, y cada uno indica cuántos nodos tiene cada opción:
+La lista muestra todos los nodos de la navegación, sin páginas, de modo que toda la navegación se puede ordenar. Busque por título, clave o enlace. Tres menús reducen la lista, y cada uno indica cuántos nodos tiene cada opción:
 
 - **Visibilidad**: los nodos visibles para todos, restringidos u ocultos.
-- **Origen**: los nodos de Moodle (o de otro plugin), marcados como **Moodle**, y los nodos añadidos en esta página, marcados como **Añadido**.
+$1
+- **Restricción**: los nodos con un tipo de restricción, los mismos que indican las insignias: roles, idiomas, URL bloqueada, ocultos también a los administradores, condiciones, programados, finalizados, una ubicación propia o siempre visibles. Se pueden elegir varios tipos; se enumera un nodo que tenga cualquiera de ellos.
 
 La columna **Visibilidad** muestra la visibilidad de cada nodo y, a su lado, una insignia por cada tipo de restricción: **Roles**, **Idiomas**, **URL bloqueada**, **También administradores**, **Solo administradores**. Sitúe el puntero sobre una insignia para leer su restricción en una frase. Seleccione una insignia para abrir **Quién ve**, que enumera todas las restricciones del nodo, una fila por insignia, con el botón **Editar nodo**. El botón del final de la fila de filtros borra la búsqueda y los filtros.
 
