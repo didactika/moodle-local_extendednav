@@ -155,7 +155,7 @@ $string['err_restricted_page'] = 'A página que abriu não está disponível par
 $string['err_scope_context'] = 'Esta página destina-se a uma categoria ou a uma disciplina.';
 $string['err_text_html'] = 'Não é permitido HTML aqui.';
 $string['err_title_usermenu_chars'] = 'Os títulos do menu do utilizador não podem conter «|» nem quebras de linha.';
-$string['err_tree_category'] = 'Escolha a categoria da administração do sítio onde fica a ligação.';
+$string['err_tree_category'] = 'Escolha a categoria onde fica a ligação. Só uma categoria, um nó sem URL, pode ficar no topo.';
 $string['err_url_forbidden'] = 'Este tipo de URL não é permitido.';
 $string['err_url_invalid'] = 'Introduza um URL válido, por exemplo «/course/view.php?id=2» ou «https://example.com».';
 $string['error_loading_title'] = 'A lista não foi carregada';
@@ -248,7 +248,6 @@ $string['langs_help'] = 'Mostra este item no menu apenas aos utilizadores cujo i
 Os idiomas só controlam se o item aparece no menu. Nunca afetam o acesso ao seu URL, porque os utilizadores podem alterar o seu próprio idioma a qualquer momento. O acesso é controlado por Visibilidade, Papéis permitidos e «Bloquear o acesso por URL».
 
 Para traduzir um item, crie um nó por idioma com o mesmo URL, os mesmos papéis e a mesma visibilidade.';
-$string['langs_hidden_notice'] = 'Este item está oculto para todos, pelo que os idiomas selecionados não têm efeito no menu. São mantidos caso volte a tornar o item visível. O acesso ao URL depende apenas de «Bloquear o acesso por URL».';
 $string['list_caption_activity'] = 'Alterações aos nós da navegação, da mais recente para a mais antiga';
 $string['list_caption_nodes'] = 'Nós da navegação, com a sua visibilidade e a sua ligação';
 $string['manage_nodes'] = 'Gerir a navegação';
@@ -348,6 +347,8 @@ $string['tooltip'] = 'Dica';
 $string['tooltip_help'] = 'Texto mostrado ao passar o cursor sobre a ligação. Opcional.';
 $string['tree_path'] = 'Nível da administração do sítio';
 $string['tree_top'] = 'Administração do sítio';
+$string['tree_top_level'] = 'Topo da administração do site';
+$string['tree_url_hint'] = 'Deixe o URL vazio para criar uma categoria, que lista o que colocar dentro dela como fazem as categorias do Moodle. No topo da administração do site, uma categoria aparece em Geral e torna-se um separador próprio quando contém outra categoria.';
 $string['try_again'] = 'Tentar novamente';
 $string['unknown_lang'] = 'Não instalado: {$a}';
 $string['unknown_role'] = 'Papel desconhecido: {$a}';

@@ -39,6 +39,8 @@ $id = optional_param('id', 0, PARAM_INT);
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
 $nodekey = optional_param('nodekey', '', PARAM_ALPHANUMEXT);
+// A new node starts in the level of the list it was added from, such as a category of the site administration.
+$parentkey = optional_param('parent', '', PARAM_ALPHANUMEXT);
 
 $node = $id ? $DB->get_record('local_extendednav', ['id' => $id], '*', MUST_EXIST) : null;
 if ($node) {
@@ -101,8 +103,8 @@ if ($source) {
     // The row that is being created has no id yet.
     $formdata->id = $node ? $node->id : 0;
     $form->set_data($formdata);
-} else if ($contextid) {
-    $form->set_data((object)['contextid' => $contextid]);
+} else {
+    $form->set_data((object)['contextid' => $contextid, 'parentkey' => $parentkey]);
 }
 
 if ($form->is_cancelled()) {

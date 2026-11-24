@@ -135,6 +135,14 @@ export const init = async(selector) => {
             : {icon: 't/hide', title: t.empty_nodes_title, text: t.empty_nodes_text, sampleurl: config.sampleurl}),
         onRender: (response, instance) => {
             group?.count(['status', 'origin', 'restriction'].filter((key) => instance.state[key]).length);
+            // In the site administration, Add node starts in the category open.
+            const add = page.querySelector('[data-action="addnode"]');
+            if (add && config.tree) {
+                const url = new URL(add.href);
+                // General is a group of the list, not a category: what is added there goes to the top.
+                url.searchParams.set('parent', instance.state.parent === 'admingeneral' ? '' : instance.state.parent || '');
+                add.href = url.toString();
+            }
             renderPath(root.querySelector('[data-region="path"]'), response.path || [], t.tree_top,
                 !config.tree || Boolean(instance.state.search));
             enableDragging(instance.region('tablewrap'), {

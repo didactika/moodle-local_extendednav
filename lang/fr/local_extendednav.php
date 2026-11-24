@@ -155,7 +155,7 @@ $string['err_restricted_page'] = 'La page que vous avez ouverte n’est pas disp
 $string['err_scope_context'] = 'Cette page concerne une catégorie ou un cours.';
 $string['err_text_html'] = 'Le HTML n’est pas autorisé ici.';
 $string['err_title_usermenu_chars'] = 'Les titres du menu utilisateur ne peuvent pas contenir « | » ni de sauts de ligne.';
-$string['err_tree_category'] = 'Choisissez la catégorie de l’administration du site dans laquelle va le lien.';
+$string['err_tree_category'] = 'Choisissez la catégorie dans laquelle va le lien. Seule une catégorie, un nœud sans URL, peut aller en haut.';
 $string['err_url_forbidden'] = 'Ce type d’URL n’est pas autorisé.';
 $string['err_url_invalid'] = 'Saisissez une URL valide, par exemple « /course/view.php?id=2 » ou « https://example.com ».';
 $string['error_loading_title'] = 'La liste ne s’est pas chargée';
@@ -248,7 +248,6 @@ $string['langs_help'] = 'Affiche cet élément dans le menu uniquement aux utili
 Les langues contrôlent seulement si l’élément apparaît dans le menu. Elles n’affectent jamais l’accès à son URL, car les utilisateurs peuvent changer leur propre langue à tout moment. L’accès est contrôlé par la Visibilité, les Rôles autorisés et « Bloquer l’accès par URL ».
 
 Pour traduire un élément, créez un nœud par langue avec la même URL, les mêmes rôles et la même visibilité.';
-$string['langs_hidden_notice'] = 'Cet élément est masqué pour tout le monde ; les langues sélectionnées n’ont donc aucun effet sur le menu. Elles sont conservées au cas où vous rendriez de nouveau l’élément visible. L’accès à l’URL dépend uniquement de « Bloquer l’accès par URL ».';
 $string['list_caption_activity'] = 'Modifications des nœuds de la navigation, de la plus récente à la plus ancienne';
 $string['list_caption_nodes'] = 'Nœuds de la navigation, avec leur visibilité et leur lien';
 $string['manage_nodes'] = 'Gérer la navigation';
@@ -348,6 +347,8 @@ $string['tooltip'] = 'Infobulle';
 $string['tooltip_help'] = 'Texte affiché au survol du lien. Facultatif.';
 $string['tree_path'] = 'Niveau de l’administration du site';
 $string['tree_top'] = 'Administration du site';
+$string['tree_top_level'] = 'Haut de l’administration du site';
+$string['tree_url_hint'] = 'Laissez l’URL vide pour créer une catégorie, qui liste ce que vous y placez comme le font les catégories de Moodle. En haut de l’administration du site, une catégorie apparaît dans Général et devient un onglet propre lorsqu’elle contient une autre catégorie.';
 $string['try_again'] = 'Réessayer';
 $string['unknown_lang'] = 'Non installée : {$a}';
 $string['unknown_role'] = 'Rôle inconnu : {$a}';

@@ -252,7 +252,9 @@ class admintree extends base {
     }
 
     /**
-     * Applies the rows to the tree of the request: names, what is hidden, the order of each category and the links added.
+     * Applies the rows to the tree of the request: names, what is hidden, the order of each category, and the categories and
+     * links added. A node of the plugin with a link is a page of the category it goes in; one without a link is a category of
+     * its own, which Moodle shows as a folder that lists what is in it, or as a new tab at the top of the administration.
      *
      * It is called at the end of the settings of this plugin, while Moodle builds the tree, and again before the page is sent,
      * so the pages that other plugins add later are reached too. Applying it twice gives the same tree.
@@ -279,23 +281,11 @@ class admintree extends base {
         };
         $walk($root);
 
+        self::add_parts($root, $rows, $parts);
+
         $parents = [];
         foreach ($rows as $key => $row) {
             $part = $parts[self::name_of($key)] ?? null;
-            if (!$part && !empty($row->url) && !empty($row->title) && !empty($row->parentkey)) {
-                // A link of the plugin, added to its category.
-                $parent = $parts[self::name_of((string)$row->parentkey)] ?? null;
-                if ($parent instanceof \admin_category) {
-                    $part = new \admin_externalpage(
-                        self::name_of($key),
-                        format_string(text::resolve($row->title)),
-                        new \moodle_url((string)$row->url),
-                        'moodle/site:configview'
-                    );
-                    $root->add($parent->name, $part);
-                    self::$added[] = $key;
-                }
-            }
             if (!$part) {
                 continue;
             }
@@ -329,6 +319,45 @@ class admintree extends base {
             $category->set_sorting(false);
             $category->children = array_values($children);
         }
+    }
+
+    /**
+     * Adds the categories and the links of the plugin to the tree. A category can hold another one, so the rows are added in
+     * rounds, each one adding what has its category in the tree already, until a round adds nothing.
+     *
+     * @param object $root The root of the administration tree.
+     * @param \stdClass[] $rows The rows of the site administration, by node key.
+     * @param array $parts Every category and page of the tree by name, to which the parts added are added.
+     */
+    private static function add_parts($root, array $rows, array &$parts): void {
+        $pending = array_filter($rows, static fn(\stdClass $row, string $key): bool => !isset($parts[self::name_of($key)])
+            && trim((string)($row->title ?? '')) !== '', ARRAY_FILTER_USE_BOTH);
+        do {
+            $added = 0;
+            foreach ($pending as $key => $row) {
+                $parentkey = (string)($row->parentkey ?? '');
+                $parent = $parentkey === '' ? $root : ($parts[self::name_of($parentkey)] ?? null);
+                if (!$parent instanceof \admin_category) {
+                    continue;
+                }
+                $name = self::name_of($key);
+                $title = format_string(text::resolve($row->title));
+                if (trim((string)($row->url ?? '')) === '') {
+                    $part = new \admin_category($name, $title);
+                } else if ($parentkey !== '') {
+                    $part = new \admin_externalpage($name, $title, new \moodle_url((string)$row->url), 'moodle/site:configview');
+                } else {
+                    // A link needs a category: at the top it would be neither a tab nor a page.
+                    unset($pending[$key]);
+                    continue;
+                }
+                $root->add($parent->name, $part);
+                $parts[$name] = $part;
+                self::$added[] = $key;
+                unset($pending[$key]);
+                $added++;
+            }
+        } while ($added > 0 && $pending);
     }
 
     /**
