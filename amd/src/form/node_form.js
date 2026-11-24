@@ -106,7 +106,7 @@ const isExternal = (value, wwwroot) => {
 export const init = () => {
     // The form writes what the script needs in an element of its own: the keys of a navigation can be hundreds.
     const data = document.querySelector('script[data-region="nodeformdata"]');
-    const {placeholders, customKeys, requiredHtml, wwwroot, currentKey, urlOptional} = JSON.parse(data?.textContent || '{}');
+    const {placeholders, customKeys, requiredHtml, wwwroot, currentKey} = JSON.parse(data?.textContent || '{}');
     const title = document.querySelector('form.mform input[name="title"]');
     const form = title ? title.closest('form') : null;
     const url = form ? form.querySelector('input[name="url"]') : null;
@@ -135,7 +135,7 @@ export const init = () => {
         title.placeholder = core ? core.title : '';
         url.placeholder = core ? core.url : '';
         setRequired(titleLabel, requiredHtml, core === null);
-        setRequired(urlLabel, requiredHtml, core === null && !urlOptional);
+        setRequired(urlLabel, requiredHtml, core === null);
     };
 
     const updateBlockAccess = () => {

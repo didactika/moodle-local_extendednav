@@ -519,3 +519,26 @@
         cursor: pointer;
     }
 }
+
+// The label of a checkbox sits beside the box, with the room of the design system between them: Bootstrap 5 floats the box in
+// the padding of its line, and Moodle 4 lays the line out as a flex row.
+.len,
+#{$len-modal} {
+    & .form-check:not(.form-switch):not(.form-check-inline) {
+        padding-left: 1.75rem;
+
+        & > .form-check-input {
+            margin-left: -1.75rem;
+        }
+
+        &.d-flex {
+            gap: 0.5rem;
+            padding-left: 0;
+
+            & > .form-check-input {
+                position: static;
+                margin-left: 0;
+            }
+        }
+    }
+}

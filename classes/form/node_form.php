@@ -108,6 +108,17 @@ class node_form extends \moodleform {
         // In the column of the fields, with no row of its own: while the alert is hidden it takes no room.
         $mform->addElement('html', \html_writer::div(\html_writer::div($alerts, 'col-md-9 offset-md-3'), 'row'));
 
+        // A node of the plugin in the site administration is one of the two parts of its tree, as Moodle names them: a category,
+        // which holds pages and other categories (at the top, the categories with categories inside are tabs), or a page.
+        if ($istree && !$isnative) {
+            $mform->addElement('select', 'treetype', get_string('tree_type', 'local_extendednav'), [
+                'page' => get_string('tree_type_page', 'local_extendednav'),
+                'category' => get_string('tree_type_category', 'local_extendednav'),
+            ]);
+            $mform->setDefault('treetype', 'page');
+            $mform->addHelpButton('treetype', 'tree_type', 'local_extendednav');
+        }
+
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
         $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'title', 'local_extendednav');
@@ -124,11 +135,8 @@ class node_form extends \moodleform {
             $mform->setType('url', PARAM_TEXT);
             $mform->addHelpButton('url', 'url', 'local_extendednav');
             if ($istree) {
-                // Without a link, a node of the administration is a category: a folder, or a new tab at the top.
-                $mform->addElement('static', 'treeurlhint', '', \html_writer::div(
-                    get_string('tree_url_hint', 'local_extendednav'),
-                    'form-text text-muted'
-                ));
+                // A category has no address: Moodle lists what it holds on a page of its own.
+                $mform->hideIf('url', 'treetype', 'eq', 'category');
             }
             if ($isparent) {
                 $mform->addElement('static', 'urlnotice', '', \html_writer::div(
@@ -318,8 +326,6 @@ class node_form extends \moodleform {
             'requiredHtml' => $required,
             'wwwroot' => (new \moodle_url('/'))->out(false),
             'currentKey' => $currentkey,
-            // In the site administration the link is optional: without one, the node is a category.
-            'urlOptional' => $istree,
         ];
         $mform->addElement('html', \html_writer::tag(
             'script',
@@ -345,6 +351,9 @@ class node_form extends \moodleform {
             $data['nodekey'] = $current->nodekey;
         }
         $data['availability'] = self::conditions_of($data['availabilityconditionsjson'] ?? '');
+        if (($data['treetype'] ?? '') === 'category') {
+            $data['url'] = '';
+        }
         $record = manager::prepare($data, $menukey);
 
         $contextid = (int)($data['contextid'] ?? 0);
@@ -377,8 +386,11 @@ class node_form extends \moodleform {
         if ($menu instanceof \local_extendednav\menu\admintree && !$menu->is_native((string)$record->nodekey)) {
             $categories = $this->get_tree_categories($menu, (string)$record->nodekey);
             $parentkey = (string)($record->parentkey ?? '');
-            $islink = trim((string)($record->url ?? '')) !== '';
-            if (($islink || $parentkey !== '') && !isset($categories[$parentkey])) {
+            $ispage = ($data['treetype'] ?? 'page') !== 'category';
+            if ($ispage && trim((string)($data['url'] ?? '')) === '') {
+                $errors['url'] = get_string('required');
+            }
+            if (($ispage || $parentkey !== '') && !isset($categories[$parentkey])) {
                 $errors['parentkey'] = get_string('err_tree_category', 'local_extendednav');
             }
         }
@@ -402,6 +414,10 @@ class node_form extends \moodleform {
         if (is_object($defaultvalues) && property_exists($defaultvalues, 'availability')) {
             $defaultvalues->availabilityconditionsjson = (string)($defaultvalues->availability ?? '');
         }
+        // A node of the site administration without an address is a category.
+        if (is_object($defaultvalues) && !empty($defaultvalues->nodekey) && property_exists($defaultvalues, 'url')) {
+            $defaultvalues->treetype = trim((string)$defaultvalues->url) === '' ? 'category' : 'page';
+        }
         parent::set_data($defaultvalues);
     }
 
@@ -414,6 +430,10 @@ class node_form extends \moodleform {
         $data = parent::get_data();
         if ($data !== null) {
             $data->availability = self::conditions_of($data->availabilityconditionsjson ?? '');
+            // A category of the site administration keeps no address, whatever the hidden field held.
+            if (($data->treetype ?? '') === 'category') {
+                $data->url = '';
+            }
         }
         return $data;
     }
@@ -501,7 +521,8 @@ class node_form extends \moodleform {
     private function get_role_options(?\stdClass $current): array {
         $options = [];
         foreach (role_fix_names(get_all_roles()) as $role) {
-            $options[$role->shortname] = $role->localname . ' (' . $role->shortname . ')';
+            $name = trim((string)$role->localname);
+            $options[$role->shortname] = ($name !== '' ? $name . ' ' : '') . '(' . $role->shortname . ')';
         }
         foreach (access::split_list($current->roles ?? '') as $shortname) {
             if (!isset($options[$shortname])) {
@@ -518,7 +539,11 @@ class node_form extends \moodleform {
      * @return array Keyed by language code.
      */
     private function get_language_options(?\stdClass $current): array {
-        $options = get_string_manager()->get_list_of_translations();
+        // A language pack without a name is offered by its code: an option is never empty.
+        $options = [];
+        foreach (get_string_manager()->get_list_of_translations() as $code => $name) {
+            $options[$code] = trim(strip_tags((string)$name)) !== '' ? $name : $code;
+        }
         foreach (access::split_list($current->langs ?? '') as $lang) {
             if (!isset($options[$lang])) {
                 $options[$lang] = get_string('unknown_lang', 'local_extendednav', $lang);
