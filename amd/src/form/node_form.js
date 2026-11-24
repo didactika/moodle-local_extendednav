@@ -129,15 +129,13 @@ export const init = () => {
     // The form writes what the script needs in an element of its own: the keys of a navigation can be hundreds.
     const data = document.querySelector('script[data-region="nodeformdata"]');
     const {placeholders, customKeys, requiredHtml, wwwroot, currentKey} = JSON.parse(data?.textContent || '{}');
-    const title = document.querySelector('form.mform input[name="title"]');
-    const form = title ? title.closest('form') : null;
+    const form = data ? data.closest('form') : null;
+    const title = form ? form.querySelector('input[name="title"]') : null;
     const url = form ? form.querySelector('input[name="url"]:not([type="hidden"])') : null;
-    if (form) {
-        hideEmptySections(form);
-    }
-    if (!form || !url) {
+    if (!form) {
         return;
     }
+    hideEmptySections(form);
     // The key of a core node cannot be changed, so it is not an input.
     const nodekey = form.querySelector('input[name="nodekey"]');
 
@@ -145,8 +143,8 @@ export const init = () => {
     const blockaccessItem = blockaccess ? blockaccess.closest('.fitem, .form-group') : null;
     const coreAlert = document.getElementById('core_node_alert');
     const duplicateAlert = document.getElementById('duplicate_node_alert');
-    const titleLabel = getLabel(title);
-    const urlLabel = getLabel(url);
+    const titleLabel = title ? getLabel(title) : null;
+    const urlLabel = url ? getLabel(url) : null;
 
     const updateKey = () => {
         const key = (nodekey ? nodekey.value : currentKey).trim();
@@ -157,21 +155,25 @@ export const init = () => {
         if (duplicateAlert) {
             duplicateAlert.hidden = !customKeys.includes(key);
         }
-        title.placeholder = core ? core.title : '';
-        url.placeholder = core ? core.url : '';
-        setRequired(titleLabel, requiredHtml, core === null);
-        setRequired(urlLabel, requiredHtml, core === null);
+        if (title) {
+            title.placeholder = core ? core.title : '';
+            setRequired(titleLabel, requiredHtml, core === null);
+        }
+        if (url) {
+            url.placeholder = core ? core.url : '';
+            setRequired(urlLabel, requiredHtml, core === null);
+        }
     };
 
     const updateBlockAccess = () => {
-        if (blockaccessItem) {
+        if (blockaccessItem && url) {
             blockaccessItem.classList.toggle(HIDDEN_CLASS, isExternal(url.value, wwwroot));
         }
     };
 
     ['input', 'change'].forEach((type) => {
         nodekey?.addEventListener(type, updateKey);
-        url.addEventListener(type, updateBlockAccess);
+        url?.addEventListener(type, updateBlockAccess);
     });
 
     updateKey();

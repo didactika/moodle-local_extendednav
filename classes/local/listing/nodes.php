@@ -114,7 +114,8 @@ class nodes {
         $all = self::get_scope_nodes($menukey, $contextid);
         // In the tree a search looks in every level; without one, the list is the level chosen. The top level holds the
         // group General and the tabs of Moodle; General holds the other items of the top level, as Moodle groups them.
-        $level = $istree && trim($search) === '';
+        // A search or a filter looks in every level, so folders and items are found wherever they are.
+        $level = $istree && trim($search) === '' && $visibility === '' && trim($origin) === '' && trim($restriction) === '';
         $general = $menu instanceof admintree ? admintree::general_keys($all) : [];
         $ingeneral = $level && $parent === admintree::GENERAL;
         $nodes = self::filter($menu, $all, $search, $istree && !$level || $ingeneral ? '' : $parent, $level);
@@ -173,12 +174,12 @@ class nodes {
         }
         foreach ($slice as $node) {
             $row = self::export_row($menu, $node, $contextid, $siblings);
-            $row['haschildren'] = $istree && isset($parents[$node->nodekey]);
+            // A node of the plugin without an address groups others (a tab, a category, a section, a submenu): it is a folder,
+            // which opens even while it holds nothing, to add what goes in it.
+            $group = $istree && !$menu->is_native($node->nodekey) && trim((string)($node->url ?? '')) === '';
+            $row['haschildren'] = $istree && (isset($parents[$node->nodekey]) || $group);
             // Moodle shows a tab or a category of the administration only once it holds a page, and says nothing of an empty one.
-            if (
-                $istree && !$row['haschildren'] && !$menu->is_native($node->nodekey)
-                && trim((string)($node->url ?? '')) === ''
-            ) {
+            if ($group && !isset($parents[$node->nodekey]) && $menu instanceof admintree) {
                 $row['flags'][] = [
                     'label' => get_string('flag_empty', 'local_extendednav'),
                     'detail' => get_string('flag_empty_detail', 'local_extendednav'),
@@ -508,13 +509,14 @@ class nodes {
     }
 
     /**
-     * Whether a navigation is listed as folders, one level at a time: the site administration and the page Preferences.
+     * Whether a navigation is listed as folders, one level at a time: the site administration, the page Preferences and the
+     * menus with submenus. The secondary navigations have no submenus and are one list.
      *
      * @param string $menukey Navigation key.
      * @return bool
      */
     public static function is_tree(string $menukey): bool {
-        return $menukey === admintree::KEY || $menukey === \local_extendednav\menu\preferences::KEY;
+        return in_array($menukey, [admintree::KEY, \local_extendednav\menu\preferences::KEY, 'primary', 'usermenu'], true);
     }
 
     /**

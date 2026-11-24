@@ -286,6 +286,7 @@ class menu_manager {
                     'activities' => $activities,
                     'courses' => (int)$usage[$modname]->courses,
                 ]) : get_string('kinds_unused', 'local_extendednav'),
+                'itemslabel' => get_string('kinds_items_count', 'local_extendednav', count($natives)),
                 'changes' => $badges,
                 'exceptions' => (int)($exceptions[$key]->contexts ?? 0),
                 'lastchange' => $last ? userdate($last, get_string('strftimedatefullshort', 'core_langconfig')) : '',

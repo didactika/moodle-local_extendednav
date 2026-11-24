@@ -41,7 +41,8 @@ const STRINGS = ['drag_node_named', 'drag_nodes_named', 'navigation_on_help', 'n
     'delete_node_named', 'select_node_named', 'show_node_named', 'hide_node_named', 'delete_nodes_title', 'delete_nodes_text',
     'reset_nodes_title', 'reset_nodes_text', 'reset', 'empty_nodes_title', 'empty_nodes_text', 'empty_level_title',
     'empty_level_text', 'nodes_changed', 'saved', 'open_level_named',
-    'tree_top', 'hide_nodes_title', 'hide_nodes_text', 'hide_nodes_admins', 'hide_nodes_admins_help', 'show_nodes_title',
+    'tree_top', 'hide_nodes_title', 'hide_nodes_text', 'hide_nodes_admins', 'hide_nodes_admins_help',
+    'hide_nodes_block', 'hide_nodes_block_help', 'show_nodes_title',
     'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found', 'restrictions_title', 'edit_node',
     'discover_done', 'discover_none'];
 const CORE_STRINGS = ['delete', 'show', 'hide'];
@@ -143,8 +144,10 @@ export const init = async(selector) => {
                 url.searchParams.set('parent', instance.state.parent === 'admingeneral' ? '' : instance.state.parent || '');
                 add.href = url.toString();
             }
-            renderPath(root.querySelector('[data-region="path"]'), response.path || [], t.tree_top,
-                !config.tree || Boolean(instance.state.search));
+            // The top of the folders is named as the navigation shown.
+            renderPath(root.querySelector('[data-region="path"]'), response.path || [], config.treetop || t.tree_top,
+                !config.tree || Boolean(instance.state.search || instance.state.status || instance.state.origin
+                    || instance.state.restriction));
             enableDragging(instance.region('tablewrap'), {
                 selectedKeys: () => instance.selectedRows().map((row) => row.nodekey),
                 place: (nodekeys, beforekey, afterkey) => change(() => call('local_extendednav_place_node',

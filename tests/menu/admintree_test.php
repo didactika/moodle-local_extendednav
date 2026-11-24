@@ -180,13 +180,16 @@ final class admintree_test extends \advanced_testcase {
     }
 
     /**
-     * A node without a link is valid in the site administration only, where it is a category.
+     * A node without a link groups others: a category of the site administration, a submenu at the top of a menu. A secondary
+     * navigation has no submenus, so its nodes need one.
      */
-    public function test_only_the_site_administration_takes_a_node_without_a_link(): void {
+    public function test_only_a_group_takes_a_node_without_a_link(): void {
         $this->prepare();
         $category = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], admintree::KEY);
         $this->assertArrayNotHasKey('url', \local_extendednav\local\node\validator::validate($category, [])['errors']);
-        $item = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], 'primary');
+        $submenu = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], 'primary');
+        $this->assertArrayNotHasKey('url', \local_extendednav\local\node\validator::validate($submenu, [])['errors']);
+        $item = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], 'course');
         $this->assertArrayHasKey('url', \local_extendednav\local\node\validator::validate($item, [])['errors']);
     }
 

@@ -49,6 +49,12 @@ final class change_nodes extends node_service {
                 VALUE_DEFAULT,
                 -1
             ),
+            'blockaccess' => new external_value(
+                PARAM_INT,
+                'When hiding: 1 to block the address too, 0 not to, -1 to leave it as it is.',
+                VALUE_DEFAULT,
+                -1
+            ),
         ]);
     }
 
@@ -60,6 +66,7 @@ final class change_nodes extends node_service {
      * @param string[] $nodekeys Node keys.
      * @param int $visibility 0 or 1.
      * @param int $hideadmins 1 to hide from administrators too, 0 not to, -1 to leave it.
+     * @param int $blockaccess 1 to block the address too, 0 not to, -1 to leave it.
      * @return array The number of nodes changed.
      */
     public static function set_visibility(
@@ -67,13 +74,18 @@ final class change_nodes extends node_service {
         int $contextid,
         array $nodekeys,
         int $visibility,
-        int $hideadmins = -1
+        int $hideadmins = -1,
+        int $blockaccess = -1
     ): array {
         $params = self::validate_parameters(
             self::set_visibility_parameters(),
-            compact('menu', 'contextid', 'nodekeys', 'visibility', 'hideadmins')
+            compact('menu', 'contextid', 'nodekeys', 'visibility', 'hideadmins', 'blockaccess')
         );
         self::require_scope($params['menu'], $params['contextid'], 'changevisibility');
+        // Blocking an address and hiding from administrators restrict the node: they take the capability of the restrictions.
+        if ($params['blockaccess'] !== -1 || $params['hideadmins'] !== -1) {
+            self::require_scope($params['menu'], $params['contextid'], 'changeconditions');
+        }
         if (!in_array($params['visibility'], [access::VISIBILITY_HIDDEN, access::VISIBILITY_ALL], true)) {
             throw new \invalid_parameter_exception('Unsupported visibility.');
         }
@@ -82,7 +94,8 @@ final class change_nodes extends node_service {
             $params['contextid'],
             $params['nodekeys'],
             $params['visibility'],
-            $params['hideadmins']
+            $params['hideadmins'],
+            $params['blockaccess']
         );
         return ['count' => $count];
     }

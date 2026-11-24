@@ -129,6 +129,16 @@ class node_form extends \moodleform {
             $mform->setDefault('treetype', 'page');
             $mform->addHelpButton('treetype', 'pref_type', 'local_extendednav');
         }
+        // In a menu with submenus, a node of the site is a link, or a submenu that groups links and has no address of its own.
+        $hassubmenus = !$istree && !$isprefs && !$issecondary;
+        if ($hassubmenus && !$isnative) {
+            $mform->addElement('select', 'treetype', get_string('tree_type', 'local_extendednav'), [
+                'page' => get_string('node_type_link', 'local_extendednav'),
+                'tab' => get_string('node_type_submenu', 'local_extendednav'),
+            ]);
+            $mform->setDefault('treetype', 'page');
+            $mform->addHelpButton('treetype', 'node_type', 'local_extendednav');
+        }
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
         $mform->setType('title', PARAM_TEXT);
@@ -149,11 +159,11 @@ class node_form extends \moodleform {
             $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => 60]);
             $mform->setType('url', PARAM_TEXT);
             $mform->addHelpButton('url', 'url', 'local_extendednav');
-            if ($istree || ($isprefs && !$isnative)) {
+            if ($istree || (($isprefs || $hassubmenus) && !$isnative)) {
                 // A tab, a category or a section has no address: Moodle lists what it holds.
                 $mform->hideIf('url', 'treetype', 'neq', 'page');
             }
-            if ($isparent) {
+            if ($isparent && $isnative) {
                 $mform->addElement('static', 'urlnotice', '', \html_writer::div(
                     get_string('parenturlunused', 'local_extendednav'),
                     'alert alert-warning mb-0'
@@ -195,7 +205,12 @@ class node_form extends \moodleform {
         // Who sees it.
         $mform->addElement('header', 'accessheader', get_string('form_section_access', 'local_extendednav'));
         $mform->setExpanded('accessheader', true);
-        $mform->addElement('select', 'visibility', get_string('visibility', 'local_extendednav'), [
+        // On a user's own page Preferences, an item is shown or hidden to that user: roles say nothing there.
+        $own = $contextid && \context::instance_by_id($contextid, IGNORE_MISSING) instanceof \context_user;
+        $mform->addElement('select', 'visibility', get_string('visibility', 'local_extendednav'), $own ? [
+            access::VISIBILITY_ALL => get_string('pref_shown', 'local_extendednav'),
+            access::VISIBILITY_HIDDEN => get_string('pref_hidden', 'local_extendednav'),
+        ] : [
             access::VISIBILITY_ALL => get_string('vis_all', 'local_extendednav'),
             access::VISIBILITY_ROLES => get_string('vis_roles', 'local_extendednav'),
             access::VISIBILITY_HIDDEN => get_string('vis_hidden', 'local_extendednav'),
@@ -334,6 +349,10 @@ class node_form extends \moodleform {
             // The secondary navigations have no submenus.
             $mform->addElement('hidden', 'parentkey', '');
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
+        } else if ($isparent && !$isnative) {
+            // A submenu stays at the top: it holds the links under it.
+            $mform->addElement('hidden', 'parentkey', '');
+            $mform->setType('parentkey', PARAM_ALPHANUMEXT);
         } else if ($isparent || ($menukey === 'primary' && $currentkey === 'siteadminnode')) {
             // This node cannot be placed in a submenu: explain why instead of an empty, locked select.
             $reason = $isparent ? 'opt_invalid_has_submenus' : 'opt_invalid_admin_submenu';
@@ -345,14 +364,18 @@ class node_form extends \moodleform {
             );
             $mform->addHelpButton('parentkeyinfo', 'parentkey', 'local_extendednav');
         } else {
-            $mform->addElement(
-                'select',
-                'parentkey',
-                get_string('parentkey', 'local_extendednav'),
-                $this->get_parent_options($menukey, $currentkey, $nodes)
-            );
+            // A link goes in a submenu; with no submenu in the menu, there is nothing to choose and the field is not shown.
+            $parents = $this->get_parent_options($menukey, $currentkey, $nodes);
+            if (count($parents) > 1) {
+                $mform->addElement('select', 'parentkey', get_string('parentkey', 'local_extendednav'), $parents);
+                $mform->addHelpButton('parentkey', 'parentkey', 'local_extendednav');
+                if (!$isnative) {
+                    $mform->hideIf('parentkey', 'treetype', 'eq', 'tab');
+                }
+            } else {
+                $mform->addElement('hidden', 'parentkey', '');
+            }
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
-            $mform->addHelpButton('parentkey', 'parentkey', 'local_extendednav');
         }
 
         $this->add_action_buttons(true, get_string('savechanges'));
@@ -371,11 +394,14 @@ class node_form extends \moodleform {
             'wwwroot' => (new \moodle_url('/'))->out(false),
             'currentKey' => $currentkey,
         ];
-        // The fields of the changes the user may not make in this category, course or activity are shown, not changed.
+        // The fields of the changes the user may not make in this category, course, activity or page of their own are not shown:
+        // they keep their value, and a field that does nothing for the user only gets in the way.
+        $parts = ['availability' => ['availabilityconditionsjson'], 'icon' => ['icon', 'iconpicker'], 'url' => ['url', 'urlinfo']];
         foreach ($this->_customdata['locked'] ?? [] as $field) {
-            $element = $field === 'availability' ? 'availabilityconditionsjson' : $field;
-            if ($mform->elementExists($element)) {
-                $mform->hardFreeze($element);
+            foreach ($parts[$field] ?? [$field] as $element) {
+                if ($mform->elementExists($element)) {
+                    $mform->removeElement($element);
+                }
             }
         }
 
@@ -449,6 +475,16 @@ class node_form extends \moodleform {
             }
         }
 
+        // In a menu with submenus, a link of the site needs its address; a submenu has none.
+        $withsubmenus = !$menu instanceof \local_extendednav\menu\admintree && !$menu instanceof \local_extendednav\menu\preferences
+            && !$menu instanceof \local_extendednav\menu\secondary;
+        if (
+            $withsubmenus && ($data['treetype'] ?? '') === 'page' && !$menu->is_native((string)$record->nodekey)
+            && trim((string)($data['url'] ?? '')) === ''
+        ) {
+            $errors['url'] = get_string('required');
+        }
+
         // In the preferences, a link of the site needs its address, and every item a section to go in.
         if ($menu instanceof \local_extendednav\menu\preferences && ($data['treetype'] ?? '') !== 'tab') {
             $native = $menu->get_native_node((string)$record->nodekey);
@@ -483,7 +519,15 @@ class node_form extends \moodleform {
         // A node of the site administration without an address is a category.
         if (is_object($defaultvalues) && !empty($defaultvalues->nodekey) && property_exists($defaultvalues, 'url')) {
             $parentkey = (string)($defaultvalues->parentkey ?? '');
-            if (trim((string)$defaultvalues->url) !== '') {
+            // A node that holds others is a submenu, whatever address it kept from before.
+            $holds = false;
+            foreach (repository::get_menu_nodes_by_key((string)($this->_customdata['menu'] ?? 'primary')) as $other) {
+                if ((string)($other->parentkey ?? '') === (string)$defaultvalues->nodekey) {
+                    $holds = true;
+                    break;
+                }
+            }
+            if (trim((string)$defaultvalues->url) !== '' && !($holds && $parentkey === '')) {
                 $defaultvalues->treetype = 'page';
             } else {
                 $defaultvalues->treetype = $parentkey === '' ? 'tab' : 'category';
@@ -696,8 +740,15 @@ class node_form extends \moodleform {
     private function get_parent_options(string $menukey, string $currentkey, array $nodes): array {
         $menu = menu_manager::get_menu($menukey);
         $options = ['' => get_string('opt_none_root', 'local_extendednav')];
+        // Only a submenu holds links: a node of the site without an address, or one that already holds others.
+        $holders = [];
+        foreach ($nodes as $node) {
+            if (!empty($node->parentkey)) {
+                $holders[(string)$node->parentkey] = true;
+            }
+        }
         foreach ($menu->get_native_nodes() as $key => $native) {
-            if ($key === $currentkey || ($menukey === 'primary' && $key === 'siteadminnode')) {
+            if ($key === $currentkey || ($menukey === 'primary' && $key === 'siteadminnode') || !isset($holders[$key])) {
                 continue;
             }
             $options[$key] = get_string('opt_native', 'local_extendednav', (object)[
@@ -706,9 +757,10 @@ class node_form extends \moodleform {
             ]);
         }
         foreach ($nodes as $key => $node) {
+            $group = !isset($holders[$key]) && !$menu->is_native($key) && trim((string)($node->url ?? '')) === '';
             if (
                 $key === $currentkey || isset($options[$key]) || !empty($node->parentkey)
-                    || ($menukey === 'primary' && $key === 'siteadminnode')
+                    || ($menukey === 'primary' && $key === 'siteadminnode') || (!isset($holders[$key]) && !$group)
             ) {
                 continue;
             }

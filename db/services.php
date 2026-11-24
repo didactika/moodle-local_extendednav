@@ -136,6 +136,13 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
+    'local_extendednav_search_export' => [
+        'classname' => \local_extendednav\external\search_export::class,
+        'description' => 'Finds the navigations, kinds of activity, users, courses or categories a file can hold, ten at a time.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
     'local_extendednav_import_navigations' => [
         'classname' => \local_extendednav\external\manage_navigation::class,
         'methodname' => 'import_navigations',

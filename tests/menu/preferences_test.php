@@ -178,7 +178,7 @@ final class preferences_test extends \advanced_testcase {
             'A section of the site holds its links and the items moved to it.'
         );
         $this->assertNotContains('forumpreferences', $shown['useraccount'], 'An item moved leaves its section.');
-        $this->assertSame('miscellaneous', array_key_last($shown), 'The items outside every section stay at the end.');
+        $this->assertContains('autograderpreferences', $shown['miscellaneous'], 'The loose items are in Miscellaneous.');
     }
 
     /**
@@ -195,11 +195,13 @@ final class preferences_test extends \advanced_testcase {
         $this->personal($admin, ['nodekey' => 'blogs', 'sortorder' => -2]);
         $this->personal($admin, ['nodekey' => 'useraccount', 'sortorder' => -1]);
         $this->personal($admin, ['nodekey' => 'blogpreferences', 'parentkey' => 'useraccount']);
+        $this->personal($admin, ['nodekey' => 'miscellaneous', 'sortorder' => -3]);
 
         $shown = $this->shown($admin);
         $this->assertNotContains('forumpreferences', $shown['useraccount'], 'What a user hides is hidden from them, an admin too.');
         $this->assertContains('blogpreferences', $shown['useraccount'], 'The user moves an item to another section.');
         $this->assertArrayNotHasKey('blogs', $shown, 'A section left empty is not shown.');
+        $this->assertSame('miscellaneous', array_key_first($shown), 'Miscellaneous is a section as any other, ordered too.');
 
         // Another user keeps the page of the site.
         $other = $this->getDataGenerator()->create_user();

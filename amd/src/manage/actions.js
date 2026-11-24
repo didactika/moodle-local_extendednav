@@ -59,17 +59,18 @@ export const init = ({root, list, config, t}) => {
      *
      * @param {string} name show, hide or delete.
      * @param {string[]} nodekeys The nodes.
-     * @param {boolean} hideadmins Whether hiding reaches administrators too.
+     * @param {Object} chosen The switches of the dialog, by key: hideadmins and blockaccess, when the page offers them.
      * @returns {Promise<void>}
      */
-    const run = async(name, nodekeys, hideadmins) => {
+    const run = async(name, nodekeys, chosen) => {
         if (name === 'delete') {
             await call('local_extendednav_delete_nodes', {nodekeys});
         } else {
             await call('local_extendednav_set_visibility', {
                 nodekeys,
                 visibility: name === 'show' ? 1 : 0,
-                hideadmins: name === 'hide' ? Number(hideadmins) : -1,
+                hideadmins: name === 'hide' && 'hideadmins' in chosen ? Number(chosen.hideadmins) : -1,
+                blockaccess: name === 'hide' && 'blockaccess' in chosen ? Number(chosen.blockaccess) : -1,
             });
         }
         await list.load();
@@ -101,16 +102,19 @@ export const init = ({root, list, config, t}) => {
             icon,
             tone,
             trigger,
-            // In the site administration a node is hidden from administrators too, unless they choose otherwise.
-            option: name === 'hide'
-                ? {label: t.hide_nodes_admins, help: t.hide_nodes_admins_help, checked: Boolean(config.tree)}
-                : null,
+            // Hiding can also reach the administrators and block the address, for whoever may restrict the nodes. In the site
+            // administration a node is hidden from administrators too, unless they choose otherwise.
+            switches: name === 'hide' && config.canrestrict ? [
+                {key: 'hideadmins', label: t.hide_nodes_admins, help: t.hide_nodes_admins_help,
+                    checked: config.menu === 'admin'},
+                {key: 'blockaccess', label: t.hide_nodes_block, help: t.hide_nodes_block_help, checked: false},
+            ] : [],
             skipped: {
                 text: t.skipped_nodes,
                 more: t.skipped_more,
                 names: rows.filter((row) => !row[allowed]).map((row) => row.title),
             },
-            action: (hideadmins) => run(name, reached.map((row) => row.nodekey), hideadmins),
+            action: (chosen) => run(name, reached.map((row) => row.nodekey), chosen),
         });
     };
 

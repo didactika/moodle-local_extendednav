@@ -82,13 +82,15 @@ final class validator_test extends \advanced_testcase {
     }
 
     /**
-     * Custom nodes need a title and a URL; core nodes do not.
+     * Custom nodes need a title, and a URL unless they are a submenu at the top; core nodes need neither.
      */
     public function test_required_fields(): void {
         $this->resetAfterTest();
         $errors = $this->run_validation(['nodekey' => 'help'])['errors'];
         $this->assertArrayHasKey('title', $errors);
-        $this->assertArrayHasKey('url', $errors);
+        $this->assertArrayNotHasKey('url', $errors, 'A node at the top without an address is a submenu.');
+        $inside = $this->run_validation(['nodekey' => 'help', 'title' => 'Help', 'parentkey' => 'myhome'])['errors'];
+        $this->assertArrayHasKey('url', $inside, 'A link inside a submenu needs its address.');
 
         $this->assertSame([], $this->run_validation(['nodekey' => 'myhome'])['errors']);
     }

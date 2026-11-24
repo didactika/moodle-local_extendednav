@@ -17,8 +17,8 @@
 {{!
     @template local_extendednav/dialog/action
 
-    The body of the question asked before an action on nodes: the tile of the action, what it does, an option of the action
-    (such as hiding from administrators too) as a switch, the nodes the action leaves as they are (how many, and the first of
+    The body of the question asked before an action on nodes: the tile of the action, what it does, its options (such as
+    hiding from administrators too or blocking the address) as switches, the nodes the action leaves as they are (how many, and the first of
     them in a list that scrolls), and the place of the error if the action fails.
 
     @copyright  2026 Didactika.org
@@ -28,7 +28,7 @@
     {
         "icon": "t/hide", "tone": "secondary",
         "text": "The nodes are hidden from everyone they were shown to.",
-        "option": {"id": "len-option", "label": "Hide from administrators too", "help": "Otherwise they keep seeing them.", "checked": true},
+        "switches": [{"id": "len-option", "key": "hideadmins", "label": "Hide from administrators too", "help": "Otherwise they keep seeing them.", "checked": true}],
         "skipped": {"text": "2 of the selected nodes are left as they are:", "names": ["Dashboard", "Site administration"], "more": ""}
     }
 }}
@@ -36,13 +36,13 @@
     <span class="icon-box text-{{tone}} mr-3 me-3">{{#pix}}{{icon}}, core{{/pix}}</span>
     <p class="mb-0">{{text}}</p>
 </div>
-{{#option}}
+{{#switches}}
     <div class="form-check form-switch custom-control custom-switch mt-3">
-        <input type="checkbox" class="form-check-input custom-control-input" id="{{id}}" data-region="option" {{#checked}}checked{{/checked}}>
+        <input type="checkbox" class="form-check-input custom-control-input" id="{{id}}" data-region="option" data-key="{{key}}" {{#checked}}checked{{/checked}}>
         <label class="form-check-label custom-control-label fw-bold" for="{{id}}">{{label}}</label>
         <p class="small text-muted mb-0">{{help}}</p>
     </div>
-{{/option}}
+{{/switches}}
 {{#skipped}}
     <div class="mt-3" data-region="skipped">
         <p class="small fw-bold mb-1">{{text}}</p>

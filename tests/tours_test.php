@@ -41,7 +41,7 @@ final class tours_test extends \advanced_testcase {
             ['name' => '%,local_extendednav']
         );
 
-        $this->assertSame(3, local_extendednav_import_tours());
+        $this->assertSame(4, local_extendednav_import_tours());
         $this->assertSame(0, local_extendednav_import_tours(), 'A tour already there is left as it is.');
 
         $strings = [];

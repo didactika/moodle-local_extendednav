@@ -559,6 +559,8 @@ class manager {
      * @param string[] $nodekeys Node keys.
      * @param int $visibility One of the visibilities of access.
      * @param int $hideadmins 1 to hide the nodes from administrators too, 0 not to, -1 to leave it as it is.
+     * @param int $blockaccess 1 to block the addresses of the nodes hidden, 0 not to, -1 to leave it as it is. An address of
+     *     another site is never blocked, nor one that would leave the users with no page to go to.
      * @return int Number of nodes changed.
      */
     public static function set_visibility(
@@ -566,7 +568,8 @@ class manager {
         int $contextid,
         array $nodekeys,
         int $visibility,
-        int $hideadmins = -1
+        int $hideadmins = -1,
+        int $blockaccess = -1
     ): int {
         $changed = 0;
         foreach (array_unique($nodekeys) as $nodekey) {
@@ -578,6 +581,22 @@ class manager {
             $values['roles'] = $visibility === access::VISIBILITY_ROLES ? $row->roles : null;
             if ($hideadmins === 0 || $hideadmins === 1) {
                 $values['hideadmins'] = $hideadmins;
+            }
+            // A node shown to everyone blocks nothing.
+            if ($blockaccess === 0 || $visibility === access::VISIBILITY_ALL) {
+                $values['blockaccess'] = 0;
+            } else if ($blockaccess === 1) {
+                $values['blockaccess'] = empty(\local_extendednav\local\navigation\access_guard::get_node_paths(
+                    (object)array_merge((array)$row, $values)
+                )) ? 0 : 1;
+                $after = (object)array_merge((array)$row, $values);
+                if (
+                    $values['blockaccess'] && \local_extendednav\local\navigation\access_guard::check_fallbacks(
+                        self::get_all_with($after, (int)$row->id)
+                    ) === \local_extendednav\local\navigation\access_guard::FALLBACKS_BLOCKED
+                ) {
+                    $values['blockaccess'] = 0;
+                }
             }
             self::update((object)$values);
             $changed++;
