@@ -54,7 +54,7 @@ Feature: Order, hide and select nodes on the management page
   Scenario: The navigations are chosen from the side column
     When I click on "Course navigation" "link" in the "[data-region='origins']" "css_element"
     Then I should see "Course navigation" in the "[data-region='origin']" "css_element"
-    And I should see "Applies to"
+    And I should see "Exceptions of categories and courses" in the "[data-region='scope']" "css_element"
 
   @javascript
   Scenario: The nodes of Moodle and the nodes added are told apart and filtered

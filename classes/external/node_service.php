@@ -57,8 +57,11 @@ abstract class node_service extends external_api {
             return;
         }
         $context = \context::instance_by_id($contextid);
-        self::validate_context($context);
-        if (!has_capability('local/extendednav:manage', \context_system::instance())) {
+        // Whoever manages the navigation of the site changes every context without entering it (they need not be enrolled).
+        if (has_capability('local/extendednav:manage', \context_system::instance())) {
+            self::validate_context(\context_system::instance());
+        } else {
+            self::validate_context($context);
             require_capability('local/extendednav:managecontext', $context);
         }
         self::validate_scope($menu, $contextid);
