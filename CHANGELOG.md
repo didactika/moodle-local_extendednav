@@ -21,6 +21,10 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 - Each node says whether Moodle manages it or it was added, and a menu Origin filters by it. The visibility shows a badge for each kind of restriction, with the details in a tooltip.
 - An empty secondary navigation finds its nodes from a page of the site, without leaving the management page.
 - The site administration groups the items of the General tab of Moodle under General.
+- Access restrictions of Moodle on every node, as Restrict access of an activity: dates, groups and groupings of a course, profile fields and the conditions of the plugins of the site. Dates make nodes that appear and end on their own, marked Scheduled and Ended on the list.
+- The activity log is a report, Extended navigation activity, in Site administration > Reports.
+- The exceptions of a course are part of its backup and come back with it; the file of the site holds the nodes of the site and the exceptions of its categories.
+- Thousands of exceptions export and import in seconds: the names of their courses and categories are read together, and a node that does not change is not written again.
 - One On and Off button next to the name of each navigation applies its changes or leaves the navigation as Moodle draws it. The settings page of the plugin is gone.
 - Site administrators see every node by default, even one that is hidden or restricted to roles they do not have, and their row says so. An option of each node applies its rules to administrators too.
 - The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity and of a category.
