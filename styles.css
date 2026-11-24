@@ -2321,6 +2321,10 @@
 }
 
 .len .mform .form-autocomplete-selection > [role=option][data-active-selection=true] {
+    box-shadow: none;
+}
+
+.len .mform .form-autocomplete-selection:focus-visible > [role=option][data-active-selection=true] {
     box-shadow: 0 0 0 2px var(--dd-ring);
 }
 
@@ -2372,8 +2376,11 @@
 
 .len .mform .form-autocomplete-suggestions > li:hover,
 .len .mform .form-autocomplete-suggestions > li[aria-selected=true] {
+    outline: 0;
+    box-shadow: none;
     background-color: var(--dd-surface-2);
     color: var(--dd-ink);
+    font-weight: inherit;
 }
 
 .len .mform [data-region=iconopen] {
