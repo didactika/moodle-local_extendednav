@@ -123,6 +123,13 @@ class node_form extends \moodleform {
             $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => 60]);
             $mform->setType('url', PARAM_TEXT);
             $mform->addHelpButton('url', 'url', 'local_extendednav');
+            if ($istree) {
+                // Without a link, a node of the administration is a category: a folder, or a new tab at the top.
+                $mform->addElement('static', 'treeurlhint', '', \html_writer::div(
+                    get_string('tree_url_hint', 'local_extendednav'),
+                    'form-text text-muted'
+                ));
+            }
             if ($isparent) {
                 $mform->addElement('static', 'urlnotice', '', \html_writer::div(
                     get_string('parenturlunused', 'local_extendednav'),
@@ -203,11 +210,8 @@ class node_form extends \moodleform {
         );
         $mform->setType('langs', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('langs', 'langs', 'local_extendednav');
-        $mform->addElement('static', 'langsnotice', '', \html_writer::div(
-            get_string('langs_hidden_notice', 'local_extendednav'),
-            'alert alert-info mb-0',
-            ['id' => 'local_extendednav_langs_notice', 'hidden' => 'hidden']
-        ));
+        // A node nobody sees has no language or condition to meet: those fields are hidden while it is not visible.
+        $mform->hideIf('langs', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
 
         // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
         // has. Its editor is drawn by Moodle's script in place of this field.
@@ -219,6 +223,7 @@ class node_form extends \moodleform {
                 ['class' => 'd-none']
             );
             $mform->addHelpButton('availabilityconditionsjson', 'conditions', 'local_extendednav');
+            $mform->hideIf('availabilityconditionsjson', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
             $mform->addElement('html', $OUTPUT->container(
                 $OUTPUT->render_from_template('core/loading', []),
                 'd-flex justify-content-center py-3',
@@ -263,15 +268,15 @@ class node_form extends \moodleform {
             $mform->addElement('hidden', 'parentkey', (string)($native->parentkey ?? ''));
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
         } else if ($istree) {
-            // A link of the plugin goes in a category of the administration.
+            // A node of the plugin goes in a category of the administration; a category of its own can also go at the top, as
+            // a new tab.
             $mform->addElement(
                 'select',
                 'parentkey',
                 get_string('category_of_page', 'local_extendednav'),
-                ['' => get_string('choosedots')] + $this->get_tree_categories($menu)
+                ['' => get_string('tree_top_level', 'local_extendednav')] + $this->get_tree_categories($menu, $currentkey)
             );
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
-            $mform->addRule('parentkey', get_string('required'), 'required', null, 'client');
             $mform->addHelpButton('parentkey', 'category_of_page', 'local_extendednav');
         } else if ($issecondary) {
             // The secondary navigations have no submenus.
@@ -313,6 +318,8 @@ class node_form extends \moodleform {
             'requiredHtml' => $required,
             'wwwroot' => (new \moodle_url('/'))->out(false),
             'currentKey' => $currentkey,
+            // In the site administration the link is optional: without one, the node is a category.
+            'urlOptional' => $istree,
         ];
         $mform->addElement('html', \html_writer::tag(
             'script',
@@ -365,11 +372,13 @@ class node_form extends \moodleform {
             unset($errors['icon']);
         }
 
-        // A link added to the site administration needs the category it goes in.
+        // A link added to the site administration needs the category it goes in; a category can go at the top.
         $menu = menu_manager::get_menu($menukey);
         if ($menu instanceof \local_extendednav\menu\admintree && !$menu->is_native((string)$record->nodekey)) {
-            $categories = $this->get_tree_categories($menu);
-            if (!isset($categories[(string)($record->parentkey ?? '')])) {
+            $categories = $this->get_tree_categories($menu, (string)$record->nodekey);
+            $parentkey = (string)($record->parentkey ?? '');
+            $islink = trim((string)($record->url ?? '')) !== '';
+            if (($islink || $parentkey !== '') && !isset($categories[$parentkey])) {
                 $errors['parentkey'] = get_string('err_tree_category', 'local_extendednav');
             }
         }
@@ -440,18 +449,44 @@ class node_form extends \moodleform {
     }
 
     /**
-     * Returns the categories of the site administration, indented as the tree has them.
+     * Returns the categories of the site administration, indented as the tree has them: the ones of Moodle and the ones the
+     * plugin added (its nodes without a link), each after its parent.
      *
      * @param \local_extendednav\menu\admintree $menu The site administration.
+     * @param string $exclude Key of the node edited, which cannot go inside itself.
      * @return array Names keyed by node key.
      */
-    private function get_tree_categories($menu): array {
-        $options = [];
+    private function get_tree_categories($menu, string $exclude = ''): array {
+        $entries = [];
         foreach ($menu->get_native_nodes() as $key => $node) {
             if ($node->category) {
-                $options[$key] = str_repeat('— ', $node->depth) . $node->text;
+                $entries[$key] = ['text' => $node->text, 'parent' => (string)$node->parentkey];
             }
         }
+        foreach (repository::get_menu_nodes_by_key($menu->get_key()) as $key => $row) {
+            if (!isset($entries[$key]) && !$menu->is_native($key) && trim((string)($row->url ?? '')) === '') {
+                $entries[$key] = [
+                    'text' => text::resolve((string)$row->title) ?: $key,
+                    'parent' => (string)($row->parentkey ?? ''),
+                ];
+            }
+        }
+        // The tree in order, from the top: each category followed by the ones inside it.
+        $children = [];
+        foreach ($entries as $key => $entry) {
+            $children[isset($entries[$entry['parent']]) ? $entry['parent'] : ''][] = $key;
+        }
+        $options = [];
+        $walk = static function (string $parent, int $depth) use (&$walk, &$options, $children, $entries, $exclude): void {
+            foreach ($children[$parent] ?? [] as $key) {
+                if ($key === $exclude) {
+                    continue;
+                }
+                $options[$key] = str_repeat('— ', $depth) . $entries[$key]['text'];
+                $walk($key, $depth + 1);
+            }
+        };
+        $walk('', 0);
         return $options;
     }
 

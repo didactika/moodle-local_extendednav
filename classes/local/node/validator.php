@@ -87,7 +87,8 @@ class validator {
         }
 
         $url = (string)($node->url ?? '');
-        if ($url === '' && !$isnative) {
+        // In the site administration a node of the plugin without a link is a category, which lists what is in it.
+        if ($url === '' && !$isnative && !$menu instanceof \local_extendednav\menu\admintree) {
             $errors['url'] = get_string('required');
         } else if ($url !== '') {
             if (url_helper::has_forbidden_scheme($url)) {

@@ -138,6 +138,54 @@ final class admintree_test extends \advanced_testcase {
     }
 
     /**
+     * A node of the plugin without a link is a category, at the top or inside another one, and holds the nodes put in it; a
+     * link at the top, with no category to go in, is left out.
+     */
+    public function test_categories_of_the_plugin(): void {
+        $this->prepare();
+        // Added in the order that needs rounds: the link before its category, the category before its parent.
+        $nodes = [
+            ['extportal', 'Portal', 'https://example.com/', 'extmoretools'],
+            ['extmoretools', 'More tools', '', 'exttools'],
+            ['exttools', 'Tools', '', ''],
+            ['extstray', 'Stray link', '/my/', ''],
+        ];
+        foreach ($nodes as [$key, $title, $url, $parent]) {
+            $data = ['nodekey' => $key, 'title' => $title, 'url' => $url, 'parentkey' => $parent];
+            manager::create(manager::prepare($data, admintree::KEY));
+        }
+
+        admintree::reset();
+        $root = admin_get_root(true, false);
+        admintree::apply($root);
+
+        $tools = $root->locate('exttools');
+        $this->assertInstanceOf(\admin_category::class, $tools);
+        $this->assertSame('Tools', $tools->visiblename);
+        $this->assertInstanceOf(\admin_category::class, $root->locate('extmoretools'));
+        $inside = array_map(static fn($part): string => $part->name, $root->locate('extmoretools')->get_children());
+        $this->assertContains('extportal', $inside);
+        $this->assertNull($root->locate('extstray'), 'A link needs a category.');
+        $tree = menu_manager::get_menu(admintree::KEY);
+        $this->assertFalse($tree->is_native('exttools'), 'A category of the plugin is not native.');
+
+        // Applying again gives the same tree.
+        admintree::apply($root);
+        $this->assertCount(1, array_filter($root->get_children(), static fn($part): bool => $part->name === 'exttools'));
+    }
+
+    /**
+     * A node without a link is valid in the site administration only, where it is a category.
+     */
+    public function test_only_the_site_administration_takes_a_node_without_a_link(): void {
+        $this->prepare();
+        $category = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], admintree::KEY);
+        $this->assertArrayNotHasKey('url', \local_extendednav\local\node\validator::validate($category, [])['errors']);
+        $item = manager::prepare(['nodekey' => 'tools', 'title' => 'Tools', 'url' => ''], 'primary');
+        $this->assertArrayHasKey('url', \local_extendednav\local\node\validator::validate($item, [])['errors']);
+    }
+
+    /**
      * Turning the navigation off leaves the tree as Moodle draws it.
      */
     public function test_a_navigation_turned_off_changes_nothing(): void {

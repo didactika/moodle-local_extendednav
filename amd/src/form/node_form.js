@@ -106,7 +106,7 @@ const isExternal = (value, wwwroot) => {
 export const init = () => {
     // The form writes what the script needs in an element of its own: the keys of a navigation can be hundreds.
     const data = document.querySelector('script[data-region="nodeformdata"]');
-    const {placeholders, customKeys, requiredHtml, wwwroot, currentKey} = JSON.parse(data?.textContent || '{}');
+    const {placeholders, customKeys, requiredHtml, wwwroot, currentKey, urlOptional} = JSON.parse(data?.textContent || '{}');
     const title = document.querySelector('form.mform input[name="title"]');
     const form = title ? title.closest('form') : null;
     const url = form ? form.querySelector('input[name="url"]') : null;
@@ -116,13 +116,10 @@ export const init = () => {
     // The key of a core node cannot be changed, so it is not an input.
     const nodekey = form.querySelector('input[name="nodekey"]');
 
-    const visibility = form.querySelector('select[name="visibility"]');
-    const langs = form.querySelector('select[name="langs[]"]');
     const blockaccess = form.querySelector('input[type="checkbox"][name="blockaccess"]');
     const blockaccessItem = blockaccess ? blockaccess.closest('.fitem, .form-group') : null;
     const coreAlert = document.getElementById('core_node_alert');
     const duplicateAlert = document.getElementById('duplicate_node_alert');
-    const langsNotice = document.getElementById('local_extendednav_langs_notice');
     const titleLabel = getLabel(title);
     const urlLabel = getLabel(url);
 
@@ -138,7 +135,7 @@ export const init = () => {
         title.placeholder = core ? core.title : '';
         url.placeholder = core ? core.url : '';
         setRequired(titleLabel, requiredHtml, core === null);
-        setRequired(urlLabel, requiredHtml, core === null);
+        setRequired(urlLabel, requiredHtml, core === null && !urlOptional);
     };
 
     const updateBlockAccess = () => {
@@ -147,21 +144,11 @@ export const init = () => {
         }
     };
 
-    const updateLangsNotice = () => {
-        if (!langsNotice || !visibility || !langs) {
-            return;
-        }
-        langsNotice.hidden = !(visibility.value === '0' && langs.selectedOptions.length > 0);
-    };
-
     ['input', 'change'].forEach((type) => {
         nodekey?.addEventListener(type, updateKey);
         url.addEventListener(type, updateBlockAccess);
     });
-    visibility?.addEventListener('change', updateLangsNotice);
-    langs?.addEventListener('change', updateLangsNotice);
 
     updateKey();
     updateBlockAccess();
-    updateLangsNotice();
 };

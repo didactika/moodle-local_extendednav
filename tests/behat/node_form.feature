@@ -27,12 +27,14 @@ Feature: Edit navigation nodes
     And I should not see "Block URL access"
 
   @javascript
-  Scenario: The form explains that languages have no effect on hidden nodes
+  Scenario: A node that nobody sees asks for no language and no restriction
     When I follow "Add node"
-    And I set the field "Languages" to "English"
-    Then I should not see "This item is hidden from everyone"
+    Then I should see "Languages"
+    And I should see "Access restrictions"
     And I set the field "Visibility" to "Not visible"
-    And I should see "This item is hidden from everyone"
+    And I should not see "Languages"
+    And I should not see "Access restrictions"
+    And I should see "Hide from administrators too"
 
   @javascript
   Scenario: The pop-up size is only asked for pop-ups

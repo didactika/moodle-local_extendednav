@@ -39,3 +39,23 @@ Feature: Shape the site administration
     And I press "Save changes"
     And I visit "/admin/category.php?category=users"
     Then I should see "Staff guide"
+
+  @javascript
+  Scenario: A node without a link is a category of the plugin, and Add node starts in the level open
+    When I follow "Add node"
+    And I set the following fields to these values:
+      | Node key | didactika       |
+      | Title    | Didactika tools |
+    And I press "Save changes"
+    And I click on "Open Users" "button"
+    And I follow "Add node"
+    Then the field "Parent" matches value "Users"
+    And I set the following fields to these values:
+      | Node key | handbook |
+      | Title    | Handbook |
+      | URL      | /my/     |
+      | Parent   | Didactika tools |
+    And I press "Save changes"
+    And I visit "/admin/category.php?category=didactika"
+    And I should see "Didactika tools"
+    And I should see "Handbook"

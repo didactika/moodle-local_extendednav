@@ -155,7 +155,7 @@ $string['err_restricted_page'] = 'The page you opened is not available for your 
 $string['err_scope_context'] = 'This page is for a category or a course.';
 $string['err_text_html'] = 'HTML is not allowed here.';
 $string['err_title_usermenu_chars'] = 'User menu titles cannot contain "|" or line breaks.';
-$string['err_tree_category'] = 'Choose the category of the site administration the link goes in.';
+$string['err_tree_category'] = 'Choose the category the link goes in. Only a category, a node without a URL, can go at the top.';
 $string['err_url_forbidden'] = 'This kind of URL is not allowed.';
 $string['err_url_invalid'] = 'Enter a valid URL, for example "/course/view.php?id=2" or "https://example.com".';
 $string['error_loading_title'] = 'The list did not load';
@@ -248,7 +248,6 @@ $string['langs_help'] = 'Show this item in the menu only to users whose current 
 Languages only control whether the item appears in the menu. They never affect access to its URL, because users can change their own language at any time. Access is controlled by Visibility, Allowed roles and "Block URL access".
 
 To translate an item, create one node per language with the same URL, roles and visibility.';
-$string['langs_hidden_notice'] = 'This item is hidden from everyone, so the selected languages have no effect on the menu. They are kept in case you make the item visible again. Access to the URL depends only on "Block URL access".';
 $string['list_caption_activity'] = 'Changes to the nodes of the navigation, newest first';
 $string['list_caption_nodes'] = 'Nodes of the navigation, with their visibility and link';
 $string['manage_nodes'] = 'Manage navigation';
@@ -348,6 +347,8 @@ $string['tooltip'] = 'Tooltip';
 $string['tooltip_help'] = 'Text shown when hovering over the link. Optional.';
 $string['tree_path'] = 'Level of the site administration';
 $string['tree_top'] = 'Site administration';
+$string['tree_top_level'] = 'Top of the site administration';
+$string['tree_url_hint'] = 'Leave the URL empty to make a category, which lists what you put in it as the categories of Moodle do. At the top of the site administration, a category is listed under General, and becomes a tab of its own when it holds another category.';
 $string['try_again'] = 'Try again';
 $string['unknown_lang'] = 'Not installed: {$a}';
 $string['unknown_role'] = 'Unknown role: {$a}';
