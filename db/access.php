@@ -105,4 +105,11 @@ $capabilities = [
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
     ],
+    // Order and hide the items of their own page Preferences, within what the site shows.
+    'local/extendednav:personalise' => [
+        'riskbitmask' => 0,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => ['user' => CAP_ALLOW],
+    ],
 ];

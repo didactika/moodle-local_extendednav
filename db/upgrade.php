@@ -36,7 +36,7 @@ require_once(__DIR__ . '/upgradelib.php');
  * @return bool
  */
 function xmldb_local_extendednav_upgrade($oldversion) {
-    global $DB;
+    global $CFG, $DB;
 
     if ($oldversion < 2026112400) {
         $dbman = $DB->get_manager();
@@ -125,6 +125,15 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         local_extendednav_upgrade_split_activities();
 
         upgrade_plugin_savepoint(true, 2026112600, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112603) {
+        // The guided tours of the plugin, for the sites that installed it before they existed; they start required.
+        require_once($CFG->dirroot . '/local/extendednav/lib.php');
+        set_config('tourrequired', 1, 'local_extendednav');
+        local_extendednav_import_tours();
+
+        upgrade_plugin_savepoint(true, 2026112603, 'local', 'extendednav');
     }
 
     return true;

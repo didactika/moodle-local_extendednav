@@ -114,6 +114,7 @@ class node_form extends \moodleform {
             $mform->addElement('select', 'treetype', get_string('tree_type', 'local_extendednav'), [
                 'page' => get_string('tree_type_page', 'local_extendednav'),
                 'category' => get_string('tree_type_category', 'local_extendednav'),
+                'tab' => get_string('tree_type_tab', 'local_extendednav'),
             ]);
             $mform->setDefault('treetype', 'page');
             $mform->addHelpButton('treetype', 'tree_type', 'local_extendednav');
@@ -136,7 +137,7 @@ class node_form extends \moodleform {
             $mform->addHelpButton('url', 'url', 'local_extendednav');
             if ($istree) {
                 // A category has no address: Moodle lists what it holds on a page of its own.
-                $mform->hideIf('url', 'treetype', 'eq', 'category');
+                $mform->hideIf('url', 'treetype', 'neq', 'page');
             }
             if ($isparent) {
                 $mform->addElement('static', 'urlnotice', '', \html_writer::div(
@@ -276,16 +277,43 @@ class node_form extends \moodleform {
             $mform->addElement('hidden', 'parentkey', (string)($native->parentkey ?? ''));
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
         } else if ($istree) {
-            // A node of the plugin goes in a category of the administration; a category of its own can also go at the top, as
-            // a new tab.
+            // What the parent can be depends on the type: a tab has none, a category goes in a tab or in another category, and a
+            // page goes in a tab or a category, or in General, where Moodle shows the pages at the top of the administration.
+            $categories = $this->get_tree_categories($menu, $currentkey);
             $mform->addElement(
                 'select',
                 'parentkey',
                 get_string('category_of_page', 'local_extendednav'),
-                ['' => get_string('tree_top_level', 'local_extendednav')] + $this->get_tree_categories($menu, $currentkey)
+                ['' => get_string('tree_top_general', 'local_extendednav')] + $categories
             );
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
             $mform->addHelpButton('parentkey', 'category_of_page', 'local_extendednav');
+            $mform->hideIf('parentkey', 'treetype', 'neq', 'page');
+            $mform->addElement(
+                'select',
+                'categoryparent',
+                get_string('category_of_page', 'local_extendednav'),
+                $categories ?: ['' => get_string('tree_no_categories', 'local_extendednav')]
+            );
+            $mform->setType('categoryparent', PARAM_ALPHANUMEXT);
+            $mform->addHelpButton('categoryparent', 'category_of_category', 'local_extendednav');
+            $mform->hideIf('categoryparent', 'treetype', 'neq', 'category');
+        } else if ($menu instanceof \local_extendednav\menu\preferences) {
+            // The preferences and the profile: Moodle's items stay in their section; a link of the site goes in one of them.
+            if ($menu->is_native($currentkey)) {
+                $mform->addElement('hidden', 'parentkey', (string)($menu->get_native_node($currentkey)->parentkey ?? ''));
+            } else {
+                $sections = [];
+                foreach ($menu->get_native_nodes() as $key => $native) {
+                    if ($native->parentkey === '') {
+                        $sections[$key] = format_string($native->text);
+                    }
+                }
+                \core_collator::asort($sections);
+                $mform->addElement('select', 'parentkey', get_string('section_of_item', 'local_extendednav'), $sections);
+                $mform->addHelpButton('parentkey', 'section_of_item', 'local_extendednav');
+            }
+            $mform->setType('parentkey', PARAM_ALPHANUMEXT);
         } else if ($issecondary) {
             // The secondary navigations have no submenus.
             $mform->addElement('hidden', 'parentkey', '');
@@ -359,9 +387,7 @@ class node_form extends \moodleform {
             $data['nodekey'] = $current->nodekey;
         }
         $data['availability'] = self::conditions_of($data['availabilityconditionsjson'] ?? '');
-        if (($data['treetype'] ?? '') === 'category') {
-            $data['url'] = '';
-        }
+        $data = (array)self::tree_values((object)$data);
         $record = manager::prepare($data, $menukey);
 
         $contextid = (int)($data['contextid'] ?? 0);
@@ -394,12 +420,27 @@ class node_form extends \moodleform {
         if ($menu instanceof \local_extendednav\menu\admintree && !$menu->is_native((string)$record->nodekey)) {
             $categories = $this->get_tree_categories($menu, (string)$record->nodekey);
             $parentkey = (string)($record->parentkey ?? '');
-            $ispage = ($data['treetype'] ?? 'page') !== 'category';
-            if ($ispage && trim((string)($data['url'] ?? '')) === '') {
+            $type = $data['treetype'] ?? 'page';
+            if ($type === 'page' && trim((string)($data['url'] ?? '')) === '') {
                 $errors['url'] = get_string('required');
             }
-            if (($ispage || $parentkey !== '') && !isset($categories[$parentkey])) {
+            // A page may stay in General (no parent); a category needs a tab or a category to go in.
+            if ($type === 'page' && $parentkey !== '' && !isset($categories[$parentkey])) {
                 $errors['parentkey'] = get_string('err_tree_category', 'local_extendednav');
+            }
+            if ($type === 'category' && !isset($categories[$parentkey])) {
+                $errors['categoryparent'] = get_string('err_tree_category', 'local_extendednav');
+            }
+        }
+
+        // A link added to the preferences or to the profile needs its section and its address.
+        if ($menu instanceof \local_extendednav\menu\preferences && !$menu->is_native((string)$record->nodekey)) {
+            $section = $menu->get_native_node((string)($record->parentkey ?? ''));
+            if ($section === null || $section->parentkey !== '') {
+                $errors['parentkey'] = get_string('required');
+            }
+            if (trim((string)($data['url'] ?? '')) === '') {
+                $errors['url'] = get_string('required');
             }
         }
 
@@ -424,7 +465,16 @@ class node_form extends \moodleform {
         }
         // A node of the site administration without an address is a category.
         if (is_object($defaultvalues) && !empty($defaultvalues->nodekey) && property_exists($defaultvalues, 'url')) {
-            $defaultvalues->treetype = trim((string)$defaultvalues->url) === '' ? 'category' : 'page';
+            $parentkey = (string)($defaultvalues->parentkey ?? '');
+            if (trim((string)$defaultvalues->url) !== '') {
+                $defaultvalues->treetype = 'page';
+            } else {
+                $defaultvalues->treetype = $parentkey === '' ? 'tab' : 'category';
+                $defaultvalues->categoryparent = $parentkey;
+            }
+        } else if (is_object($defaultvalues) && !empty($defaultvalues->parentkey)) {
+            // A new node of the level open: a category starts in the same parent as a page.
+            $defaultvalues->categoryparent = $defaultvalues->parentkey;
         }
         parent::set_data($defaultvalues);
     }
@@ -438,10 +488,23 @@ class node_form extends \moodleform {
         $data = parent::get_data();
         if ($data !== null) {
             $data->availability = self::conditions_of($data->availabilityconditionsjson ?? '');
-            // A category of the site administration keeps no address, whatever the hidden field held.
-            if (($data->treetype ?? '') === 'category') {
-                $data->url = '';
-            }
+            $data = self::tree_values($data);
+        }
+        return $data;
+    }
+
+    /**
+     * Gives the values of a node of the site administration what its type means: a tab and a category keep no address, a tab
+     * goes at the top and a category in the parent chosen for it. Other nodes are returned as they are.
+     *
+     * @param \stdClass $data The values of the form.
+     * @return \stdClass
+     */
+    private static function tree_values(\stdClass $data): \stdClass {
+        $type = $data->treetype ?? '';
+        if ($type === 'tab' || $type === 'category') {
+            $data->url = '';
+            $data->parentkey = $type === 'tab' ? '' : (string)($data->categoryparent ?? '');
         }
         return $data;
     }

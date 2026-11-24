@@ -56,6 +56,10 @@ if ($scope->is_activity()) {
     // The description of the activity says nothing about its navigation.
     $PAGE->activityheader->set_attrs(['description' => '', 'hidecompletion' => true]);
 }
+// The guided tour cannot be skipped when the site asks for it: the styles hide its skip button.
+if (get_config('local_extendednav', 'tourrequired')) {
+    $PAGE->add_body_class('local-extendednav-tour-required');
+}
 $PAGE->set_title(get_string('context_navigation', 'local_extendednav') . ' - ' . $scope->name());
 $PAGE->set_heading($scope->name());
 $PAGE->navbar->add(get_string('context_navigation', 'local_extendednav'), $PAGE->url);

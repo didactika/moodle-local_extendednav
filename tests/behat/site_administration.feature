@@ -41,10 +41,10 @@ Feature: Shape the site administration
     Then I should see "Staff guide"
 
   @javascript
-  Scenario: A category of the plugin holds a page, and Add node starts in the level open
+  Scenario: A tab of the plugin holds a page, and Add node starts in the level open
     When I follow "Add node"
     And I set the following fields to these values:
-      | Type     | Category        |
+      | Type     | Tab             |
       | Node key | didactika       |
       | Title    | Didactika tools |
     And "#fitem_id_url" "css_element" should not be visible
@@ -61,3 +61,26 @@ Feature: Shape the site administration
     And I visit "/admin/category.php?category=didactika"
     And I should see "Didactika tools"
     And I should see "Handbook"
+
+  @javascript
+  Scenario: The parent offered depends on the type of the node
+    When I follow "Add node"
+    And I set the field "Type" to "Tab"
+    Then "#fitem_id_parentkey" "css_element" should not be visible
+    And "#fitem_id_categoryparent" "css_element" should not be visible
+    And "#fitem_id_url" "css_element" should not be visible
+    And I set the field "Type" to "Category"
+    And "#fitem_id_categoryparent" "css_element" should be visible
+    And "#fitem_id_parentkey" "css_element" should not be visible
+    And the "categoryparent" select box should not contain "General (top of the site administration)"
+    And I set the field "Type" to "Page"
+    And "#fitem_id_parentkey" "css_element" should be visible
+    And the "parentkey" select box should contain "General (top of the site administration)"
+    And I set the following fields to these values:
+      | Node key | toplink   |
+      | Title    | Top link  |
+      | URL      | /my/      |
+      | parentkey | General (top of the site administration) |
+    And I press "Save changes"
+    And I visit "/admin/search.php"
+    And I should see "Top link"

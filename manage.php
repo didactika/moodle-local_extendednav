@@ -66,6 +66,10 @@ if ($menu === null) {
     $menu = menu_manager::get_menu($menukey);
 }
 $hasscopes = nodes::supports_scopes($menukey);
+// The boxes of a profile are found when a profile is built; the first time, the one of the current user is built here.
+if ($menu instanceof \local_extendednav\menu\profile && !$menu->get_native_nodes()) {
+    \core_user\output\myprofile\manager::build_tree($USER, true);
+}
 
 $pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 $PAGE->set_url($pageurl);

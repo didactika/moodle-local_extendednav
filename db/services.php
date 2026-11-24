@@ -112,4 +112,11 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
+    'local_extendednav_set_personal' => [
+        'classname' => \local_extendednav\external\set_personal::class,
+        'description' => 'Saves the order and the items a user hides on their own page Preferences.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:personalise',
+    ],
 ];
