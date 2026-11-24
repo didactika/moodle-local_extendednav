@@ -11,8 +11,16 @@
     gap: 1.5rem;
 
     @media (min-width: 992px) {
-        grid-template-columns: 15rem minmax(0, 1fr);
         align-items: start;
+
+        &:not([data-compact]) {
+            grid-template-columns: 15rem minmax(0, 1fr);
+        }
+    }
+
+    // A page of few navigations chooses them with a select, never as wide as the page.
+    &[data-compact] [data-region="originselect"] {
+        max-width: 20rem;
     }
 
     & > [data-region="origin"] {

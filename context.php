@@ -73,6 +73,8 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'origins' => $groups['origins'],
     'originoptions' => $groups['originoptions'],
     'sitewide' => false,
+    // A course has two navigations and a category three: a select, so the list keeps the width of the page.
+    'compact' => true,
     'scopename' => $scope->name(),
     'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
