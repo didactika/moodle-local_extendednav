@@ -128,6 +128,6 @@ Feature: Edit navigation nodes
     Then I should see "Currently unavailable" in the "myhome" "table_row"
     And "Delete" "button" should not exist in the "siteadminnode" "table_row"
     And I click on "Delete" "button" in the "myhome" "table_row"
-    And I click on "Delete" "button" in the "Delete Dashboard?" "dialogue"
+    And I click on "Delete" "button" in the "Delete myhome?" "dialogue"
     And I should see "1 changed"
     And I should not see "myhome" in the "[data-region='tablewrap']" "css_element"

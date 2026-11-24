@@ -42,7 +42,7 @@
     <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>
     <thead>
         <tr>
-            <th scope="col" data-column="select"><input type="checkbox" class="form-check-input" data-region="selectpage" aria-label="{{#str}}selectall, moodle{{/str}}"></th>
+            <th scope="col" data-column="select"><input type="checkbox" class="form-check-input" data-region="selectpage" title="{{#str}}selectall, moodle{{/str}}" aria-label="{{#str}}selectall, moodle{{/str}}"></th>
             <th scope="col" data-column="title">{{#str}}title, local_extendednav{{/str}}</th>
             <th scope="col" class="d-none d-md-table-cell">{{#str}}visibility, local_extendednav{{/str}}</th>
             <th scope="col" class="d-none d-lg-table-cell">{{#str}}url, local_extendednav{{/str}}</th>
@@ -52,7 +52,7 @@
     <tbody>
         {{#rows}}
             <tr {{#isselected}}class="table-active"{{/isselected}} data-key="{{nodekey}}">
-                <td data-column="select"><input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}></td>
+                <td data-column="select"><input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" title="{{selectlabel}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}></td>
                 <th scope="row" data-column="title">
                     <span class="d-flex align-items-center gap-2 {{#child}}ps-4 pl-4{{/child}}">
                         {{#icon}}<span class="text-muted">{{{icon}}}</span>{{/icon}}
