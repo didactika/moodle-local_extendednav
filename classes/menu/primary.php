@@ -391,10 +391,10 @@ class primary extends base {
 
         if ($needslabels) {
             // Moodle 5.3 prints the text of top-level items as plain text; the module shows the icon and marker again.
-            $PAGE->requires->js_call_amd('local_extendednav/primary_labels', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/primary_labels', 'init');
         }
         if ($needsscript) {
-            $PAGE->requires->js_call_amd('local_extendednav/link_display', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/link_display', 'init');
         }
     }
 

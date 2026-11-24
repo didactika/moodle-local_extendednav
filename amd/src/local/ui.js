@@ -25,7 +25,7 @@
 import ModalForm from 'core_form/modalform';
 import {add as addToast} from 'core/toast';
 import {getString} from 'core/str';
-import {normalise} from 'local_extendednav/form_layout';
+import {normalise} from 'local_extendednav/form/form_layout';
 import {init as initSearchClear} from 'local_extendednav/local/search_clear';
 
 // Every page of the plugin loads this module, so its search fields get the button that empties them.

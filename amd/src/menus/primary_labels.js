@@ -24,7 +24,7 @@
  * React keeps owning its text node: it is emptied, not removed, and the elements are added before it. When
  * React writes the text again, for example when items move into the "More" menu, it is shown again.
  *
- * @module     local_extendednav/primary_labels
+ * @module     local_extendednav/menus/primary_labels
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

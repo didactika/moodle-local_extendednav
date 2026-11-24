@@ -27,7 +27,7 @@ use local_extendednav\local\node\text;
  * Moodle builds the user menu from the customusermenuitems setting, so the plugin
  * rewrites that setting for the current request. Moodle reads only "text|url"
  * from each line, so icons, tooltips, new windows and submenus are applied in the
- * browser by the local_extendednav/usermenu module.
+ * browser by the local_extendednav/menus/usermenu module.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
