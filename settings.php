@@ -28,6 +28,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// The changes of the navigation of a course and of its activities travel with the backups of Moodle: whether they go in a backup
+// and come back with a restore is set beside the other defaults of Moodle.
+if ($hassiteconfig && $ADMIN->fulltree) {
+    $backupdefaults = $ADMIN->locate('backupgeneralsettings');
+    if ($backupdefaults instanceof admin_settingpage) {
+        $backupdefaults->add(new admin_setting_configcheckbox(
+            'local_extendednav/backup_navigation',
+            get_string('backup_navigation', 'local_extendednav'),
+            get_string('backup_navigation_desc', 'local_extendednav'),
+            1
+        ));
+    }
+    $restoredefaults = $ADMIN->locate('restoregeneralsettings');
+    if ($restoredefaults instanceof admin_settingpage) {
+        $restoredefaults->add(new admin_setting_configcheckbox(
+            'local_extendednav/restore_navigation',
+            get_string('restore_navigation', 'local_extendednav'),
+            get_string('restore_navigation_desc', 'local_extendednav'),
+            1
+        ));
+    }
+}
+
 if ($hassiteconfig || has_capability('local/extendednav:manage', context_system::instance())) {
     // Appearance is visible to every user who can open an admin page, unlike Local plugins,
     // so administrators and managers find the plugin in the same place.
@@ -46,21 +69,6 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/exceptions.php'),
         'local/extendednav:manage'
     ));
-    // Whether the guided tours of the plugin can be skipped. Moodle always lets a tour be closed with the Escape key.
-    $tourpage = new admin_settingpage(
-        'local_extendednav_settings',
-        get_string('settings', 'local_extendednav'),
-        'moodle/site:config'
-    );
-    if ($ADMIN->fulltree) {
-        $tourpage->add(new admin_setting_configcheckbox(
-            'local_extendednav/tourrequired',
-            get_string('setting:tourrequired', 'local_extendednav'),
-            get_string('setting:tourrequired_desc', 'local_extendednav'),
-            1
-        ));
-    }
-    $ADMIN->add('local_extendednav_cat', $tourpage);
     // The changes to the navigation are a report, in a section of its own among the reports of the site.
     $ADMIN->add('reports', new admin_category('local_extendednav_reports', get_string('pluginname', 'local_extendednav')));
     $ADMIN->add('local_extendednav_reports', new admin_externalpage(

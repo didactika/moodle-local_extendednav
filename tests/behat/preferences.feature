@@ -5,24 +5,36 @@ Feature: Arrange one's own preferences
   I need to hide and order the options of my Preferences page, without changing anyone else's
 
   Background:
-    Given the following "users" exist:
+    Given the guided tours of extended navigation are off
+    And the following "users" exist:
       | username | firstname | lastname |
       | student1 | Sam       | Student  |
+      | student2 | Sue       | Student  |
 
   @javascript
-  Scenario: A user hides an option and restores the page
+  Scenario: A user hides an option of a section and shows it again
     Given I log in as "student1"
     And I follow "Preferences" in the user menu
     And I should see "Forum preferences"
+    And I should see "Extended navigation"
     When I follow "Arrange my preferences"
-    And I click on "Show Forum preferences" "checkbox"
+    And I click on "Open User account" "button"
+    And I click on "Hide Forum preferences" "button"
     And I wait until the page is ready
-    And I follow "Go to Preferences"
+    And I follow "Preferences" in the user menu
     Then I should not see "Forum preferences"
+    And I log out
+    And I log in as "student2"
+    And I follow "Preferences" in the user menu
+    And I should see "Forum preferences"
+    And I log out
+    And I log in as "student1"
+    And I follow "Preferences" in the user menu
     And I follow "Arrange my preferences"
-    And I press "Restore the default layout"
+    And I click on "Open User account" "button"
+    And I click on "Show Forum preferences" "button"
     And I wait until the page is ready
-    And I follow "Go to Preferences"
+    And I follow "Preferences" in the user menu
     And I should see "Forum preferences"
 
   Scenario: A user without the capability keeps the page of the site
@@ -32,3 +44,8 @@ Feature: Arrange one's own preferences
     When I log in as "student1"
     And I follow "Preferences" in the user menu
     Then I should not see "Arrange my preferences"
+
+  Scenario: An administrator arranges the preferences of a user from that user
+    Given I log in as "admin"
+    When I visit the preferences page of "student1"
+    Then I should see "Arrange the preferences of Sam Student"

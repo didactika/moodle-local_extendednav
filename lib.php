@@ -88,18 +88,6 @@ function local_extendednav_extend_navigation_user_settings(
 }
 
 /**
- * Adds the items of the site to the boxes of the profile of a user.
- *
- * @param \core_user\output\myprofile\tree $tree The profile.
- * @param stdClass $user The user whose profile it is.
- * @param bool $iscurrentuser Whether it is the profile of the current user.
- * @param stdClass|null $course The course of the page, if any.
- */
-function local_extendednav_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course): void {
-    \local_extendednav\local\navigation\profile_injector::apply($tree, $user);
-}
-
-/**
  * Adds Navigation to the menu of an activity, for whoever may change the navigation of the activity.
  *
  * @param settings_navigation $navigation The settings of the page.

@@ -144,8 +144,9 @@ final class exceptions {
     private static function where(string $search): array {
         global $DB;
 
-        $where = 'n.contextid <> 0';
-        $params = [];
+        // The preferences each user arranges are theirs, opened from that user, and never listed here.
+        $where = 'n.contextid <> 0 AND ctx.contextlevel <> :leveluser';
+        $params = ['leveluser' => CONTEXT_USER];
         if ($search !== '') {
             $where .= ' AND (' . $DB->sql_like('c.fullname', ':s1', false, false)
                 . ' OR ' . $DB->sql_like('c.shortname', ':s2', false, false)

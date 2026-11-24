@@ -234,24 +234,8 @@
     }
 }
 
-// The button that clears every filter: the arrow of a reload at the end of the row, and a cross at the right of the head of the
-// group of filters, where it clears the menus listed under it.
-.len {
-    & [data-action="clearfilters"] [data-region="icon-group"] {
-        display: none;
-    }
-
-    & [data-region="filter-panel-head"] {
-        padding: 0.25rem 0.25rem 0 0.75rem;
-
-        & [data-action="clearfilters"] {
-            & [data-region="icon-row"] {
-                display: none;
-            }
-
-            & [data-region="icon-group"] {
-                display: inline-flex;
-            }
-        }
-    }
+// The head of the group of filters: its name on the left and, at its right, the button that clears every filter, with the same
+// reload icon it has at the end of the row.
+.len [data-region="filter-panel-head"] {
+    padding: 0.25rem 0.25rem 0 0.75rem;
 }

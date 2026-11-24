@@ -128,12 +128,35 @@ function xmldb_local_extendednav_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026112603) {
-        // The guided tours of the plugin, for the sites that installed it before they existed; they start required.
+        // The guided tours of the plugin, for the sites that installed it before they existed.
         require_once($CFG->dirroot . '/local/extendednav/lib.php');
-        set_config('tourrequired', 1, 'local_extendednav');
         local_extendednav_import_tours();
 
         upgrade_plugin_savepoint(true, 2026112603, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112604) {
+        // The profile has no navigation of its own, each user arranges their preferences as changes of their own context, and
+        // the tours are managed on the page of the tours of Moodle.
+        $DB->delete_records('local_extendednav', ['menu' => 'profile']);
+        unset_config('nativenodes_profile', 'local_extendednav');
+        unset_config('enabled_profile', 'local_extendednav');
+        unset_config('tourrequired', 'local_extendednav');
+        $DB->delete_records('user_preferences', ['name' => 'local_extendednav_preferences']);
+        if ($DB->get_manager()->table_exists('tool_usertours_tours')) {
+            // The tours change: the one of the Navigation page leaves the preferences of each user to a tour of their own.
+            foreach (['mypreferences', 'context', 'preferences'] as $name) {
+                $tour = $DB->get_record('tool_usertours_tours', ['name' => 'tour_' . $name . '_name,local_extendednav']);
+                if ($tour) {
+                    \tool_usertours\tour::instance((int)$tour->id)->remove();
+                }
+            }
+        }
+        require_once($CFG->dirroot . '/local/extendednav/lib.php');
+        local_extendednav_import_tours();
+        \local_extendednav\local\node\repository::purge();
+
+        upgrade_plugin_savepoint(true, 2026112604, 'local', 'extendednav');
     }
 
     return true;

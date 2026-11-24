@@ -47,6 +47,7 @@ class importer {
      *
      * @param string $defaultmenu Menu used for nodes that do not name one.
      * @param bool $overwrite Whether nodes that already exist are replaced (true) or skipped (false).
+     * @param int[] $targets Contexts the nodes of the file go to, whatever the file says, or none to follow the file.
      */
     public function __construct(string $defaultmenu, bool $overwrite, array $targets = []) {
         $this->targets = array_values(array_filter(array_map('intval', $targets)));
@@ -65,6 +66,8 @@ class importer {
         $errors = [];
         $warnings = [];
         $counts = ['created' => 0, 'updated' => 0, 'skipped' => 0];
+        // The categories, courses, activities and users are looked up again: one may have gone since they were named.
+        scope::reset();
         $items = $this->expand_legacy_activities($items, $warnings, $counts);
         if ($this->targets) {
             $items = $this->give_to_targets($items, $counts);
@@ -298,8 +301,14 @@ class importer {
                 $errors[] = $label . ': ' . get_string('err_invalid_menu', 'local_extendednav');
                 continue;
             }
-            if ($contextid === null || !nodes::supports_scopes($menukey)) {
+            if (!nodes::supports_scopes($menukey)) {
                 $errors[] = $label . ': ' . get_string('err_import_scope', 'local_extendednav', s((string)$item['scope']));
+                continue;
+            }
+            // A category, a course, an activity or a user this site does not have is left out, and the rest is imported.
+            if ($contextid === null) {
+                $warnings[] = $label . ': ' . get_string('warn_import_scope', 'local_extendednav', s((string)$item['scope']));
+                $counts['skipped']++;
                 continue;
             }
             $values = array_intersect_key($item, array_flip(manager::EDITABLE_FIELDS));

@@ -35,4 +35,8 @@ $observers = [
         'eventname' => '\core\event\role_deleted',
         'callback' => '\local_extendednav\observer::role_deleted',
     ],
+    [
+        'eventname' => '\core\event\user_deleted',
+        'callback' => '\local_extendednav\observer::user_deleted',
+    ],
 ];

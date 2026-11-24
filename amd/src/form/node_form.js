@@ -99,6 +99,28 @@ const isExternal = (value, wwwroot) => {
 };
 
 /**
+ * Hides each section of the form whose fields are all hidden, such as Where it goes for a tab, which has no parent: a heading
+ * over nothing says nothing. The section comes back as soon as one of its fields does.
+ *
+ * @param {HTMLFormElement} form The form.
+ */
+const hideEmptySections = (form) => {
+    const isHidden = (item) => item.hidden || item.classList.contains('d-none') || window.getComputedStyle(item).display === 'none';
+    const update = () => {
+        form.querySelectorAll('fieldset[id^="id_"]').forEach((section) => {
+            const items = [...section.querySelectorAll('.fitem')];
+            const empty = items.length > 0 && items.every(isHidden);
+            if (section.hidden !== empty) {
+                section.hidden = empty;
+            }
+        });
+    };
+    // Moodle shows and hides the fields itself when the values they depend on change.
+    new MutationObserver(update).observe(form, {subtree: true, attributes: true, attributeFilter: ['class', 'hidden', 'style']});
+    update();
+};
+
+/**
  * Sets up the form. The form writes in the element nodeformdata, as JSON: the titles and links of the nodes of Moodle by key
  * (placeholders), the keys of the other nodes of the navigation (customKeys), the icon of a required field (requiredHtml), the
  * root of the site (wwwroot) and the key of the node edited, when it cannot be changed (currentKey).
@@ -109,7 +131,10 @@ export const init = () => {
     const {placeholders, customKeys, requiredHtml, wwwroot, currentKey} = JSON.parse(data?.textContent || '{}');
     const title = document.querySelector('form.mform input[name="title"]');
     const form = title ? title.closest('form') : null;
-    const url = form ? form.querySelector('input[name="url"]') : null;
+    const url = form ? form.querySelector('input[name="url"]:not([type="hidden"])') : null;
+    if (form) {
+        hideEmptySections(form);
+    }
     if (!form || !url) {
         return;
     }

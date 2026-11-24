@@ -48,10 +48,11 @@
         "id": "len-nodes"
     }
 }}
-<div class="len" data-region="manage" data-config="{{config}}">
+<div class="len" data-region="manage" data-scope="{{scope}}" data-config="{{config}}">
     {{#sitewide}}<p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>{{/sitewide}}
-    {{^sitewide}}<p class="text-muted mb-0">{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}</p>{{/sitewide}}
+    {{^sitewide}}<p class="text-muted mb-0">{{#description}}{{description}}{{/description}}{{^description}}{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}{{/description}}</p>{{/sitewide}}
 
+    {{^single}}{{> local_extendednav/manage/origins_bar }}{{/single}}
     <div class="d-grid gap-3" data-region="head">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div class="d-flex flex-wrap align-items-center gap-3">

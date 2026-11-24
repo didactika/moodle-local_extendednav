@@ -76,7 +76,7 @@ if (menu_manager::get_menu($menukey) === null) {
 $manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
 if ($choose) {
-    // The navigations and the contexts chosen, with or without the nodes of the site.
+    // The navigations, the users and the courses and categories chosen, with or without the changes of the whole site.
     $url = new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'choose' => 1]);
     $PAGE->set_url($url);
     $PAGE->set_title(get_string('export_choose', 'local_extendednav'));
@@ -84,13 +84,8 @@ if ($choose) {
     $form = new \local_extendednav\form\export_form($url, ['menu' => $menukey]);
     if ($form->is_cancelled()) {
         redirect($manageurl);
-    } else if ($data = $form->get_data()) {
-        $menukeys = array_values(array_filter((array)$data->menus, static fn($key): bool => menu_manager::get_menu($key) !== null));
-        $contexts = array_map('intval', (array)($data->contexts ?? []));
-        if (!empty($data->withsite)) {
-            $contexts[] = 0;
-        }
-        local_extendednav_send_export(exporter::export_file($menukeys, $contexts), 'chosen', $url);
+    } else if ($choice = $form->get_choice()) {
+        local_extendednav_send_export(exporter::export_file($choice['menus'], $choice['contexts']), 'chosen', $url);
     }
     echo $OUTPUT->header();
     echo html_writer::start_div('len');

@@ -5,7 +5,8 @@ Feature: Change the navigations of a course from the course
   I need a page of the course where its navigations are changed
 
   Background:
-    Given the following "users" exist:
+    Given the guided tours of extended navigation are off
+    And the following "users" exist:
       | username | firstname | lastname |
       | teacher1 | Teacher   | One      |
     And the following "courses" exist:

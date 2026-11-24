@@ -60,6 +60,21 @@ abstract class node_service extends external_api {
             return;
         }
         $context = \context::instance_by_id($contextid);
+        // A user arranges their own preferences; whoever manages the navigation of the site, the ones of any user.
+        $scope = \local_extendednav\local\navigation\context_scope::from_id($contextid);
+        if ($scope !== null && $scope->is_user()) {
+            self::validate_context($context);
+            $allowed = match ($change) {
+                'view' => $scope->can_view(),
+                '' => $scope->can_manage(),
+                default => $scope->can($change),
+            };
+            if (!$allowed) {
+                throw new \required_capability_exception($context, 'local/extendednav:personalise', 'nopermissions', '');
+            }
+            self::validate_scope($menu, $contextid);
+            return;
+        }
         // Whoever manages the navigation of the site changes every context without entering it (they need not be enrolled).
         if (has_capability('local/extendednav:manage', \context_system::instance())) {
             self::validate_context(\context_system::instance());

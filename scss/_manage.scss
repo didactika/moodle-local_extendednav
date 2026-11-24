@@ -199,7 +199,7 @@
 
 // The selects of the navigations, drawn as the menus of the toolbar of a list: a pill as tall as the search, as wide as what it
 // says. The select of the kinds of activity is tinted while the navigation shown is one of them.
-.len [data-region="origins"] select:is(.form-select, .custom-select) {
+.len :is([data-region="origins"], [data-region="originbar"]) select:is(.form-select, .custom-select) {
     width: auto;
     min-width: 10rem;
     max-width: 12rem;
@@ -236,9 +236,4 @@
 .len [data-region="tablewrap"] .btn[data-action="changes"] {
     font-size: 0.8125rem;
     line-height: 1.4;
-}
-
-// The groups of the column of the navigations are apart by a band of the surface, with no name above them.
-.len [data-region="originlist"] > .list-group + .list-group {
-    border-top: 0.375rem solid var(--dd-surface-2);
 }
