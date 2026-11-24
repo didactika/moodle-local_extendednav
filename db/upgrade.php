@@ -159,5 +159,13 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112604, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112605) {
+        // The guided tour of the form of a node; the tours already there are left as they are.
+        require_once($CFG->dirroot . '/local/extendednav/lib.php');
+        local_extendednav_import_tours();
+
+        upgrade_plugin_savepoint(true, 2026112605, 'local', 'extendednav');
+    }
+
     return true;
 }
