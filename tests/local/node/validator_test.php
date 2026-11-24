@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_validator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node\validator::class)]
 /**
  * Tests for the shared validation rules.
  *
@@ -25,9 +25,9 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_validator
+ * @covers     \local_extendednav\local\node\validator
  */
-final class node_validator_test extends \advanced_testcase {
+final class validator_test extends \advanced_testcase {
     /**
      * Finds Moodle's primary navigation items for the tests.
      */
@@ -45,10 +45,10 @@ final class node_validator_test extends \advanced_testcase {
      * @return array Result of the validator.
      */
     private function run_validation(array $data, string $menu = 'primary'): array {
-        $record = node_manager::prepare($data + ['visibility' => 1], $menu);
-        $others = node_repository::get_menu_nodes_by_key($menu);
+        $record = manager::prepare($data + ['visibility' => 1], $menu);
+        $others = repository::get_menu_nodes_by_key($menu);
         unset($others[$record->nodekey]);
-        return node_validator::validate($record, $others);
+        return validator::validate($record, $others);
     }
 
     /**
@@ -101,8 +101,8 @@ final class node_validator_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $generator->create_node(['nodekey' => 'help', 'title' => 'Help', 'url' => '/help.php']);
 
-        $record = node_manager::prepare(['nodekey' => 'help', 'title' => 'Again', 'url' => '/a.php'], 'primary');
-        $errors = node_validator::validate($record, node_repository::get_menu_nodes_by_key('primary'))['errors'];
+        $record = manager::prepare(['nodekey' => 'help', 'title' => 'Again', 'url' => '/a.php'], 'primary');
+        $errors = validator::validate($record, repository::get_menu_nodes_by_key('primary'))['errors'];
         $this->assertSame(get_string('err_duplicate_key', 'local_extendednav'), $errors['nodekey']);
 
         // The same key is fine in the other menu.
@@ -137,7 +137,7 @@ final class node_validator_test extends \advanced_testcase {
      * @param bool $valid Whether it is accepted.
      */
     public function test_icon(string $icon, bool $valid): void {
-        $this->assertSame($valid, node_validator::is_valid_icon($icon));
+        $this->assertSame($valid, validator::is_valid_icon($icon));
     }
 
     /**
@@ -259,8 +259,8 @@ final class node_validator_test extends \advanced_testcase {
      */
     public function test_unknown_menu(): void {
         $this->resetAfterTest();
-        $record = node_manager::prepare(['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php'], 'sidebar');
-        $errors = node_validator::validate($record, [])['errors'];
+        $record = manager::prepare(['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php'], 'sidebar');
+        $errors = validator::validate($record, [])['errors'];
         $this->assertSame(get_string('err_invalid_menu', 'local_extendednav'), $errors['menu']);
     }
 }

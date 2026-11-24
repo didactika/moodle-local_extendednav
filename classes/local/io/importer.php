@@ -14,9 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\io;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\listing\nodes;
+use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\node\validator;
 
 /**
  * Imports and exports nodes in the YAML file format.
@@ -26,7 +32,7 @@ use local_extendednav\menu_manager;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_importer {
+class importer {
     /** @var string[] Keys written for each node, in order. */
     public const EXPORT_FIELDS = [
         'nodekey', 'menu', 'native', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
@@ -107,7 +113,7 @@ class node_importer {
                 return false;
             }
         }
-        return $menu->is_native($row->nodekey) && (int)$row->visibility === node_access::VISIBILITY_ALL
+        return $menu->is_native($row->nodekey) && (int)$row->visibility === access::VISIBILITY_ALL
             && empty($row->blockaccess) && empty($row->display) && empty($row->placement)
             && (int)$row->hideadmins === ($row->menu === \local_extendednav\menu\admintree::KEY ? 1 : 0)
             && (int)$row->contextid === 0;
@@ -125,7 +131,7 @@ class node_importer {
     public static function export_nodes(array $nodes, array $menunodes, int $depth = 2): array {
         $positions = [];
         $siblings = [];
-        foreach (node_manager::group_by_parent($menunodes, $depth) as $index => $node) {
+        foreach (manager::group_by_parent($menunodes, $depth) as $index => $node) {
             if ($depth > 2) {
                 $parent = (string)($node->parentkey ?? '');
                 $siblings[$parent] = ($siblings[$parent] ?? 0) + 1;
@@ -245,7 +251,7 @@ class node_importer {
         $counts = ['created' => 0, 'updated' => 0, 'skipped' => 0];
 
         $existing = [];
-        foreach (node_repository::get_all() as $node) {
+        foreach (repository::get_all() as $node) {
             $existing[$node->menu][$node->nodekey] = $node;
         }
 
@@ -299,8 +305,8 @@ class node_importer {
                 continue;
             }
 
-            $values = array_intersect_key($item, array_flip(node_manager::EDITABLE_FIELDS));
-            $record = node_manager::prepare($values, $menukey);
+            $values = array_intersect_key($item, array_flip(manager::EDITABLE_FIELDS));
+            $record = manager::prepare($values, $menukey);
             $label = $menukey . '/' . $record->nodekey;
             $order = $item['order'] ?? '';
             if ($order !== '' && $order !== null && !(is_numeric($order) && (int)$order == $order && (int)$order >= 1)) {
@@ -337,7 +343,7 @@ class node_importer {
             foreach ($records as $nodekey => $record) {
                 $others = $final[$menukey];
                 unset($others[$nodekey]);
-                $result = node_validator::validate($record, $others);
+                $result = validator::validate($record, $others);
                 foreach ($result['errors'] as $field => $message) {
                     $errors[] = $menukey . '/' . $nodekey . ' (' . $field . '): ' . $message;
                 }
@@ -362,10 +368,10 @@ class node_importer {
             $ids = [];
             foreach ($records as $nodekey => $record) {
                 if (isset($record->id)) {
-                    node_manager::update($record);
+                    manager::update($record);
                     $counts['updated']++;
                 } else {
-                    $record = node_manager::create($record);
+                    $record = manager::create($record);
                     $counts['created']++;
                 }
                 $ids[$nodekey] = (int)$record->id;
@@ -378,14 +384,14 @@ class node_importer {
         }
         foreach ($scopedrecords as $record) {
             if (isset($record->id)) {
-                node_manager::update($record);
+                manager::update($record);
                 $counts['updated']++;
             } else {
-                node_manager::create($record);
+                manager::create($record);
                 $counts['created']++;
             }
         }
-        if (access_guard::check_fallbacks(node_repository::get_all()) === access_guard::FALLBACKS_BLOCKED_FOR_SOME) {
+        if (access_guard::check_fallbacks(repository::get_all()) === access_guard::FALLBACKS_BLOCKED_FOR_SOME) {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
         return ['errors' => [], 'warnings' => $warnings, 'counts' => $counts];
@@ -411,17 +417,17 @@ class node_importer {
                 $errors[] = $label . ': ' . get_string('err_invalid_menu', 'local_extendednav');
                 continue;
             }
-            if ($contextid === null || !node_list::supports_scopes($menukey)) {
+            if ($contextid === null || !nodes::supports_scopes($menukey)) {
                 $errors[] = $label . ': ' . get_string('err_import_scope', 'local_extendednav', s((string)$item['scope']));
                 continue;
             }
-            $values = array_intersect_key($item, array_flip(node_manager::EDITABLE_FIELDS));
-            $record = node_manager::prepare($values, $menukey);
+            $values = array_intersect_key($item, array_flip(manager::EDITABLE_FIELDS));
+            $record = manager::prepare($values, $menukey);
             $record->contextid = $contextid;
             $label = $menukey . '@' . $item['scope'] . '/' . $record->nodekey;
 
             // The key of a node of a category or a course repeats the one of the site on purpose: it is checked against its own.
-            $others = node_repository::get_exceptions($menukey, $contextid);
+            $others = repository::get_exceptions($menukey, $contextid);
             $current = null;
             foreach ($others as $other) {
                 if ($other->nodekey === $record->nodekey) {
@@ -438,7 +444,7 @@ class node_importer {
             }
             $others = array_column($others, null, 'nodekey');
             unset($others[$record->nodekey]);
-            $result = node_validator::validate($record, $others);
+            $result = validator::validate($record, $others);
             foreach ($result['errors'] as $field => $message) {
                 $errors[] = $label . ' (' . $field . '): ' . $message;
             }
@@ -479,13 +485,13 @@ class node_importer {
             'id, nodekey, parentkey, sortorder'
         );
         $list = array_values(array_diff(
-            array_map(static fn(\stdClass $node): int => (int)$node->id, node_manager::group_by_parent($nodes)),
+            array_map(static fn(\stdClass $node): int => (int)$node->id, manager::group_by_parent($nodes)),
             $placed
         ));
         foreach ($orders as $nodekey => [$order]) {
             array_splice($list, min($order - 1, count($list)), 0, [$ids[$nodekey]]);
         }
-        node_manager::reorder($menukey, $list);
+        manager::reorder($menukey, $list);
     }
 
     /**
@@ -496,7 +502,7 @@ class node_importer {
      * @param array[] $orders Position among the siblings and file index, keyed by node key.
      */
     private static function apply_sibling_orders(string $menukey, array $orders): void {
-        $nodes = node_list::get_scope_nodes($menukey, 0);
+        $nodes = nodes::get_scope_nodes($menukey, 0);
         $groups = [];
         foreach ($nodes as $key => $node) {
             $groups[(string)($node->parentkey ?? '')][] = $key;
@@ -524,7 +530,7 @@ class node_importer {
         foreach ($nodes as $key => $node) {
             $order[] = array_shift($queues[(string)($node->parentkey ?? '')]);
         }
-        node_manager::save_order($menukey, 0, $order);
+        manager::save_order($menukey, 0, $order);
         foreach ($touched as $parent) {
             \local_extendednav\menu\admintree::mark_ordered($parent);
         }

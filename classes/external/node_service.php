@@ -20,7 +20,7 @@ use core_external\external_api;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\node_list;
+use local_extendednav\local\listing\nodes;
 use local_extendednav\menu_manager;
 
 /**
@@ -56,7 +56,7 @@ abstract class node_service extends external_api {
         if ($contextid === 0) {
             return;
         }
-        if (!node_list::supports_scopes($menu)) {
+        if (!nodes::supports_scopes($menu)) {
             throw new \invalid_parameter_exception('This navigation has no exceptions.');
         }
         $context = \context::instance_by_id($contextid, IGNORE_MISSING);

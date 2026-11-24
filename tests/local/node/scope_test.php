@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\listing\nodes;
 
 /**
  * Tests for the nodes of a category or a course, which change what the site sets.
@@ -25,11 +26,11 @@ use local_extendednav\menu_manager;
  * @category   test
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_repository
- * @covers     \local_extendednav\local\node_manager
- * @covers     \local_extendednav\local\node_list
+ * @covers     \local_extendednav\local\node\repository
+ * @covers     \local_extendednav\local\node\manager
+ * @covers     \local_extendednav\local\listing\nodes
  */
-final class node_scope_test extends \advanced_testcase {
+final class scope_test extends \advanced_testcase {
     /**
      * Records the nodes a course navigation shows, so each one has a row.
      *
@@ -56,15 +57,15 @@ final class node_scope_test extends \advanced_testcase {
 
         $categorycontext = \context_coursecat::instance($category->id);
         $coursecontext = \context_course::instance($course->id);
-        node_manager::set_visibility('course', $categorycontext->id, ['grades'], node_access::VISIBILITY_HIDDEN);
-        node_manager::set_visibility('course', $coursecontext->id, ['grades'], node_access::VISIBILITY_ALL);
+        manager::set_visibility('course', $categorycontext->id, ['grades'], access::VISIBILITY_HIDDEN);
+        manager::set_visibility('course', $coursecontext->id, ['grades'], access::VISIBILITY_ALL);
 
-        $site = node_repository::get_scoped_nodes('course', \context_system::instance());
-        $this->assertSame(node_access::VISIBILITY_ALL, (int)$site['grades']->visibility);
-        $inside = node_repository::get_scoped_nodes('course', \context_course::instance($other->id));
-        $this->assertSame(node_access::VISIBILITY_HIDDEN, (int)$inside['grades']->visibility, 'The category sets it.');
-        $own = node_repository::get_scoped_nodes('course', $coursecontext);
-        $this->assertSame(node_access::VISIBILITY_ALL, (int)$own['grades']->visibility, 'The course sets it again.');
+        $site = repository::get_scoped_nodes('course', \context_system::instance());
+        $this->assertSame(access::VISIBILITY_ALL, (int)$site['grades']->visibility);
+        $inside = repository::get_scoped_nodes('course', \context_course::instance($other->id));
+        $this->assertSame(access::VISIBILITY_HIDDEN, (int)$inside['grades']->visibility, 'The category sets it.');
+        $own = repository::get_scoped_nodes('course', $coursecontext);
+        $this->assertSame(access::VISIBILITY_ALL, (int)$own['grades']->visibility, 'The course sets it again.');
     }
 
     /**
@@ -79,15 +80,15 @@ final class node_scope_test extends \advanced_testcase {
         $this->see_nodes(['grades']);
         $context = \context_course::instance($course->id);
 
-        $this->assertSame(1, node_manager::set_visibility('course', $context->id, ['grades'], node_access::VISIBILITY_HIDDEN));
+        $this->assertSame(1, manager::set_visibility('course', $context->id, ['grades'], access::VISIBILITY_HIDDEN));
 
         $where = ['menu' => 'course', 'nodekey' => 'grades'];
         $site = $DB->get_record('local_extendednav', $where + ['contextid' => 0], '*', MUST_EXIST);
-        $this->assertSame(node_access::VISIBILITY_ALL, (int)$site->visibility);
+        $this->assertSame(access::VISIBILITY_ALL, (int)$site->visibility);
         $this->assertSame(1, $DB->count_records('local_extendednav', $where + ['contextid' => $context->id]));
         // The site list never shows the exceptions.
         $this->assertCount(1, array_filter(
-            node_repository::get_menu_nodes('course'),
+            repository::get_menu_nodes('course'),
             static fn(\stdClass $node): bool => $node->nodekey === 'grades'
         ));
     }
@@ -100,11 +101,11 @@ final class node_scope_test extends \advanced_testcase {
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();
         $this->see_nodes(['grades']);
-        $site = node_repository::get_menu_nodes_by_key('course')['grades'];
-        node_manager::update((object)['id' => $site->id, 'title' => 'Marks']);
+        $site = repository::get_menu_nodes_by_key('course')['grades'];
+        manager::update((object)['id' => $site->id, 'title' => 'Marks']);
 
         $context = \context_course::instance($course->id);
-        $row = node_manager::ensure_row('course', 'grades', $context->id);
+        $row = manager::ensure_row('course', 'grades', $context->id);
 
         $this->assertSame('Marks', $row->title);
         $this->assertSame($context->id, (int)$row->contextid);
@@ -119,14 +120,14 @@ final class node_scope_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->see_nodes(['one', 'two', 'three']);
 
-        node_manager::move('course', 0, 'three', -1);
-        $this->assertSame(['one', 'three', 'two'], array_keys(node_list::get_scope_nodes('course', 0)));
+        manager::move('course', 0, 'three', -1);
+        $this->assertSame(['one', 'three', 'two'], array_keys(nodes::get_scope_nodes('course', 0)));
 
-        node_manager::move('course', 0, 'one', -1);
-        $this->assertSame(['one', 'three', 'two'], array_keys(node_list::get_scope_nodes('course', 0)), 'The first one stays.');
+        manager::move('course', 0, 'one', -1);
+        $this->assertSame(['one', 'three', 'two'], array_keys(nodes::get_scope_nodes('course', 0)), 'The first one stays.');
 
-        node_manager::move('course', 0, 'one', 1);
-        $this->assertSame(['three', 'one', 'two'], array_keys(node_list::get_scope_nodes('course', 0)));
+        manager::move('course', 0, 'one', 1);
+        $this->assertSame(['three', 'one', 'two'], array_keys(nodes::get_scope_nodes('course', 0)));
     }
 
     /**
@@ -137,11 +138,11 @@ final class node_scope_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->see_nodes(['one', 'two', 'three']);
 
-        node_manager::place('course', 0, 'three', 'one');
-        $this->assertSame(['three', 'one', 'two'], array_keys(node_list::get_scope_nodes('course', 0)));
+        manager::place('course', 0, 'three', 'one');
+        $this->assertSame(['three', 'one', 'two'], array_keys(nodes::get_scope_nodes('course', 0)));
 
-        node_manager::place('course', 0, 'three', '');
-        $this->assertSame(['one', 'two', 'three'], array_keys(node_list::get_scope_nodes('course', 0)));
+        manager::place('course', 0, 'three', '');
+        $this->assertSame(['one', 'two', 'three'], array_keys(nodes::get_scope_nodes('course', 0)));
     }
 
     /**
@@ -154,10 +155,10 @@ final class node_scope_test extends \advanced_testcase {
         $this->see_nodes(['one', 'two', 'three']);
         $context = \context_course::instance($course->id);
 
-        node_manager::move('course', $context->id, 'three', -1);
+        manager::move('course', $context->id, 'three', -1);
 
-        $this->assertSame(['one', 'three', 'two'], array_keys(node_list::get_scope_nodes('course', $context->id)));
-        $this->assertSame(['one', 'two', 'three'], array_keys(node_list::get_scope_nodes('course', 0)));
+        $this->assertSame(['one', 'three', 'two'], array_keys(nodes::get_scope_nodes('course', $context->id)));
+        $this->assertSame(['one', 'two', 'three'], array_keys(nodes::get_scope_nodes('course', 0)));
     }
 
     /**
@@ -170,12 +171,12 @@ final class node_scope_test extends \advanced_testcase {
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();
         $values = ['nodekey' => 'library', 'title' => 'Library', 'url' => '/library.php'];
-        $record = node_manager::create(node_manager::prepare($values, 'course'));
+        $record = manager::create(manager::prepare($values, 'course'));
         $context = \context_course::instance($course->id);
-        node_manager::set_visibility('course', $context->id, ['library'], node_access::VISIBILITY_HIDDEN);
+        manager::set_visibility('course', $context->id, ['library'], access::VISIBILITY_HIDDEN);
         $this->assertSame(2, $DB->count_records('local_extendednav', ['menu' => 'course', 'nodekey' => 'library']));
 
-        node_manager::delete([$record]);
+        manager::delete([$record]);
 
         $this->assertSame(0, $DB->count_records('local_extendednav', ['menu' => 'course', 'nodekey' => 'library']));
     }

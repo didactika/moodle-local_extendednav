@@ -20,7 +20,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\node_list;
+use local_extendednav\local\listing\nodes;
 
 /**
  * One page of the nodes of a navigation, with the counts of each visibility.
@@ -78,7 +78,7 @@ final class get_nodes extends node_service {
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
-        if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > node_list::MAX_PAGE_SIZE) {
+        if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > nodes::MAX_PAGE_SIZE) {
             throw new \invalid_parameter_exception('Page must be non-negative and perpage between 0 and 100.');
         }
         foreach (array_filter(explode(',', $params['visibility']), static fn(string $value): bool => $value !== '') as $value) {
@@ -86,7 +86,7 @@ final class get_nodes extends node_service {
                 throw new \invalid_parameter_exception('Unsupported visibility.');
             }
         }
-        return node_list::get(
+        return nodes::get(
             $params['menu'],
             $params['contextid'],
             $params['search'],

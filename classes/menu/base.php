@@ -16,8 +16,8 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_text;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\text;
 use local_extendednav\observer;
 
 /**
@@ -138,7 +138,7 @@ abstract class base {
         $placeholders = [];
         foreach ($this->get_native_nodes() as $key => $native) {
             $placeholders[$key] = [
-                'title' => strip_tags(node_text::resolve($native->text)),
+                'title' => strip_tags(text::resolve($native->text)),
                 'url' => (string)$native->action,
             ];
         }
@@ -161,8 +161,8 @@ abstract class base {
             if (isset($existing[$key])) {
                 continue;
             }
-            $record = node_manager::prepare(['nodekey' => $key, 'visibility' => 1], $this->get_key());
-            node_manager::create($record, $events);
+            $record = manager::prepare(['nodekey' => $key, 'visibility' => 1], $this->get_key());
+            manager::create($record, $events);
         }
     }
 

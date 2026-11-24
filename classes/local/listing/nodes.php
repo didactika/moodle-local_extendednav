@@ -14,10 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\listing;
 
 use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\node\text;
 
 /**
  * The nodes of one navigation, as the management page lists them: filtered, with the counts of each visibility, in pages
@@ -27,7 +32,7 @@ use local_extendednav\menu_manager;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_list {
+class nodes {
     /** @var int Most rows a page of the list holds. */
     public const MAX_PAGE_SIZE = 100;
 
@@ -48,10 +53,10 @@ class node_list {
         if ($contextid === 0) {
             // The administration is a tree of any depth; the menus have two levels of submenus.
             $depth = $menukey === admintree::KEY ? 20 : 2;
-            return node_manager::group_by_parent_keyed(node_repository::get_menu_nodes_by_key($menukey), $depth);
+            return manager::group_by_parent_keyed(repository::get_menu_nodes_by_key($menukey), $depth);
         }
         $context = \context::instance_by_id($contextid, MUST_EXIST);
-        return node_repository::get_scoped_nodes($menukey, $context);
+        return repository::get_scoped_nodes($menukey, $context);
     }
 
     /**
@@ -165,7 +170,7 @@ class node_list {
         $title = get_string('general');
         return [
             'details' => [], 'flags' => [], 'id' => 0, 'nodekey' => admintree::GENERAL, 'title' => $title, 'native' => true,
-            'url' => '', 'icon' => '', 'visibility' => node_access::VISIBILITY_ALL, 'visibilitylabel' => '', 'tone' => 'secondary',
+            'url' => '', 'icon' => '', 'visibility' => access::VISIBILITY_ALL, 'visibilitylabel' => '', 'tone' => 'secondary',
             'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
             'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
@@ -195,7 +200,7 @@ class node_list {
             $native = $menu->get_native_node($node->nodekey);
             $haystack = implode(' ', [
                 $node->nodekey,
-                node_text::get_title($node, $native),
+                text::get_title($node, $native),
                 (string)($node->url ?? '') !== '' ? $node->url : ($native->action ?? ''),
             ]);
             return \core_text::strpos(\core_text::strtolower($haystack), \core_text::strtolower($search)) !== false;
@@ -231,7 +236,7 @@ class node_list {
         $path = [];
         while ($parent !== '' && isset($all[$parent]) && count($path) < 20) {
             $node = $all[$parent];
-            $title = node_text::get_title($node, $menu->get_native_node($parent)) ?: $parent;
+            $title = text::get_title($node, $menu->get_native_node($parent)) ?: $parent;
             array_unshift($path, ['key' => $parent, 'title' => $title]);
             $parent = (string)($node->parentkey ?? '');
         }
@@ -270,21 +275,21 @@ class node_list {
     private static function export_row($menu, \stdClass $node, int $contextid, array $siblings): array {
         $native = $menu->get_native_node($node->nodekey);
         $visibility = (int)$node->visibility;
-        $roles = node_access::split_list($node->roles ?? '');
+        $roles = access::split_list($node->roles ?? '');
         $isexception = (int)($node->contextid ?? 0) !== 0;
         $inherited = $isexception && (int)$node->contextid !== $contextid;
         $url = trim((string)($node->url ?? '')) !== '' ? (string)$node->url : (string)($native->action ?? '');
         $placement = (int)($node->placement ?? 0);
-        $langs = node_access::split_list($node->langs ?? '');
+        $langs = access::split_list($node->langs ?? '');
 
         $visibilitykeys = [
-            node_access::VISIBILITY_ALL => ['vis_all', 'success'],
-            node_access::VISIBILITY_ROLES => ['vis_roles', 'warning'],
-            node_access::VISIBILITY_HIDDEN => ['vis_hidden', 'danger'],
+            access::VISIBILITY_ALL => ['vis_all', 'success'],
+            access::VISIBILITY_ROLES => ['vis_roles', 'warning'],
+            access::VISIBILITY_HIDDEN => ['vis_hidden', 'danger'],
         ];
-        [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[node_access::VISIBILITY_HIDDEN];
+        [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[access::VISIBILITY_HIDDEN];
 
-        $protected = node_access::is_protected($node);
+        $protected = access::is_protected($node);
         // What narrows the visibility: a short flag for each kind of restriction, shown beside the visibility, and a whole line
         // for each, shown when the pointer is over them, so a long list of roles never fills the row.
         $flags = [];
@@ -293,18 +298,18 @@ class node_list {
             $flags[] = ['label' => get_string($flag, 'local_extendednav')];
             $details[] = $detail;
         };
-        if ($visibility === node_access::VISIBILITY_ROLES && !empty($roles)) {
+        if ($visibility === access::VISIBILITY_ROLES && !empty($roles)) {
             $restrict('flag_roles', get_string('visibility_roles_line', 'local_extendednav', implode(', ', $roles)));
         }
         if (!empty($langs)) {
             $restrict('flag_langs', get_string('visibility_langs_line', 'local_extendednav', implode(', ', $langs)));
         }
-        if (!empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL) {
+        if (!empty($node->blockaccess) && $visibility !== access::VISIBILITY_ALL) {
             $restrict('badge_blocked', get_string('badge_blocked', 'local_extendednav'));
         }
-        if (!empty($node->hideadmins) && $visibility !== node_access::VISIBILITY_ALL) {
+        if (!empty($node->hideadmins) && $visibility !== access::VISIBILITY_ALL) {
             $restrict('flag_hideadmins', get_string('hidden_from_admins', 'local_extendednav'));
-        } else if (node_access::is_admin_only($node)) {
+        } else if (access::is_admin_only($node)) {
             $restrict('admin_only', get_string('admin_only_help', 'local_extendednav'));
         }
         if ($menu instanceof \local_extendednav\menu\primary && $native !== null && !$menu->is_shown_by_moodle($node->nodekey)) {
@@ -325,10 +330,10 @@ class node_list {
             'details' => $details,
             'id' => (int)$node->id,
             'nodekey' => (string)$node->nodekey,
-            'title' => node_text::get_title($node, $native) ?: (string)$node->nodekey,
+            'title' => text::get_title($node, $native) ?: (string)$node->nodekey,
             'native' => $native !== null,
             'url' => $url,
-            'icon' => node_icon::render((string)($node->icon ?? '')),
+            'icon' => icon::render((string)($node->icon ?? '')),
             'visibility' => $visibility,
             'visibilitylabel' => get_string($visibilitystring, 'local_extendednav'),
             'tone' => $tone,
@@ -336,15 +341,15 @@ class node_list {
             'langs' => implode(', ', $langs),
             'parentkey' => (string)($node->parentkey ?? ''),
             'child' => !empty($node->parentkey),
-            'blocked' => !empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL,
+            'blocked' => !empty($node->blockaccess) && $visibility !== access::VISIBILITY_ALL,
             // A node of Moodle that Moodle does not add right now, for example because it is turned off.
             'unavailable' => $menu instanceof \local_extendednav\menu\primary && $native !== null
                 && !$menu->is_shown_by_moodle($node->nodekey),
-            'unknownroles' => $visibility === node_access::VISIBILITY_ROLES ? implode(', ', array_map(
+            'unknownroles' => $visibility === access::VISIBILITY_ROLES ? implode(', ', array_map(
                 static fn(string $role): string => get_string('unknown_role', 'local_extendednav', $role),
                 array_diff($roles, array_keys(self::role_shortnames()))
             )) : '',
-            'adminonly' => node_access::is_admin_only($node),
+            'adminonly' => access::is_admin_only($node),
             'hideadmins' => !empty($node->hideadmins),
             'placement' => $placement,
             'placementlabel' => $placement === 0 ? '' : get_string(
@@ -354,8 +359,8 @@ class node_list {
             'exception' => $isexception && !$inherited,
             'inherited' => $inherited,
             'candelete' => $contextid !== 0 ? $isexception && !$inherited : $menu->can_delete($node->nodekey),
-            'canhide' => !$protected && $visibility !== node_access::VISIBILITY_HIDDEN,
-            'canshow' => !$protected && $visibility !== node_access::VISIBILITY_ALL,
+            'canhide' => !$protected && $visibility !== access::VISIBILITY_HIDDEN,
+            'canshow' => !$protected && $visibility !== access::VISIBILITY_ALL,
             'first' => $siblings[$node->nodekey]['first'] ?? false,
             'last' => $siblings[$node->nodekey]['last'] ?? false,
             'flags' => $flags,

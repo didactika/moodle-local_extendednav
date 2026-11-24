@@ -16,9 +16,9 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_repository;
-use local_extendednav\local\node_text;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\node\text;
 
 /**
  * The site administration: every category of the administration tree and every page inside it, at any depth.
@@ -159,7 +159,7 @@ class admintree extends base {
         }
         if ($part instanceof \admin_externalpage) {
             $url = $part->url instanceof \moodle_url ? $part->url->out(false) : (string)$part->url;
-            return \local_extendednav\local\url_helper::to_site_path($url) ?? $url;
+            return \local_extendednav\local\support\url_helper::to_site_path($url) ?? $url;
         }
         return '/admin/settings.php?section=' . $part->name;
     }
@@ -201,7 +201,7 @@ class admintree extends base {
             }
             $new[] = (object)[
                 'menu' => self::KEY, 'contextid' => 0, 'nodekey' => $key, 'parentkey' => $native->parentkey ?: null,
-                'visibility' => node_access::VISIBILITY_ALL, 'blockaccess' => 0, 'display' => 0, 'placement' => 0,
+                'visibility' => access::VISIBILITY_ALL, 'blockaccess' => 0, 'display' => 0, 'placement' => 0,
                 'hideadmins' => 1, 'sortorder' => $sortorder++, 'timecreated' => $now, 'timemodified' => $now,
             ];
         }
@@ -220,7 +220,7 @@ class admintree extends base {
             );
         }
         if (!empty($new) || !empty($existing)) {
-            node_repository::purge();
+            repository::purge();
         }
     }
 
@@ -263,7 +263,7 @@ class admintree extends base {
         if (!\local_extendednav\menu_manager::is_enabled(self::KEY) || during_initial_install()) {
             return;
         }
-        $rows = node_repository::get_menu_nodes_by_key(self::KEY);
+        $rows = repository::get_menu_nodes_by_key(self::KEY);
         if (empty($rows)) {
             return;
         }
@@ -288,7 +288,7 @@ class admintree extends base {
                 if ($parent instanceof \admin_category) {
                     $part = new \admin_externalpage(
                         self::name_of($key),
-                        format_string(node_text::resolve($row->title)),
+                        format_string(text::resolve($row->title)),
                         new \moodle_url((string)$row->url),
                         'moodle/site:configview'
                     );
@@ -299,11 +299,11 @@ class admintree extends base {
             if (!$part) {
                 continue;
             }
-            $title = node_text::resolve($row->title ?? '');
+            $title = text::resolve($row->title ?? '');
             if ($title !== '') {
                 $part->visiblename = format_string($title);
             }
-            if (!in_array($key, self::PROTECTED, true) && !node_access::is_shown($row) && empty($part->hidden)) {
+            if (!in_array($key, self::PROTECTED, true) && !access::is_shown($row) && empty($part->hidden)) {
                 $part->hidden = true;
                 self::$hiddenbyplugin[] = $key;
             }

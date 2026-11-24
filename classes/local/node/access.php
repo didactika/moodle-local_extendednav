@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 /**
  * Decides which nodes a user can see.
@@ -28,7 +28,7 @@ namespace local_extendednav\local;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_access {
+class access {
     /** @var int The node is not visible to anyone. */
     public const VISIBILITY_HIDDEN = 0;
 

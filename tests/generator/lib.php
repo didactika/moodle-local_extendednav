@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use local_extendednav\local\node_manager;
+use local_extendednav\local\node\manager;
 
 /**
  * Test data generator for local_extendednav.
@@ -74,7 +74,7 @@ class local_extendednav_generator extends component_generator_base {
         if ($menu === 'primary') {
             $this->ensure_native_nodes();
         }
-        $record = node_manager::prepare($data + ['visibility' => 1], $menu);
+        $record = manager::prepare($data + ['visibility' => 1], $menu);
         if (isset($data['sortorder'])) {
             $record->sortorder = (int)$data['sortorder'];
         }
@@ -82,8 +82,8 @@ class local_extendednav_generator extends component_generator_base {
         $existing = $DB->get_record('local_extendednav', ['menu' => $menu, 'nodekey' => $record->nodekey]);
         if ($existing) {
             $record->id = $existing->id;
-            return node_manager::update($record, false);
+            return manager::update($record, false);
         }
-        return node_manager::create($record, false);
+        return manager::create($record, false);
     }
 }

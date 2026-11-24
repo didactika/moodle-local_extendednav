@@ -16,13 +16,13 @@
 
 namespace local_extendednav\form;
 
-use local_extendednav\local\access_guard;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
-use local_extendednav\local\node_text;
-use local_extendednav\local\node_validator;
+use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\node\text;
+use local_extendednav\local\node\validator;
 use local_extendednav\menu_manager;
 
 defined('MOODLE_INTERNAL') || die();
@@ -52,7 +52,7 @@ class node_form extends \moodleform {
         $current = $this->_customdata['node'] ?? null;
         $currentkey = $current ? (string)$current->nodekey : '';
         $contextid = (int)($this->_customdata['contextid'] ?? 0);
-        $nodes = node_repository::get_menu_nodes_by_key($menukey);
+        $nodes = repository::get_menu_nodes_by_key($menukey);
         $isnative = $current !== null && $menu->is_native($currentkey);
         $issecondary = $menu instanceof \local_extendednav\menu\secondary;
         $istree = $menu instanceof \local_extendednav\menu\admintree;
@@ -81,7 +81,7 @@ class node_form extends \moodleform {
             'menudisplay',
             get_string('menu_type', 'local_extendednav'),
             \html_writer::tag('strong', $menu->get_name()) . ($contextid ? ' · '
-                . s(\local_extendednav\local\node_importer::describe_scope($contextid)) : '')
+                . s(\local_extendednav\local\io\importer::describe_scope($contextid)) : '')
         );
 
         $mform->addElement('text', 'nodekey', get_string('nodekey', 'local_extendednav'), ['size' => 30, 'maxlength' => 50]);
@@ -142,15 +142,15 @@ class node_form extends \moodleform {
             $mform->setType('tooltip', PARAM_TEXT);
             $mform->addHelpButton('tooltip', 'tooltip', 'local_extendednav');
 
-            $mform->addElement('select', 'display', get_string('display', 'local_extendednav'), node_display::get_options());
-            $mform->setDefault('display', node_display::CURRENT);
+            $mform->addElement('select', 'display', get_string('display', 'local_extendednav'), display::get_options());
+            $mform->setDefault('display', display::CURRENT);
             $mform->addHelpButton('display', 'display', 'local_extendednav');
-            $sizes = ['popupwidth' => node_display::DEFAULT_WIDTH, 'popupheight' => node_display::DEFAULT_HEIGHT];
+            $sizes = ['popupwidth' => display::DEFAULT_WIDTH, 'popupheight' => display::DEFAULT_HEIGHT];
             foreach ($sizes as $field => $default) {
                 $mform->addElement('text', $field, get_string($field, 'local_extendednav'), ['size' => 5]);
                 $mform->setType($field, PARAM_INT);
                 $mform->setDefault($field, $default);
-                $mform->hideIf($field, 'display', 'neq', node_display::POPUP);
+                $mform->hideIf($field, 'display', 'neq', display::POPUP);
             }
         }
 
@@ -158,11 +158,11 @@ class node_form extends \moodleform {
         $mform->addElement('header', 'accessheader', get_string('form_section_access', 'local_extendednav'));
         $mform->setExpanded('accessheader', true);
         $mform->addElement('select', 'visibility', get_string('visibility', 'local_extendednav'), [
-            node_access::VISIBILITY_ALL => get_string('vis_all', 'local_extendednav'),
-            node_access::VISIBILITY_ROLES => get_string('vis_roles', 'local_extendednav'),
-            node_access::VISIBILITY_HIDDEN => get_string('vis_hidden', 'local_extendednav'),
+            access::VISIBILITY_ALL => get_string('vis_all', 'local_extendednav'),
+            access::VISIBILITY_ROLES => get_string('vis_roles', 'local_extendednav'),
+            access::VISIBILITY_HIDDEN => get_string('vis_hidden', 'local_extendednav'),
         ]);
-        $mform->setDefault('visibility', node_access::VISIBILITY_ALL);
+        $mform->setDefault('visibility', access::VISIBILITY_ALL);
         $mform->addHelpButton('visibility', 'visibility', 'local_extendednav');
 
         $mform->addElement(
@@ -174,14 +174,14 @@ class node_form extends \moodleform {
         );
         $mform->setType('roles', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
-        $mform->hideIf('roles', 'visibility', 'neq', node_access::VISIBILITY_ROLES);
+        $mform->hideIf('roles', 'visibility', 'neq', access::VISIBILITY_ROLES);
 
         // The pages of the administration are never blocked: Moodle checks their capabilities.
         if (!$istree) {
             $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
             $mform->setDefault('blockaccess', 1);
             $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
-            $mform->hideIf('blockaccess', 'visibility', 'eq', node_access::VISIBILITY_ALL);
+            $mform->hideIf('blockaccess', 'visibility', 'eq', access::VISIBILITY_ALL);
         }
 
         $mform->addElement(
@@ -300,12 +300,12 @@ class node_form extends \moodleform {
         if ($current !== null && menu_manager::get_menu($menukey)->is_native($current->nodekey)) {
             $data['nodekey'] = $current->nodekey;
         }
-        $record = node_manager::prepare($data, $menukey);
+        $record = manager::prepare($data, $menukey);
 
         $contextid = (int)($data['contextid'] ?? 0);
         // The nodes of a category or a course are checked against its own: they repeat the key of a node of the site on purpose.
-        $others = $contextid === 0 ? node_repository::get_menu_nodes_by_key($menukey)
-            : array_column(node_repository::get_exceptions($menukey, $contextid), null, 'nodekey');
+        $others = $contextid === 0 ? repository::get_menu_nodes_by_key($menukey)
+            : array_column(repository::get_exceptions($menukey, $contextid), null, 'nodekey');
         if ($current !== null) {
             foreach ($others as $key => $other) {
                 if ((int)$other->id === (int)$current->id) {
@@ -314,7 +314,7 @@ class node_form extends \moodleform {
             }
         }
 
-        $result = node_validator::validate($record, $others);
+        $result = validator::validate($record, $others);
         $errors += $result['errors'];
 
         // A link added to the site administration needs the category it goes in.
@@ -328,7 +328,7 @@ class node_form extends \moodleform {
 
         if (
             $contextid === 0 && empty($errors)
-                && access_guard::check_fallbacks(node_manager::get_all_with($record, (int)($current->id ?? 0)))
+                && access_guard::check_fallbacks(manager::get_all_with($record, (int)($current->id ?? 0)))
                 === access_guard::FALLBACKS_BLOCKED
         ) {
             $errors['blockaccess'] = get_string('err_fallbacks_blocked', 'local_extendednav');
@@ -365,7 +365,7 @@ class node_form extends \moodleform {
         foreach (role_fix_names(get_all_roles()) as $role) {
             $options[$role->shortname] = $role->localname . ' (' . $role->shortname . ')';
         }
-        foreach (node_access::split_list($current->roles ?? '') as $shortname) {
+        foreach (access::split_list($current->roles ?? '') as $shortname) {
             if (!isset($options[$shortname])) {
                 $options[$shortname] = get_string('unknown_role', 'local_extendednav', $shortname);
             }
@@ -381,7 +381,7 @@ class node_form extends \moodleform {
      */
     private function get_language_options(?\stdClass $current): array {
         $options = get_string_manager()->get_list_of_translations();
-        foreach (node_access::split_list($current->langs ?? '') as $lang) {
+        foreach (access::split_list($current->langs ?? '') as $lang) {
             if (!isset($options[$lang])) {
                 $options[$lang] = get_string('unknown_lang', 'local_extendednav', $lang);
             }
@@ -405,7 +405,7 @@ class node_form extends \moodleform {
                 continue;
             }
             $options[$key] = get_string('opt_native', 'local_extendednav', (object)[
-                'text' => strip_tags(node_text::resolve($native->text)),
+                'text' => strip_tags(text::resolve($native->text)),
                 'key' => $key,
             ]);
         }
@@ -416,7 +416,7 @@ class node_form extends \moodleform {
             ) {
                 continue;
             }
-            $title = strip_tags(format_string(node_text::get_title($node, $menu->get_native_node($key))));
+            $title = strip_tags(format_string(text::get_title($node, $menu->get_native_node($key))));
             $options[$key] = get_string('opt_plugin', 'local_extendednav', (object)[
                 'title' => $title !== '' ? $title : get_string('none_title', 'local_extendednav'),
                 'key' => $key,

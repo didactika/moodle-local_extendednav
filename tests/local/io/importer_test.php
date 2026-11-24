@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\io;
 
 use local_extendednav\yaml;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_importer::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\io\importer::class)]
 /**
  * Tests for the YAML import and export of nodes.
  *
@@ -27,9 +29,9 @@ use local_extendednav\yaml;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_importer
+ * @covers     \local_extendednav\local\io\importer
  */
-final class node_importer_test extends \advanced_testcase {
+final class importer_test extends \advanced_testcase {
     /**
      * Finds Moodle's primary navigation items for the tests.
      */
@@ -60,25 +62,25 @@ final class node_importer_test extends \advanced_testcase {
             'menu = ? AND id <> ? ORDER BY sortorder',
             ['primary', $help->id]
         );
-        node_manager::reorder('primary', array_merge([(int)$help->id], array_map('intval', $others)));
+        manager::reorder('primary', array_merge([(int)$help->id], array_map('intval', $others)));
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary'], 'sortorder ASC');
-        $before = node_importer::export_nodes($nodes, $nodes);
+        $before = importer::export_nodes($nodes, $nodes);
         $yamltext = yaml::dump(['nodes' => $before], false);
         $this->assertSame(1, $before[0]['order']);
         $this->assertSame('help_es', $before[0]['nodekey']);
 
         $DB->delete_records('local_extendednav', ['nodekey' => 'help_es']);
         $DB->set_field('local_extendednav', 'title', null, ['nodekey' => 'myhome']);
-        node_repository::purge();
+        repository::purge();
 
         $parsed = yaml::parse($yamltext, false);
-        $result = (new node_importer('primary', true))->import($parsed['nodes']);
+        $result = (new importer('primary', true))->import($parsed['nodes']);
         $this->assertSame([], $result['errors']);
         $this->assertSame(1, $result['counts']['created']);
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary']);
-        $after = node_importer::export_nodes($nodes, $nodes);
+        $after = importer::export_nodes($nodes, $nodes);
         $this->assertEquals($before, $after, 'Same values, in the same order.');
     }
 
@@ -90,12 +92,12 @@ final class node_importer_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $menu = static function () use ($DB): array {
-            $nodes = node_manager::group_by_parent($DB->get_records('local_extendednav', ['menu' => 'primary']));
+            $nodes = manager::group_by_parent($DB->get_records('local_extendednav', ['menu' => 'primary']));
             return array_map(static fn(\stdClass $node): string => $node->nodekey, $nodes);
         };
         $existing = $menu();
 
-        $result = (new node_importer('primary', true))->import([
+        $result = (new importer('primary', true))->import([
             ['nodekey' => 'third', 'title' => 'Third', 'url' => '/third.php', 'order' => 3],
             ['nodekey' => 'first', 'title' => 'First', 'url' => '/first.php', 'order' => 1],
             ['nodekey' => 'last', 'title' => 'Last', 'url' => '/last.php'],
@@ -108,14 +110,14 @@ final class node_importer_test extends \advanced_testcase {
         $this->assertSame($expected, $menu());
 
         // A replaced node without an order keeps its place.
-        $result = (new node_importer('primary', true))->import([
+        $result = (new importer('primary', true))->import([
             ['nodekey' => 'first', 'title' => 'First!', 'url' => '/first.php'],
         ]);
         $this->assertSame([], $result['errors']);
         $this->assertSame($expected, $menu());
 
         foreach ([0, -1, 'abc', 1.5] as $order) {
-            $result = (new node_importer('primary', true))->import([['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php',
+            $result = (new importer('primary', true))->import([['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php',
                 'order' => $order]]);
             $this->assertCount(1, $result['errors'], (string)$order);
         }
@@ -129,7 +131,7 @@ final class node_importer_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $count = $DB->count_records('local_extendednav');
-        $result = (new node_importer('primary', false))->import([
+        $result = (new importer('primary', false))->import([
             ['nodekey' => 'good', 'title' => 'Good', 'url' => '/good.php'],
             ['nodekey' => 'bad', 'title' => 'Bad', 'url' => 'javascript:alert(1)'],
             ['title' => 'No key'],
@@ -152,11 +154,11 @@ final class node_importer_test extends \advanced_testcase {
         $generator->create_node(['nodekey' => 'help', 'title' => 'Help', 'url' => '/help.php']);
         $items = [['nodekey' => 'help', 'title' => 'New help', 'url' => '/help.php']];
 
-        $result = (new node_importer('primary', false))->import($items);
+        $result = (new importer('primary', false))->import($items);
         $this->assertSame(1, $result['counts']['skipped']);
         $this->assertSame('Help', $DB->get_field('local_extendednav', 'title', ['nodekey' => 'help']));
 
-        $result = (new node_importer('primary', true))->import($items);
+        $result = (new importer('primary', true))->import($items);
         $this->assertSame(1, $result['counts']['updated']);
         $this->assertSame('New help', $DB->get_field('local_extendednav', 'title', ['nodekey' => 'help']));
     }
@@ -166,13 +168,13 @@ final class node_importer_test extends \advanced_testcase {
      */
     public function test_parents_in_the_same_file(): void {
         $this->resetAfterTest();
-        $result = (new node_importer('primary', false))->import([
+        $result = (new importer('primary', false))->import([
             ['nodekey' => 'child', 'title' => 'Child', 'url' => '/c.php', 'parentkey' => 'parent'],
             ['nodekey' => 'parent', 'title' => 'Parent', 'url' => '/p.php'],
         ]);
         $this->assertSame([], $result['errors']);
 
-        $result = (new node_importer('primary', false))->import([
+        $result = (new importer('primary', false))->import([
             ['nodekey' => 'grandchild', 'title' => 'Grandchild', 'url' => '/g.php', 'parentkey' => 'child'],
         ]);
         $this->assertStringContainsString(get_string('err_parent_thirdlevel', 'local_extendednav'), $result['errors'][0]);
@@ -187,7 +189,7 @@ final class node_importer_test extends \advanced_testcase {
         foreach (['myhome', 'home', 'mycourses'] as $key) {
             $items[] = ['nodekey' => $key, 'visibility' => 0, 'blockaccess' => 1];
         }
-        $result = (new node_importer('primary', true))->import($items);
+        $result = (new importer('primary', true))->import($items);
         $this->assertSame([get_string('err_fallbacks_blocked', 'local_extendednav')], $result['errors']);
     }
 
@@ -196,7 +198,7 @@ final class node_importer_test extends \advanced_testcase {
      */
     public function test_unknown_role_warning(): void {
         $this->resetAfterTest();
-        $result = (new node_importer('primary', false))->import([
+        $result = (new importer('primary', false))->import([
             ['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php', 'visibility' => 2, 'roles' => 'ghost'],
         ]);
         $this->assertSame([], $result['errors']);

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 /**
  * Cached read access to the navigation nodes.
@@ -24,7 +24,7 @@ namespace local_extendednav\local;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_repository {
+class repository {
     /** @var string Cache key holding every node. */
     private const CACHE_KEY = 'allnodes';
 

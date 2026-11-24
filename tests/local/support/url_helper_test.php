@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\support;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\url_helper::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\support\url_helper::class)]
 /**
  * Tests for the URL helper.
  *
@@ -25,7 +25,7 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\url_helper
+ * @covers     \local_extendednav\local\support\url_helper
  */
 final class url_helper_test extends \advanced_testcase {
     #[\PHPUnit\Framework\Attributes\DataProvider('normalise_provider')]

@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\node_importer;
+use local_extendednav\local\io\importer;
 use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -64,7 +64,7 @@ if ($form->is_cancelled()) {
         throw new \moodle_exception('err_invalid_yaml_structure', 'local_extendednav', $url);
     }
 
-    $importer = new node_importer($menukey, $data->conflict_action === 'overwrite');
+    $importer = new importer($menukey, $data->conflict_action === 'overwrite');
     $result = $importer->import($parsed['nodes']);
     if (empty($result['errors'])) {
         // A file of several navigations also says which of them are on.

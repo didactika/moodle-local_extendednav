@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_access::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node\access::class)]
 /**
  * Tests for node visibility, roles and languages.
  *
@@ -25,16 +25,16 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_access
+ * @covers     \local_extendednav\local\node\access
  */
-final class node_access_test extends \advanced_testcase {
+final class access_test extends \advanced_testcase {
     /**
      * Resets the request caches.
      */
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        node_access::reset_caches();
+        access::reset_caches();
     }
 
     /**
@@ -65,13 +65,13 @@ final class node_access_test extends \advanced_testcase {
         $noroles = $this->make_node(['visibility' => 2, 'roles' => '']);
         $authenticated = $this->make_node(['visibility' => 2, 'roles' => 'user']);
 
-        $this->assertTrue(node_access::is_allowed($all, $student->id));
-        $this->assertFalse(node_access::is_allowed($hidden, $student->id));
-        $this->assertFalse(node_access::is_allowed($teachers, $student->id));
-        $this->assertTrue(node_access::is_allowed($teachers, $teacher->id));
-        $this->assertFalse(node_access::is_allowed($noroles, $teacher->id));
+        $this->assertTrue(access::is_allowed($all, $student->id));
+        $this->assertFalse(access::is_allowed($hidden, $student->id));
+        $this->assertFalse(access::is_allowed($teachers, $student->id));
+        $this->assertTrue(access::is_allowed($teachers, $teacher->id));
+        $this->assertFalse(access::is_allowed($noroles, $teacher->id));
         // The default role for authenticated users counts without a role assignment.
-        $this->assertTrue(node_access::is_allowed($authenticated, $student->id));
+        $this->assertTrue(access::is_allowed($authenticated, $student->id));
     }
 
     /**
@@ -79,12 +79,12 @@ final class node_access_test extends \advanced_testcase {
      */
     public function test_site_administration_is_protected(): void {
         $node = $this->make_node(['nodekey' => 'siteadminnode', 'visibility' => 0, 'langs' => 'es']);
-        $this->assertTrue(node_access::is_protected($node));
-        $this->assertTrue(node_access::is_allowed($node, 0));
-        $this->assertTrue(node_access::is_shown($node, 0, 'en'));
+        $this->assertTrue(access::is_protected($node));
+        $this->assertTrue(access::is_allowed($node, 0));
+        $this->assertTrue(access::is_shown($node, 0, 'en'));
 
         $usermenu = $this->make_node(['menu' => 'usermenu', 'nodekey' => 'siteadminnode']);
-        $this->assertFalse(node_access::is_protected($usermenu));
+        $this->assertFalse(access::is_protected($usermenu));
     }
 
     /**
@@ -95,12 +95,12 @@ final class node_access_test extends \advanced_testcase {
         $spanish = $this->make_node(['langs' => 'es']);
         $several = $this->make_node(['langs' => 'en, pt_br']);
 
-        $this->assertTrue(node_access::language_matches($any, 'de'));
-        $this->assertTrue(node_access::language_matches($spanish, 'es'));
-        $this->assertTrue(node_access::language_matches($spanish, 'es_mx'));
-        $this->assertFalse(node_access::language_matches($spanish, 'en'));
-        $this->assertTrue(node_access::language_matches($several, 'pt_br'));
-        $this->assertFalse(node_access::language_matches($several, 'pt'));
+        $this->assertTrue(access::language_matches($any, 'de'));
+        $this->assertTrue(access::language_matches($spanish, 'es'));
+        $this->assertTrue(access::language_matches($spanish, 'es_mx'));
+        $this->assertFalse(access::language_matches($spanish, 'en'));
+        $this->assertTrue(access::language_matches($several, 'pt_br'));
+        $this->assertFalse(access::language_matches($several, 'pt'));
     }
 
     /**
@@ -111,18 +111,18 @@ final class node_access_test extends \advanced_testcase {
         $spanish = $this->make_node(['langs' => 'es']);
         $hidden = $this->make_node(['visibility' => 0]);
 
-        $this->assertTrue(node_access::is_shown($spanish, $user->id, 'es'));
-        $this->assertFalse(node_access::is_shown($spanish, $user->id, 'en'));
-        $this->assertFalse(node_access::is_shown($hidden, $user->id, 'en'));
+        $this->assertTrue(access::is_shown($spanish, $user->id, 'es'));
+        $this->assertFalse(access::is_shown($spanish, $user->id, 'en'));
+        $this->assertFalse(access::is_shown($hidden, $user->id, 'en'));
         // Language never changes whether the user is allowed the node.
-        $this->assertTrue(node_access::is_allowed($spanish, $user->id));
+        $this->assertTrue(access::is_allowed($spanish, $user->id));
     }
 
     /**
      * Lists are split and cleaned.
      */
     public function test_split_list(): void {
-        $this->assertSame(['a', 'b'], node_access::split_list(' a, ,b,a '));
-        $this->assertSame([], node_access::split_list(null));
+        $this->assertSame(['a', 'b'], access::split_list(' a, ,b,a '));
+        $this->assertSame([], access::split_list(null));
     }
 }

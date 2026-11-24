@@ -17,7 +17,7 @@
 namespace local_extendednav\external;
 
 use core_external\external_api;
-use local_extendednav\local\node_access;
+use local_extendednav\local\node\access;
 use local_extendednav\menu_manager;
 
 /**
@@ -111,20 +111,20 @@ final class node_services_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $contextid = \context_course::instance($course->id)->id;
 
-        $result = change_nodes::set_visibility('course', 0, ['one', 'two'], node_access::VISIBILITY_HIDDEN);
+        $result = change_nodes::set_visibility('course', 0, ['one', 'two'], access::VISIBILITY_HIDDEN);
         $this->assertSame(2, $result['count']);
         $this->assertSame(2, $DB->count_records('local_extendednav', ['menu' => 'course', 'visibility' => 0]));
 
-        change_nodes::set_visibility('course', $contextid, ['one'], node_access::VISIBILITY_ALL);
+        change_nodes::set_visibility('course', $contextid, ['one'], access::VISIBILITY_ALL);
         $scope = get_nodes::execute('course', $contextid);
         $rows = array_column($scope['rows'], null, 'nodekey');
-        $this->assertSame(node_access::VISIBILITY_ALL, $rows['one']['visibility']);
+        $this->assertSame(access::VISIBILITY_ALL, $rows['one']['visibility']);
         $this->assertTrue($rows['one']['exception']);
-        $this->assertSame(node_access::VISIBILITY_HIDDEN, $rows['two']['visibility']);
+        $this->assertSame(access::VISIBILITY_HIDDEN, $rows['two']['visibility']);
         $this->assertFalse($rows['two']['exception']);
 
         $this->expectException(\invalid_parameter_exception::class);
-        change_nodes::set_visibility('course', 0, ['one'], node_access::VISIBILITY_ROLES);
+        change_nodes::set_visibility('course', 0, ['one'], access::VISIBILITY_ROLES);
     }
 
     /**
@@ -149,7 +149,7 @@ final class node_services_test extends \advanced_testcase {
         $this->prepare();
         $course = $this->getDataGenerator()->create_course();
         $contextid = \context_course::instance($course->id)->id;
-        change_nodes::set_visibility('course', $contextid, ['one'], node_access::VISIBILITY_HIDDEN);
+        change_nodes::set_visibility('course', $contextid, ['one'], access::VISIBILITY_HIDDEN);
 
         $this->assertSame(0, change_nodes::delete('course', 0, ['one'])['count'], 'A node of Moodle is not deleted.');
         $this->assertSame(1, change_nodes::delete('course', $contextid, ['one'])['count']);
@@ -165,7 +165,7 @@ final class node_services_test extends \advanced_testcase {
         $category = $this->getDataGenerator()->create_category(['name' => 'Humanities']);
         $course = $this->getDataGenerator()->create_course(['fullname' => 'Ancient history', 'category' => $category->id]);
         $contextid = \context_course::instance($course->id)->id;
-        change_nodes::set_visibility('course', $contextid, ['one'], node_access::VISIBILITY_HIDDEN);
+        change_nodes::set_visibility('course', $contextid, ['one'], access::VISIBILITY_HIDDEN);
 
         $none = external_api::clean_returnvalue(get_scopes::execute_returns(), get_scopes::execute('course', ''));
         $this->assertSame([$contextid], array_column($none['scopes'], 'contextid'));

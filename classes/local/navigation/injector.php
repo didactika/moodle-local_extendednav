@@ -14,10 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\navigation;
 
 use local_extendednav\menu\secondary;
 use local_extendednav\menu_manager;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\node\text;
+use local_extendednav\local\support\url_helper;
 
 /**
  * Applies the nodes of the plugin to the secondary navigation of the page: the one of a course, of the site home, of an
@@ -31,7 +36,7 @@ use local_extendednav\menu_manager;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class secondary_navigation {
+class injector {
     /**
      * Applies the nodes to the secondary navigation of the page, if it has one.
      */
@@ -64,7 +69,7 @@ class secondary_navigation {
         }
         $menu->record_seen($seen);
 
-        $nodes = node_repository::get_scoped_nodes($origin, $PAGE->context);
+        $nodes = repository::get_scoped_nodes($origin, $PAGE->context);
         if (!empty($nodes)) {
             self::inject($menu, $nodes, $view);
         }
@@ -104,13 +109,13 @@ class secondary_navigation {
         $shown = [];
         foreach ($nodes as $key => $record) {
             $node = $view->get($key);
-            if (!node_access::is_shown($record)) {
+            if (!access::is_shown($record)) {
                 if ($node) {
                     $node->remove();
                 }
                 continue;
             }
-            $title = node_text::get_title($record);
+            $title = text::get_title($record);
             $url = trim((string)($record->url ?? '')) === '' ? null : trim((string)$record->url);
             if (!$node) {
                 // A node Moodle does not show on this page is never added in its place; only nodes of the plugin are.
@@ -134,11 +139,11 @@ class secondary_navigation {
                     $node->action = new \moodle_url($url);
                 }
             }
-            $tooltip = node_text::resolve($record->tooltip ?? '');
+            $tooltip = text::resolve($record->tooltip ?? '');
             if ($tooltip !== '') {
                 $node->title(format_string($tooltip, true, ['escape' => false]));
             }
-            $attributes = node_display::get_link_attributes($record);
+            $attributes = display::get_link_attributes($record);
             if (!empty($attributes)) {
                 // The navigation prints no link attributes, so they go on a hidden marker the script reads.
                 $node->text .= \html_writer::span('', 'local-extendednav-display', ['hidden' => 'hidden'] + $attributes);

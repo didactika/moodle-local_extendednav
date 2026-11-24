@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 /**
  * Tests for what a site administrator sees: every node, unless the plugin or the node says otherwise.
@@ -23,9 +23,9 @@ namespace local_extendednav\local;
  * @category   test
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_access
+ * @covers     \local_extendednav\local\node\access
  */
-final class node_admin_access_test extends \advanced_testcase {
+final class admin_access_test extends \advanced_testcase {
     /**
      * Builds a node record.
      *
@@ -43,13 +43,13 @@ final class node_admin_access_test extends \advanced_testcase {
         $this->resetAfterTest();
         $admin = get_admin();
         $user = $this->getDataGenerator()->create_user();
-        $hidden = $this->node(['visibility' => node_access::VISIBILITY_HIDDEN]);
-        $restricted = $this->node(['visibility' => node_access::VISIBILITY_ROLES, 'roles' => 'editingteacher']);
+        $hidden = $this->node(['visibility' => access::VISIBILITY_HIDDEN]);
+        $restricted = $this->node(['visibility' => access::VISIBILITY_ROLES, 'roles' => 'editingteacher']);
 
-        $this->assertTrue(node_access::is_allowed($hidden, $admin->id));
-        $this->assertTrue(node_access::is_allowed($restricted, $admin->id));
-        $this->assertFalse(node_access::is_allowed($hidden, $user->id));
-        $this->assertFalse(node_access::is_allowed($restricted, $user->id));
+        $this->assertTrue(access::is_allowed($hidden, $admin->id));
+        $this->assertTrue(access::is_allowed($restricted, $admin->id));
+        $this->assertFalse(access::is_allowed($hidden, $user->id));
+        $this->assertFalse(access::is_allowed($restricted, $user->id));
     }
 
     /**
@@ -58,11 +58,11 @@ final class node_admin_access_test extends \advanced_testcase {
     public function test_admin_only_marks_what_others_do_not_see(): void {
         $this->resetAfterTest();
         $admin = get_admin();
-        $hidden = $this->node(['visibility' => node_access::VISIBILITY_HIDDEN]);
-        $open = $this->node(['visibility' => node_access::VISIBILITY_ALL]);
+        $hidden = $this->node(['visibility' => access::VISIBILITY_HIDDEN]);
+        $open = $this->node(['visibility' => access::VISIBILITY_ALL]);
 
-        $this->assertTrue(node_access::is_admin_only($hidden, $admin->id));
-        $this->assertFalse(node_access::is_admin_only($open, $admin->id));
+        $this->assertTrue(access::is_admin_only($hidden, $admin->id));
+        $this->assertFalse(access::is_admin_only($open, $admin->id));
     }
 
     /**
@@ -71,10 +71,10 @@ final class node_admin_access_test extends \advanced_testcase {
     public function test_a_node_can_be_hidden_from_administrators(): void {
         $this->resetAfterTest();
         $admin = get_admin();
-        $node = $this->node(['visibility' => node_access::VISIBILITY_HIDDEN, 'hideadmins' => 1]);
+        $node = $this->node(['visibility' => access::VISIBILITY_HIDDEN, 'hideadmins' => 1]);
 
-        $this->assertFalse(node_access::is_allowed($node, $admin->id));
-        $this->assertFalse(node_access::is_admin_only($node, $admin->id));
+        $this->assertFalse(access::is_allowed($node, $admin->id));
+        $this->assertFalse(access::is_admin_only($node, $admin->id));
     }
 
     /**
@@ -83,9 +83,9 @@ final class node_admin_access_test extends \advanced_testcase {
     public function test_the_language_still_applies(): void {
         $this->resetAfterTest();
         $admin = get_admin();
-        $node = $this->node(['visibility' => node_access::VISIBILITY_ALL, 'langs' => 'es']);
+        $node = $this->node(['visibility' => access::VISIBILITY_ALL, 'langs' => 'es']);
 
-        $this->assertTrue(node_access::is_shown($node, $admin->id, 'es'));
-        $this->assertFalse(node_access::is_shown($node, $admin->id, 'en'));
+        $this->assertTrue(access::is_shown($node, $admin->id, 'es'));
+        $this->assertFalse(access::is_shown($node, $admin->id, 'en'));
     }
 }

@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\navigation;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\support\url_helper;
 
 /**
  * Blocks access to the URLs of nodes the user is not allowed.
@@ -81,7 +84,7 @@ class access_guard {
             return null;
         }
 
-        $rules = self::get_user_rules(node_repository::get_all(), $userid);
+        $rules = self::get_user_rules(repository::get_all(), $userid);
         if (!self::is_blocked($current, $rules)) {
             return null;
         }
@@ -159,7 +162,7 @@ class access_guard {
             if (empty($paths)) {
                 continue;
             }
-            if (node_access::is_allowed($node, $userid)) {
+            if (access::is_allowed($node, $userid)) {
                 array_push($rules['allowed'], ...$paths);
             } else if (!empty($node->blockaccess)) {
                 array_push($rules['blocked'], ...$paths);
@@ -211,12 +214,12 @@ class access_guard {
                 continue;
             }
             $visibility = (int)$node->visibility;
-            if ($visibility === node_access::VISIBILITY_ALL || node_access::is_protected($node)) {
+            if ($visibility === access::VISIBILITY_ALL || access::is_protected($node)) {
                 array_push($everyone['allowed'], ...$paths);
                 array_push($some['allowed'], ...$paths);
             } else if (!empty($node->blockaccess)) {
                 array_push($some['blocked'], ...$paths);
-                if ($visibility === node_access::VISIBILITY_HIDDEN) {
+                if ($visibility === access::VISIBILITY_HIDDEN) {
                     array_push($everyone['blocked'], ...$paths);
                 }
             }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\navigation;
 
 /**
  * A page of the site that shows a secondary navigation, so its nodes can be found while the list of that navigation is empty:

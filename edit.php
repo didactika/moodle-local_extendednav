@@ -23,12 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\access_guard;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_list;
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
+use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\listing\nodes;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -51,7 +51,7 @@ if ($menu === null) {
     $menukey = 'primary';
     $menu = menu_manager::get_menu($menukey);
 }
-if ($contextid !== 0 && !node_list::supports_scopes($menukey)) {
+if ($contextid !== 0 && !nodes::supports_scopes($menukey)) {
     $contextid = 0;
 }
 
@@ -59,7 +59,7 @@ if ($contextid !== 0 && !node_list::supports_scopes($menukey)) {
 // saving it gives the scope a row of its own.
 $inherited = null;
 if ($node === null && $contextid !== 0 && $nodekey !== '') {
-    $inherited = node_list::get_scope_nodes($menukey, $contextid)[$nodekey] ?? null;
+    $inherited = nodes::get_scope_nodes($menukey, $contextid)[$nodekey] ?? null;
 }
 
 $params = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []) + ($id ? ['id' => $id] : [])
@@ -84,11 +84,11 @@ $form = new \local_extendednav\form\node_form(
 
 if ($source) {
     $formdata = clone $source;
-    $formdata->roles = node_access::split_list($source->roles);
-    $formdata->langs = node_access::split_list($source->langs);
+    $formdata->roles = access::split_list($source->roles);
+    $formdata->langs = access::split_list($source->langs);
     // Offer Moodle's default size when the node is switched to a pop-up.
-    $formdata->popupwidth = $source->popupwidth ?? node_display::DEFAULT_WIDTH;
-    $formdata->popupheight = $source->popupheight ?? node_display::DEFAULT_HEIGHT;
+    $formdata->popupwidth = $source->popupwidth ?? display::DEFAULT_WIDTH;
+    $formdata->popupheight = $source->popupheight ?? display::DEFAULT_HEIGHT;
     $formdata->contextid = $contextid;
     // The row that is being created has no id yet.
     $formdata->id = $node ? $node->id : 0;
@@ -103,14 +103,14 @@ if ($form->is_cancelled()) {
     if ($source && $menu->is_native($source->nodekey)) {
         $data->nodekey = $source->nodekey;
     }
-    $record = node_manager::prepare($data, $menukey);
+    $record = manager::prepare($data, $menukey);
     $record->contextid = $contextid;
 
     if ($node) {
         $record->id = $node->id;
-        node_manager::update($record);
+        manager::update($record);
         if ($contextid === 0 && (string)($record->parentkey ?? '') !== (string)($node->parentkey ?? '')) {
-            node_manager::place_after_parent_change($node, (string)($record->parentkey ?? ''));
+            manager::place_after_parent_change($node, (string)($record->parentkey ?? ''));
         }
         // Keep submenu items attached when a parent is renamed.
         if ($contextid === 0 && $record->nodekey !== $node->nodekey) {
@@ -119,18 +119,18 @@ if ($form->is_cancelled()) {
                 ['menu' => $menukey, 'parentkey' => $node->nodekey, 'contextid' => 0]
             );
             foreach ($children as $child) {
-                node_manager::update((object)['id' => $child->id, 'parentkey' => $record->nodekey]);
+                manager::update((object)['id' => $child->id, 'parentkey' => $record->nodekey]);
             }
         }
     } else {
         if ($inherited) {
             $record->sortorder = $inherited->sortorder;
         }
-        node_manager::create($record);
+        manager::create($record);
     }
 
     if (
-        $contextid === 0 && access_guard::check_fallbacks(node_repository::get_all())
+        $contextid === 0 && access_guard::check_fallbacks(repository::get_all())
             === access_guard::FALLBACKS_BLOCKED_FOR_SOME
     ) {
         \core\notification::warning(get_string('warn_fallbacks_blocked_for_some', 'local_extendednav'));

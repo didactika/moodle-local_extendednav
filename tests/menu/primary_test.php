@@ -17,8 +17,8 @@
 namespace local_extendednav\menu;
 
 use local_extendednav\hooks;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_manager;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\primary::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\hooks::class)]
@@ -42,7 +42,7 @@ final class primary_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        node_access::reset_caches();
+        access::reset_caches();
         hooks::reset();
         primary::reset_discovery();
         // From Moodle 5.3 the Home item is only added when this setting is on; earlier versions ignore it.
@@ -243,7 +243,7 @@ final class primary_test extends \advanced_testcase {
         primary::reset_discovery();
 
         $records = $DB->get_records('local_extendednav', ['menu' => 'primary'], '', '*');
-        $this->assertSame(1, node_manager::delete($records, false));
+        $this->assertSame(1, manager::delete($records, false));
         $this->assertFalse($DB->record_exists('local_extendednav', ['menu' => 'primary', 'nodekey' => 'myhome']));
         $this->assertTrue($DB->record_exists('local_extendednav', ['menu' => 'primary', 'nodekey' => 'siteadminnode']));
         $this->assertFalse($menu->is_native('myhome'));

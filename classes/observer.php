@@ -16,9 +16,9 @@
 
 namespace local_extendednav;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 use local_extendednav\menu\base;
 
 /**
@@ -75,12 +75,12 @@ class observer {
             ['shortname' => '%' . $DB->sql_like_escape($shortname) . '%']
         );
         foreach ($records as $record) {
-            $roles = node_access::split_list($record->roles);
+            $roles = access::split_list($record->roles);
             if (!in_array($shortname, $roles, true)) {
                 continue;
             }
             $roles = array_values(array_diff($roles, [$shortname]));
-            node_manager::update((object)['id' => $record->id, 'roles' => empty($roles) ? null : implode(',', $roles)]);
+            manager::update((object)['id' => $record->id, 'roles' => empty($roles) ? null : implode(',', $roles)]);
         }
     }
 
@@ -145,7 +145,7 @@ class observer {
                 'title' => $item['text'],
                 'url' => $item['url'] !== '' ? $item['url'] : null,
                 'tooltip' => $item['tooltip'] !== '' ? $item['tooltip'] : null,
-                'langs' => $item['langs'] !== '' ? implode(',', node_access::split_list($item['langs'])) : null,
+                'langs' => $item['langs'] !== '' ? implode(',', access::split_list($item['langs'])) : null,
                 'parentkey' => $parentkey,
             ];
             if (isset($natives[$nodekey])) {
@@ -167,11 +167,11 @@ class observer {
                     }
                 }
                 if (count($changes) > 1) {
-                    node_manager::update((object)$changes, $events);
+                    manager::update((object)$changes, $events);
                 }
             } else {
-                $new = node_manager::prepare(['nodekey' => $nodekey, 'visibility' => 1] + $values, $menu->get_key());
-                $new = node_manager::create($new, $events);
+                $new = manager::prepare(['nodekey' => $nodekey, 'visibility' => 1] + $values, $menu->get_key());
+                $new = manager::create($new, $events);
                 $matched[$new->id] = true;
             }
         }
@@ -186,10 +186,10 @@ class observer {
                 $removed[] = $record;
             }
         }
-        node_manager::delete($removed, $events, false);
+        manager::delete($removed, $events, false);
 
         set_config('confighash_' . $configname, sha1($text), 'local_extendednav');
-        node_repository::purge();
+        repository::purge();
     }
 
     /**

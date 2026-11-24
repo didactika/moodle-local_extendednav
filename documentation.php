@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\node_importer;
+use local_extendednav\local\io\importer;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -44,7 +44,7 @@ if (optional_param('example', 0, PARAM_BOOL) && $example !== '') {
 }
 
 $fields = [];
-foreach (node_importer::EXPORT_FIELDS as $field) {
+foreach (importer::EXPORT_FIELDS as $field) {
     $fields[] = [
         'name' => $field,
         'required' => $field === 'nodekey',

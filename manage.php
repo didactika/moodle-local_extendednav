@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\node_list;
-use local_extendednav\local\sample_page;
+use local_extendednav\local\listing\nodes;
+use local_extendednav\local\navigation\sample_page;
 use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
 
@@ -41,7 +41,7 @@ if ($menu === null) {
     $menukey = 'primary';
     $menu = menu_manager::get_menu($menukey);
 }
-$hasscopes = node_list::supports_scopes($menukey);
+$hasscopes = nodes::supports_scopes($menukey);
 $scopename = get_string('applies_whole_site', 'local_extendednav');
 if ($contextid !== 0) {
     $context = $hasscopes ? context::instance_by_id($contextid, IGNORE_MISSING) : false;
