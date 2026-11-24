@@ -56,10 +56,10 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
-    'local_extendednav_get_scopes' => [
-        'classname' => \local_extendednav\external\get_scopes::class,
+    'local_extendednav_get_exceptions' => [
+        'classname' => \local_extendednav\external\get_exceptions::class,
         'methodname' => 'execute',
-        'description' => 'Lists the categories and courses a navigation has exceptions for, and the ones a search finds.',
+        'description' => 'Returns one page of the categories and courses that change a navigation.',
         'type' => 'read',
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',

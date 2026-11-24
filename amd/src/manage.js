@@ -16,7 +16,7 @@
 /**
  * The management page. It wires the parts, each in its own module: the list of the nodes (local/list), their order by dragging
  * (manage/dragging), the actions on them (manage/actions), the breadcrumb of the site administration (manage/tree_path), the
- * button that turns the navigation on or off (manage/power), the scope (manage/scope) and the menu of the exports. Every action
+ * button that turns the navigation on or off (manage/power) and the menu of the exports. Every action
  * changes the page in place through a web service; nothing reloads it but the choice of another navigation or scope.
  *
  * @module     local_extendednav/manage
@@ -34,14 +34,13 @@ import {init as popupMenu} from 'local_extendednav/local/popup_menu';
 import {init as initActions} from 'local_extendednav/manage/actions';
 import {init as enableDragging} from 'local_extendednav/manage/dragging';
 import {init as initPower} from 'local_extendednav/manage/power';
-import {init as initScope} from 'local_extendednav/manage/scope';
 import {render as renderPath} from 'local_extendednav/manage/tree_path';
 
 /** Strings of the page, all of local_extendednav but the ones of Moodle. */
 const STRINGS = ['drag_node_named', 'drag_nodes_named', 'navigation_on_help', 'navigation_off_help', 'edit_node_named',
     'delete_node_named', 'select_node_named', 'show_node_named', 'hide_node_named', 'delete_nodes_title', 'delete_nodes_text',
     'reset_nodes_title', 'reset_nodes_text', 'reset', 'empty_nodes_title', 'empty_nodes_text', 'empty_level_title',
-    'empty_level_text', 'nodes_changed', 'saved', 'applies_whole_site', 'exceptions_count', 'no_scopes', 'open_level_named',
+    'empty_level_text', 'nodes_changed', 'saved', 'open_level_named',
     'tree_top', 'hide_nodes_title', 'hide_nodes_text', 'hide_nodes_admins', 'hide_nodes_admins_help', 'show_nodes_title',
     'show_nodes_text', 'skipped_nodes', 'skipped_more', 'nodes_count_label', 'nodes_found'];
 const CORE_STRINGS = ['delete', 'show', 'hide'];
@@ -211,7 +210,6 @@ export const init = async(selector) => {
     if (exportmenu) {
         popupMenu(exportmenu);
     }
-    initScope(page, config, {wholesite: t.applies_whole_site, exceptions: t.exceptions_count, noscopes: t.no_scopes});
     // The menus of the filters are grouped in one menu, Filters, when they do not fit beside the search.
     group = filterGroup(root.querySelector('[data-region="filters"]'));
 

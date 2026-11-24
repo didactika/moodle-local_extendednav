@@ -73,8 +73,7 @@ final class change_nodes extends node_service {
             self::set_visibility_parameters(),
             compact('menu', 'contextid', 'nodekeys', 'visibility', 'hideadmins')
         );
-        self::require_manage();
-        self::validate_scope($params['menu'], $params['contextid']);
+        self::require_scope($params['menu'], $params['contextid']);
         if (!in_array($params['visibility'], [access::VISIBILITY_HIDDEN, access::VISIBILITY_ALL], true)) {
             throw new \invalid_parameter_exception('Unsupported visibility.');
         }
@@ -131,8 +130,7 @@ final class change_nodes extends node_service {
         global $DB;
 
         $params = self::validate_parameters(self::delete_parameters(), compact('menu', 'contextid', 'nodekeys'));
-        self::require_manage();
-        self::validate_scope($params['menu'], $params['contextid']);
+        self::require_scope($params['menu'], $params['contextid']);
 
         [$in, $inparams] = $DB->get_in_or_equal($params['nodekeys'] ?: [''], SQL_PARAMS_NAMED);
         $records = $DB->get_records_select(
@@ -183,8 +181,7 @@ final class change_nodes extends node_service {
      */
     public static function move(string $menu, int $contextid, string $nodekey, int $direction): array {
         $params = self::validate_parameters(self::move_parameters(), compact('menu', 'contextid', 'nodekey', 'direction'));
-        self::require_manage();
-        self::validate_scope($params['menu'], $params['contextid']);
+        self::require_scope($params['menu'], $params['contextid']);
         if (!in_array($params['direction'], [-1, 1], true)) {
             throw new \invalid_parameter_exception('The direction is -1 or 1.');
         }
@@ -237,8 +234,7 @@ final class change_nodes extends node_service {
             self::place_parameters(),
             compact('menu', 'contextid', 'nodekeys', 'beforekey', 'afterkey')
         );
-        self::require_manage();
-        self::validate_scope($params['menu'], $params['contextid']);
+        self::require_scope($params['menu'], $params['contextid']);
         manager::place($params['menu'], $params['contextid'], $params['nodekeys'], $params['beforekey'], $params['afterkey']);
         return ['count' => count($params['nodekeys'])];
     }

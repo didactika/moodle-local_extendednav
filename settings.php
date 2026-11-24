@@ -39,6 +39,13 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/manage.php'),
         'local/extendednav:manage'
     ));
+    // The categories and courses that change a navigation, to look them up; each changes them on its own page.
+    $ADMIN->add('local_extendednav_cat', new admin_externalpage(
+        'local_extendednav_exceptions',
+        get_string('exceptions_overview', 'local_extendednav'),
+        new moodle_url('/local/extendednav/exceptions.php'),
+        'local/extendednav:manage'
+    ));
     // The changes to the navigation are a report, with the other reports of the site.
     $ADMIN->add('reports', new admin_externalpage(
         'local_extendednav_activity',

@@ -34,4 +34,11 @@ $capabilities = [
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [],
     ],
+    // Change the navigations of one category or course, and of everything inside it: the exceptions of that context.
+    'local/extendednav:managecontext' => [
+        'riskbitmask' => RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => ['manager' => CAP_ALLOW],
+    ],
 ];

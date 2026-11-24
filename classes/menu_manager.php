@@ -95,9 +95,11 @@ class menu_manager {
      *
      * @param string $current Key of the navigation shown.
      * @param string $script Page the links open, such as /local/extendednav/manage.php.
+     * @param array $params Other parameters of the links, such as the context of a category or a course.
+     * @param string[]|null $only The navigations listed, or null for all of them.
      * @return array The groups (origins) and the same navigations as options of a select (originoptions).
      */
-    public static function get_origin_groups(string $current, string $script): array {
+    public static function get_origin_groups(string $current, string $script, array $params = [], ?array $only = null): array {
         $groups = [
             'origin_group_site' => ['primary', 'usermenu', 'frontpage'],
             'origin_group_course' => ['course', 'activity', 'category'],
@@ -114,10 +116,10 @@ class menu_manager {
             $items = [];
             foreach ($keys as $key) {
                 $menu = self::get_menu($key);
-                if ($menu === null) {
+                if ($menu === null || ($only !== null && !in_array($key, $only, true))) {
                     continue;
                 }
-                $url = (new \moodle_url($script, ['menu' => $key]))->out(false);
+                $url = (new \moodle_url($script, $params + ['menu' => $key]))->out(false);
                 $items[] = [
                     'key' => $key,
                     'name' => $menu->get_name(),
@@ -128,7 +130,9 @@ class menu_manager {
                 ];
                 $options[] = ['name' => $menu->get_name(), 'url' => $url, 'selected' => $key === $current];
             }
-            $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];
+            if ($items) {
+                $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];
+            }
         }
         return ['origins' => $origins, 'originoptions' => $options];
     }

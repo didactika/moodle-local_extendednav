@@ -1,0 +1,69 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/exceptions/table
+
+    One page of the categories and courses that change a navigation: the name with the categories around it, the kind, the
+    navigations it changes with the number of nodes of each (each a link to its page), and the way to its page.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "rows": [
+            {
+                "contextid": 42, "name": "Algebra I", "path": "Sciences / Mathematics", "kind": "course", "iscourse": true,
+                "total": 3, "url": "#", "openlabel": "Open Algebra I",
+                "navigations": [{"name": "Course navigation", "count": 2, "url": "#"}, {"name": "Activity navigation", "count": 1, "url": "#"}]
+            }
+        ]
+    }
+}}
+<table class="table w-100">
+    <caption class="sr-only visually-hidden">{{#str}}exceptions_overview, local_extendednav{{/str}}</caption>
+    <thead>
+        <tr>
+            <th scope="col">{{#str}}exceptions_context, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{#str}}navigations, local_extendednav{{/str}}</th>
+            <th scope="col" class="text-end text-right"><span class="sr-only visually-hidden">{{#str}}actions, moodle{{/str}}</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#rows}}
+            <tr data-contextid="{{contextid}}">
+                <th scope="row">
+                    <span class="d-flex align-items-center gap-2">
+                        <span class="text-muted">{{#iscourse}}{{#pix}}i/course, core{{/pix}}{{/iscourse}}{{^iscourse}}{{#pix}}i/withsubcat, core{{/pix}}{{/iscourse}}</span>
+                        <span class="d-flex flex-column overflow-hidden">
+                            <a class="fw-bold text-truncate" href="{{url}}">{{name}}</a>
+                            {{#path}}<span class="small text-muted text-truncate">{{path}}</span>{{/path}}
+                        </span>
+                    </span>
+                </th>
+                <td class="d-none d-md-table-cell">
+                    <span class="d-inline-flex flex-wrap gap-1">
+                        {{#navigations}}<a class="badge rounded-pill text-bg-light text-decoration-none" href="{{url}}">{{name}} · {{count}}</a>{{/navigations}}
+                    </span>
+                </td>
+                <td class="text-end text-right text-nowrap" data-column="actions">
+                    <a class="btn btn-link btn-icon btn-sm text-primary" href="{{url}}" title="{{openlabel}}" aria-label="{{openlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
+                </td>
+            </tr>
+        {{/rows}}
+    </tbody>
+</table>
