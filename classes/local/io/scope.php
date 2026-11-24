@@ -61,17 +61,35 @@ final class scope {
         }
         $contexts = $DB->get_records_list('context', 'id', $missing, '', 'id, contextlevel, instanceid');
         $courseids = [];
+        $cmids = [];
         foreach ($contexts as $context) {
             if ((int)$context->contextlevel === CONTEXT_COURSE) {
                 $courseids[] = (int)$context->instanceid;
+            } else if ((int)$context->contextlevel === CONTEXT_MODULE) {
+                $cmids[] = (int)$context->instanceid;
             }
         }
         $courses = $courseids ? $DB->get_records_list('course', 'id', $courseids, '', 'id, shortname') : [];
+        $activities = [];
+        if ($cmids) {
+            [$insql, $params] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+            $activities = $DB->get_records_sql(
+                "SELECT cm.id, cm.idnumber, c.shortname
+                   FROM {course_modules} cm
+                   JOIN {course} c ON c.id = cm.course
+                  WHERE cm.id $insql",
+                $params
+            );
+        }
         foreach ($missing as $contextid) {
             $context = $contexts[$contextid] ?? null;
             $name = '';
             if ($context && (int)$context->contextlevel === CONTEXT_COURSE && isset($courses[$context->instanceid])) {
                 $name = 'course:' . $courses[$context->instanceid]->shortname;
+            } else if ($context && (int)$context->contextlevel === CONTEXT_MODULE && isset($activities[$context->instanceid])) {
+                $activity = $activities[$context->instanceid];
+                $name = 'activity:' . $activity->shortname . '/'
+                    . (trim((string)$activity->idnumber) !== '' ? $activity->idnumber : '#' . $activity->id);
             } else if ($context && (int)$context->contextlevel === CONTEXT_COURSECAT) {
                 $category = \core_course_category::get((int)$context->instanceid, IGNORE_MISSING, true);
                 $name = $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
@@ -99,6 +117,18 @@ final class scope {
         if ($type === 'course') {
             $id = $DB->get_field('course', 'id', ['shortname' => $name]);
             $contextid = $id ? (int)\context_course::instance((int)$id)->id : null;
+        } else if ($type === 'activity' && strrpos($name, '/') !== false) {
+            // The course and the activity: its ID number, or its number in the site after # when it has none.
+            $slash = strrpos($name, '/');
+            $courseid = $DB->get_field('course', 'id', ['shortname' => substr($name, 0, $slash)]);
+            $ident = substr($name, $slash + 1);
+            $cmid = false;
+            if ($courseid && str_starts_with($ident, '#')) {
+                $cmid = $DB->get_field('course_modules', 'id', ['id' => (int)substr($ident, 1), 'course' => $courseid]);
+            } else if ($courseid && $ident !== '') {
+                $cmid = $DB->get_field('course_modules', 'id', ['idnumber' => $ident, 'course' => $courseid], IGNORE_MULTIPLE);
+            }
+            $contextid = $cmid ? (int)\context_module::instance((int)$cmid)->id : null;
         } else if ($type === 'category') {
             // The nested names of the categories are worked out once, whatever the number of nodes of the file.
             if (self::$categories === null) {
