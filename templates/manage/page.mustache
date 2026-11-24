@@ -54,9 +54,9 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <h2 class="h4 fw-bold mb-0">{{name}}</h2>
-                    <button type="button" class="btn btn-sm {{#enabled}}btn-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
+                    <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
                         <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
-                        <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/invalid, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
+                        <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/uncheckedcircle, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
                     </button>
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-2" data-region="actions">
@@ -71,6 +71,7 @@
                                 <span class="d-block fw-bold">{{#str}}export_this, local_extendednav{{/str}}</span>
                                 <span class="d-block small text-muted">{{name}}</span>
                             </a>
+                            <span class="dropdown-divider d-block" role="separator"></span>
                             <a class="dropdown-item" href="{{exporteverythingurl}}">
                                 <span class="d-block fw-bold">{{#str}}export_everything, local_extendednav{{/str}}</span>
                                 <span class="d-block small text-muted">{{#str}}export_everything_help, local_extendednav{{/str}}</span>
@@ -115,16 +116,15 @@
                     </div>
                     <div data-region="empty" hidden></div>
                     <div data-region="error" hidden></div>
-                    {{> local_extendednav/list/pager }}
+                    <div class="px-3 py-2 border-top small text-muted" data-region="foot" role="status"><span data-region="count"></span></div>
                 </div>
                 <div class="card" data-region="floatbar" hidden role="region" aria-label="{{#str}}selection, local_extendednav{{/str}}">
                     <div class="d-flex flex-wrap align-items-center gap-3 px-3 py-2">
                         <span class="fw-bold" role="status" data-region="selectedcount"></span>
-                        <button type="button" class="btn btn-link" data-action="selectall" hidden></button>
-                        <div class="d-flex flex-wrap gap-2 ms-auto ml-auto">
-                            <button type="button" class="btn btn-secondary btn-tonal btn-sm" data-action="bulkshow">{{#pix}}t/show, core{{/pix}} {{#str}}show_selected, local_extendednav{{/str}}</button>
-                            <button type="button" class="btn btn-secondary btn-tonal btn-sm" data-action="bulkhide">{{#pix}}t/hide, core{{/pix}} {{#str}}hide_selected, local_extendednav{{/str}}</button>
-                            <button type="button" class="btn btn-danger btn-tonal btn-sm" data-action="bulkdelete">{{#pix}}t/delete, core{{/pix}} <span data-region="deletelabel"></span></button>
+                                                <div class="d-flex flex-wrap gap-2 ms-auto ml-auto">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-action="bulkshow" hidden>{{#pix}}t/hide, core{{/pix}} {{#str}}show_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-action="bulkhide" hidden>{{#pix}}t/show, core{{/pix}} {{#str}}hide_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-action="bulkdelete" hidden>{{#pix}}t/delete, core{{/pix}} <span data-region="deletelabel"></span></button>
                         </div>
                         <button type="button" class="btn btn-link btn-icon btn-sm" data-action="clearselection" title="{{#str}}clear, moodle{{/str}}" aria-label="{{#str}}clear, moodle{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
                     </div>

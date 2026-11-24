@@ -114,6 +114,12 @@ abstract class node_service extends external_api {
             'candelete' => $flag('Whether the node can be deleted, or the exception reset.'),
             'first' => $flag('Whether it is the first among its siblings.'),
             'last' => $flag('Whether it is the last among its siblings.'),
+            'canhide' => $flag('Whether the node can be hidden.'),
+            'canshow' => $flag('Whether the node can be shown to everyone.'),
+            'flags' => new external_multiple_structure(new external_single_structure([
+                'label' => $text('Kind of restriction, in a word or two.'),
+            ]), 'Kinds of restriction, each explained by a line of details.'),
+            'virtual' => $flag('Whether the row is a group of the list and not a node.'),
         ]);
     }
 }

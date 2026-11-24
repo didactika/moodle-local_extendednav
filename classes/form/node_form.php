@@ -204,6 +204,8 @@ class node_form extends \moodleform {
 
         $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
         $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
+        // A node of the site administration is hidden from administrators too, unless they choose otherwise.
+        $mform->setDefault('hideadmins', $istree ? 1 : 0);
 
         // Where it goes.
         $mform->addElement('header', 'placeheader', get_string('form_section_place', 'local_extendednav'));

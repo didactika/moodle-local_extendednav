@@ -40,11 +40,12 @@ final class get_nodes extends node_service {
         return new external_function_parameters([
             'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
             'contextid' => new external_value(PARAM_INT, 'Context of the scope, 0 for the whole site.', VALUE_DEFAULT, 0),
-            'search' => new external_value(PARAM_TEXT, 'Text to find in the key, the title and the link.', VALUE_DEFAULT, ''),
+            'search' => new external_value(PARAM_RAW, 'Text to find in the key, the title and the link.', VALUE_DEFAULT, ''),
             'visibility' => new external_value(PARAM_TEXT, '0, 1 and 2, separated by commas, or empty.', VALUE_DEFAULT, ''),
             'parent' => new external_value(PARAM_ALPHANUMEXT, 'Key of a parent node, or empty.', VALUE_DEFAULT, ''),
             'page' => new external_value(PARAM_INT, 'Zero-based page.', VALUE_DEFAULT, 0),
-            'perpage' => new external_value(PARAM_INT, 'Rows per page, from 1 to 100, or 0 for all.', VALUE_DEFAULT, 12),
+            'perpage' => new external_value(PARAM_INT, 'Rows per page, from 1 to 100, or 0 for all.', VALUE_DEFAULT, 0),
+            'origin' => new external_value(PARAM_TEXT, 'native and custom, separated by commas, or empty.', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -57,7 +58,8 @@ final class get_nodes extends node_service {
      * @param string $visibility Visibility filter.
      * @param string $parent Parent filter.
      * @param int $page Page.
-     * @param int $perpage Rows per page.
+     * @param int $perpage Rows per page, 0 for every row.
+     * @param string $origin Nodes of Moodle (native), nodes added (custom), or both.
      * @return array The page.
      */
     public static function execute(
@@ -67,11 +69,12 @@ final class get_nodes extends node_service {
         string $visibility = '',
         string $parent = '',
         int $page = 0,
-        int $perpage = 12
+        int $perpage = 0,
+        string $origin = ''
     ): array {
         $params = self::validate_parameters(
             self::execute_parameters(),
-            compact('menu', 'contextid', 'search', 'visibility', 'parent', 'page', 'perpage')
+            compact('menu', 'contextid', 'search', 'visibility', 'parent', 'page', 'perpage', 'origin')
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
@@ -90,7 +93,8 @@ final class get_nodes extends node_service {
             $params['visibility'],
             $params['parent'],
             $params['page'],
-            $params['perpage']
+            $params['perpage'],
+            $params['origin']
         );
     }
 
@@ -107,6 +111,8 @@ final class get_nodes extends node_service {
                 'visible' => new external_value(PARAM_INT, 'Nodes visible to everyone.'),
                 'roles' => new external_value(PARAM_INT, 'Nodes restricted to roles.'),
                 'hidden' => new external_value(PARAM_INT, 'Hidden nodes.'),
+                'native' => new external_value(PARAM_INT, 'Nodes of Moodle.'),
+                'custom' => new external_value(PARAM_INT, 'Nodes added by the plugin.'),
             ]),
             'rows' => new external_multiple_structure(self::row_structure()),
             'reorderable' => new external_value(PARAM_BOOL, 'Whether the list can be reordered as it is.'),

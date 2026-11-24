@@ -17,8 +17,9 @@
 {{!
     @template local_extendednav/list/toolbar
 
-    The toolbar of the list of nodes: the search, the menu of the visibilities, with the nodes of each, and the button that
-    clears every filter. It keeps one row.
+    The toolbar of the list of nodes: the search, the menu of the visibilities and the menu of the origins (nodes of Moodle or
+    added), each with the nodes of each option, and the button that clears every filter. It keeps one row: when the menus do
+    not fit they are grouped in one menu, Filters.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,29 +37,56 @@
             <label class="sr-only visually-hidden" for="{{id}}-search">{{searchlabel}}</label>
             <input class="form-control" type="search" id="{{id}}-search" data-region="search" placeholder="{{searchlabel}}" autocomplete="off">
         </form>
-        <span class="dropdown d-inline-flex" data-menu="status">
-            <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
-                aria-label="{{#str}}visibility, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}visibility, local_extendednav{{/str}}">{{#str}}visibility, local_extendednav{{/str}}</span></button>
-            <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}"
-                aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
-            <span class="dropdown-menu show" role="group" aria-label="{{#str}}visibility, local_extendednav{{/str}}" hidden>
-                <label class="dropdown-item" for="{{id}}-vis-1">
-                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-1" data-status="1">
-                    <span>{{#str}}vis_all, local_extendednav{{/str}}</span>
-                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="visible"></span>
-                </label>
-                <label class="dropdown-item" for="{{id}}-vis-2">
-                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-2" data-status="2">
-                    <span>{{#str}}vis_roles, local_extendednav{{/str}}</span>
-                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="roles"></span>
-                </label>
-                <label class="dropdown-item" for="{{id}}-vis-0">
-                    <input type="checkbox" class="form-check-input" id="{{id}}-vis-0" data-status="0">
-                    <span>{{#str}}vis_hidden, local_extendednav{{/str}}</span>
-                    <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="hidden"></span>
-                </label>
+        <div class="d-flex align-items-center gap-2" data-region="filter-menus">
+            <span class="dropdown d-inline-flex" data-menu="status" data-filter="status">
+                <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                    aria-label="{{#str}}visibility, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}visibility, local_extendednav{{/str}}">{{#str}}visibility, local_extendednav{{/str}}</span></button>
+                <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}"
+                    aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}visibility, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                <span class="dropdown-menu show" role="group" aria-label="{{#str}}visibility, local_extendednav{{/str}}" hidden>
+                    <label class="dropdown-item" for="{{id}}-vis-1">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-vis-1" data-option="1">
+                        <span>{{#str}}vis_all, local_extendednav{{/str}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="visible"></span>
+                    </label>
+                    <label class="dropdown-item" for="{{id}}-vis-2">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-vis-2" data-option="2">
+                        <span>{{#str}}vis_roles, local_extendednav{{/str}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="roles"></span>
+                    </label>
+                    <label class="dropdown-item" for="{{id}}-vis-0">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-vis-0" data-option="0">
+                        <span>{{#str}}vis_hidden, local_extendednav{{/str}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="hidden"></span>
+                    </label>
+                </span>
             </span>
-        </span>
+                <span class="dropdown d-inline-flex" data-menu="origin" data-filter="origin">
+                <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                    aria-label="{{#str}}origin, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}origin, local_extendednav{{/str}}">{{#str}}origin, local_extendednav{{/str}}</span></button>
+                <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}origin, local_extendednav{{/str}}"
+                    aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}origin, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                <span class="dropdown-menu show" role="group" aria-label="{{#str}}origin, local_extendednav{{/str}}" hidden>
+                    <label class="dropdown-item" for="{{id}}-origin-native">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-origin-native" data-option="native">
+                        <span>{{#str}}origin_native, local_extendednav{{/str}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="native"></span>
+                    </label>
+                    <label class="dropdown-item" for="{{id}}-origin-custom">
+                        <input type="checkbox" class="form-check-input" id="{{id}}-origin-custom" data-option="custom">
+                        <span>{{#str}}origin_custom, local_extendednav{{/str}}</span>
+                        <span class="badge text-bg-secondary ms-auto ml-auto" data-count="custom"></span>
+                    </label>
+                </span>
+            </span>
+            <span class="dropdown" data-menu="filters" hidden>
+                <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                    aria-label="{{#str}}filters{{/str}}">{{#pix}}i/filter, core{{/pix}} <span data-region="menu-label" data-label="{{#str}}filters{{/str}}">{{#str}}filters{{/str}}</span></button>
+                <span class="dropdown-menu show dropdown-menu-end dropdown-menu-right" role="group" aria-label="{{#str}}filters{{/str}}" hidden>
+                    <span class="d-grid" data-region="filter-panel"></span>
+                </span>
+            </span>
+        </div>
     </div>
     <div class="d-flex align-items-center gap-2 flex-shrink-0">
         <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled

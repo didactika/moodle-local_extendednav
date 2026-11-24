@@ -23,9 +23,6 @@
  */
 
 import ModalForm from 'core_form/modalform';
-import ModalSaveCancel from 'core/modal_save_cancel';
-import ModalEvents from 'core/modal_events';
-import Templates from 'core/templates';
 import {add as addToast} from 'core/toast';
 import {getString} from 'core/str';
 import {normalise} from 'local_extendednav/form_layout';
@@ -71,48 +68,6 @@ export const describeError = (error) => {
         return error.message || error.error || String(error);
     }
     return String(error);
-};
-
-/**
- * Asks before a destructive action, with the focus on Cancel and the action named in the danger button.
- *
- * @param {Object} options The question.
- * @param {string} options.title Question with the quantity.
- * @param {string} options.text What is lost and what is kept.
- * @param {string} options.button Name of the action.
- * @param {HTMLElement} options.trigger Element that gets the focus back.
- * @param {Function} options.action Does the action; a rejection keeps the dialog open with the error.
- * @returns {Promise<void>}
- */
-export const confirmDanger = async({title, text, button, trigger, action}) => {
-    const body = await Templates.render('local_extendednav/dialog/confirm', {text});
-    const modal = await ModalSaveCancel.create({
-        title,
-        body,
-        buttons: {save: button},
-        removeOnClose: true,
-        returnElement: trigger,
-    });
-    const root = modal.getRoot()[0];
-    const save = root.querySelector('[data-action="save"]');
-    save.classList.remove('btn-primary');
-    save.classList.add('btn-danger');
-    modal.getRoot().on(ModalEvents.save, async(event) => {
-        event.preventDefault();
-        save.disabled = true;
-        root.querySelector('[data-region="confirm-error"]').hidden = true;
-        try {
-            await action();
-            modal.destroy();
-        } catch (error) {
-            const alert = root.querySelector('[data-region="confirm-error"]');
-            alert.textContent = describeError(error);
-            alert.hidden = false;
-            save.disabled = false;
-        }
-    });
-    modal.getRoot().on(ModalEvents.shown, () => root.querySelector('[data-action="cancel"]')?.focus());
-    modal.show();
 };
 
 /**

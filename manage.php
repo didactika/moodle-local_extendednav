@@ -24,6 +24,7 @@
  */
 
 use local_extendednav\local\node_list;
+use local_extendednav\local\sample_page;
 use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
 
@@ -62,7 +63,14 @@ $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/manage.p
 ['origins' => $origins, 'originoptions' => $originoptions] = $groups;
 
 $scopeparams = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []);
-$config = json_encode(['menu' => $menukey, 'contextid' => $contextid, 'tree' => $menukey === admintree::KEY]);
+// A page that shows the navigation, so its nodes can be found from the empty list.
+$sample = sample_page::for_navigation($menukey);
+$config = json_encode([
+    'menu' => $menukey,
+    'contextid' => $contextid,
+    'tree' => $menukey === admintree::KEY,
+    'sampleurl' => $sample ? $sample->out(false) : '',
+]);
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_extendednav/manage/page', [

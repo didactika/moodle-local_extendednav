@@ -52,26 +52,26 @@
                                 <input class="form-control" type="search" id="{{id}}-search" data-region="search" placeholder="{{#str}}activity_search, local_extendednav{{/str}}" autocomplete="off">
                             </form>
                             <div class="d-flex align-items-center gap-2" data-region="filter-menus">
-                                <span class="dropdown d-inline-flex" data-menu="status">
+                                <span class="dropdown d-inline-flex" data-menu="status" data-filter="status">
                                     <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
                                         aria-label="{{#str}}activity_filter_action, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}activity_filter_action, local_extendednav{{/str}}">{{#str}}activity_filter_action, local_extendednav{{/str}}</span></button>
                                     <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_action, local_extendednav{{/str}}"
                                         aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}activity_filter_action, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
                                     <span class="dropdown-menu show" role="group" aria-label="{{#str}}activity_filter_action, local_extendednav{{/str}}" hidden>
                                         <label class="dropdown-item" for="{{id}}-act-created">
-                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-created" data-status="created">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-created" data-option="created">
                                             <span>{{#str}}action_created, local_extendednav{{/str}}</span>
-                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="created"></span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-count="created"></span>
                                         </label>
                                         <label class="dropdown-item" for="{{id}}-act-updated">
-                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-updated" data-status="updated">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-updated" data-option="updated">
                                             <span>{{#str}}action_updated, local_extendednav{{/str}}</span>
-                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="updated"></span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-count="updated"></span>
                                         </label>
                                         <label class="dropdown-item" for="{{id}}-act-deleted">
-                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-deleted" data-status="deleted">
+                                            <input type="checkbox" class="form-check-input" id="{{id}}-act-deleted" data-option="deleted">
                                             <span>{{#str}}action_deleted, local_extendednav{{/str}}</span>
-                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-status-count="deleted"></span>
+                                            <span class="badge text-bg-secondary ms-auto ml-auto" data-count="deleted"></span>
                                         </label>
                                     </span>
                                 </span>

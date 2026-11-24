@@ -43,6 +43,12 @@ final class change_nodes extends node_service {
             'contextid' => new external_value(PARAM_INT, 'Context of the scope, 0 for the whole site.', VALUE_DEFAULT, 0),
             'nodekeys' => self::keys_structure(),
             'visibility' => new external_value(PARAM_INT, '0 hidden or 1 visible to everyone.'),
+            'hideadmins' => new external_value(
+                PARAM_INT,
+                'When hiding: 1 to hide from administrators too, 0 not to, -1 to leave it as it is.',
+                VALUE_DEFAULT,
+                -1
+            ),
         ]);
     }
 
@@ -53,19 +59,32 @@ final class change_nodes extends node_service {
      * @param int $contextid Context of the scope.
      * @param string[] $nodekeys Node keys.
      * @param int $visibility 0 or 1.
+     * @param int $hideadmins 1 to hide from administrators too, 0 not to, -1 to leave it.
      * @return array The number of nodes changed.
      */
-    public static function set_visibility(string $menu, int $contextid, array $nodekeys, int $visibility): array {
+    public static function set_visibility(
+        string $menu,
+        int $contextid,
+        array $nodekeys,
+        int $visibility,
+        int $hideadmins = -1
+    ): array {
         $params = self::validate_parameters(
             self::set_visibility_parameters(),
-            compact('menu', 'contextid', 'nodekeys', 'visibility')
+            compact('menu', 'contextid', 'nodekeys', 'visibility', 'hideadmins')
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
         if (!in_array($params['visibility'], [node_access::VISIBILITY_HIDDEN, node_access::VISIBILITY_ALL], true)) {
             throw new \invalid_parameter_exception('Unsupported visibility.');
         }
-        $count = node_manager::set_visibility($params['menu'], $params['contextid'], $params['nodekeys'], $params['visibility']);
+        $count = node_manager::set_visibility(
+            $params['menu'],
+            $params['contextid'],
+            $params['nodekeys'],
+            $params['visibility'],
+            $params['hideadmins']
+        );
         return ['count' => $count];
     }
 
@@ -191,37 +210,37 @@ final class change_nodes extends node_service {
         return new external_function_parameters([
             'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
             'contextid' => new external_value(PARAM_INT, 'Context of the scope, 0 for the whole site.', VALUE_DEFAULT, 0),
-            'nodekey' => new external_value(PARAM_ALPHANUMEXT, 'Key of the node that moves.'),
-            'beforekey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling it goes before, or empty.', VALUE_DEFAULT, ''),
-            'afterkey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling it goes after, instead of before.', VALUE_DEFAULT, ''),
+            'nodekeys' => self::keys_structure(),
+            'beforekey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling they go before, or empty.', VALUE_DEFAULT, ''),
+            'afterkey' => new external_value(PARAM_ALPHANUMEXT, 'Sibling they go after, instead of before.', VALUE_DEFAULT, ''),
         ]);
     }
 
     /**
-     * Places a node before or after another one among its siblings, as when it is dragged.
+     * Places nodes, together, before or after another one among their siblings, as when they are dragged.
      *
      * @param string $menu Navigation key.
      * @param int $contextid Context of the scope.
-     * @param string $nodekey Key of the node that moves.
-     * @param string $beforekey Key of the sibling it goes before, or empty.
-     * @param string $afterkey Key of the sibling it goes after, or empty.
+     * @param string[] $nodekeys Keys of the nodes that move, all of them siblings.
+     * @param string $beforekey Key of the sibling they go before, or empty.
+     * @param string $afterkey Key of the sibling they go after, or empty.
      * @return array The number of nodes moved.
      */
     public static function place(
         string $menu,
         int $contextid,
-        string $nodekey,
+        array $nodekeys,
         string $beforekey = '',
         string $afterkey = ''
     ): array {
         $params = self::validate_parameters(
             self::place_parameters(),
-            compact('menu', 'contextid', 'nodekey', 'beforekey', 'afterkey')
+            compact('menu', 'contextid', 'nodekeys', 'beforekey', 'afterkey')
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
-        node_manager::place($params['menu'], $params['contextid'], $params['nodekey'], $params['beforekey'], $params['afterkey']);
-        return ['count' => 1];
+        node_manager::place($params['menu'], $params['contextid'], $params['nodekeys'], $params['beforekey'], $params['afterkey']);
+        return ['count' => count($params['nodekeys'])];
     }
 
     /**

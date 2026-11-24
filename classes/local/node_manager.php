@@ -89,7 +89,12 @@ class node_manager {
 
         $placement = isset($data['placement']) && is_numeric($data['placement']) ? (int)$data['placement'] : 0;
         $record->placement = in_array($placement, [0, 1, 2], true) ? $placement : 0;
-        $record->hideadmins = empty($data['hideadmins']) ? 0 : 1;
+        // A node of the site administration is hidden from administrators too unless the data says otherwise.
+        if (array_key_exists('hideadmins', $data)) {
+            $record->hideadmins = empty($data['hideadmins']) ? 0 : 1;
+        } else {
+            $record->hideadmins = $menu === \local_extendednav\menu\admintree::KEY ? 1 : 0;
+        }
         if (isset($data['contextid']) && is_numeric($data['contextid']) && (int)$data['contextid'] > 0) {
             $record->contextid = (int)$data['contextid'];
         }
@@ -455,9 +460,16 @@ class node_manager {
      * @param int $contextid Context of the scope, 0 for the whole site.
      * @param string[] $nodekeys Node keys.
      * @param int $visibility One of the visibilities of node_access.
+     * @param int $hideadmins 1 to hide the nodes from administrators too, 0 not to, -1 to leave it as it is.
      * @return int Number of nodes changed.
      */
-    public static function set_visibility(string $menu, int $contextid, array $nodekeys, int $visibility): int {
+    public static function set_visibility(
+        string $menu,
+        int $contextid,
+        array $nodekeys,
+        int $visibility,
+        int $hideadmins = -1
+    ): int {
         $changed = 0;
         foreach (array_unique($nodekeys) as $nodekey) {
             $row = self::ensure_row($menu, (string)$nodekey, $contextid);
@@ -466,6 +478,9 @@ class node_manager {
             }
             $values = ['id' => $row->id, 'visibility' => $visibility];
             $values['roles'] = $visibility === node_access::VISIBILITY_ROLES ? $row->roles : null;
+            if ($hideadmins === 0 || $hideadmins === 1) {
+                $values['hideadmins'] = $hideadmins;
+            }
             self::update((object)$values);
             $changed++;
         }
@@ -512,46 +527,52 @@ class node_manager {
     }
 
     /**
-     * Places a node right before another one among its siblings, or after the last of them.
+     * Places nodes, together and in the order they have, right before a sibling, right after one, or after the last of them.
+     *
+     * Every node that moves has the same parent, and the sibling that marks the place is one of theirs and not one that moves.
      *
      * @param string $menu Menu key.
      * @param int $contextid Context of the scope, 0 for the whole site.
-     * @param string $nodekey Key of the node that moves.
-     * @param string $beforekey Key of the sibling it goes before, or empty to go after the last sibling.
-     * @param string $afterkey Key of the sibling it goes after, instead of a sibling it goes before.
+     * @param string[] $nodekeys Keys of the nodes that move.
+     * @param string $beforekey Key of the sibling they go before, or empty to go after the last sibling.
+     * @param string $afterkey Key of the sibling they go after, instead of a sibling they go before.
      */
-    public static function place(string $menu, int $contextid, string $nodekey, string $beforekey, string $afterkey = ''): void {
+    public static function place(string $menu, int $contextid, array $nodekeys, string $beforekey, string $afterkey = ''): void {
         $nodes = node_list::get_scope_nodes($menu, $contextid);
-        if (!isset($nodes[$nodekey])) {
+        $nodekeys = array_values(array_unique(array_map('strval', $nodekeys)));
+        if (empty($nodekeys) || array_diff($nodekeys, array_keys($nodes))) {
             throw new \invalid_parameter_exception('Unknown node.');
         }
-        $parent = (string)($nodes[$nodekey]->parentkey ?? '');
+        $parent = (string)($nodes[$nodekeys[0]]->parentkey ?? '');
+        $issibling = static fn(string $key): bool => isset($nodes[$key]) && (string)($nodes[$key]->parentkey ?? '') === $parent;
+        foreach ([...$nodekeys, $beforekey, $afterkey] as $key) {
+            if ($key !== '' && !$issibling($key)) {
+                throw new \invalid_parameter_exception('Nodes move among their siblings.');
+            }
+        }
+        if (in_array($beforekey, $nodekeys, true) || in_array($afterkey, $nodekeys, true)) {
+            throw new \invalid_parameter_exception('A node does not move next to itself.');
+        }
+
+        // The nodes that move keep the order they have; the rest keep theirs.
+        $moving = array_values(array_intersect(array_keys($nodes), $nodekeys));
+        $keys = array_values(array_diff(array_keys($nodes), $moving));
         if ($afterkey !== '') {
             // Right after a sibling is right before the sibling that follows it, or at the end.
-            if (!isset($nodes[$afterkey]) || (string)($nodes[$afterkey]->parentkey ?? '') !== $parent) {
-                throw new \invalid_parameter_exception('A node goes among its siblings.');
-            }
-            $siblings = array_values(array_filter(
-                array_keys($nodes),
-                static fn(string $key): bool => $key !== $nodekey && (string)($nodes[$key]->parentkey ?? '') === $parent
-            ));
+            $siblings = array_values(array_filter($keys, $issibling));
             $beforekey = $siblings[array_search($afterkey, $siblings, true) + 1] ?? '';
         }
-        if ($beforekey !== '' && (!isset($nodes[$beforekey]) || (string)($nodes[$beforekey]->parentkey ?? '') !== $parent)) {
-            throw new \invalid_parameter_exception('A node goes among its siblings.');
-        }
-        $keys = array_values(array_diff(array_keys($nodes), [$nodekey]));
         if ($beforekey !== '') {
             $at = array_search($beforekey, $keys, true);
         } else {
             $at = 0;
             foreach ($keys as $index => $key) {
-                if ((string)($nodes[$key]->parentkey ?? '') === $parent) {
+                if ($issibling($key)) {
                     $at = $index + 1;
                 }
             }
         }
-        array_splice($keys, (int)$at, 0, [$nodekey]);
+        array_splice($keys, (int)$at, 0, $moving);
         self::save_order($menu, $contextid, $keys);
         if ($menu === \local_extendednav\menu\admintree::KEY) {
             \local_extendednav\menu\admintree::mark_ordered($parent);

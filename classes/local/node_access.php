@@ -99,6 +99,10 @@ class node_access {
      * @return bool
      */
     public static function is_protected(\stdClass $node): bool {
+        if ($node->menu === \local_extendednav\menu\admintree::KEY) {
+            // The way to the management page of the plugin is never hidden in the site administration.
+            return in_array($node->nodekey, \local_extendednav\menu\admintree::PROTECTED, true);
+        }
         return $node->menu === 'primary' && $node->nodekey === 'siteadminnode';
     }
 

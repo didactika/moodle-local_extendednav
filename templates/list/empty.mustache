@@ -28,7 +28,8 @@
         "filtered": false,
         "icon": "i/users",
         "title": "No delegations yet",
-        "text": "Create delegations to let people open other accounts for a period."
+        "text": "Create delegations to let people open other accounts for a period.",
+        "sampleurl": ""
     }
 }}
 <div class="d-flex flex-column align-items-center gap-2 px-4 py-5 text-center">
@@ -42,5 +43,11 @@
         <span class="icon-box">{{#pix}}{{icon}}{{^icon}}i/users{{/icon}}, core{{/pix}}</span>
         <p class="fw-bold mb-0">{{title}}</p>
         <p class="text-muted mb-0">{{text}}</p>
+        {{#sampleurl}}
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                <button type="button" class="btn btn-primary" data-action="loadsample" data-url="{{sampleurl}}">{{#pix}}i/reload, core{{/pix}} {{#str}}find_nodes, local_extendednav{{/str}}</button>
+                <a class="btn btn-outline-secondary" href="{{sampleurl}}" target="_blank" rel="noopener">{{#pix}}i/externallink, core{{/pix}} {{#str}}open_sample_page, local_extendednav{{/str}}</a>
+            </div>
+        {{/sampleurl}}
     {{/filtered}}
 </div>

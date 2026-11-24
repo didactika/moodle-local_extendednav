@@ -31,6 +31,9 @@ class node_list {
     /** @var int Most rows a page of the list holds. */
     public const MAX_PAGE_SIZE = 100;
 
+    /** @var int Longest search, in characters. */
+    public const MAX_SEARCH = 255;
+
     /**
      * Returns the nodes of a navigation that apply to a scope, in the order the navigation has them.
      *
@@ -58,6 +61,7 @@ class node_list {
      * @param int $contextid Context of the scope, 0 for the whole site.
      * @param string $search Text to find in the key, the title and the URL.
      * @param string $visibility 0, 1 and 2, separated by commas, to list those visibilities, or empty for all of them.
+     * @param string $origin native (nodes of Moodle) and custom (nodes added), separated by commas, or empty for both.
      * @param string $parent Key of a parent node, or empty for every node. In the site administration, which is a tree, the
      *     list is always one level of it: the children of this category, or the top level when it is empty.
      * @param int $page Page, from 0.
@@ -71,7 +75,8 @@ class node_list {
         string $visibility = '',
         string $parent = '',
         int $page = 0,
-        int $perpage = 12
+        int $perpage = 0,
+        string $origin = ''
     ): array {
         $menu = menu_manager::get_menu($menukey);
         if ($menu === null) {
@@ -80,15 +85,29 @@ class node_list {
         // Moodle's own nodes are found before they are listed, so the list shows what Moodle shows.
         $menu->ensure_synced();
 
+        // The search is only compared, never shown; any text is accepted, up to a length that is enough for a key or a link.
+        $search = \core_text::substr(trim($search), 0, self::MAX_SEARCH);
         $istree = $menu instanceof admintree;
         $all = self::get_scope_nodes($menukey, $contextid);
-        // In the tree a search looks in every level; without one, the list is the level chosen.
+        // In the tree a search looks in every level; without one, the list is the level chosen. The top level holds the
+        // group General and the tabs of Moodle; General holds the other items of the top level, as Moodle groups them.
         $level = $istree && trim($search) === '';
-        $nodes = self::filter($menu, $all, $search, $istree && !$level ? '' : $parent, $level);
+        $general = $istree ? admintree::general_keys($all) : [];
+        $ingeneral = $level && $parent === admintree::GENERAL;
+        $nodes = self::filter($menu, $all, $search, $istree && !$level || $ingeneral ? '' : $parent, $level);
+        if ($level && ($parent === '' || $ingeneral)) {
+            $nodes = array_filter($nodes, static fn(\stdClass $node): bool => isset($general[$node->nodekey]) === $ingeneral);
+        }
 
-        $counts = ['all' => count($nodes), 'visible' => 0, 'roles' => 0, 'hidden' => 0];
+        $counts = ['all' => count($nodes), 'visible' => 0, 'roles' => 0, 'hidden' => 0, 'native' => 0, 'custom' => 0];
         foreach ($nodes as $node) {
             $counts[['hidden', 'visible', 'roles'][(int)$node->visibility] ?? 'hidden']++;
+            $counts[$menu->is_native($node->nodekey) ? 'native' : 'custom']++;
+        }
+        $origins = array_intersect(['native', 'custom'], explode(',', $origin));
+        if (count($origins) === 1) {
+            $native = in_array('native', $origins, true);
+            $nodes = array_filter($nodes, static fn(\stdClass $node): bool => $menu->is_native($node->nodekey) === $native);
         }
         $wanted = array_values(array_filter(explode(',', $visibility), static fn(string $value): bool => $value !== ''));
         if (!empty($wanted)) {
@@ -110,6 +129,9 @@ class node_list {
             }
         }
         $rows = [];
+        if ($level && $parent === '' && !empty($general) && empty($wanted) && count($origins) !== 1) {
+            $rows[] = self::general_row();
+        }
         foreach ($slice as $node) {
             $row = self::export_row($menu, $node, $contextid, $siblings);
             $row['haschildren'] = $istree && isset($parents[$node->nodekey]);
@@ -117,13 +139,37 @@ class node_list {
             $rows[] = $row;
         }
         // Moving a node only makes sense in a whole list, not in a part of it; in the tree, the whole level shown.
-        $reorderable = trim($search) === '' && $visibility === '' && ($istree || $parent === '');
+        $reorderable = trim($search) === '' && $visibility === '' && count($origins) !== 1 && ($istree || $parent === '');
+        $path = [];
+        if ($ingeneral) {
+            $path = [['key' => admintree::GENERAL, 'title' => get_string('general')]];
+        } else if ($istree) {
+            $path = self::path_of($menu, $all, $parent);
+        }
         return [
             'total' => $total,
             'counts' => $counts,
             'rows' => $rows,
             'reorderable' => $reorderable,
-            'path' => $istree ? self::path_of($menu, $all, $parent) : [],
+            'path' => $path,
+        ];
+    }
+
+    /**
+     * Returns the row of the group General of the site administration: it opens the items of the top level that are not tabs,
+     * and is not a node, so it has no actions.
+     *
+     * @return array
+     */
+    private static function general_row(): array {
+        $title = get_string('general');
+        return [
+            'details' => [], 'flags' => [], 'id' => 0, 'nodekey' => admintree::GENERAL, 'title' => $title, 'native' => true,
+            'url' => '', 'icon' => '', 'visibility' => node_access::VISIBILITY_ALL, 'visibilitylabel' => '', 'tone' => 'secondary',
+            'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
+            'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
+            'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
+            'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true,
         ];
     }
 
@@ -238,30 +284,41 @@ class node_list {
         ];
         [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[node_access::VISIBILITY_HIDDEN];
 
-        // What narrows the visibility, one short line each, in the order that matters.
+        $protected = node_access::is_protected($node);
+        // What narrows the visibility: a short flag for each kind of restriction, shown beside the visibility, and a whole line
+        // for each, shown when the pointer is over them, so a long list of roles never fills the row.
+        $flags = [];
         $details = [];
+        $restrict = static function (string $flag, string $detail) use (&$flags, &$details): void {
+            $flags[] = ['label' => get_string($flag, 'local_extendednav')];
+            $details[] = $detail;
+        };
         if ($visibility === node_access::VISIBILITY_ROLES && !empty($roles)) {
-            $details[] = get_string('visibility_roles_line', 'local_extendednav', implode(', ', $roles));
+            $restrict('flag_roles', get_string('visibility_roles_line', 'local_extendednav', implode(', ', $roles)));
         }
         if (!empty($langs)) {
-            $details[] = get_string('visibility_langs_line', 'local_extendednav', implode(', ', $langs));
+            $restrict('flag_langs', get_string('visibility_langs_line', 'local_extendednav', implode(', ', $langs)));
         }
         if (!empty($node->blockaccess) && $visibility !== node_access::VISIBILITY_ALL) {
-            $details[] = get_string('badge_blocked', 'local_extendednav');
+            $restrict('badge_blocked', get_string('badge_blocked', 'local_extendednav'));
         }
-        if (!empty($node->hideadmins)) {
-            $details[] = get_string('hidden_from_admins', 'local_extendednav');
+        if (!empty($node->hideadmins) && $visibility !== node_access::VISIBILITY_ALL) {
+            $restrict('flag_hideadmins', get_string('hidden_from_admins', 'local_extendednav'));
         } else if (node_access::is_admin_only($node)) {
-            $details[] = get_string('admin_only', 'local_extendednav');
+            $restrict('admin_only', get_string('admin_only_help', 'local_extendednav'));
         }
         if ($menu instanceof \local_extendednav\menu\primary && $native !== null && !$menu->is_shown_by_moodle($node->nodekey)) {
-            $details[] = get_string('badge_unavailable', 'local_extendednav');
+            $restrict('flag_unavailable', get_string('badge_unavailable', 'local_extendednav'));
         }
         if ($placement !== 0) {
-            $details[] = get_string($placement === 1 ? 'placement_more' : 'placement_main', 'local_extendednav');
+            $where = $placement === 1 ? 'placement_more' : 'placement_main';
+            $restrict($where, get_string($where, 'local_extendednav'));
         }
         if (!empty($native->moodlehidden)) {
-            $details[] = get_string('hidden_by_moodle', 'local_extendednav');
+            $restrict('hidden_by_moodle', get_string('hidden_by_moodle', 'local_extendednav'));
+        }
+        if ($protected) {
+            $restrict('flag_protected', get_string('flag_protected_help', 'local_extendednav'));
         }
 
         return [
@@ -297,8 +354,12 @@ class node_list {
             'exception' => $isexception && !$inherited,
             'inherited' => $inherited,
             'candelete' => $contextid !== 0 ? $isexception && !$inherited : $menu->can_delete($node->nodekey),
+            'canhide' => !$protected && $visibility !== node_access::VISIBILITY_HIDDEN,
+            'canshow' => !$protected && $visibility !== node_access::VISIBILITY_ALL,
             'first' => $siblings[$node->nodekey]['first'] ?? false,
             'last' => $siblings[$node->nodekey]['last'] ?? false,
+            'flags' => $flags,
+            'virtual' => false,
         ];
     }
 

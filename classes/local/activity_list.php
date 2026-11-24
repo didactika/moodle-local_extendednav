@@ -33,6 +33,9 @@ final class activity_list {
     /** @var int Most rows in one page. */
     public const MAX_PAGE_SIZE = 100;
 
+    /** @var int Longest search, in characters. */
+    public const MAX_SEARCH = 255;
+
     /** @var string[] Colour of the badge of each action. */
     private const TONES = ['created' => 'success', 'updated' => 'info', 'deleted' => 'danger'];
 
@@ -132,7 +135,7 @@ final class activity_list {
             'menu' => '%' . $DB->sql_like_escape(substr(json_encode(['menu' => $menu]), 1, -1)) . '%',
         ];
 
-        $search = trim($search);
+        $search = \core_text::substr(trim($search), 0, self::MAX_SEARCH);
         if ($search !== '') {
             $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
             $where .= ' AND (' . $DB->sql_like('log.other', ':searchkey', false, false)

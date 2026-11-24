@@ -17,8 +17,9 @@
 {{!
     @template local_extendednav/list/nodes_table
 
-    One page of the nodes of a navigation: the handle that moves a node, the title with its key, the visibility with what
-    narrows it, the link and the actions of each node. The title stays when a narrow screen scrolls the table.
+    The nodes of a navigation: the handle that moves a node (or every node selected with it), the title with its key, the
+    visibility with a badge for each kind of restriction (a tooltip gives the details), the link and the actions of each node.
+    A group of the list, such as General in the site administration, only opens its level.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,11 +29,13 @@
         "rows": [
             {
                 "id": 3, "nodekey": "grades", "title": "Grades", "url": "/grade/report/?id=2", "icon": "", "parentkey": "",
-                "visibility": 1, "visibilitylabel": "Visible to everyone", "tone": "success", "child": false,
-                "details": ["Roles: teacher"], "exception": false, "inherited": false, "candelete": false,
-                "isselected": false, "editurl": "#", "depth": 0, "haschildren": false, "openlabel": "Open Grades", "childrenlabel": "Open", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
-                "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": true,
-                "canmove": true, "draglabel": "Drag Grades to move it"
+                "visibility": 2, "visibilitylabel": "Restricted", "tone": "warning", "child": false,
+                "flags": [{"label": "Roles"}], "details": ["Roles: teacher"], "hasdetails": true,
+                "exception": false, "inherited": false, "candelete": false, "canhide": true, "canshow": true,
+                "isselected": false, "editurl": "#", "depth": 0, "haschildren": false, "virtual": false,
+                "openlabel": "Open Grades", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
+                "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": false,
+                "selectable": true, "canmove": true, "draglabel": "Drag Grades to move it"
             }
         ]
     }
@@ -51,13 +54,15 @@
     </thead>
     <tbody>
         {{#rows}}
-            <tr {{#isselected}}class="table-active"{{/isselected}} data-key="{{nodekey}}" data-parent="{{parentkey}}">
+            <tr {{#isselected}}class="table-active"{{/isselected}} data-key="{{nodekey}}" data-parent="{{parentkey}}" {{#virtual}}data-virtual="1"{{/virtual}}>
                 <td class="d-none d-md-table-cell" data-column="handle">
                     {{#canmove}}
                         <button type="button" class="btn btn-link btn-icon btn-sm" data-region="handle" data-key="{{nodekey}}" title="{{draglabel}}" aria-label="{{draglabel}}">{{#pix}}i/dragdrop, core{{/pix}}</button>
                     {{/canmove}}
                 </td>
-                <td data-column="select"><input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" title="{{selectlabel}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}></td>
+                <td data-column="select">
+                    {{#selectable}}<input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" title="{{selectlabel}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}>{{/selectable}}
+                </td>
                 <th scope="row" data-column="title">
                     <span class="d-flex align-items-center gap-2" data-depth="{{depth}}">
                         {{#icon}}<span class="text-muted">{{{icon}}}</span>{{/icon}}
@@ -68,25 +73,31 @@
                             {{^haschildren}}
                                 <a class="fw-bold text-truncate" href="{{editurl}}">{{title}}</a>
                             {{/haschildren}}
-                            <span class="small text-muted text-truncate"><code>{{nodekey}}</code>{{#exception}} · {{#str}}exception, local_extendednav{{/str}}{{/exception}}{{#inherited}} · {{#str}}inherited, local_extendednav{{/str}}{{/inherited}}</span>
-                            <span class="d-md-none mt-1 text-truncate"><span class="badge rounded-pill text-bg-{{tone}} mw-100 text-truncate align-bottom">{{visibilitylabel}}</span></span>
+                            {{^virtual}}
+                                <span class="small text-muted text-truncate">{{#native}}<span class="badge rounded-pill text-bg-light" title="{{#str}}origin_native_help, local_extendednav{{/str}}">{{#str}}origin_native, local_extendednav{{/str}}</span>{{/native}}{{^native}}<span class="badge rounded-pill text-bg-info" title="{{#str}}origin_custom_help, local_extendednav{{/str}}">{{#str}}origin_custom, local_extendednav{{/str}}</span>{{/native}} <code>{{nodekey}}</code>{{#exception}} · {{#str}}exception, local_extendednav{{/str}}{{/exception}}{{#inherited}} · {{#str}}inherited, local_extendednav{{/str}}{{/inherited}}</span>
+                                <span class="d-md-none mt-1 text-truncate"><span class="badge rounded-pill text-bg-{{tone}} mw-100 text-truncate align-bottom">{{visibilitylabel}}</span></span>
+                            {{/virtual}}
                         </span>
                     </span>
                 </th>
                 <td class="d-none d-md-table-cell" data-column="visibility">
-                    <span class="d-flex flex-column align-items-start gap-1">
-                        <span class="badge rounded-pill text-bg-{{tone}}">{{visibilitylabel}}</span>
-                        {{#details}}<span class="small text-muted">{{.}}</span>{{/details}}
-                    </span>
+                    {{^virtual}}
+                        <span class="d-inline-flex flex-wrap align-items-center gap-1" {{#hasdetails}}tabindex="0" data-toggle="tooltip" data-bs-toggle="tooltip" data-html="true" data-bs-html="true" title="{{#details}}{{.}}<br>{{/details}}"{{/hasdetails}}>
+                            <span class="badge rounded-pill text-bg-{{tone}}">{{visibilitylabel}}</span>
+                            {{#flags}}<span class="badge rounded-pill text-bg-light">{{label}}</span>{{/flags}}
+                        </span>
+                    {{/virtual}}
                 </td>
                 <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block">{{url}}</span></td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
-                    {{#visible}}<button type="button" class="btn btn-link btn-icon btn-sm" data-action="toggle" data-key="{{nodekey}}" data-visibility="0" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/visible}}
-                    {{^visible}}<button type="button" class="btn btn-link btn-icon btn-sm" data-action="toggle" data-key="{{nodekey}}" data-visibility="1" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/visible}}
-                    <a class="btn btn-link btn-icon btn-sm" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
-                    {{#candelete}}
-                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>
-                    {{/candelete}}
+                    {{^virtual}}
+                        {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-secondary" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
+                        {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{/canhide}}
+                        <a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
+                        {{#candelete}}
+                            <button type="button" class="btn btn-link btn-icon btn-sm text-danger" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>
+                        {{/candelete}}
+                    {{/virtual}}
                 </td>
             </tr>
         {{/rows}}
