@@ -1923,6 +1923,22 @@
     background-color: var(--dd-surface);
 }
 
+.len [data-action=clearfilters] [data-region=icon-group] {
+    display: none;
+}
+
+.len [data-region=filter-panel-head] {
+    padding: 0.25rem 0.25rem 0 0.75rem;
+}
+
+.len [data-region=filter-panel-head] [data-action=clearfilters] [data-region=icon-row] {
+    display: none;
+}
+
+.len [data-region=filter-panel-head] [data-action=clearfilters] [data-region=icon-group] {
+    display: inline-flex;
+}
+
 .path-local-extendednav .modal .modal-dialog.modal-lg,
 .path-admin-local-extendednav .modal .modal-dialog.modal-lg,
 #page-admin-setting-local_extendednav_settings .modal .modal-dialog.modal-lg,
@@ -2373,6 +2389,10 @@
 .len [data-region=tablewrap] .btn[data-action=changes] {
     font-size: 0.8125rem;
     line-height: 1.4;
+}
+
+.len [data-region=originlist] > .list-group + .list-group {
+    border-top: 0.375rem solid var(--dd-surface-2);
 }
 
 .path-local-extendednav .modal [data-region=iconpicker] > [data-region=grid],

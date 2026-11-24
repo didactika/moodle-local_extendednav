@@ -34,6 +34,22 @@ require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('local_extendednav_activity');
 
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
+// The kinds of activity are listed first; each opens the log of its navigation.
+if ($menukey === menu_manager::ACTIVITIES) {
+    $PAGE->set_url(new moodle_url('/local/extendednav/activity.php', ['menu' => $menukey]));
+    $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/activity.php');
+    echo $OUTPUT->header();
+    echo $OUTPUT->render_from_template('local_extendednav/manage/kinds', [
+        'name' => get_string('origin_group_activity', 'local_extendednav'),
+        'origins' => $groups['origins'],
+        'originoptions' => $groups['originoptions'],
+        'rows' => menu_manager::get_kind_rows('/local/extendednav/activity.php'),
+    ]);
+    $PAGE->requires->js_call_amd('local_extendednav/kinds', 'init', ['[data-region="kinds"]']);
+    $PAGE->requires->js_call_amd('local_extendednav/local/select_menu', 'init');
+    echo $OUTPUT->footer();
+    die();
+}
 $menu = menu_manager::get_menu($menukey);
 if ($menu === null) {
     $menukey = 'primary';

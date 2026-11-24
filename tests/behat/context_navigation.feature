@@ -26,7 +26,7 @@ Feature: Change the navigations of a course from the course
     And I change window size to "large"
     And I am on "Course 1" course homepage
     When I navigate to "Navigation" in current page administration
-    Then I should see "Course navigation" in the "[data-region='origin']" "css_element"
+    Then I should see "Course navigation" in the "[data-region='head']" "css_element"
     And I should not see "Import"
     And I click on "Hide Participants" "button" in the "Participants" "table_row"
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"

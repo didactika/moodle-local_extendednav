@@ -17,7 +17,8 @@
 {{!
     @template local_extendednav/activity/page
 
-    The activity log of a navigation: the navigations to the left (a select on a narrow screen) and, to the right, the search,
+    The activity log of a navigation: its name above, the navigations to the left (a select on a narrow screen) and, to the
+    right, the search,
     the menu of the actions, with the rows of each, the menu of the date and the rows. The rows are loaded by
     local_extendednav/activity.
 
@@ -36,11 +37,13 @@
     }
 }}
 <div class="len" data-region="activity">
+    <div class="d-grid gap-3" data-region="head">
+        <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+    </div>
     <div data-region="layout">
         {{> local_extendednav/manage/origins }}
 
         <section class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
-            <h2 class="h4 fw-bold mb-0">{{name}}</h2>
 
             <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{#str}}activity_log, local_extendednav{{/str}}">
                 <div class="card">
@@ -102,6 +105,7 @@
                                     <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
                                         aria-label="{{#str}}filters{{/str}}">{{#pix}}i/filter, core{{/pix}} <span data-region="menu-label" data-label="{{#str}}filters{{/str}}">{{#str}}filters{{/str}}</span></button>
                                     <span class="dropdown-menu show dropdown-menu-end dropdown-menu-right" role="group" aria-label="{{#str}}filters{{/str}}" hidden>
+                                        <span class="d-flex align-items-center justify-content-between gap-2" data-region="filter-panel-head"><span class="small fw-bold text-uppercase text-muted">{{#str}}filters{{/str}}</span></span>
                                         <span class="d-grid" data-region="filter-panel"></span>
                                     </span>
                                 </span>
@@ -109,7 +113,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
                             <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled
-                                title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}">{{#pix}}i/reload, core{{/pix}}</button>
+                                title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}"><span data-region="icon-row">{{#pix}}i/reload, core{{/pix}}</span><span data-region="icon-group">{{#pix}}e/cancel, core{{/pix}}</span></button>
                         </div>
                     </div>
                     <div class="table-responsive" data-region="tablewrap" aria-busy="true">

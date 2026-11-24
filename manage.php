@@ -41,6 +41,25 @@ if ($contextid && ($scope = context_scope::from_id($contextid))) {
     redirect($scope->url($menukey));
 }
 
+// The kinds of activity are many: Activities lists them, and each opens its own navigation.
+if ($menukey === menu_manager::ACTIVITIES) {
+    $PAGE->set_url(new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]));
+    $PAGE->navbar->add(get_string('origin_group_activity', 'local_extendednav'), $PAGE->url);
+    $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/manage.php');
+    echo $OUTPUT->header();
+    echo $OUTPUT->render_from_template('local_extendednav/manage/kinds', [
+        'name' => get_string('origin_group_activity', 'local_extendednav'),
+        'description' => get_string('manage_nodes_desc', 'local_extendednav'),
+        'origins' => $groups['origins'],
+        'originoptions' => $groups['originoptions'],
+        'rows' => menu_manager::get_kind_rows('/local/extendednav/manage.php'),
+    ]);
+    $PAGE->requires->js_call_amd('local_extendednav/kinds', 'init', ['[data-region="kinds"]']);
+    $PAGE->requires->js_call_amd('local_extendednav/local/select_menu', 'init');
+    echo $OUTPUT->footer();
+    die();
+}
+
 $menu = menu_manager::get_menu($menukey);
 if ($menu === null) {
     $menukey = 'primary';
@@ -50,6 +69,14 @@ $hasscopes = nodes::supports_scopes($menukey);
 
 $pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 $PAGE->set_url($pageurl);
+// The navigation of a kind of activity is reached from Activities, which the breadcrumb of Moodle shows.
+if ($menu instanceof \local_extendednav\menu\activity) {
+    $PAGE->navbar->add(
+        get_string('origin_group_activity', 'local_extendednav'),
+        new moodle_url('/local/extendednav/manage.php', ['menu' => menu_manager::ACTIVITIES])
+    );
+    $PAGE->navbar->add($menu->get_short_name(), $pageurl);
+}
 
 // The navigations, in groups: the ones of the whole site, the ones of the courses and the site administration.
 $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/manage.php');

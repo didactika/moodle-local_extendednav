@@ -76,7 +76,7 @@ class secondary extends base {
 
     /**
      * Returns the nodes of a secondary navigation that can be changed, by the key that is the same on every page. The page of
-     * the activity itself and the way into this plugin are left as they are.
+     * the activity itself is left as it is; the way into this plugin is listed, and can be renamed and moved but not hidden.
      *
      * @param \navigation_node $view The navigation.
      * @return \navigation_node[]
@@ -85,7 +85,7 @@ class secondary extends base {
         $children = [];
         foreach ($view->children as $child) {
             $key = self::key_of($child);
-            if ($key !== null && !in_array($key, ['modulepage', 'local_extendednav'], true)) {
+            if ($key !== null && $key !== 'modulepage') {
                 $children[$key] = $child;
             }
         }
