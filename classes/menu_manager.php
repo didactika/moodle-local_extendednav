@@ -38,7 +38,8 @@ class menu_manager {
 
     /** @var string[] The icon of Moodle that stands for each navigation in the column; a kind of activity has its own. */
     private const ICONS = [
-        'primary' => 'i/menu', 'usermenu' => 'i/user', 'frontpage' => 'i/home', 'course' => 'i/course',
+        'primary' => 'i/menu', 'usermenu' => 'i/user', 'preferences' => 't/preferences', 'profile' => 'i/users',
+        'frontpage' => 'i/home', 'course' => 'i/course',
         'category' => 'i/withsubcat', 'admin' => 'i/settings',
     ];
 
@@ -52,6 +53,8 @@ class menu_manager {
         $menus = [
             'primary' => new \local_extendednav\menu\primary(),
             'usermenu' => new \local_extendednav\menu\usermenu(),
+            \local_extendednav\menu\preferences::KEY => new \local_extendednav\menu\preferences(),
+            \local_extendednav\menu\profile::KEY => new \local_extendednav\menu\profile(),
         ];
         foreach (array_keys(\local_extendednav\menu\secondary::ORIGINS) as $origin) {
             $menus[$origin] = new \local_extendednav\menu\secondary($origin);
@@ -87,6 +90,10 @@ class menu_manager {
                 return new \local_extendednav\menu\primary();
             case 'usermenu':
                 return new \local_extendednav\menu\usermenu();
+            case \local_extendednav\menu\preferences::KEY:
+                return new \local_extendednav\menu\preferences();
+            case \local_extendednav\menu\profile::KEY:
+                return new \local_extendednav\menu\profile();
             case \local_extendednav\menu\admintree::KEY:
                 return new \local_extendednav\menu\admintree();
         }
@@ -174,7 +181,8 @@ class menu_manager {
 
         $origins = [];
         $options = [];
-        $lists = ['origin_group_site' => ['primary', 'usermenu', 'frontpage'], 'origin_group_course' => ['course', 'category']];
+        $lists = ['origin_group_site' => ['primary', 'usermenu', 'preferences', 'profile', 'frontpage'],
+            'origin_group_course' => ['course', 'category']];
         foreach ($lists as $string => $keys) {
             if ($entries = $items($keys)) {
                 $label = get_string($string, 'local_extendednav');

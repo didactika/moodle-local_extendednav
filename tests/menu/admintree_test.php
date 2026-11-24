@@ -168,7 +168,9 @@ final class admintree_test extends \advanced_testcase {
         $this->assertInstanceOf(\admin_category::class, $root->locate('extmoretools'));
         $inside = array_map(static fn($part): string => $part->name, $root->locate('extmoretools')->get_children());
         $this->assertContains('extportal', $inside);
-        $this->assertNull($root->locate('extstray'), 'A link needs a category.');
+        $stray = $root->locate('extstray');
+        $this->assertInstanceOf(\admin_externalpage::class, $stray, 'A link at the top goes in General.');
+        $this->assertContains('extstray', array_map(static fn($part): string => $part->name, $root->get_children()));
         $tree = menu_manager::get_menu(admintree::KEY);
         $this->assertFalse($tree->is_native('exttools'), 'A category of the plugin is not native.');
 

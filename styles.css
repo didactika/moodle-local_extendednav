@@ -2160,6 +2160,10 @@
     }
 }
 
+.local-extendednav-tour-required [data-role=flexitour-step] [data-role=end].btn-secondary {
+    display: none;
+}
+
 .len [data-region=layout] {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

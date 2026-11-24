@@ -25,23 +25,46 @@
 
 namespace local_extendednav\privacy;
 
-use core_privacy\local\metadata\null_provider;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
+use local_extendednav\local\navigation\preferences_injector;
 
 /**
  * Privacy API provider for local_extendednav.
  *
- * This plugin does not store any personal data.
+ * The plugin keeps one thing of each user: how they arranged their own page Preferences, as a user preference.
  *
  * @copyright  2026 Didactika
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
+class provider implements
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\user_preference_provider {
     /**
-     * Get the language string identifier to explain why this plugin stores no data.
+     * Describes the data the plugin keeps.
      *
-     * @return  string
+     * @param collection $collection The collection to add to.
+     * @return collection
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public static function get_metadata(collection $collection): collection {
+        $collection->add_user_preference(preferences_injector::PREFERENCE, 'privacy:metadata:preference');
+        return $collection;
+    }
+
+    /**
+     * Exports how a user arranged their own page Preferences.
+     *
+     * @param int $userid The user.
+     */
+    public static function export_user_preferences(int $userid): void {
+        $value = get_user_preferences(preferences_injector::PREFERENCE, null, $userid);
+        if ($value !== null) {
+            writer::export_user_preference(
+                'local_extendednav',
+                preferences_injector::PREFERENCE,
+                $value,
+                get_string('privacy:metadata:preference', 'local_extendednav')
+            );
+        }
     }
 }

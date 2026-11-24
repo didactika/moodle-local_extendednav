@@ -1,0 +1,94 @@
+{
+  "name": "tour_context_name,local_extendednav",
+  "description": "tour_context_description,local_extendednav",
+  "pathmatch": "/local/extendednav/context.php%",
+  "enabled": "1",
+  "sortorder": "0",
+  "endtourlabel": "",
+  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"showtourwhen\":1,\"filtervalues\":{\"accessdate\":{\"filter_accessdate\":\"tool_usertours_accountcreation\",\"filter_accessdate_range\":0,\"filter_accessdate_enabled\":\"0\"},\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\".len[data-region=\\\"manage\\\"]\"]}}",
+  "displaystepnumbers": true,
+  "version": "2024100700",
+  "steps": [
+    {
+      "title": "tour_context_step1_title,local_extendednav",
+      "content": "tour_context_step1_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "0"
+    },
+    {
+      "title": "tour_context_step2_title,local_extendednav",
+      "content": "tour_context_step2_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"head\"]",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "1"
+    },
+    {
+      "title": "tour_context_step3_title,local_extendednav",
+      "content": "tour_context_step3_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"origins\"]",
+      "configdata": "{\"placement\":\"right\"}",
+      "sortorder": "2"
+    },
+    {
+      "title": "tour_context_step4_title,local_extendednav",
+      "content": "tour_context_step4_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"filters\"]",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "3"
+    },
+    {
+      "title": "tour_context_step5_title,local_extendednav",
+      "content": "tour_context_step5_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-region=\"handle\"]",
+      "configdata": "{\"placement\":\"right\"}",
+      "sortorder": "4"
+    },
+    {
+      "title": "tour_context_step6_title,local_extendednav",
+      "content": "tour_context_step6_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-action=\"hide\"]",
+      "configdata": "{\"placement\":\"left\"}",
+      "sortorder": "5"
+    },
+    {
+      "title": "tour_context_step7_title,local_extendednav",
+      "content": "tour_context_step7_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-action=\"restrictions\"]",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "6"
+    },
+    {
+      "title": "tour_context_step8_title,local_extendednav",
+      "content": "tour_context_step8_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"actions\"] [data-action=\"addnode\"]",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "7"
+    },
+    {
+      "title": "tour_context_step9_title,local_extendednav",
+      "content": "tour_context_step9_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "8"
+    }
+  ]
+}

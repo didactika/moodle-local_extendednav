@@ -46,6 +46,21 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/exceptions.php'),
         'local/extendednav:manage'
     ));
+    // Whether the guided tours of the plugin can be skipped. Moodle always lets a tour be closed with the Escape key.
+    $tourpage = new admin_settingpage(
+        'local_extendednav_settings',
+        get_string('settings', 'local_extendednav'),
+        'moodle/site:config'
+    );
+    if ($ADMIN->fulltree) {
+        $tourpage->add(new admin_setting_configcheckbox(
+            'local_extendednav/tourrequired',
+            get_string('setting:tourrequired', 'local_extendednav'),
+            get_string('setting:tourrequired_desc', 'local_extendednav'),
+            1
+        ));
+    }
+    $ADMIN->add('local_extendednav_cat', $tourpage);
     // The changes to the navigation are a report, in a section of its own among the reports of the site.
     $ADMIN->add('reports', new admin_category('local_extendednav_reports', get_string('pluginname', 'local_extendednav')));
     $ADMIN->add('local_extendednav_reports', new admin_externalpage(

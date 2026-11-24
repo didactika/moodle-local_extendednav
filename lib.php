@@ -68,6 +68,38 @@ function local_extendednav_extend_navigation_category_settings(navigation_node $
 }
 
 /**
+ * Applies the navigation of the preferences to the page Preferences of a user: what the site changes and, on the user's own
+ * page, what the user chose for themselves.
+ *
+ * @param navigation_node $settings The node that holds the groups of the preferences.
+ * @param stdClass $user The user whose preferences they are.
+ * @param context_user $usercontext Context of that user.
+ * @param stdClass $course Course of the page.
+ * @param context_course $coursecontext Context of that course.
+ */
+function local_extendednav_extend_navigation_user_settings(
+    navigation_node $settings,
+    stdClass $user,
+    context_user $usercontext,
+    stdClass $course,
+    context_course $coursecontext
+): void {
+    \local_extendednav\local\navigation\preferences_injector::apply($settings, $user);
+}
+
+/**
+ * Adds the items of the site to the boxes of the profile of a user.
+ *
+ * @param \core_user\output\myprofile\tree $tree The profile.
+ * @param stdClass $user The user whose profile it is.
+ * @param bool $iscurrentuser Whether it is the profile of the current user.
+ * @param stdClass|null $course The course of the page, if any.
+ */
+function local_extendednav_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course): void {
+    \local_extendednav\local\navigation\profile_injector::apply($tree, $user);
+}
+
+/**
  * Adds Navigation to the menu of an activity, for whoever may change the navigation of the activity.
  *
  * @param settings_navigation $navigation The settings of the page.
@@ -90,4 +122,39 @@ function local_extendednav_extend_settings_navigation(settings_navigation $navig
         'local_extendednav',
         new pix_icon('i/navigationitem', '')
     );
+}
+
+/**
+ * Adds the guided tours of the plugin to the site, once each: a tour that is already there, edited or not, is left as it is.
+ *
+ * Their texts are language strings, so each person reads them in their own language, and a site can change them in the
+ * language customisation like any other string.
+ *
+ * @return int How many tours were added.
+ */
+function local_extendednav_import_tours(): int {
+    global $DB;
+
+    if (!class_exists(\tool_usertours\manager::class)) {
+        return 0;
+    }
+    // A new site installs the local plugins before the tours of Moodle may exist: the tours are then added by an ad-hoc task.
+    if (!$DB->get_manager()->table_exists('tool_usertours_tours')) {
+        \core\task\manager::queue_adhoc_task(new \local_extendednav\task\import_tours(), true);
+        return 0;
+    }
+    $imported = 0;
+    foreach (glob(__DIR__ . '/tours/*.json') as $file) {
+        $json = file_get_contents($file);
+        $tour = json_decode($json);
+        if (!is_object($tour) || empty($tour->name) || empty($tour->steps)) {
+            continue;
+        }
+        if ($DB->record_exists('tool_usertours_tours', ['name' => $tour->name])) {
+            continue;
+        }
+        \tool_usertours\manager::import_tour_from_json($json);
+        $imported++;
+    }
+    return $imported;
 }

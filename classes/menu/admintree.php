@@ -340,12 +340,9 @@ class admintree extends base {
                 $title = format_string(text::resolve($row->title));
                 if (trim((string)($row->url ?? '')) === '') {
                     $part = new \admin_category($name, $title);
-                } else if ($parentkey !== '') {
-                    $part = new \admin_externalpage($name, $title, new \moodle_url((string)$row->url), 'moodle/site:configview');
                 } else {
-                    // A link needs a category: at the top it would be neither a tab nor a page.
-                    unset($pending[$key]);
-                    continue;
+                    // A page at the top goes in General, where Moodle shows the pages of the top of the administration.
+                    $part = new \admin_externalpage($name, $title, new \moodle_url((string)$row->url), 'moodle/site:configview');
                 }
                 $root->add($parent->name, $part);
                 $parts[$name] = $part;

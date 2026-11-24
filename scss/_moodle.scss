@@ -149,3 +149,8 @@
         }
     }
 }
+
+// A required guided tour has no button to skip it: it is finished step by step, or closed with the Escape key.
+.local-extendednav-tour-required [data-role="flexitour-step"] [data-role="end"].btn-secondary {
+    display: none;
+}
