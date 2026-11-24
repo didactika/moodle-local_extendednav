@@ -46,8 +46,9 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/exceptions.php'),
         'local/extendednav:manage'
     ));
-    // The changes to the navigation are a report, with the other reports of the site.
-    $ADMIN->add('reports', new admin_externalpage(
+    // The changes to the navigation are a report, in a section of its own among the reports of the site.
+    $ADMIN->add('reports', new admin_category('local_extendednav_reports', get_string('pluginname', 'local_extendednav')));
+    $ADMIN->add('local_extendednav_reports', new admin_externalpage(
         'local_extendednav_activity',
         get_string('activity_report', 'local_extendednav'),
         new moodle_url('/local/extendednav/activity.php'),

@@ -197,20 +197,39 @@
     }
 }
 
-// The kinds of activity the site does not use are folded under a button: its arrow points down while they are open.
-.len [data-region="origins"] [data-region="originsmore"] {
-    & .icon {
-        margin-right: 0;
-        transition: transform var(--dd-ease);
+// The selects of the navigations, as the design system draws them: the one of a narrow screen and the one of the kinds of
+// activity. The select of the kinds is tinted while the navigation shown is one of them.
+.len [data-region="origins"] select:is(.form-select, .custom-select) {
+    min-height: var(--dd-h);
+    padding-right: 2.5rem;
+    border-color: var(--dd-line);
+    border-radius: var(--dd-radius-sm);
+    background-color: var(--dd-surface);
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color var(--dd-ease), box-shadow var(--dd-ease);
+
+    &:hover {
+        border-color: var(--dd-line-hover);
     }
 
-    &.collapsed .icon {
-        transform: rotate(-90deg);
+    &:focus,
+    &[aria-expanded="true"] {
+        border-color: var(--dd-primary);
+        outline: 0;
+        box-shadow: 0 0 0 3px var(--dd-ring);
+    }
+
+    &.border-primary {
+        background-color: var(--dd-primary-soft);
+        color: var(--dd-primary-ink);
+        font-weight: 600;
     }
 }
 
-// The icon of a kind of activity is drawn as an image: it takes the size of the icons of Moodle beside it.
-.len [data-region="origins"] img.icon {
-    width: 1rem;
-    height: 1rem;
+// The fields a change touched, under the node of a row of the activity log: a link at the size of the text beside it.
+.len [data-region="tablewrap"] .btn[data-action="changes"] {
+    font-size: 0.8125rem;
+    line-height: 1.4;
 }

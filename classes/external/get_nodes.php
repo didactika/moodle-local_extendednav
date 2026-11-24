@@ -46,6 +46,12 @@ final class get_nodes extends node_service {
             'page' => new external_value(PARAM_INT, 'Zero-based page.', VALUE_DEFAULT, 0),
             'perpage' => new external_value(PARAM_INT, 'Rows per page, from 1 to 100, or 0 for all.', VALUE_DEFAULT, 0),
             'origin' => new external_value(PARAM_TEXT, 'native and custom, separated by commas, or empty.', VALUE_DEFAULT, ''),
+            'restriction' => new external_value(
+                PARAM_TEXT,
+                'Kinds of restriction, separated by commas, or empty.',
+                VALUE_DEFAULT,
+                ''
+            ),
         ]);
     }
 
@@ -60,6 +66,7 @@ final class get_nodes extends node_service {
      * @param int $page Page.
      * @param int $perpage Rows per page, 0 for every row.
      * @param string $origin Nodes of Moodle (native), nodes added (custom), or both.
+     * @param string $restriction Kinds of restriction.
      * @return array The page.
      */
     public static function execute(
@@ -70,11 +77,12 @@ final class get_nodes extends node_service {
         string $parent = '',
         int $page = 0,
         int $perpage = 0,
-        string $origin = ''
+        string $origin = '',
+        string $restriction = ''
     ): array {
         $params = self::validate_parameters(
             self::execute_parameters(),
-            compact('menu', 'contextid', 'search', 'visibility', 'parent', 'page', 'perpage', 'origin')
+            compact('menu', 'contextid', 'search', 'visibility', 'parent', 'page', 'perpage', 'origin', 'restriction')
         );
         self::require_scope($params['menu'], $params['contextid']);
         if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > nodes::MAX_PAGE_SIZE) {
@@ -93,8 +101,22 @@ final class get_nodes extends node_service {
             $params['parent'],
             $params['page'],
             $params['perpage'],
-            $params['origin']
+            $params['origin'],
+            $params['restriction']
         );
+    }
+
+    /**
+     * Describes the counts of the kinds of restriction, one for each kind (r_ and its key).
+     *
+     * @return external_value[]
+     */
+    private static function restriction_counts(): array {
+        $counts = [];
+        foreach (array_keys(nodes::RESTRICTIONS) as $kind) {
+            $counts['r_' . $kind] = new external_value(PARAM_INT, 'Nodes with the restriction ' . $kind . '.');
+        }
+        return $counts;
     }
 
     /**
@@ -112,7 +134,7 @@ final class get_nodes extends node_service {
                 'hidden' => new external_value(PARAM_INT, 'Hidden nodes.'),
                 'native' => new external_value(PARAM_INT, 'Nodes of Moodle.'),
                 'custom' => new external_value(PARAM_INT, 'Nodes added by the plugin.'),
-            ]),
+            ] + self::restriction_counts()),
             'rows' => new external_multiple_structure(self::row_structure()),
             'reorderable' => new external_value(PARAM_BOOL, 'Whether the list can be reordered as it is.'),
             'path' => new external_multiple_structure(new external_single_structure([

@@ -82,6 +82,19 @@
                 color: var(--dd-ink);
             }
         }
+
+        // Bootstrap 4 draws the cross as the character ×, which sits on its line of text: its box is the size of the glyph,
+        // so it is in the centre of the circle.
+        & .close {
+            font-size: 1.5rem;
+            line-height: 1;
+
+            & > span {
+                display: block;
+                height: 1em;
+                line-height: 0.95;
+            }
+        }
     }
 
     & .modal-title {

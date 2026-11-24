@@ -96,6 +96,21 @@ final class activity_test extends \advanced_testcase {
     }
 
     /**
+     * The search looks at the most recent activities of a kind only, as many as asked.
+     */
+    public function test_the_search_looks_at_the_most_recent_activities(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        foreach (range(1, 3) as $unused) {
+            $this->getDataGenerator()->create_module('forum', ['course' => $course->id]);
+        }
+
+        $this->assertSame(2, discovery::kind('forum', 2)['activities']);
+        $this->assertSame(3, discovery::kind('forum')['activities']);
+    }
+
+    /**
      * An activity changes its own navigation; a course its own and the one of each kind it has; a category every kind.
      */
     public function test_the_navigations_of_a_context(): void {

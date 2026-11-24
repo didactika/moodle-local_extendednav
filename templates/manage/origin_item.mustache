@@ -24,11 +24,11 @@
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
     Example context (json):
-    {"key": "mod_forum", "name": "Forum", "title": "Forum navigation", "url": "#", "active": true, "icon": "monologo",
+    {"key": "mod_forum", "name": "Forum navigation", "short": "Forum", "url": "#", "active": true, "icon": "monologo",
         "component": "mod_forum", "off": false}
 }}
-<a class="list-group-item list-group-item-action d-flex align-items-center gap-2 {{#active}}active{{/active}}" href="{{url}}" title="{{title}}" {{#active}}aria-current="page"{{/active}} data-key="{{key}}">
+<a class="list-group-item list-group-item-action d-flex align-items-center gap-2 {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}} data-key="{{key}}">
     {{#pix}}{{icon}}, {{component}}{{/pix}}
-    <span class="text-truncate">{{name}}</span>
+    <span class="text-truncate">{{short}}</span>
     <span class="badge rounded-pill text-bg-secondary ms-auto ml-auto" {{^off}}hidden{{/off}}>{{#str}}navigation_off, local_extendednav{{/str}}</span>
 </a>

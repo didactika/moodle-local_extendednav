@@ -136,23 +136,18 @@ class menu_manager {
 
     /**
      * The navigations in groups, as the column of a page lists them: the ones of the whole site, the ones of the courses, the
-     * ones of each kind of activity (the kinds the site uses first, the others folded) and the site administration. Each one
-     * links to the same page for that navigation. A select lists the same navigations in the same groups.
+     * kinds of activity and the site administration. The kinds of activity are many, so they are chosen in a select with a
+     * search, the ones the site uses first. A page of few navigations (a category, a course) lists them all in one select with
+     * the same groups, each by its short name.
      *
      * @param string $current Key of the navigation shown.
      * @param string $script Page the links open, such as /local/extendednav/manage.php.
      * @param array $params Other parameters of the links, such as the context of a category or a course.
      * @param string[]|null $only The navigations listed, or null for all of them.
-     * @return array The groups (origins) and the same navigations as groups of options of a select (originoptions).
+     * @return array The groups (origins) and the same navigations as groups of options of one select (originoptions).
      */
     public static function get_origin_groups(string $current, string $script, array $params = [], ?array $only = null): array {
         $activities = self::get_activity_keys($only);
-        $groups = [
-            'origin_group_site' => [['primary', 'usermenu', 'frontpage'], []],
-            'origin_group_course' => [['course', 'category'], []],
-            'origin_group_activity' => [$activities['used'], $activities['others']],
-            'origin_group_admin' => [['admin'], []],
-        ];
         $item = static function (string $key) use ($current, $script, $params, $only): ?array {
             $menu = self::get_menu($key);
             if ($menu === null || ($only !== null && !in_array($key, $only, true))) {
@@ -161,8 +156,8 @@ class menu_manager {
             $activity = $menu instanceof \local_extendednav\menu\activity;
             return [
                 'key' => $key,
-                'name' => $activity ? $menu->get_short_name() : $menu->get_name(),
-                'title' => $menu->get_name(),
+                'name' => $menu->get_name(),
+                'short' => $menu->get_short_name(),
                 'url' => (new \moodle_url($script, $params + ['menu' => $key]))->out(false),
                 'active' => $key === $current,
                 'icon' => $activity ? 'monologo' : (self::ICONS[$key] ?? 'i/navigationitem'),
@@ -170,28 +165,54 @@ class menu_manager {
                 'off' => !self::is_enabled($key),
             ];
         };
+        $items = static fn(array $keys): array => array_values(array_filter(array_map($item, $keys)));
+        $option = static fn(array $entry): array => ['name' => $entry['short'], 'url' => $entry['url'],
+            'selected' => $entry['active']];
+
         $origins = [];
         $options = [];
-        foreach ($groups as $string => [$shown, $folded]) {
-            $items = array_values(array_filter(array_map($item, $shown)));
-            $more = array_values(array_filter(array_map($item, $folded)));
-            if (!$items && !$more) {
-                continue;
+        $lists = ['origin_group_site' => ['primary', 'usermenu', 'frontpage'], 'origin_group_course' => ['course', 'category']];
+        foreach ($lists as $string => $keys) {
+            if ($entries = $items($keys)) {
+                $label = get_string($string, 'local_extendednav');
+                $origins[] = ['label' => $label, 'items' => $entries, 'picker' => false];
+                $options[] = ['label' => $label, 'options' => array_map($option, $entries)];
             }
-            $label = get_string($string, 'local_extendednav');
+        }
+
+        // The kinds of activity: a select with a search, the kinds the site uses in a group of their own.
+        $used = $items($activities['used']);
+        $others = $items($activities['others']);
+        if ($used || $others) {
+            $label = get_string('origin_group_activity', 'local_extendednav');
+            $groups = [];
+            if ($used) {
+                $groups[] = [
+                    'label' => get_string('origin_kinds_used', 'local_extendednav'),
+                    'options' => array_map($option, $used),
+                ];
+            }
+            if ($others) {
+                $groups[] = [
+                    'label' => get_string('origin_kinds_others', 'local_extendednav'),
+                    'options' => array_map($option, $others),
+                ];
+            }
+            $chosen = array_values(array_filter(array_merge($used, $others), static fn(array $entry): bool => $entry['active']));
             $origins[] = [
                 'label' => $label,
-                'items' => $items,
-                'more' => $more,
-                'hasmore' => !empty($more),
-                // The folded kinds open by themselves when the navigation shown is one of them.
-                'moreopen' => in_array($current, array_column($more, 'key'), true),
-                'morelabel' => get_string('origin_more_kinds', 'local_extendednav', count($more)),
-                'moreid' => 'len-origins-' . preg_replace('/[^a-z]/', '', $string),
+                'picker' => true,
+                'pickergroups' => $groups,
+                'pickeractive' => !empty($chosen),
+                'pickeroff' => !empty($chosen) && $chosen[0]['off'],
             ];
-            $options[] = ['label' => $label, 'options' => array_map(static fn(array $entry): array => [
-                'name' => $entry['title'], 'url' => $entry['url'], 'selected' => $entry['active'],
-            ], array_merge($items, $more))];
+            $options[] = ['label' => $label, 'options' => array_map($option, array_merge($used, $others))];
+        }
+
+        if ($entries = $items(['admin'])) {
+            $label = get_string('origin_group_admin', 'local_extendednav');
+            $origins[] = ['label' => $label, 'items' => $entries, 'picker' => false];
+            $options[] = ['label' => $label, 'options' => array_map($option, $entries)];
         }
         return ['origins' => $origins, 'originoptions' => $options];
     }

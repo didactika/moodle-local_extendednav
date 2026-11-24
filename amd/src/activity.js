@@ -23,6 +23,8 @@
  */
 
 import {get_strings as getStrings} from 'core/str';
+import Modal from 'core/modal';
+import Templates from 'core/templates';
 import List from 'local_extendednav/local/list';
 import {init as fitTables} from 'local_extendednav/local/fit_tables';
 import {init as filterGroup} from 'local_extendednav/local/filter_group';
@@ -85,13 +87,15 @@ export const init = async(selector) => {
     const from = menu.querySelector('input[name="datefrom"]');
     const to = menu.querySelector('input[name="dateto"]');
     const reset = root.querySelector('[data-region="filters"] [data-action="clearfilters"]');
-    const [range, since, until, emptytitle, emptytext, nolog] = await getStrings([
+    const [range, since, until, emptytitle, emptytext, nolog, changeslabel, changestitle] = await getStrings([
         {key: 'filter_date_range', component: 'local_extendednav', param: {from: '{from}', to: '{to}'}},
         {key: 'filter_date_since', component: 'local_extendednav', param: '{n}'},
         {key: 'filter_date_until', component: 'local_extendednav', param: '{n}'},
         {key: 'activity_empty_title', component: 'local_extendednav'},
         {key: 'activity_empty_text', component: 'local_extendednav'},
         {key: 'activity_nolog', component: 'local_extendednav'},
+        {key: 'changes_of', component: 'local_extendednav', param: '{key}'},
+        {key: 'changes_title', component: 'local_extendednav', param: '{key}'},
     ]);
     let haslog = true;
     // When the menus do not fit beside the search they are grouped in one menu, Filters.
@@ -150,7 +154,7 @@ export const init = async(selector) => {
         }),
         context: (response) => {
             haslog = response.haslog;
-            return {rows: response.rows};
+            return {rows: response.rows.map((row) => ({...row, changeslabel: changeslabel.replace('{key}', row.nodekey)}))};
         },
         isFiltered: (state) => Boolean(state.search || state.status || state.datefrom || state.dateto),
         cleared: {status: '', datefrom: '', dateto: ''},
@@ -195,8 +199,26 @@ export const init = async(selector) => {
             toggle.focus();
         }
     }, true);
-    root.closest('[data-region="activity"]')?.querySelector('[data-region="originselect"]')?.addEventListener('change', (event) => {
-        window.location.assign(event.target.value);
+    root.closest('[data-region="activity"]')?.addEventListener('change', (event) => {
+        const select = event.target.closest('[data-region="originselect"]');
+        if (select?.value) {
+            window.location.assign(select.value);
+        }
+    });
+
+    // The fields of a change open the dialog that gives each one before and after.
+    root.addEventListener('click', async(event) => {
+        const button = event.target.closest('[data-action="changes"]');
+        const row = button ? list.rows.find((item) => String(item.id) === button.dataset.id) : null;
+        if (!row) {
+            return;
+        }
+        const modal = await Modal.create({
+            title: changestitle.replace('{key}', row.nodekey),
+            body: Templates.render('local_extendednav/activity/changes', {changes: row.changes, time: row.time, user: row.user}),
+            removeOnClose: true,
+        });
+        modal.show();
     });
 
     await list.init();
