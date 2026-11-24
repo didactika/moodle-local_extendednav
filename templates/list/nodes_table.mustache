@@ -91,7 +91,7 @@
                 <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block">{{url}}</span></td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
                     {{^virtual}}
-                        {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-secondary" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
+                        {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-body" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
                         {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{/canhide}}
                         <a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>
                         {{#candelete}}
