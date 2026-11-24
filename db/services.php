@@ -112,11 +112,48 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
-    'local_extendednav_set_personal' => [
-        'classname' => \local_extendednav\external\set_personal::class,
-        'description' => 'Saves the order and the items a user hides on their own page Preferences.',
+    'local_extendednav_get_navigations' => [
+        'classname' => \local_extendednav\external\manage_navigation::class,
+        'methodname' => 'get_navigations',
+        'description' => 'Lists the navigations of the site and whether their changes are applied.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
+    'local_extendednav_save_node' => [
+        'classname' => \local_extendednav\external\manage_navigation::class,
+        'methodname' => 'save_node',
+        'description' => 'Adds or changes a node, for the whole site or for a category, a course, an activity or a user.',
         'type' => 'write',
         'ajax' => true,
-        'capabilities' => 'local/extendednav:personalise',
+        'capabilities' => 'local/extendednav:manage, local/extendednav:managecontext, local/extendednav:personalise',
+    ],
+    'local_extendednav_export_navigations' => [
+        'classname' => \local_extendednav\external\manage_navigation::class,
+        'methodname' => 'export_navigations',
+        'description' => 'Writes navigations, and the changes of some contexts, as a file in YAML.',
+        'type' => 'read',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
+    'local_extendednav_import_navigations' => [
+        'classname' => \local_extendednav\external\manage_navigation::class,
+        'methodname' => 'import_navigations',
+        'description' => 'Reads a file in YAML; the contexts the site does not have are skipped with a warning.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
+];
+
+// Every function in one service, so a system outside Moodle manages the navigations with a token of its own.
+$services = [
+    'Extended navigation' => [
+        'functions' => array_keys($functions),
+        'shortname' => 'local_extendednav',
+        'restrictedusers' => 1,
+        'enabled' => 0,
+        'downloadfiles' => 0,
+        'uploadfiles' => 0,
     ],
 ];

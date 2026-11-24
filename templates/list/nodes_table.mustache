@@ -75,7 +75,7 @@
                                 <button type="button" class="btn btn-link p-0 fw-bold text-start text-left text-truncate" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{title}}</button>
                             {{/haschildren}}
                             {{^haschildren}}
-                                <a class="fw-bold text-truncate" href="{{editurl}}">{{title}}</a>
+                                <a class="fw-bold text-truncate" href="{{editurl}}" title="{{title}}">{{title}}</a>
                             {{/haschildren}}
                             {{^virtual}}
                                 <span class="small text-muted text-truncate">{{#native}}<span class="badge rounded-pill text-bg-light" title="{{#str}}origin_native_help, local_extendednav{{/str}}">{{#str}}origin_native, local_extendednav{{/str}}</span>{{/native}}{{^native}}<span class="badge rounded-pill text-bg-info" title="{{#str}}origin_custom_help, local_extendednav{{/str}}">{{#str}}origin_custom, local_extendednav{{/str}}</span>{{/native}} <code>{{nodekey}}</code>{{#exception}} · {{#str}}exception, local_extendednav{{/str}}{{/exception}}{{#inherited}} · {{#str}}inherited, local_extendednav{{/str}}{{/inherited}}</span>
@@ -92,7 +92,7 @@
                         </span>
                     {{/virtual}}
                 </td>
-                <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block">{{url}}</span></td>
+                <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span></td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
                     {{^virtual}}
                         <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">

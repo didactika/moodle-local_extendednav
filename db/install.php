@@ -59,9 +59,8 @@ function xmldb_local_extendednav_install() {
         }
     }
 
-    // The guided tours of the plugin, which start required.
+    // The guided tours of the plugin.
     require_once(__DIR__ . '/../lib.php');
-    set_config('tourrequired', 1, 'local_extendednav');
     local_extendednav_import_tours();
     return true;
 }

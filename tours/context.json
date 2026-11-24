@@ -5,7 +5,7 @@
   "enabled": "1",
   "sortorder": "0",
   "endtourlabel": "",
-  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"showtourwhen\":1,\"filtervalues\":{\"accessdate\":{\"filter_accessdate\":\"tool_usertours_accountcreation\",\"filter_accessdate_range\":0,\"filter_accessdate_enabled\":\"0\"},\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\".len[data-region=\\\"manage\\\"]\"]}}",
+  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"showtourwhen\":1,\"filtervalues\":{\"accessdate\":{\"filter_accessdate\":\"tool_usertours_accountcreation\",\"filter_accessdate_range\":0,\"filter_accessdate_enabled\":\"0\"},\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\".len[data-region=\\\"manage\\\"]:not([data-scope=\\\"user\\\"])\"]}}",
   "displaystepnumbers": true,
   "version": "2024100700",
   "steps": [

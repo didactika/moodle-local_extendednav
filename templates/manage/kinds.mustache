@@ -18,8 +18,8 @@
     @template local_extendednav/manage/kinds
 
     The kinds of activity of the site, each with its own navigation: a search, and a list with the icon and the name of each
-    kind, the activities of the site of that kind, the items of its navigation, the ones changed for the whole site and whether
-    its changes are applied. The kinds the site uses come first. A kind opens its navigation.
+    kind, how much the site uses it, what the site changes in its navigation, how many courses, categories or activities
+    change it on their own and when it was last changed. The kinds the site uses come first. A kind opens its navigation.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,12 +27,14 @@
     Example context (json):
     {
         "name": "Activities", "description": "Order, rename, hide and extend the navigations of Moodle.", "origins": [], "originoptions": [],
-        "rows": [{"key": "mod_forum", "name": "Forum", "component": "mod_forum", "url": "#", "activities": 12, "items": 10,
-            "changed": 2, "off": false}]
+        "rows": [{"key": "mod_forum", "name": "Forum", "component": "mod_forum", "url": "#", "activities": 12,
+            "usage": "12 activities in 4 courses", "changes": [{"label": "2 hidden"}], "exceptions": 3,
+            "lastchange": "24/11/26", "off": false}]
     }
 }}
 <div class="len" data-region="kinds">
     {{#description}}<p class="text-muted mb-0">{{description}}</p>{{/description}}
+    {{> local_extendednav/manage/origins_bar }}
     <div class="d-grid gap-3" data-region="head">
         <h2 class="h4 fw-bold mb-0">{{name}}</h2>
         <p class="small text-muted mb-0">{{#str}}kinds_desc, local_extendednav{{/str}}</p>
@@ -54,9 +56,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">{{#str}}kinds_kind, local_extendednav{{/str}}</th>
-                                <th scope="col" class="text-end text-right">{{#str}}kinds_activities, local_extendednav{{/str}}</th>
-                                <th scope="col" class="text-end text-right d-none d-md-table-cell">{{#str}}kinds_items, local_extendednav{{/str}}</th>
-                                <th scope="col" class="text-end text-right d-none d-md-table-cell">{{#str}}kinds_changed, local_extendednav{{/str}}</th>
+                                <th scope="col" class="d-none d-md-table-cell">{{#str}}kinds_changes, local_extendednav{{/str}}</th>
+                                <th scope="col" class="text-end text-right d-none d-md-table-cell">{{#str}}kinds_exceptions, local_extendednav{{/str}}</th>
+                                <th scope="col" class="text-end text-right d-none d-lg-table-cell">{{#str}}kinds_lastchange, local_extendednav{{/str}}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,14 +67,25 @@
                                     <th scope="row">
                                         <span class="d-flex align-items-center gap-2">
                                             <span class="text-muted" data-region="nodeicon">{{#pix}}monologo, {{component}}{{/pix}}</span>
-                                            <a class="fw-bold text-truncate" href="{{url}}">{{name}}</a>
-                                            {{#off}}<span class="badge rounded-pill text-bg-secondary">{{#str}}navigation_off, local_extendednav{{/str}}</span>{{/off}}
+                                            <span class="d-flex flex-column overflow-hidden">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <a class="fw-bold text-truncate" href="{{url}}" title="{{name}}">{{name}}</a>
+                                                    {{#off}}<span class="badge rounded-pill text-bg-secondary">{{#str}}navigation_off, local_extendednav{{/str}}</span>{{/off}}
+                                                </span>
+                                                <span class="small text-muted fw-normal text-truncate" title="{{usage}}">{{usage}}</span>
+                                            </span>
                                         </span>
                                     </th>
-                                    <td class="text-end text-right">{{activities}}</td>
-                                    <td class="text-end text-right d-none d-md-table-cell">{{items}}</td>
-                                    <td class="text-end text-right d-none d-md-table-cell">{{changed}}</td>
+                                    <td class="d-none d-md-table-cell">
+                                        <span class="d-inline-flex flex-wrap gap-1">
+                                            {{#changes}}<span class="badge rounded-pill text-bg-light">{{label}}</span>{{/changes}}
+                                            {{^changes}}<span class="small text-muted">{{#str}}kinds_nochanges, local_extendednav{{/str}}</span>{{/changes}}
+                                        </span>
+                                    </td>
+                                    <td class="text-end text-right d-none d-md-table-cell">{{#exceptions}}{{exceptions}}{{/exceptions}}{{^exceptions}}<span class="text-muted">—</span>{{/exceptions}}</td>
+                                    <td class="text-end text-right text-nowrap d-none d-lg-table-cell">{{#lastchange}}{{lastchange}}{{/lastchange}}{{^lastchange}}<span class="text-muted">—</span>{{/lastchange}}</td>
                                 </tr>
+                            {{/rows}}
                             {{/rows}}
                         </tbody>
                     </table>

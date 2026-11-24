@@ -158,6 +158,17 @@ if ($form->is_cancelled()) {
     ) {
         \core\notification::warning(get_string('warn_fallbacks_blocked_for_some', 'local_extendednav'));
     }
+    // Moodle shows a tab or a category of the site administration only once it holds a page: a new one opens in the list, to add
+    // its pages.
+    if ($id === 0 && $menukey === \local_extendednav\menu\admintree::KEY && trim((string)$record->url) === '') {
+        $manageurl->param('parent', $record->nodekey);
+        redirect(
+            $manageurl,
+            get_string('tree_category_empty_saved', 'local_extendednav', format_string($record->title)),
+            null,
+            \core\output\notification::NOTIFY_INFO
+        );
+    }
     redirect($manageurl, get_string('node_saved', 'local_extendednav'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
 

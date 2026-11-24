@@ -85,6 +85,20 @@ class observer {
     }
 
     /**
+     * Forgets how a deleted user arranged their own preferences.
+     *
+     * @param \core\event\user_deleted $event The event.
+     */
+    public static function user_deleted(\core\event\user_deleted $event): void {
+        global $DB;
+
+        if ($DB->record_exists('local_extendednav', ['contextid' => $event->contextid])) {
+            $DB->delete_records('local_extendednav', ['contextid' => $event->contextid]);
+            repository::purge();
+        }
+    }
+
+    /**
      * Returns the hash of the current value of a Moodle menu setting.
      *
      * @param string $configname Setting name.

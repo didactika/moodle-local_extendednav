@@ -35,7 +35,8 @@ final class scope {
      * Describes the category or the course a node applies to, as the file names it.
      *
      * @param int $contextid Context id, 0 for the whole site.
-     * @return string Empty for the whole site, "course:shortname" or "category:Parent / Name".
+     * @return string Empty for the whole site, "course:shortname", "category:Parent / Name", "activity:shortname/idnumber" or
+     *     "user:username".
      */
     public static function describe(int $contextid): string {
         if ($contextid === 0) {
@@ -62,7 +63,11 @@ final class scope {
         $contexts = $DB->get_records_list('context', 'id', $missing, '', 'id, contextlevel, instanceid');
         $courseids = [];
         $cmids = [];
+        $userids = [];
         foreach ($contexts as $context) {
+            if ((int)$context->contextlevel === CONTEXT_USER) {
+                $userids[] = (int)$context->instanceid;
+            }
             if ((int)$context->contextlevel === CONTEXT_COURSE) {
                 $courseids[] = (int)$context->instanceid;
             } else if ((int)$context->contextlevel === CONTEXT_MODULE) {
@@ -70,6 +75,7 @@ final class scope {
             }
         }
         $courses = $courseids ? $DB->get_records_list('course', 'id', $courseids, '', 'id, shortname') : [];
+        $users = $userids ? $DB->get_records_list('user', 'id', $userids, '', 'id, username') : [];
         $activities = [];
         if ($cmids) {
             [$insql, $params] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
@@ -90,6 +96,8 @@ final class scope {
                 $activity = $activities[$context->instanceid];
                 $name = 'activity:' . $activity->shortname . '/'
                     . (trim((string)$activity->idnumber) !== '' ? $activity->idnumber : '#' . $activity->id);
+            } else if ($context && (int)$context->contextlevel === CONTEXT_USER && isset($users[$context->instanceid])) {
+                $name = 'user:' . $users[$context->instanceid]->username;
             } else if ($context && (int)$context->contextlevel === CONTEXT_COURSECAT) {
                 $category = \core_course_category::get((int)$context->instanceid, IGNORE_MISSING, true);
                 $name = $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
@@ -129,6 +137,13 @@ final class scope {
                 $cmid = $DB->get_field('course_modules', 'id', ['idnumber' => $ident, 'course' => $courseid], IGNORE_MULTIPLE);
             }
             $contextid = $cmid ? (int)\context_module::instance((int)$cmid)->id : null;
+        } else if ($type === 'user') {
+            $id = $DB->get_field('user', 'id', [
+                'username' => $name,
+                'deleted' => 0,
+                'mnethostid' => $GLOBALS['CFG']->mnet_localhost_id,
+            ]);
+            $contextid = $id && !isguestuser((int)$id) ? (int)\context_user::instance((int)$id)->id : null;
         } else if ($type === 'category') {
             // The nested names of the categories are worked out once, whatever the number of nodes of the file.
             if (self::$categories === null) {

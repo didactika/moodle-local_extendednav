@@ -31,7 +31,7 @@ class restore_local_extendednav_plugin extends restore_local_plugin {
      * @return restore_path_element[]
      */
     protected function define_course_plugin_structure() {
-        return [new restore_path_element('navigation_node', $this->get_pathfor('/navigation_node'))];
+        return $this->nodes_paths();
     }
 
     /**
@@ -40,6 +40,19 @@ class restore_local_extendednav_plugin extends restore_local_plugin {
      * @return restore_path_element[]
      */
     protected function define_module_plugin_structure() {
+        return $this->nodes_paths();
+    }
+
+    /**
+     * The nodes of a backup, unless the site chose, among the defaults of the restores, to leave the changes of the navigation
+     * out.
+     *
+     * @return restore_path_element[]
+     */
+    private function nodes_paths(): array {
+        if (get_config('local_extendednav', 'restore_navigation') === '0') {
+            return [];
+        }
         return [new restore_path_element('navigation_node', $this->get_pathfor('/navigation_node'))];
     }
 

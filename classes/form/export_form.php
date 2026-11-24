@@ -16,66 +16,116 @@
 
 namespace local_extendednav\form;
 
-use local_extendednav\local\navigation\context_scope;
+use local_extendednav\menu\activity;
 use local_extendednav\menu_manager;
 
 /**
- * Chooses what a file of the site holds: the navigations, whether the nodes of the site, and the categories, courses and
- * activities whose changes go with them.
+ * Chooses what a file of the site holds, in three parts: the navigations (the ones of the site and the kinds of activity) and
+ * whether their changes for the whole site go in it; the users whose arrangement of their own Preferences page goes in it,
+ * found by a search; and, when wanted, some courses and categories, which otherwise travel with the backups of Moodle.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class export_form extends \moodleform {
-    /** @var int Contexts offered at most, the ones that change most nodes first. */
-    private const MAX_CONTEXTS = 1000;
+    /** @var string[] The navigations of the site, in the order of the column of the management page. */
+    public const SITE = ['primary', 'usermenu', 'preferences', 'frontpage', 'course', 'category', 'admin'];
 
     /**
      * Form definition.
      */
     protected function definition() {
-        global $DB;
-
         $mform = $this->_form;
-        $menus = [];
-        foreach (menu_manager::get_menus() as $key => $menu) {
-            $menus[$key] = $menu->get_name();
-        }
-        $mform->addElement('autocomplete', 'menus', get_string('export_menus', 'local_extendednav'), $menus, ['multiple' => true]);
-        $mform->setDefault('menus', [$this->_customdata['menu'] ?? 'primary']);
-        $mform->addRule('menus', get_string('required'), 'required', null, 'client');
+        $current = $this->_customdata['menu'] ?? 'primary';
 
+        $mform->addElement('header', 'navigationshdr', get_string('export_navigations', 'local_extendednav'));
+        $mform->setExpanded('navigationshdr');
+        $checks = [];
+        foreach (self::SITE as $key) {
+            $menu = menu_manager::get_menu($key);
+            $checks[] = $mform->createElement('advcheckbox', $key, '', $menu->get_name(), ['group' => 1]);
+        }
+        $mform->addGroup($checks, 'site', get_string('export_site_navigations', 'local_extendednav'), '<br>', true);
+        if (in_array($current, self::SITE, true)) {
+            $mform->setDefault('site[' . $current . ']', 1);
+        }
+        $kinds = [];
+        foreach (array_keys(activity::types()) as $modname) {
+            $menu = new activity($modname);
+            $kinds[$menu->get_key()] = $menu->get_short_name();
+        }
+        \core_collator::asort($kinds);
+        $mform->addElement('autocomplete', 'kinds', get_string('export_kinds', 'local_extendednav'), $kinds, [
+            'multiple' => true,
+            'noselectionstring' => get_string('export_none', 'local_extendednav'),
+        ]);
+        if (isset($kinds[$current])) {
+            $mform->setDefault('kinds', [$current]);
+        }
         $mform->addElement('advcheckbox', 'withsite', get_string('export_withsite', 'local_extendednav'));
+        $mform->addHelpButton('withsite', 'export_withsite', 'local_extendednav');
         $mform->setDefault('withsite', 1);
 
-        // The categories, courses and activities that change a navigation.
-        $contexts = [];
-        $records = $DB->get_records_sql(
-            'SELECT contextid, COUNT(1) AS nodes
-               FROM {local_extendednav}
-              WHERE contextid <> 0
-           GROUP BY contextid
-           ORDER BY COUNT(1) DESC, contextid ASC',
-            [],
-            0,
-            self::MAX_CONTEXTS
-        );
-        foreach ($records as $record) {
-            $scope = context_scope::from_id((int)$record->contextid);
-            if ($scope !== null) {
-                $kind = get_string('kind_' . $scope->kind(), 'local_extendednav');
-                $contexts[(int)$record->contextid] = $kind . ': ' . $scope->name();
-            }
-        }
-        \core_collator::asort($contexts);
-        $mform->addElement('autocomplete', 'contexts', get_string('export_contexts', 'local_extendednav'), $contexts, [
+        // The users are many: a search finds them, a few at a time.
+        $mform->addElement('header', 'usershdr', get_string('export_users', 'local_extendednav'));
+        $mform->addElement('autocomplete', 'users', get_string('export_users_chosen', 'local_extendednav'), [], [
             'multiple' => true,
-            'noselectionstring' => get_string('export_contexts_none', 'local_extendednav'),
+            'ajax' => 'core_user/form_user_selector',
+            'valuehtmlcallback' => static function ($userid): string {
+                $user = \core_user::get_user((int)$userid);
+                return $user ? fullname($user) : '';
+            },
+            'noselectionstring' => get_string('export_none', 'local_extendednav'),
         ]);
-        $mform->addHelpButton('contexts', 'export_contexts', 'local_extendednav');
+        $mform->addHelpButton('users', 'export_users_chosen', 'local_extendednav');
+
+        // Courses and categories travel with the backups of Moodle; a file can still hold the changes of some of them.
+        $mform->addElement('header', 'contextshdr', get_string('export_contexts', 'local_extendednav'));
+        $mform->addElement('static', 'contextsnote', '', get_string('export_contexts_note', 'local_extendednav'));
+        $mform->addElement('course', 'courses', get_string('export_courses', 'local_extendednav'), [
+            'multiple' => true,
+            'noselectionstring' => get_string('export_none', 'local_extendednav'),
+        ]);
+        $mform->addElement(
+            'autocomplete',
+            'categories',
+            get_string('export_categories', 'local_extendednav'),
+            \core_course_category::make_categories_list(),
+            ['multiple' => true, 'noselectionstring' => get_string('export_none', 'local_extendednav')]
+        );
 
         $this->add_action_buttons(true, get_string('export', 'local_extendednav'));
+    }
+
+    /**
+     * Returns what the file holds.
+     *
+     * @return array|null The navigations (menus) and the contexts, 0 for the whole site; null when the form was not sent.
+     */
+    public function get_choice(): ?array {
+        $data = $this->get_data();
+        if ($data === null) {
+            return null;
+        }
+        $menus = array_keys(array_filter((array)($data->site ?? [])));
+        $menus = array_merge($menus, array_values((array)($data->kinds ?? [])));
+        $contexts = !empty($data->withsite) ? [0] : [];
+        $users = array_filter(array_map('intval', (array)($data->users ?? [])));
+        foreach ($users as $userid) {
+            $contexts[] = (int)\context_user::instance($userid)->id;
+        }
+        if ($users && !in_array('preferences', $menus, true)) {
+            $menus[] = 'preferences';
+        }
+        foreach (array_filter(array_map('intval', (array)($data->courses ?? []))) as $courseid) {
+            $contexts[] = (int)\context_course::instance($courseid)->id;
+        }
+        foreach (array_filter(array_map('intval', (array)($data->categories ?? []))) as $categoryid) {
+            $contexts[] = (int)\context_coursecat::instance($categoryid)->id;
+        }
+        $menus = array_values(array_filter(array_unique($menus), static fn($key): bool => menu_manager::get_menu($key) !== null));
+        return ['menus' => $menus, 'contexts' => $contexts];
     }
 
     /**
@@ -87,8 +137,10 @@ class export_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        if (empty($data['withsite']) && empty($data['contexts'])) {
-            $errors['contexts'] = get_string('export_nothing', 'local_extendednav');
+        $menus = array_filter((array)($data['site'] ?? [])) || !empty($data['kinds']);
+        $where = !empty($data['withsite']) || !empty($data['users']) || !empty($data['courses']) || !empty($data['categories']);
+        if (!$where || (!$menus && empty($data['users']))) {
+            $errors['withsite'] = get_string('export_nothing', 'local_extendednav');
         }
         return $errors;
     }

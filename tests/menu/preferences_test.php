@@ -16,14 +16,16 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\external\set_personal;
+use local_extendednav\local\listing\nodes;
+use local_extendednav\local\navigation\context_scope;
 use local_extendednav\local\navigation\preferences_injector;
 use local_extendednav\local\node\access;
 use local_extendednav\local\node\repository;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\preferences::class)]
 /**
- * Tests for the navigation of the page Preferences and for what each user arranges on it.
+ * Tests for the navigation of the page Preferences: the sections as folders, what the site changes and what each user arranges
+ * as changes of their own context.
  *
  * @package    local_extendednav
  * @category   test
@@ -31,12 +33,12 @@ use local_extendednav\local\node\repository;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\menu\preferences
  * @covers     \local_extendednav\local\navigation\preferences_injector
- * @covers     \local_extendednav\external\set_personal
+ * @covers     \local_extendednav\local\navigation\context_scope
  */
 final class preferences_test extends \advanced_testcase {
     /**
-     * Builds settings as Moodle builds them for the page Preferences: two groups with a key, one without (Roles) and an item
-     * outside every group.
+     * Builds settings as Moodle builds them for the page Preferences: two sections with a key, one without (Roles) and an item
+     * outside every section.
      *
      * @return \navigation_node
      */
@@ -79,12 +81,14 @@ final class preferences_test extends \advanced_testcase {
     }
 
     /**
-     * The groups of the page, in order, each with its items.
+     * Applies the navigation to fresh settings of a user and returns the sections, in order, with their items.
      *
-     * @param \navigation_node $settings The settings.
-     * @return array Item keys by group key; the loose items under miscellaneous.
+     * @param \stdClass $user The user whose preferences they are.
+     * @return array Item keys by section key; the loose items under miscellaneous.
      */
-    private function shown(\navigation_node $settings): array {
+    private function shown(\stdClass $user): array {
+        $settings = $this->settings();
+        preferences_injector::apply($settings, $user);
         $shown = [];
         foreach (preferences_injector::read($settings) as $groupkey => $group) {
             $shown[$groupkey] = array_keys($group['items']);
@@ -93,80 +97,144 @@ final class preferences_test extends \advanced_testcase {
     }
 
     /**
-     * The groups and items are recorded with their group, Roles by its first item and the loose ones under Miscellaneous.
+     * Saves a change of a user to their own preferences, as the list of their page does.
+     *
+     * @param \stdClass $user The user.
+     * @param array $data Node fields.
      */
-    public function test_the_groups_and_items_are_recorded(): void {
-        $this->resetAfterTest();
-        $this->setAdminUser();
+    private function personal(\stdClass $user, array $data): void {
+        global $DB;
 
-        preferences_injector::apply($this->settings(), get_admin());
-        $natives = (new preferences())->get_native_nodes();
-
-        $this->assertSame('', $natives['useraccount']->parentkey);
-        $this->assertSame('useraccount', $natives['changepassword']->parentkey);
-        $this->assertArrayHasKey('group_admin_roles_usersroles', $natives, 'A group without a key is known by its first item.');
-        $this->assertSame('miscellaneous', $natives['autograderpreferences']->parentkey);
-        $this->assertTrue(repository::get_menu_nodes_by_key(preferences::KEY) !== [], 'Every group and item has its row.');
+        $contextid = (int)\context_user::instance($user->id)->id;
+        $record = \local_extendednav\local\node\manager::prepare($data + ['contextid' => $contextid], 'preferences');
+        $record->contextid = $contextid;
+        if (isset($data['sortorder'])) {
+            $record->sortorder = (int)$data['sortorder'];
+        }
+        $existing = $DB->get_record('local_extendednav', ['menu' => 'preferences', 'nodekey' => $record->nodekey,
+            'contextid' => $contextid]);
+        if ($existing) {
+            $record->id = $existing->id;
+            \local_extendednav\local\node\manager::update($record, false);
+        } else {
+            \local_extendednav\local\node\manager::create($record, false);
+        }
+        repository::purge();
+        access::reset_caches();
     }
 
     /**
-     * The site hides, renames, orders and adds items; the user's own order and hidden items come on top.
+     * The sections and items are recorded with their section, Roles by its first item and the loose ones under Miscellaneous,
+     * and the list shows them as folders.
      */
-    public function test_the_site_and_the_user_arrange_the_page(): void {
+    public function test_the_sections_are_folders(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $this->shown(get_admin());
+        $natives = (new preferences())->get_native_nodes();
+        $this->assertSame('', $natives['useraccount']->parentkey);
+        $this->assertSame('useraccount', $natives['changepassword']->parentkey);
+        $this->assertArrayHasKey('group_admin_roles_usersroles', $natives, 'A section without a key is known by its first item.');
+        $this->assertSame('miscellaneous', $natives['autograderpreferences']->parentkey);
+        $this->assertSame(preferences_injector::SECTION, $natives[preferences::PERSONAL]->parentkey);
+
+        $this->assertTrue(nodes::is_tree(preferences::KEY));
+        $top = array_column(nodes::get(preferences::KEY, 0)['rows'], 'nodekey');
+        $this->assertContains('useraccount', $top);
+        $this->assertNotContains('changepassword', $top, 'The items are inside their section.');
+        $inside = array_column(nodes::get(preferences::KEY, 0, '', '', 'useraccount')['rows'], 'nodekey');
+        $this->assertContains('changepassword', $inside);
+    }
+
+    /**
+     * The site hides, renames and orders, creates a section of its own and moves items into it.
+     */
+    public function test_the_site_arranges_the_page(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        access::reset_caches();
-        preferences_injector::apply($this->settings(), $user);
+        $this->shown($user);
 
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $generator->create_node(['menu' => 'preferences', 'nodekey' => 'changepassword', 'visibility' => 0,
             'parentkey' => 'useraccount']);
-        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'blogs', 'title' => 'Weblogs', 'parentkey' => '']);
-        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'library', 'title' => 'Library',
-            'url' => '/library.php', 'parentkey' => 'blogs']);
+        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'blogs', 'title' => 'Weblogs']);
+        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'campus', 'title' => 'Campus']);
+        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'library', 'title' => 'Library', 'url' => '/library.php',
+            'parentkey' => 'campus']);
+        $generator->create_node(['menu' => 'preferences', 'nodekey' => 'forumpreferences', 'parentkey' => 'campus']);
         repository::purge();
         access::reset_caches();
 
         $settings = $this->settings();
         preferences_injector::apply($settings, $user);
-        $shown = $this->shown($settings);
+        $this->assertSame('Weblogs', $settings->get('blogs')->text, 'The site renames a section.');
+        $shown = $this->shown($user);
         $this->assertNotContains('changepassword', $shown['useraccount'], 'The site hides an item.');
-        $this->assertContains('library', $shown['blogs'], 'The site adds an item to a group.');
-        $this->assertSame('Weblogs', $settings->get('blogs')->text, 'The site renames a group.');
-        $this->assertContains(preferences::PERSONAL, array_map(
-            static fn($node) => $node->key,
-            iterator_to_array($settings->get('useraccount')->children)
-        ), 'The user finds the way to arrange the page.');
-
-        preferences_injector::set_personal((int)$user->id, ['hidden' => ['forumpreferences'],
-            'order' => ['' => ['blogs', 'useraccount']]]);
-        $settings = $this->settings();
-        preferences_injector::apply($settings, $user);
-        $shown = $this->shown($settings);
-        $this->assertSame(['editprofile'], $shown['useraccount'], 'The user hides an item.');
-        $this->assertSame('blogs', array_key_first($shown), 'The user orders the groups.');
-        $this->assertSame('miscellaneous', array_key_last($shown), 'The items outside every group stay at the end.');
+        $this->assertEqualsCanonicalizing(
+            ['library', 'forumpreferences'],
+            $shown['campus'],
+            'A section of the site holds its links and the items moved to it.'
+        );
+        $this->assertNotContains('forumpreferences', $shown['useraccount'], 'An item moved leaves its section.');
+        $this->assertSame('miscellaneous', array_key_last($shown), 'The items outside every section stay at the end.');
     }
 
     /**
-     * A user who hides every item still finds the way back.
+     * A user hides, orders and moves their own items, administrators too, and their own section holds the way to do it.
      */
-    public function test_the_way_back_is_never_hidden(): void {
+    public function test_a_user_arranges_their_own_page(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $admin = get_admin();
+        $this->shown($admin);
+
+        $this->assertContains(preferences::PERSONAL, $this->shown($admin)[preferences_injector::SECTION]);
+        $this->personal($admin, ['nodekey' => 'forumpreferences', 'visibility' => 0, 'parentkey' => 'useraccount']);
+        $this->personal($admin, ['nodekey' => 'blogs', 'sortorder' => -2]);
+        $this->personal($admin, ['nodekey' => 'useraccount', 'sortorder' => -1]);
+        $this->personal($admin, ['nodekey' => 'blogpreferences', 'parentkey' => 'useraccount']);
+
+        $shown = $this->shown($admin);
+        $this->assertNotContains('forumpreferences', $shown['useraccount'], 'What a user hides is hidden from them, an admin too.');
+        $this->assertContains('blogpreferences', $shown['useraccount'], 'The user moves an item to another section.');
+        $this->assertArrayNotHasKey('blogs', $shown, 'A section left empty is not shown.');
+
+        // Another user keeps the page of the site.
+        $other = $this->getDataGenerator()->create_user();
+        $this->setUser($other);
+        $this->assertContains('forumpreferences', $this->shown($other)['useraccount']);
+    }
+
+    /**
+     * The user's own context is a scope of the preferences only, with the changes a user may make.
+     */
+    public function test_the_scope_of_a_user(): void {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        preferences_injector::set_personal((int)$user->id, ['hidden' => ['editprofile', 'changepassword',
-            'forumpreferences', 'blogs', 'group_admin_roles_usersroles', 'miscellaneous'], 'order' => []]);
 
-        $settings = $this->settings();
-        preferences_injector::apply($settings, $user);
+        $scope = context_scope::from_id(\context_user::instance($user->id)->id);
+        $this->assertTrue($scope->is_user());
+        $this->assertSame([preferences::KEY], $scope->menus());
+        $this->assertTrue($scope->can_manage());
+        $this->assertTrue($scope->can('changevisibility'));
+        $this->assertTrue($scope->can('changeorder'));
+        $this->assertFalse($scope->can('changetitles'), 'A user does not rename.');
+        $this->assertFalse($scope->can('addnodes'), 'A user does not add links.');
+        $this->assertContains('title', $scope->locked_fields());
 
-        $this->assertNotFalse($settings->find(preferences::PERSONAL, null));
+        $theirs = context_scope::from_id(\context_user::instance($other->id)->id);
+        $this->assertFalse($theirs->can_manage(), 'A user does not arrange the page of another.');
+        $this->setAdminUser();
+        $this->assertTrue($theirs->can_manage(), 'Whoever manages the navigation arranges it, from that user.');
+        $this->assertNull(context_scope::from_id(\context_user::instance(guest_user()->id)->id));
     }
 
     /**
-     * Without the capability, a user sees what the site sets and nothing of their own.
+     * Without the capability, a user sees what the site sets and has no way to arrange it.
      */
     public function test_personalising_takes_the_capability(): void {
         global $DB;
@@ -174,63 +242,43 @@ final class preferences_test extends \advanced_testcase {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $this->assertTrue(preferences_injector::can_personalise(), 'Every user may arrange their page by default.');
+        $this->assertArrayHasKey(preferences_injector::SECTION, $this->shown($user), 'Every user may arrange their page.');
 
         $role = $DB->get_field('role', 'id', ['shortname' => 'user']);
         assign_capability('local/extendednav:personalise', CAP_PROHIBIT, $role, \context_system::instance()->id, true);
         accesslib_clear_all_caches_for_unit_testing();
-        preferences_injector::set_personal((int)$user->id, ['hidden' => ['editprofile'], 'order' => []]);
 
-        $settings = $this->settings();
-        preferences_injector::apply($settings, $user);
-        $this->assertFalse(preferences_injector::can_personalise());
-        $this->assertFalse($settings->find(preferences::PERSONAL, null));
-        $this->assertContains('editprofile', $this->shown($settings)['useraccount']);
-
+        $this->assertArrayNotHasKey(preferences_injector::SECTION, $this->shown($user));
+        $this->assertFalse(context_scope::from_id(\context_user::instance($user->id)->id)->can_manage());
         $this->expectException(\required_capability_exception::class);
-        set_personal::execute(['editprofile'], []);
+        \local_extendednav\external\get_nodes::execute(preferences::KEY, (int)\context_user::instance($user->id)->id);
     }
 
     /**
-     * The service saves what the user chose, and empty lists take the page back to what the site shows.
+     * The changes of a user are their data: listed, exported and deleted by the privacy API, and gone with the user.
      */
-    public function test_the_service_saves_and_restores(): void {
+    public function test_the_privacy_of_a_user(): void {
+        global $DB;
+
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
+        $this->shown($user);
+        $this->personal($user, ['nodekey' => 'forumpreferences', 'visibility' => 0, 'parentkey' => 'useraccount']);
+        $context = \context_user::instance($user->id);
 
-        set_personal::execute(['blogpreferences'], [['group' => '', 'keys' => ['blogs', 'useraccount']]]);
-        $personal = preferences_injector::get_personal((int)$user->id);
-        $this->assertSame(['blogpreferences'], $personal['hidden']);
-        $this->assertSame(['blogs', 'useraccount'], $personal['order']['']);
+        $contexts = \local_extendednav\privacy\provider::get_contexts_for_userid((int)$user->id)->get_contextids();
+        $this->assertSame([(int)$context->id], array_map('intval', $contexts));
+        $approved = new \core_privacy\local\request\approved_contextlist($user, 'local_extendednav', [$context->id]);
+        \local_extendednav\privacy\provider::export_user_data($approved);
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $data = $writer->get_data([get_string('pluginname', 'local_extendednav')]);
+        $this->assertSame('forumpreferences', $data->preferences[0]->item);
+        \local_extendednav\privacy\provider::delete_data_for_user($approved);
+        $this->assertFalse($DB->record_exists('local_extendednav', ['contextid' => $context->id]));
 
-        set_personal::execute([], []);
-        $this->assertNull(get_user_preferences(preferences_injector::PREFERENCE, null, $user->id));
-    }
-
-    /**
-     * The profile records its boxes and shows the links of the site in them, for the users they are meant for.
-     */
-    public function test_the_profile_gets_the_links_of_the_site(): void {
-        $this->resetAfterTest();
-        $user = $this->getDataGenerator()->create_user();
-        $this->setUser($user);
-
-        \core_user\output\myprofile\manager::build_tree($user, true);
-        $boxes = (new profile())->get_native_nodes();
-        $this->assertArrayHasKey('contact', $boxes);
-        $this->assertTrue(access::is_protected(repository::get_menu_nodes_by_key(profile::KEY)['contact']));
-
-        $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
-        $generator->create_node(['menu' => 'profile', 'nodekey' => 'handbook', 'title' => 'Handbook',
-            'url' => '/handbook.php', 'parentkey' => 'contact']);
-        $generator->create_node(['menu' => 'profile', 'nodekey' => 'secret', 'title' => 'Secret',
-            'url' => '/secret.php', 'parentkey' => 'contact', 'visibility' => 0]);
-        repository::purge();
-
-        $tree = \core_user\output\myprofile\manager::build_tree($user, true);
-        $nodes = $tree->categories['contact']->nodes;
-        $this->assertArrayHasKey('local_extendednav_handbook', $nodes);
-        $this->assertArrayNotHasKey('local_extendednav_secret', $nodes);
+        $this->personal($user, ['nodekey' => 'forumpreferences', 'visibility' => 0, 'parentkey' => 'useraccount']);
+        delete_user($user);
+        $this->assertFalse($DB->record_exists('local_extendednav', ['contextid' => $context->id]));
     }
 }

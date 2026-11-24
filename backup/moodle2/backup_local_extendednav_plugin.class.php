@@ -56,7 +56,10 @@ class backup_local_extendednav_plugin extends backup_local_plugin {
             'timecreated', 'timemodified',
         ]);
         $wrapper->add_child($node);
-        $node->set_source_table('local_extendednav', ['contextid' => backup::VAR_CONTEXTID], 'sortorder ASC, id ASC');
+        // The site chooses, among the defaults of the backups, whether the changes of the navigation go in them.
+        if (get_config('local_extendednav', 'backup_navigation') !== '0') {
+            $node->set_source_table('local_extendednav', ['contextid' => backup::VAR_CONTEXTID], 'sortorder ASC, id ASC');
+        }
 
         return $plugin;
     }

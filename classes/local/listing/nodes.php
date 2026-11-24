@@ -108,12 +108,14 @@ class nodes {
 
         // The search is only compared, never shown; any text is accepted, up to a length that is enough for a key or a link.
         $search = \core_text::substr(trim($search), 0, self::MAX_SEARCH);
-        $istree = $menu instanceof admintree;
+        // The site administration and the page Preferences are folders: the tabs and categories of one, the sections of the
+        // other, each opened in its own level.
+        $istree = self::is_tree($menukey);
         $all = self::get_scope_nodes($menukey, $contextid);
         // In the tree a search looks in every level; without one, the list is the level chosen. The top level holds the
         // group General and the tabs of Moodle; General holds the other items of the top level, as Moodle groups them.
         $level = $istree && trim($search) === '';
-        $general = $istree ? admintree::general_keys($all) : [];
+        $general = $menu instanceof admintree ? admintree::general_keys($all) : [];
         $ingeneral = $level && $parent === admintree::GENERAL;
         $nodes = self::filter($menu, $all, $search, $istree && !$level || $ingeneral ? '' : $parent, $level);
         if ($level && ($parent === '' || $ingeneral)) {
@@ -172,6 +174,16 @@ class nodes {
         foreach ($slice as $node) {
             $row = self::export_row($menu, $node, $contextid, $siblings);
             $row['haschildren'] = $istree && isset($parents[$node->nodekey]);
+            // Moodle shows a tab or a category of the administration only once it holds a page, and says nothing of an empty one.
+            if (
+                $istree && !$row['haschildren'] && !$menu->is_native($node->nodekey)
+                && trim((string)($node->url ?? '')) === ''
+            ) {
+                $row['flags'][] = [
+                    'label' => get_string('flag_empty', 'local_extendednav'),
+                    'detail' => get_string('flag_empty_detail', 'local_extendednav'),
+                ];
+            }
             $row['depth'] = $istree ? self::depth_of($all, $node) : ($row['child'] ? 1 : 0);
             $row['canedit'] = true;
             if ($can !== null) {
@@ -496,13 +508,24 @@ class nodes {
     }
 
     /**
-     * Whether a navigation can have exceptions for a category, a course or an activity: the ones of the courses, of the
-     * categories and of each kind of activity.
+     * Whether a navigation is listed as folders, one level at a time: the site administration and the page Preferences.
+     *
+     * @param string $menukey Navigation key.
+     * @return bool
+     */
+    public static function is_tree(string $menukey): bool {
+        return $menukey === admintree::KEY || $menukey === \local_extendednav\menu\preferences::KEY;
+    }
+
+    /**
+     * Whether a navigation can have exceptions: the ones of the courses, of the categories and of each kind of activity, in a
+     * category, a course or an activity, and the page Preferences, for each user.
      *
      * @param string $menukey Navigation key.
      * @return bool
      */
     public static function supports_scopes(string $menukey): bool {
-        return in_array($menukey, ['course', 'category'], true) || \local_extendednav\menu\activity::from_key($menukey) !== null;
+        return in_array($menukey, ['course', 'category', 'preferences'], true)
+            || \local_extendednav\menu\activity::from_key($menukey) !== null;
     }
 }

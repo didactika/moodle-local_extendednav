@@ -25,38 +25,39 @@ use local_extendednav\menu\secondary;
 use local_extendednav\menu_manager;
 
 /**
- * Applies the navigation of the preferences to the settings of a user, as Moodle builds them for the page Preferences: first
- * what the site sets (groups and items hidden, renamed, ordered or added), then, on the user's own preferences, what the user
- * chose for themselves (the items they hide and the order they give them), when they may.
+ * Applies the navigation of the preferences to the settings of a user, as Moodle builds them for the page Preferences.
+ *
+ * The sections (User account, Badges...) and their items are the folders of the navigation, as in the site administration:
+ * the site hides, renames and orders them, moves items from one section to another, creates sections of its own and adds
+ * links to them. Each user arranges their own page in the same way, as exceptions of their own context: which sections and
+ * items it shows, in which order and in which section. The plugin adds its own section, Extended navigation, with the way to
+ * arrange the page.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class preferences_injector {
-    /** @var string User preference that keeps what a user chose for their own preferences, as JSON. */
-    public const PREFERENCE = 'local_extendednav_preferences';
-
-    /** @var bool Whether what the user chose is applied; the page where they choose it shows what the site shows. */
-    public static bool $personal = true;
-
-    /** @var string Key of the items outside every group, which Moodle shows last, under Miscellaneous. */
+    /** @var string Key of the items outside every section, which Moodle shows last, under Miscellaneous. */
     public const LOOSE = 'miscellaneous';
 
+    /** @var string Key of the section of the plugin. */
+    public const SECTION = 'local_extendednav';
+
     /**
-     * Reads the groups and items of the settings of a user.
+     * Reads the sections and items of the settings of a user.
      *
-     * @param \navigation_node $settings The node that holds the groups of the preferences.
-     * @return array By group key: node and items (by item key).
+     * @param \navigation_node $settings The node that holds the sections of the preferences.
+     * @return array By section key: node (null for the loose items) and items (by item key).
      */
     public static function read(\navigation_node $settings): array {
         $groups = [];
         $loose = [];
         foreach ($settings->children as $group) {
             if (!$group->has_children()) {
-                // An item outside every group: Moodle shows it under Miscellaneous, at the end.
+                // An item outside every section: Moodle shows it under Miscellaneous, at the end.
                 $key = secondary::key_of($group);
-                if ($key !== null && $key !== preferences::PERSONAL) {
+                if ($key !== null) {
                     $loose[$key] = $group;
                 }
                 continue;
@@ -64,11 +65,11 @@ final class preferences_injector {
             $items = [];
             foreach ($group->children as $item) {
                 $itemkey = secondary::key_of($item);
-                if ($itemkey !== null && $itemkey !== preferences::PERSONAL) {
+                if ($itemkey !== null) {
                     $items[$itemkey] = $item;
                 }
             }
-            // A group Moodle adds without a key (Roles) is known by its first item, the same in every language.
+            // A section Moodle adds without a key (Roles) is known by its first item, the same in every language.
             $groupkey = secondary::key_of($group) ?? ($items ? 'group_' . array_key_first($items) : null);
             if ($groupkey !== null) {
                 $groups[$groupkey] = ['node' => $group, 'items' => $items];
@@ -81,7 +82,7 @@ final class preferences_injector {
     }
 
     /**
-     * Records the groups and items of the settings of a user, so the site can change them.
+     * Records the sections and items of the settings of a user, so the site can change them.
      *
      * @param array $groups As read() returns them.
      */
@@ -99,44 +100,80 @@ final class preferences_injector {
     }
 
     /**
-     * Applies the changes to the settings of a user.
+     * Applies the changes of the site and of the user to the settings of a user.
      *
-     * @param \navigation_node $settings The node that holds the groups of the preferences.
+     * @param \navigation_node $settings The node that holds the sections of the preferences.
      * @param \stdClass $user The user whose preferences they are.
      */
     public static function apply(\navigation_node $settings, \stdClass $user): void {
-        global $USER;
-
-        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin')) {
+        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin') || isguestuser($user)) {
             return;
         }
         $groups = self::read($settings);
+        $section = self::section($user);
+        if ($section !== null) {
+            $groups[self::SECTION] = $section;
+        }
         if (!$groups) {
             return;
         }
         self::record($groups);
 
-        // With the navigation turned off, the site changes nothing, and each user still orders their own page.
-        $rows = menu_manager::is_enabled(preferences::KEY) ? repository::get_menu_nodes_by_key(preferences::KEY) : [];
-        $own = self::$personal && (int)$user->id === (int)$USER->id && self::can_personalise();
-        $personal = $own ? self::get_personal((int)$user->id) : ['hidden' => [], 'order' => []];
+        $context = \context_user::instance((int)$user->id);
+        // With the navigation turned off, the site changes nothing, and each user still arranges their own page.
+        $rows = menu_manager::is_enabled(preferences::KEY)
+            ? repository::get_scoped_nodes(preferences::KEY, $context)
+            : array_filter(repository::get_scoped_nodes(preferences::KEY, $context), static fn(\stdClass $row): bool =>
+                (int)($row->contextid ?? 0) === (int)$context->id);
+        $natives = (new preferences())->get_native_nodes();
 
-        // The items the site adds to a group.
+        // The sections and links the site adds.
         foreach ($rows as $key => $row) {
-            $parent = (string)($row->parentkey ?? '');
-            if (
-                isset($groups[$key]) || !isset($groups[$parent]) || isset($groups[$parent]['items'][$key])
-                    || trim((string)$row->url) === ''
-            ) {
+            if (isset($natives[$key]) || isset($groups[$key])) {
                 continue;
             }
-            $groups[$parent]['items'][$key] = \navigation_node::create(
-                format_string(text::resolve($row->title)),
-                new \moodle_url((string)$row->url),
-                \navigation_node::TYPE_SETTING,
-                null,
-                $key
-            );
+            $url = trim((string)$row->url);
+            $parent = (string)($row->parentkey ?? '');
+            if ($url === '' && $parent === '') {
+                $node = \navigation_node::create(
+                    format_string(text::resolve($row->title)),
+                    null,
+                    \navigation_node::TYPE_CONTAINER,
+                    null,
+                    $key
+                );
+                $groups[$key] = ['node' => $node, 'items' => []];
+            }
+        }
+        $items = [];
+        $home = [];
+        foreach ($groups as $groupkey => $group) {
+            foreach ($group['items'] as $itemkey => $item) {
+                $items[$itemkey] = $item;
+                $home[$itemkey] = $groupkey;
+            }
+        }
+        foreach ($rows as $key => $row) {
+            if (!isset($natives[$key]) && !isset($items[$key]) && !isset($groups[$key]) && trim((string)$row->url) !== '') {
+                $items[$key] = \navigation_node::create(
+                    format_string(text::resolve($row->title)),
+                    new \moodle_url((string)$row->url),
+                    \navigation_node::TYPE_SETTING,
+                    null,
+                    $key
+                );
+                $home[$key] = (string)($row->parentkey ?? '');
+            }
+        }
+
+        // Each item goes to the section its row names, when that section is there; otherwise it stays where Moodle put it.
+        $members = array_fill_keys(array_keys($groups), []);
+        foreach ($items as $key => $item) {
+            $target = (string)($rows[$key]->parentkey ?? '');
+            $target = $target !== '' && isset($groups[$target]) ? $target : $home[$key];
+            if (isset($groups[$target])) {
+                $members[$target][] = $key;
+            }
         }
 
         foreach ($groups as $group) {
@@ -146,31 +183,28 @@ final class preferences_injector {
                 }
             }
         }
-        // The items outside every group stay at the end, where Moodle shows them.
-        $groupkeys = array_values(array_diff(self::order(array_keys($groups), $rows, $personal['order'][''] ?? []), [self::LOOSE]));
+        foreach ($items as $item) {
+            if ($item->parent) {
+                $item->remove();
+            }
+        }
+
+        // The items outside every section stay at the end, where Moodle shows them.
+        $groupkeys = array_values(array_diff(self::order(array_keys($groups), $rows), [self::LOOSE]));
         if (isset($groups[self::LOOSE])) {
             $groupkeys[] = self::LOOSE;
         }
-        $first = null;
-        $fallback = null;
         foreach ($groupkeys as $groupkey) {
-            if (!self::shown($groupkey, $rows, $personal['hidden'])) {
+            if (!self::shown($groupkey, $rows)) {
                 continue;
             }
             $group = $groups[$groupkey]['node'];
             if ($group) {
-                $fallback = $fallback ?? $group;
                 self::rename($group, $rows[$groupkey] ?? null);
             }
-            $items = $groups[$groupkey]['items'];
-            foreach ($items as $item) {
-                if ($item->parent) {
-                    $item->remove();
-                }
-            }
             $added = 0;
-            foreach (self::order(array_keys($items), $rows, $personal['order'][$groupkey] ?? []) as $itemkey) {
-                if (self::shown($itemkey, $rows, $personal['hidden'])) {
+            foreach (self::order($members[$groupkey], $rows) as $itemkey) {
+                if (self::shown($itemkey, $rows)) {
                     self::rename($items[$itemkey], $rows[$itemkey] ?? null);
                     ($group ?? $settings)->add_node($items[$itemkey]);
                     $added++;
@@ -178,99 +212,84 @@ final class preferences_injector {
             }
             if ($added && $group) {
                 $settings->add_node($group);
-                $first = $first ?? $group;
             }
         }
-
-        // The way to order and hide their own preferences, in the first group, for whoever may.
-        if ($own && $first === null && $fallback !== null) {
-            // The user hid every item: the first group still holds the way back.
-            $settings->add_node($fallback);
-            $first = $fallback;
-        }
-        if ($own && $first !== null) {
-            $first->add(
-                get_string('personal_preferences', 'local_extendednav'),
-                new \moodle_url('/local/extendednav/mypreferences.php'),
-                \navigation_node::TYPE_SETTING,
-                null,
-                preferences::PERSONAL
-            );
-        }
     }
 
     /**
-     * Whether the current user may order and hide their own preferences.
+     * The section of the plugin, with the way to arrange the page: for the user, their own; for whoever manages the navigation
+     * of the site, the one of the user whose preferences they look at.
      *
-     * @return bool
+     * @param \stdClass $user The user whose preferences they are.
+     * @return array|null As read() returns a section, or null when nobody may arrange this page here.
      */
-    public static function can_personalise(): bool {
+    private static function section(\stdClass $user): ?array {
         global $USER;
 
-        return isloggedin() && !isguestuser()
-            && has_capability('local/extendednav:personalise', \context_user::instance((int)$USER->id));
-    }
-
-    /**
-     * Returns what a user chose for their own preferences.
-     *
-     * @param int $userid User.
-     * @return array With hidden (keys) and order (the keys of each group by the key of the group; the groups under '').
-     */
-    public static function get_personal(int $userid): array {
-        $stored = json_decode((string)get_user_preferences(self::PREFERENCE, '', $userid), true);
-        $stored = is_array($stored) ? $stored : [];
-        $order = [];
-        foreach ((array)($stored['order'] ?? []) as $groupkey => $keys) {
-            $order[(string)$groupkey] = array_values(array_filter((array)$keys, 'is_string'));
+        $scope = context_scope::from_id((int)\context_user::instance((int)$user->id)->id);
+        if ($scope === null || !$scope->can_manage()) {
+            return null;
         }
-        return ['hidden' => array_values(array_filter((array)($stored['hidden'] ?? []), 'is_string')), 'order' => $order];
+        $own = (int)$user->id === (int)$USER->id;
+        $node = \navigation_node::create(
+            get_string('pluginname', 'local_extendednav'),
+            null,
+            \navigation_node::TYPE_CONTAINER,
+            null,
+            self::SECTION
+        );
+        $item = $node->add(
+            get_string($own ? 'personal_preferences' : 'personal_preferences_of', 'local_extendednav', fullname($user)),
+            $scope->url(preferences::KEY),
+            \navigation_node::TYPE_SETTING,
+            null,
+            preferences::PERSONAL
+        );
+        return ['node' => $node, 'items' => [preferences::PERSONAL => $item]];
     }
 
     /**
-     * Saves what a user chose for their own preferences.
-     *
-     * @param int $userid User.
-     * @param array $personal With hidden and order, as get_personal() returns them.
-     */
-    public static function set_personal(int $userid, array $personal): void {
-        $value = json_encode(['hidden' => array_values(array_unique($personal['hidden'])), 'order' => $personal['order']]);
-        set_user_preference(self::PREFERENCE, $value, $userid);
-    }
-
-    /**
-     * Orders keys as the site orders them, and then as the user ordered them.
+     * Orders keys as the rows order them: the ones with a row first, in the order of the rows, then the others as they came.
      *
      * @param string[] $keys Keys.
-     * @param \stdClass[] $rows Rows of the site, by key.
-     * @param string[] $mine The order the user chose, if any.
+     * @param \stdClass[] $rows Rows that apply, by key, in their order.
      * @return string[]
      */
-    public static function order(array $keys, array $rows, array $mine = []): array {
-        usort($keys, static function (string $one, string $two) use ($rows): int {
-            return [(int)($rows[$one]->sortorder ?? PHP_INT_MAX), $one] <=> [(int)($rows[$two]->sortorder ?? PHP_INT_MAX), $two];
+    public static function order(array $keys, array $rows): array {
+        $position = array_flip(array_keys($rows));
+        $start = array_flip($keys);
+        usort($keys, static function (string $one, string $two) use ($position, $start): int {
+            return [$position[$one] ?? PHP_INT_MAX, $start[$one]] <=> [$position[$two] ?? PHP_INT_MAX, $start[$two]];
         });
-        $mine = array_values(array_intersect($mine, $keys));
-        return $mine ? array_values(array_unique(array_merge($mine, $keys))) : $keys;
+        return $keys;
     }
 
     /**
-     * Whether the site and the user let a group or an item show.
+     * Whether the rows let a section or an item show. The way to arrange the page is never hidden.
      *
      * @param string $key Key.
-     * @param \stdClass[] $rows Rows of the site, by key.
-     * @param string[] $hidden What the user hides.
+     * @param \stdClass[] $rows Rows that apply, by key.
      * @return bool
      */
-    private static function shown(string $key, array $rows, array $hidden): bool {
-        return (!isset($rows[$key]) || access::is_shown($rows[$key])) && !in_array($key, $hidden, true);
+    private static function shown(string $key, array $rows): bool {
+        if ($key === self::SECTION || $key === preferences::PERSONAL || !isset($rows[$key])) {
+            return true;
+        }
+        // What a user hides on their own page is hidden from them, administrators too.
+        $row = $rows[$key];
+        $contextid = (int)($row->contextid ?? 0);
+        $user = $contextid > 0 ? \context::instance_by_id($contextid, IGNORE_MISSING) : null;
+        if ($user instanceof \context_user && (int)$row->visibility === access::VISIBILITY_HIDDEN) {
+            return false;
+        }
+        return access::is_shown($row);
     }
 
     /**
-     * Gives a node the title the site sets, if any.
+     * Gives a node the title its row sets, if any.
      *
      * @param \navigation_node $node Node.
-     * @param \stdClass|null $row Its row of the site.
+     * @param \stdClass|null $row Its row.
      */
     private static function rename(\navigation_node $node, ?\stdClass $row): void {
         $title = $row === null ? '' : text::resolve($row->title ?? '');

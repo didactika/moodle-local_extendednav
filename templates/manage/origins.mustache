@@ -17,44 +17,29 @@
 {{!
     @template local_extendednav/manage/origins
 
-    The navigations in groups, as a column of links, the groups apart by a band and named for the readers of the screen; on a
-    narrow screen, one select with a search, the same groups and the short names. A page of few navigations (compact), such as
-    the one of a course, has the select only. The kinds of activity are many: the column has one entry, Activities, which opens
-    the list of the kinds; the select lists the kinds themselves. Each opens the page of its navigation.
+    The navigations as one column of links, with no groups, Activities among them, which opens the list of the kinds. A page of
+    few navigations (compact), such as the one of a course, chooses them with a select instead. On a narrow screen the select is
+    above the name of the page (origins_bar), so this column is only shown on a wide one.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
     Example context (json):
     {
-        "origins": [
-            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "short": "Course", "url": "#",
-                "active": true, "icon": "i/course", "component": "core", "off": false}]},
-            {"label": "Activities", "items": [{"key": "activities", "name": "Activities", "short": "Activities", "url": "#",
-                "active": false, "icon": "i/activities", "component": "core", "off": false}]}
-        ],
-        "originoptions": [{"label": "Courses", "options": [{"name": "Course", "url": "#", "selected": true}]}]
+        "origins": [{"key": "course", "name": "Course navigation", "short": "Course", "url": "#", "active": true,
+            "icon": "i/course", "component": "core", "off": false}],
+        "originoptions": [{"name": "Course", "url": "#", "selected": true}]
     }
 }}
-<nav aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
-    <div {{^compact}}class="d-lg-none"{{/compact}}>
-        <label class="sr-only visually-hidden" for="len-origin-select">{{#str}}navigations, local_extendednav{{/str}}</label>
-        <select class="custom-select form-select" id="len-origin-select" data-region="originselect" data-searchable
-            data-search-label="{{#str}}search_navigations, local_extendednav{{/str}}" data-noresults="{{#str}}noresults, local_extendednav{{/str}}">
-            {{#originoptions}}
-                <optgroup label="{{label}}">
-                    {{#options}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/options}}
-                </optgroup>
-            {{/originoptions}}
-        </select>
-    </div>
+<nav class="d-none d-lg-block" aria-label="{{#str}}navigations, local_extendednav{{/str}}" data-region="origins">
+    {{#compact}}
+        {{< local_extendednav/manage/origin_select }}{{$selectid}}len-origin-select-wide{{/selectid}}{{/ local_extendednav/manage/origin_select }}
+    {{/compact}}
     {{^compact}}
-    <div class="card d-none d-lg-block" data-region="originlist">
-        {{#origins}}
-            <div class="list-group list-group-flush" role="group" aria-label="{{label}}">
-                {{#items}}{{> local_extendednav/manage/origin_item }}{{/items}}
+        <div class="card" data-region="originlist">
+            <div class="list-group list-group-flush">
+                {{#origins}}{{> local_extendednav/manage/origin_item }}{{/origins}}
             </div>
-        {{/origins}}
-    </div>
+        </div>
     {{/compact}}
 </nav>

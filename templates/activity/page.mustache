@@ -37,6 +37,7 @@
     }
 }}
 <div class="len" data-region="activity">
+    {{> local_extendednav/manage/origins_bar }}
     <div class="d-grid gap-3" data-region="head">
         <h2 class="h4 fw-bold mb-0">{{name}}</h2>
     </div>
@@ -113,7 +114,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-2 flex-shrink-0">
                             <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled
-                                title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}"><span data-region="icon-row">{{#pix}}i/reload, core{{/pix}}</span><span data-region="icon-group">{{#pix}}e/cancel, core{{/pix}}</span></button>
+                                title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}">{{#pix}}i/reload, core{{/pix}}</button>
                         </div>
                     </div>
                     <div class="table-responsive" data-region="tablewrap" aria-busy="true">

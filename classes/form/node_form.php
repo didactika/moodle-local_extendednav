@@ -119,12 +119,26 @@ class node_form extends \moodleform {
             $mform->setDefault('treetype', 'page');
             $mform->addHelpButton('treetype', 'tree_type', 'local_extendednav');
         }
+        // A node of the site in the page Preferences is a section of its own, which holds items, or a link in a section.
+        $isprefs = $menu instanceof \local_extendednav\menu\preferences;
+        if ($isprefs && !$isnative) {
+            $mform->addElement('select', 'treetype', get_string('tree_type', 'local_extendednav'), [
+                'page' => get_string('pref_type_link', 'local_extendednav'),
+                'tab' => get_string('pref_type_section', 'local_extendednav'),
+            ]);
+            $mform->setDefault('treetype', 'page');
+            $mform->addHelpButton('treetype', 'pref_type', 'local_extendednav');
+        }
 
         $mform->addElement('text', 'title', get_string('title', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
         $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'title', 'local_extendednav');
 
-        if ($istreepage) {
+        if ($isprefs && self::is_section($menu, $current)) {
+            // A section of the page Preferences is no link: it holds options, and has no address.
+            $mform->addElement('hidden', 'url', '');
+            $mform->setType('url', PARAM_TEXT);
+        } else if ($istreepage) {
             $mform->addElement(
                 'static',
                 'urlinfo',
@@ -135,8 +149,8 @@ class node_form extends \moodleform {
             $mform->addElement('text', 'url', get_string('url', 'local_extendednav'), ['size' => 60]);
             $mform->setType('url', PARAM_TEXT);
             $mform->addHelpButton('url', 'url', 'local_extendednav');
-            if ($istree) {
-                // A category has no address: Moodle lists what it holds on a page of its own.
+            if ($istree || ($isprefs && !$isnative)) {
+                // A tab, a category or a section has no address: Moodle lists what it holds.
                 $mform->hideIf('url', 'treetype', 'neq', 'page');
             }
             if ($isparent) {
@@ -147,8 +161,9 @@ class node_form extends \moodleform {
             }
         }
 
-        // How it looks and how it opens. The pages of the administration are drawn by Moodle and keep their look.
-        if (!$istree) {
+        // How it looks and how it opens. The pages of the administration and of the preferences are drawn by Moodle, as plain
+        // links, and keep their look.
+        if (!$istree && !$isprefs) {
             $mform->addElement('header', 'lookheader', get_string('form_section_look', 'local_extendednav'));
             $mform->setExpanded('lookheader', true);
             // The icon is chosen from a list, never typed: the value goes in a hidden field and the picker shows it.
@@ -299,19 +314,20 @@ class node_form extends \moodleform {
             $mform->addHelpButton('categoryparent', 'category_of_category', 'local_extendednav');
             $mform->hideIf('categoryparent', 'treetype', 'neq', 'category');
         } else if ($menu instanceof \local_extendednav\menu\preferences) {
-            // The preferences and the profile: Moodle's items stay in their section; a link of the site goes in one of them.
-            if ($menu->is_native($currentkey)) {
-                $mform->addElement('hidden', 'parentkey', (string)($menu->get_native_node($currentkey)->parentkey ?? ''));
+            // The page Preferences: a section stays at the top; an item, of Moodle or of the site, goes in any section.
+            if (self::is_section($menu, $current)) {
+                $mform->addElement('hidden', 'parentkey', '');
             } else {
-                $sections = [];
-                foreach ($menu->get_native_nodes() as $key => $native) {
-                    if ($native->parentkey === '') {
-                        $sections[$key] = format_string($native->text);
-                    }
-                }
-                \core_collator::asort($sections);
-                $mform->addElement('select', 'parentkey', get_string('section_of_item', 'local_extendednav'), $sections);
+                $mform->addElement(
+                    'select',
+                    'parentkey',
+                    get_string('section_of_item', 'local_extendednav'),
+                    self::sections_of($menu, $currentkey)
+                );
                 $mform->addHelpButton('parentkey', 'section_of_item', 'local_extendednav');
+                if (!$isnative) {
+                    $mform->hideIf('parentkey', 'treetype', 'eq', 'tab');
+                }
             }
             $mform->setType('parentkey', PARAM_ALPHANUMEXT);
         } else if ($issecondary) {
@@ -433,13 +449,14 @@ class node_form extends \moodleform {
             }
         }
 
-        // A link added to the preferences or to the profile needs its section and its address.
-        if ($menu instanceof \local_extendednav\menu\preferences && !$menu->is_native((string)$record->nodekey)) {
-            $section = $menu->get_native_node((string)($record->parentkey ?? ''));
-            if ($section === null || $section->parentkey !== '') {
+        // In the preferences, a link of the site needs its address, and every item a section to go in.
+        if ($menu instanceof \local_extendednav\menu\preferences && ($data['treetype'] ?? '') !== 'tab') {
+            $native = $menu->get_native_node((string)$record->nodekey);
+            $issection = $native !== null && $native->parentkey === '';
+            if (!$issection && !isset(self::sections_of($menu, (string)$record->nodekey)[(string)($record->parentkey ?? '')])) {
                 $errors['parentkey'] = get_string('required');
             }
-            if (trim((string)($data['url'] ?? '')) === '') {
+            if ($native === null && trim((string)($data['url'] ?? '')) === '') {
                 $errors['url'] = get_string('required');
             }
         }
@@ -491,6 +508,51 @@ class node_form extends \moodleform {
             $data = self::tree_values($data);
         }
         return $data;
+    }
+
+    /**
+     * Whether a node of the page Preferences is a section: one of Moodle at the top, or one of the site without an address.
+     *
+     * @param \local_extendednav\menu\base $menu The navigation of the preferences.
+     * @param \stdClass|null $node The node edited, or null for a new one.
+     * @return bool
+     */
+    private static function is_section($menu, ?\stdClass $node): bool {
+        if ($node === null) {
+            return false;
+        }
+        $native = $menu->get_native_node((string)$node->nodekey);
+        if ($native !== null) {
+            return $native->parentkey === '';
+        }
+        return trim((string)($node->url ?? '')) === '' && (string)($node->parentkey ?? '') === '';
+    }
+
+    /**
+     * The sections of the page Preferences an item can go in: the ones of Moodle and the ones of the site, by name.
+     *
+     * @param \local_extendednav\menu\base $menu The navigation of the preferences.
+     * @param string $exclude Key of the node edited.
+     * @return string[] Names by key.
+     */
+    private static function sections_of($menu, string $exclude = ''): array {
+        $sections = [];
+        foreach ($menu->get_native_nodes() as $key => $native) {
+            if ($native->parentkey === '') {
+                $sections[$key] = format_string(text::resolve($native->text));
+            }
+        }
+        foreach (repository::get_menu_nodes_by_key($menu->get_key()) as $key => $row) {
+            if (
+                !isset($sections[$key]) && !$menu->is_native($key) && trim((string)($row->url ?? '')) === ''
+                    && (string)($row->parentkey ?? '') === ''
+            ) {
+                $sections[$key] = format_string(text::resolve((string)$row->title)) ?: $key;
+            }
+        }
+        unset($sections[$exclude]);
+        \core_collator::asort($sections);
+        return $sections;
     }
 
     /**

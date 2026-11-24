@@ -20,11 +20,14 @@ use local_extendednav\menu\activity;
 use local_extendednav\menu_manager;
 
 /**
- * A category, a course or an activity whose navigations are changed in place: which navigations it can change, who may
- * change them and the page where it is done. Everything inside the context follows its changes, and the rest follows the site.
+ * A category, a course, an activity or a user whose navigations are changed in place: which navigations it can change, who
+ * may change them and the page where it is done. Everything inside the context follows its changes, and the rest follows the
+ * site.
  *
  * A category changes its own navigation, the one of the courses inside it and the one of each kind of activity; a course
- * changes its own navigation and the one of each kind of activity it has; an activity changes its own navigation.
+ * changes its own navigation and the one of each kind of activity it has; an activity changes its own navigation. A user
+ * arranges their own page Preferences: which sections and items it shows, in which order and in which section, and nothing
+ * else, as the site sets the rest.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -41,7 +44,10 @@ final class context_scope {
         'changeconditions' => ['roles', 'langs', 'blockaccess', 'hideadmins', 'availability'],
     ];
 
-    /** @var \context The category, the course or the activity. */
+    /** @var string[] What a user may change in their own preferences: show and hide, order, and go back to the site. */
+    public const PERSONAL = ['changevisibility', 'changeorder', 'deletenodes'];
+
+    /** @var \context The category, the course, the activity or the user. */
     private \context $context;
 
     /**
@@ -61,7 +67,11 @@ final class context_scope {
      */
     public static function from_id(int $contextid): ?self {
         $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if (!$context || !in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE], true)) {
+        $levels = [CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE, CONTEXT_USER];
+        if (!$context || !in_array($context->contextlevel, $levels, true)) {
+            return null;
+        }
+        if ($context->contextlevel === CONTEXT_USER && isguestuser((int)$context->instanceid)) {
             return null;
         }
         if ($context->contextlevel === CONTEXT_COURSE && (int)$context->instanceid === (int)SITEID) {
@@ -98,7 +108,27 @@ final class context_scope {
     }
 
     /**
-     * Returns the kind of the scope: category, course or activity.
+     * Whether the scope is a user, who arranges their own preferences.
+     *
+     * @return bool
+     */
+    public function is_user(): bool {
+        return $this->context->contextlevel === CONTEXT_USER;
+    }
+
+    /**
+     * Whether the scope is the current user.
+     *
+     * @return bool
+     */
+    public function is_current_user(): bool {
+        global $USER;
+
+        return $this->is_user() && (int)$this->context->instanceid === (int)$USER->id;
+    }
+
+    /**
+     * Returns the kind of the scope: category, course, activity or user.
      *
      * @return string
      */
@@ -106,6 +136,7 @@ final class context_scope {
         return match ($this->context->contextlevel) {
             CONTEXT_COURSE => 'course',
             CONTEXT_MODULE => 'activity',
+            CONTEXT_USER => 'user',
             default => 'category',
         };
     }
@@ -129,6 +160,9 @@ final class context_scope {
      * @return \stdClass|null
      */
     public function course(): ?\stdClass {
+        if ($this->is_user()) {
+            return null;
+        }
         $coursecontext = $this->context->get_course_context(false);
         return $coursecontext ? get_course($coursecontext->instanceid) : null;
     }
@@ -139,6 +173,11 @@ final class context_scope {
      * @return string
      */
     public function name(): string {
+        global $DB;
+
+        if ($this->is_user()) {
+            return fullname($DB->get_record('user', ['id' => $this->context->instanceid], '*', MUST_EXIST));
+        }
         if ($this->is_activity()) {
             $cm = $this->cm();
             return format_string($cm->name, true, ['context' => $this->context]);
@@ -157,6 +196,9 @@ final class context_scope {
      * @return string[] Navigation keys.
      */
     public function menus(): array {
+        if ($this->is_user()) {
+            return [\local_extendednav\menu\preferences::KEY];
+        }
         if ($this->is_activity()) {
             return [activity::key_for($this->cm()->modname)];
         }
@@ -180,7 +222,10 @@ final class context_scope {
     public function login(): void {
         global $PAGE;
 
-        if ($this->is_activity()) {
+        if ($this->is_user()) {
+            require_login(null, false);
+            $PAGE->set_context($this->context);
+        } else if ($this->is_activity()) {
             $cm = $this->cm();
             require_login($cm->course, false, $cm);
         } else if ($this->is_course()) {
@@ -199,6 +244,9 @@ final class context_scope {
      * @return bool
      */
     public function can_view(): bool {
+        if ($this->is_user()) {
+            return $this->can_manage();
+        }
         return $this->can_manage() || has_capability('local/extendednav:viewcontext', $this->context);
     }
 
@@ -206,6 +254,10 @@ final class context_scope {
      * Stops the page unless the current user may see the navigations of the scope.
      */
     public function require_view(): void {
+        if ($this->is_user()) {
+            $this->require_manage();
+            return;
+        }
         if (!$this->can_view()) {
             require_capability('local/extendednav:viewcontext', $this->context);
         }
@@ -219,6 +271,10 @@ final class context_scope {
      * @return bool
      */
     public function can(string $change): bool {
+        if ($this->is_user()) {
+            // A user arranges their own preferences, and a manager of the navigation the ones of any user, opened from that user.
+            return in_array($change, self::PERSONAL, true) && $this->can_manage();
+        }
         if (has_capability('local/extendednav:manage', \context_system::instance())) {
             return true;
         }
@@ -260,6 +316,10 @@ final class context_scope {
      * @return bool
      */
     public function can_manage(): bool {
+        if ($this->is_user()) {
+            return has_capability('local/extendednav:manage', \context_system::instance())
+                || ($this->is_current_user() && has_capability('local/extendednav:personalise', $this->context));
+        }
         return has_capability('local/extendednav:manage', \context_system::instance())
             || has_capability('local/extendednav:managecontext', $this->context);
     }
@@ -268,6 +328,12 @@ final class context_scope {
      * Stops the page or the service unless the current user may change the navigations of the scope.
      */
     public function require_manage(): void {
+        if ($this->is_user()) {
+            if (!$this->can_manage()) {
+                require_capability('local/extendednav:personalise', $this->context);
+            }
+            return;
+        }
         if (!has_capability('local/extendednav:manage', \context_system::instance())) {
             require_capability('local/extendednav:managecontext', $this->context);
         }

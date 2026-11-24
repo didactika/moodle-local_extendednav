@@ -28,7 +28,7 @@ namespace local_extendednav;
  */
 final class tours_test extends \advanced_testcase {
     /**
-     * The tours are added once, required by default, and their texts are strings of the plugin in every language.
+     * The tours are added once, and their texts are strings of the plugin in every language.
      */
     public function test_the_tours_are_added_once(): void {
         global $CFG, $DB;
@@ -43,7 +43,6 @@ final class tours_test extends \advanced_testcase {
 
         $this->assertSame(3, local_extendednav_import_tours());
         $this->assertSame(0, local_extendednav_import_tours(), 'A tour already there is left as it is.');
-        $this->assertSame('1', (string)get_config('local_extendednav', 'tourrequired'));
 
         $strings = [];
         foreach (glob($CFG->dirroot . '/local/extendednav/tours/*.json') as $file) {

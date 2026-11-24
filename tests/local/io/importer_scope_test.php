@@ -128,17 +128,27 @@ final class importer_scope_test extends \advanced_testcase {
     }
 
     /**
-     * A course that does not exist, and a navigation that has no exceptions, are refused.
+     * A course or a user that does not exist is left out with a warning, and the rest is imported; a navigation that has no
+     * exceptions is refused.
      */
     public function test_the_scope_is_checked(): void {
+        global $DB;
+
         $this->resetAfterTest();
         $this->setAdminUser();
         menu_manager::get_menu('course')->record_seen(['grades' => (object)['text' => 'Grades', 'action' => '/grade/']]);
+        $course = $this->getDataGenerator()->create_course(['shortname' => 'ENG1']);
 
         $nowhere = (new importer('course', true))->import([
             ['nodekey' => 'grades', 'scope' => 'course:NOPE', 'visibility' => 0],
+            ['nodekey' => 'grades', 'scope' => 'user:nobody', 'menu' => 'preferences', 'visibility' => 0],
+            ['nodekey' => 'grades', 'scope' => 'course:ENG1', 'visibility' => 0],
         ]);
-        $this->assertNotEmpty($nowhere['errors']);
+        $this->assertSame([], $nowhere['errors']);
+        $this->assertCount(2, $nowhere['warnings']);
+        $this->assertSame(2, $nowhere['counts']['skipped']);
+        $contextid = \context_course::instance($course->id)->id;
+        $this->assertTrue($DB->record_exists('local_extendednav', ['menu' => 'course', 'contextid' => $contextid]));
 
         $course = $this->getDataGenerator()->create_course(['shortname' => 'ENG2']);
         $primary = (new importer('primary', true))->import([

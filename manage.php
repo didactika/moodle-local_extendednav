@@ -65,11 +65,8 @@ if ($menu === null) {
     $menukey = 'primary';
     $menu = menu_manager::get_menu($menukey);
 }
-$hasscopes = nodes::supports_scopes($menukey);
-// The boxes of a profile are found when a profile is built; the first time, the one of the current user is built here.
-if ($menu instanceof \local_extendednav\menu\profile && !$menu->get_native_nodes()) {
-    \core_user\output\myprofile\manager::build_tree($USER, true);
-}
+// The preferences of each user are arranged from that user, never from a list of every user.
+$hasscopes = nodes::supports_scopes($menukey) && $menukey !== \local_extendednav\menu\preferences::KEY;
 
 $pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 $PAGE->set_url($pageurl);
@@ -92,7 +89,7 @@ $sample = sample_page::for_navigation($menukey);
 $config = json_encode([
     'menu' => $menukey,
     'contextid' => 0,
-    'tree' => $menukey === admintree::KEY,
+    'tree' => nodes::is_tree($menukey),
     'sampleurl' => $sample ? $sample->out(false) : '',
 ]);
 

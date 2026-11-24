@@ -108,8 +108,11 @@ class access {
         if ($node->nodekey === 'local_extendednav') {
             return true;
         }
-        // The boxes of a profile are Moodle's: the site adds items to them, and they stay as Moodle shows them.
-        if ($node->menu === \local_extendednav\menu\profile::KEY && (string)($node->parentkey ?? '') === '') {
+        // The way to arrange one's own preferences is never hidden either.
+        if (
+            $node->menu === \local_extendednav\menu\preferences::KEY
+            && $node->nodekey === \local_extendednav\menu\preferences::PERSONAL
+        ) {
             return true;
         }
         return $node->menu === 'primary' && $node->nodekey === 'siteadminnode';
