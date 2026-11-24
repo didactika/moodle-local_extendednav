@@ -1,21 +1,23 @@
 ---
 title: Ajustes y capacidades
-summary: El ajuste del plugin, su capacidad y lo que almacena.
+summary: Cómo se activa o desactiva cada navegación, la capacidad del plugin y lo que almacena.
 order: 40
 ---
 
-## Ajustes
+## Activar o desactivar una navegación
 
-Los ajustes están en **Administración del sitio > Apariencia > Extended navigation > Ajustes**. La página requiere `moodle/site:config`.
+El plugin no tiene página de ajustes: todo está en la página de gestión, en **Administración del sitio > Apariencia > Navegación ampliada > Gestionar la navegación**.
 
-<Screenshot src="asset:settings.webp" alt="La página de ajustes de Extended navigation, con el ajuste Activar" caption="Los ajustes del plugin." url="/admin/settings.php?section=local_extendednav_settings" />
+El botón junto al nombre de cada navegación aplica o no sus cambios. Muestra **Activada**, en verde, mientras los cambios se aplican: púlselo para desactivarlos. Entonces muestra **Desactivada**, en gris, y la columna de las navegaciones marca esa navegación como **Desactivada**: pulse el botón para volver a aplicar los cambios. Mientras una navegación está desactivada, Moodle la dibuja como lo hace sin el plugin, y sus nodos y su orden se conservan. Las demás navegaciones conservan sus cambios.
 
-| Ajuste | Valor predeterminado | Descripción |
-|---|---|---|
-| Activar | Activado | Aplica los elementos y el bloqueo de URL. Cuando está desactivado, Moodle muestra su navegación sin cambios y no se bloquea ninguna página |
-| Ocultar los nodos también a los administradores | Desactivado | Aplica las reglas de visibilidad también a los administradores del sitio. De forma predeterminada ven todos los nodos. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything) |
+| Navegación | Cuando está desactivada |
+|---|---|
+| Navegación principal | Moodle muestra su navegación principal, y no se bloquea ninguna dirección |
+| Menú de usuario | Moodle muestra su menú de usuario |
+| Página principal, curso, actividad, categoría | Moodle muestra su propia navegación en esas páginas |
+| Administración del sitio | Moodle muestra su propio árbol de categorías y páginas |
 
-Ambos ajustes también son interruptores en la parte superior de la página de gestión, que se guardan en cuanto cambian.
+Si un nodo también se oculta a los administradores se decide en el formulario de cada nodo. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
 
 ## Capacidades
 

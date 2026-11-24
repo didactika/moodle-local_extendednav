@@ -1,21 +1,23 @@
 ---
 title: Settings and capabilities
-summary: The setting of the plugin, its capability, and what it stores.
+summary: How each navigation is turned on or off, the capability of the plugin, and what it stores.
 order: 40
 ---
 
-## Settings
+## Turn a navigation on or off
 
-The settings are at **Site administration > Appearance > Extended navigation > Settings**. The page requires `moodle/site:config`.
+The plugin has no settings page: everything is on the management page, at **Site administration > Appearance > Extended navigation > Manage navigation**.
 
-<Screenshot src="asset:settings.webp" alt="The settings page of Extended navigation, with the setting Enable" caption="The settings of the plugin." url="/admin/settings.php?section=local_extendednav_settings" />
+The button next to the name of each navigation applies its changes or not. It shows **On**, in green, while the changes are applied: press it to turn them off. It then shows **Off**, in grey, and the column of the navigations marks that navigation as **Off**: press the button to apply the changes again. While a navigation is off, Moodle draws it as it does without the plugin, and its nodes and their order are kept. The other navigations keep their changes.
 
-| Setting | Default | Description |
-|---|---|---|
-| Enable | On | Apply the items and the URL blocking. When off, Moodle shows its navigation unchanged and no page is blocked |
-| Hide nodes from administrators too | Off | Apply the visibility rules to site administrators too. By default they see every node. See [Administrators see every node](page:concepts/administrators-see-everything) |
+| Navigation | When it is off |
+|---|---|
+| Primary navigation | Moodle shows its primary navigation, and no address is blocked |
+| User menu | Moodle shows its user menu |
+| Site home, course, activity, category | Moodle shows its own navigation on those pages |
+| Site administration | Moodle shows its own tree of categories and pages |
 
-Both settings are also switches at the top of the management page, which save as soon as they change.
+Whether a node is also hidden from administrators is decided in the form of each node. See [Administrators see every node](page:concepts/administrators-see-everything).
 
 ## Capabilities
 

@@ -6,11 +6,21 @@ order: 41
 
 Un archivo de importación es un archivo YAML con una lista `nodes`. Cada entrada describe un elemento con los campos siguientes. Todos los campos salvo `nodekey` son opcionales, y los campos vacíos de un elemento de Moodle conservan los valores de Moodle.
 
+El mismo formato contiene una navegación o todas. Un archivo exportado empieza además con dos claves:
+
+| Clave | Descripción |
+|---|---|
+| `format` | La versión del formato, `2` |
+| `navigations` | Para cada navegación del archivo, `enabled: 1` cuando sus cambios se aplican y `enabled: 0` cuando no. Al importar, cada navegación se activa o desactiva como indica. Un archivo sin esta clave deja cada navegación como está |
+
+## Campos de un nodo
+
 | Campo | Descripción |
 |---|---|
 | `nodekey` | Clave del elemento, única dentro de su menú. Use la clave de un elemento de Moodle (por ejemplo `myhome`) para cambiarlo |
-| `menu` | Menú del elemento: `primary` o `usermenu`. Es el menú que se importa cuando se omite |
-| `order` | Posición del elemento en su menú, siendo 1 la primera. Los archivos exportados listan todas las posiciones. Al importar, un elemento sin ella conserva su lugar, o va al final cuando es nuevo |
+| `menu` | Navegación del elemento: `primary`, `usermenu`, `frontpage` (página principal del sitio), `course`, `activity`, `category` o `admin` (administración del sitio). Es la navegación elegida en la página de gestión cuando se omite |
+| `native` | `1` para un elemento de Moodle. Un elemento de Moodle que este sitio no tiene se omite con un aviso |
+| `order` | Posición del elemento en su navegación, siendo 1 la primera. En la administración del sitio, su posición entre las categorías y páginas de su categoría. Al importar, un elemento sin ella conserva su lugar, o va al final cuando es nuevo |
 | `title` | Texto que se muestra. Vacío en un elemento de Moodle conserva el título de Moodle |
 | `tooltip` | Texto que se muestra al pasar el cursor sobre el enlace |
 | `url` | Destino: una ruta de este sitio (por ejemplo `/course/view.php?id=2`) o una dirección completa |
@@ -19,7 +29,7 @@ Un archivo de importación es un archivo YAML con una lista `nodes`. Cada entrad
 | `roles` | Nombres cortos de rol separados por comas (por ejemplo `editingteacher,teacher`). Se usa cuando `visibility` es `2` |
 | `blockaccess` | `1` para bloquear la URL a los usuarios que no pueden ver el elemento, `0` en caso contrario. Solo se usa cuando `visibility` es `0` o `2` |
 | `langs` | Códigos de idioma separados por comas (por ejemplo `es,pt_br`). El elemento solo se muestra para esos idiomas. Vacío significa todos los idiomas |
-| `parentkey` | Clave del elemento padre, para mostrar este elemento en su submenú |
+| `parentkey` | Clave del elemento padre, para mostrar este elemento en su submenú. En la administración del sitio, la clave de la categoría en la que está el elemento |
 | `display` | Cómo se abre el enlace: `0` ventana actual, `1` ventana nueva, `2` ventana emergente |
 | `popupwidth`, `popupheight` | Ancho y alto de la ventana emergente en píxeles, de 100 a 9999. Se usan cuando `display` es `2` |
 | `scope` | La categoría o el curso para el que el nodo es una excepción: `course:nombrecorto` o `category:Padre / Nombre`. Vacío significa todo el sitio |
@@ -29,6 +39,10 @@ Un archivo de importación es un archivo YAML con una lista `nodes`. Cada entrad
 ## Ejemplo
 
 ```yaml
+format: 2
+navigations:
+  primary:
+    enabled: 1
 nodes:
   - nodekey: help_en
     menu: primary

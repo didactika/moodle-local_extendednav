@@ -1,21 +1,32 @@
 ---
 title: Importar y exportar
-summary: Copie la navegación de un sitio a otro con archivos YAML.
+summary: Copie una navegación, o todas, de un sitio a otro con un archivo YAML.
 order: 50
 ---
 
 ## Exportar
 
-En la página de gestión, use **Exportar todo** para descargar un archivo `.yaml` con todos los nodos de la navegación elegida, incluidas las excepciones de categorías y cursos.
+En la página de gestión, abra **Exportar** y elija:
+
+- **Esta navegación**, para un archivo con todos los nodos de la navegación elegida, incluidas las excepciones de categorías y cursos.
+- **Todas las navegaciones**, para un único archivo con todas las navegaciones y si cada una está activada.
+
+<Screenshot src="asset:manage-export-menu.webp" alt="El menú Exportar abierto, con las opciones Esta navegación y Todas las navegaciones" caption="Los dos tipos de exportación." url="/local/extendednav/manage.php" />
+
+Ambos archivos tienen el mismo formato: cada nodo indica a qué navegación pertenece. En la administración del sitio solo se escriben las categorías y páginas que se han cambiado, y las de una categoría que se ha ordenado a mano.
 
 ## Importar
 
-En el otro sitio, seleccione **Importar** y suba el archivo (`.yaml` o `.yml`). En **Nodos existentes**, elija si los elementos que ya existen se conservan o se sustituyen.
+En el otro sitio, seleccione **Importar** y suba el archivo (`.yaml` o `.yml`). La misma página importa un archivo de una navegación o de todas. En **Nodos existentes**, elija si los nodos que ya existen se conservan o se reemplazan.
 
-<Screenshot src="asset:import.webp" alt="La página de importación, con el campo del archivo YAML y la elección para los elementos existentes" caption="La página de importación." url="/local/extendednav/import.php" />
+<Screenshot src="asset:import.webp" alt="La página de importación, con el campo del archivo YAML y la elección para los nodos existentes" caption="La página de importación." url="/local/extendednav/import.php" />
 
-- Todo el archivo se comprueba antes de guardar nada. Si algún elemento no es válido, la página lista cada uno con el motivo y no se importa nada.
-- Cada elemento conserva su posición, de modo que un menú completo se importa en el mismo orden. Un elemento sin posición conserva su lugar, o va al final cuando es nuevo.
-- Un idioma que no está instalado en el sitio da una advertencia, y el elemento se importa.
+| Caso | Qué ocurre |
+|---|---|
+| Un nodo no es válido | La página enumera cada problema con su motivo, y no se importa nada |
+| Un nodo de Moodle que este sitio no tiene, como una página de un plugin que no está instalado | Se omite con un aviso, y el resto del archivo se importa |
+| Un nodo de una categoría o un curso | Se importa para la categoría o el curso con el mismo nombre corto o nombre completo. Si no existe, el archivo no se importa |
+| Un archivo de todas las navegaciones | Cada navegación se activa o desactiva como indica el archivo |
+| Un idioma que no está instalado | Se muestra un aviso, y el nodo se importa |
 
-**Ver el formato YAML**, en la página de importación, describe cada campo y ofrece un archivo de ejemplo. La misma descripción está en [El formato YAML](page:reference/yaml-format).
+Cada nodo conserva su posición, así que una navegación completa se importa en el mismo orden. **Ver el formato YAML** en la página de importación describe cada campo y ofrece un archivo de ejemplo. La misma descripción está en [El formato YAML](page:reference/yaml-format).

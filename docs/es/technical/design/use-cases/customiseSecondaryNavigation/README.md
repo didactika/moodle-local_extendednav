@@ -34,8 +34,10 @@ Análisis: [README](../../../analysis/use-cases/customiseSecondaryNavigation/REA
 
 | Operación | Entrada | Salida | Errores |
 | --- | --- | --- | --- |
-| `local_extendednav_get_nodes(menu, contextid, search, visibility, parent, page, perpage)` | la navegación, el ámbito y los filtros | filas, total, cuentas y si la lista se puede reordenar | sin capacidad, navegación desconocida, visibilidad no admitida |
+| `local_extendednav_get_nodes(menu, contextid, search, visibility, parent, page, perpage, origin)` | la navegación, el ámbito y los filtros | filas, total, cuentas y si la lista se puede reordenar | sin capacidad, navegación desconocida, visibilidad no admitida |
 | `local_extendednav_set_visibility(menu, contextid, nodekeys, visibility)` | los nodos y la nueva visibilidad | cuántos cambiaron | sin capacidad, visibilidad distinta de oculto o visible |
+| `local_extendednav_place_node(menu, contextid, nodekeys, beforekey, afterkey)` | los nodos arrastrados juntos y el hermano que marca el lugar | cuántos se movieron | sin capacidad, nodos que no son hermanos |
+| `local_extendednav_set_visibility(menu, contextid, nodekeys, visibility, hideadmins)` | los nodos, la visibilidad y si ocultar alcanza también a los administradores | cuántos cambiaron | sin capacidad, visibilidad no admitida |
 | `local_extendednav_move_node(menu, contextid, nodekey, direction)` | el nodo y la dirección | cuántos se movieron | sin capacidad, dirección distinta de -1 o 1 |
 
 ## Datos afectados

@@ -1,0 +1,34 @@
+---
+title: Shape the site administration
+summary: Rename, hide and order every category and page of the site administration, at any depth, and add links of your own.
+order: 47
+---
+
+The site administration is a tree: categories such as **Users** or **Plugins** hold pages and other categories. The plugin reads that tree on every administration page, so every category and every page can be changed, however deep it is.
+
+<Screenshot src="asset:manage-admin-top.webp" alt="The site administration on the management page, with its top-level categories" caption="The top level of the site administration." url="/local/extendednav/manage.php?menu=admin" />
+
+## Browse the tree
+
+Choose **Site administration** in the column of the management page. The list shows one level of the tree. The top level has the categories that Moodle shows as tabs (**Users**, **Courses**, **Plugins**…) and, first, **General**, which holds the other items of the top level, as the tab General of Moodle does. Select the name of a category to open it. The breadcrumb above the list shows where you are; select a level to go back to it. A search looks in every level at once.
+
+<Screenshot src="asset:manage-admin-level.webp" alt="The category Users opened, with its categories and the breadcrumb above the list" caption="A category opened, with the way back in the breadcrumb." url="/local/extendednav/manage.php?menu=admin&parent=users" />
+
+## What you can do
+
+| Action | How |
+|---|---|
+| Rename a category or a page | Edit it and fill **Title**. The new name is shown in the administration, in the breadcrumb and in the search |
+| Hide it | The eye button of its row, or restrict it to some roles or languages in its form |
+| Order it | Drag it by its handle among the others of its category |
+| Add a link of your own | **Add node**, with the title, the URL and the **Category** it goes in |
+
+The address of a page of Moodle cannot change, and its settings stay where they are: renaming or hiding a page changes how it is listed, never what it does. Moodle still checks the capabilities of each page.
+
+## Pages that Moodle hides
+
+Some pages are hidden by Moodle itself, such as the ones it opens after an upgrade. They are listed with **Hidden by Moodle** under their visibility, and the plugin does not show them.
+
+## Administrators
+
+In the site administration, **Hide from administrators too** is on by default: a category or a page that you hide is hidden from the administrators as well. The question asked when you hide nodes lets you turn it off, and so does the form of each node. The way to this management page is never hidden. See [Administrators see every node](page:concepts/administrators-see-everything).

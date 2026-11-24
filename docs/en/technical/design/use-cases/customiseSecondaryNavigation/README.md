@@ -34,8 +34,10 @@ Analysis: [README](../../../analysis/use-cases/customiseSecondaryNavigation/READ
 
 | Operation | Input | Output | Errors |
 | --- | --- | --- | --- |
-| `local_extendednav_get_nodes(menu, contextid, search, visibility, parent, page, perpage)` | the navigation, the scope and the filters | rows, total, counts and whether the list can be reordered | no capability, unknown navigation, unsupported visibility |
+| `local_extendednav_get_nodes(menu, contextid, search, visibility, parent, page, perpage, origin)` | the navigation, the scope and the filters | rows, total, counts and whether the list can be reordered | no capability, unknown navigation, unsupported visibility |
 | `local_extendednav_set_visibility(menu, contextid, nodekeys, visibility)` | the nodes and the new visibility | how many changed | no capability, visibility other than hidden or visible |
+| `local_extendednav_place_node(menu, contextid, nodekeys, beforekey, afterkey)` | the nodes dragged together and the sibling that marks the place | how many moved | no capability, nodes that are not siblings |
+| `local_extendednav_set_visibility(menu, contextid, nodekeys, visibility, hideadmins)` | the nodes, the visibility and whether hiding reaches administrators too | how many changed | no capability, unsupported visibility |
 | `local_extendednav_move_node(menu, contextid, nodekey, direction)` | the node and the direction | how many moved | no capability, direction other than -1 or 1 |
 
 ## Data touched

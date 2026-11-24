@@ -1,21 +1,32 @@
 ---
 title: Import and export
-summary: Copy the navigation from one site to another with YAML files.
+summary: Copy one navigation, or every navigation, from one site to another with a YAML file.
 order: 50
 ---
 
 ## Export
 
-On the management page, use **Export all** to download a `.yaml` file with every node of the navigation chosen, including the exceptions of categories and courses.
+On the management page, open **Export** and choose:
+
+- **This navigation**, for a file with every node of the navigation chosen, including the exceptions of categories and courses.
+- **Every navigation**, for one file with every navigation and whether each one is on.
+
+<Screenshot src="asset:manage-export-menu.webp" alt="The Export menu open, with the options This navigation and Every navigation" caption="The two kinds of export." url="/local/extendednav/manage.php" />
+
+Both files have the same format: every node says which navigation it belongs to. In the site administration, only the categories and pages that were changed are written, and the ones of a category that was ordered by hand.
 
 ## Import
 
-On the other site, select **Import** and upload the file (`.yaml` or `.yml`). In **Existing nodes**, choose whether the items that already exist are kept or replaced.
+On the other site, select **Import** and upload the file (`.yaml` or `.yml`). The same page imports a file of one navigation or of every navigation. In **Existing nodes**, choose whether the nodes that already exist are kept or replaced.
 
-<Screenshot src="asset:import.webp" alt="The import page, with the field for the YAML file and the choice for the existing items" caption="The import page." url="/local/extendednav/import.php" />
+<Screenshot src="asset:import.webp" alt="The import page, with the field for the YAML file and the choice for the existing nodes" caption="The import page." url="/local/extendednav/import.php" />
 
-- The whole file is checked before anything is saved. If any item is not valid, the page lists each one with the reason and nothing is imported.
-- Each item keeps its position, so a whole menu is imported in the same order. An item without a position keeps its place, or goes last when it is new.
-- A language that is not installed on the site gives a warning, and the item is imported.
+| Case | What happens |
+|---|---|
+| A node is not valid | The page lists each problem with its reason, and nothing is imported |
+| A node of Moodle that this site does not have, such as a page of a plugin that is not installed | It is left out with a warning, and the rest of the file is imported |
+| A node of a category or a course | It is imported for the category or the course with the same short name or full name. If there is none, the file is not imported |
+| A file of every navigation | Each navigation is turned on or off as the file says |
+| A language that is not installed | A warning is shown, and the node is imported |
 
-**See the YAML format** on the import page describes every field and offers an example file. The same description is in [The YAML format](page:reference/yaml-format).
+Each node keeps its position, so a whole navigation is imported in the same order. **See the YAML format** on the import page describes every field and offers an example file. The same description is in [The YAML format](page:reference/yaml-format).

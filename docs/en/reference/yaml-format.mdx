@@ -6,11 +6,21 @@ order: 41
 
 An import file is a YAML file with a `nodes` list. Each entry describes one item with the fields below. Every field except `nodekey` is optional, and the empty fields of an item of Moodle keep the values of Moodle.
 
+The same format holds one navigation or every navigation. An exported file also starts with two keys:
+
+| Key | Description |
+|---|---|
+| `format` | The version of the format, `2` |
+| `navigations` | For each navigation of the file, `enabled: 1` when its changes are applied and `enabled: 0` when they are not. On import, each navigation is turned on or off as it says. A file without it leaves every navigation as it is |
+
+## Fields of a node
+
 | Field | Description |
 |---|---|
 | `nodekey` | Key of the item, unique within its menu. Use the key of an item of Moodle (for example `myhome`) to change it |
-| `menu` | Menu of the item: `primary` or `usermenu`. It is the menu being imported when omitted |
-| `order` | Position of the item in its menu, 1 being the first. Exported files list every position. On import, an item without it keeps its place, or goes last when it is new |
+| `menu` | Navigation of the item: `primary`, `usermenu`, `frontpage` (site home), `course`, `activity`, `category` or `admin` (site administration). It is the navigation chosen on the management page when omitted |
+| `native` | `1` for an item of Moodle. An item of Moodle that this site does not have is left out with a warning |
+| `order` | Position of the item in its navigation, 1 being the first. In the site administration, its position among the categories and pages of its category. On import, an item without it keeps its place, or goes last when it is new |
 | `title` | Display text. Empty on an item of Moodle keeps the title of Moodle |
 | `tooltip` | Text shown when hovering over the link |
 | `url` | Destination: a path of this site (for example `/course/view.php?id=2`) or a full address |
@@ -19,7 +29,7 @@ An import file is a YAML file with a `nodes` list. Each entry describes one item
 | `roles` | Role shortnames separated by commas (for example `editingteacher,teacher`). Used when `visibility` is `2` |
 | `blockaccess` | `1` to block the URL for the users who cannot see the item, `0` otherwise. Only used when `visibility` is `0` or `2` |
 | `langs` | Language codes separated by commas (for example `es,pt_br`). The item is only shown for these languages. Empty means every language |
-| `parentkey` | Key of the parent item, to show this item in its submenu |
+| `parentkey` | Key of the parent item, to show this item in its submenu. In the site administration, the key of the category the item is in |
 | `display` | How the link opens: `0` current window, `1` new window, `2` pop-up |
 | `popupwidth`, `popupheight` | Width and height of the pop-up in pixels, from 100 to 9999. Used when `display` is `2` |
 | `scope` | The category or the course the node is an exception for: `course:shortname` or `category:Parent / Name`. Empty means the whole site |
@@ -29,6 +39,10 @@ An import file is a YAML file with a `nodes` list. Each entry describes one item
 ## Example
 
 ```yaml
+format: 2
+navigations:
+  primary:
+    enabled: 1
 nodes:
   - nodekey: help_en
     menu: primary

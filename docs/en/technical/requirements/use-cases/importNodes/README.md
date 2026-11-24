@@ -47,7 +47,7 @@ A navigation takes work to build. An administrator exports its items to a YAML f
 
 | Step | Actor | System |
 | --- | --- | --- |
-| 1 | Chooses **Export all**, or selects items and **Export selected**. | Writes a YAML file with each item and its position. |
+| 1 | Opens **Export** and chooses **This navigation** or **Every navigation**. | Writes one YAML file, in the same format for both, with each item, its navigation and its position, and whether each navigation is on. |
 | 2 | Chooses **Import**, uploads a file and chooses what to do with the existing items. | Reads the file and validates every item. |
 | 3 |  | Creates, updates or skips each item, keeping its position. |
 | 4 |  | Shows the counts and the warnings, such as a language that is not installed. |

@@ -12,15 +12,14 @@ You need the capability `local/extendednav:manage`, or to be a site administrato
 
 ## Add or change an item
 
-Select **Add node**, or the edit icon of an item.
+Select **Add node**, or the edit icon of an item. The form is in sections, in the order in which an item is usually decided. A field that is required is marked, and a value that is not valid is explained under its field when you save.
 
-- For a new item, choose a **Node key** (letters, numbers, underscores and hyphens), a **Title** and a **URL**.
-- For an item of Moodle, change only what you need. The empty fields keep the values of Moodle.
-- Choose the **Visibility**, the **Allowed roles** of a restricted item and whether to **Block URL access**. Turn on **Hide from administrators too** when the rules must apply to administrators as well; by default they see every node.
-- In the navigations of a course, an activity and a category, **Where it goes** keeps the node in the **More** menu or in the bar.
-- Optionally limit the item to some **Languages**, add a **Tooltip** or an **Icon**. The square next to the field opens a searchable list of icons of Moodle and FontAwesome.
-- Choose how it opens with **Display**: **Current window**, **New window** or **Pop-up**, with its width and height (620 × 450 pixels by default).
-- Choose a **Parent** to show the item in the submenu of that item.
+| Section | Fields |
+|---|---|
+| **Node** | The **Node key** of a new item (letters, numbers, underscores and hyphens), its **Title** and its **URL**. For an item of Moodle, change only what you need: the empty fields keep the values of Moodle, shown as placeholders |
+| **Look and opening** | A **Tooltip** and an **Icon** (the square next to the field opens a searchable list of icons of Moodle and FontAwesome), and how it opens with **Display**: **Current window**, **New window** or **Pop-up**, with its width and height (620 × 450 pixels by default) |
+| **Who sees it** | The **Visibility**, the **Allowed roles** of a restricted item, the **Languages**, whether to **Block URL access**, and **Hide from administrators too** when the rules must apply to administrators as well (by default they see every node) |
+| **Where it goes** | The **Parent**, to show the item in its submenu. In the navigations of the site home, a course, an activity and a category, it decides whether the node stays where Moodle puts it, always in the **More** menu or in the bar. In the site administration, the **Category** of a link of your own, which is required |
 
 <Screenshot src="asset:node-form.webp" alt="The form of an item" caption="The form of an item." url="/local/extendednav/edit.php" />
 

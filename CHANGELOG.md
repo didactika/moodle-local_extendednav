@@ -15,9 +15,12 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ### Added
 
-- A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list as wide as the page and of fixed height with a pager, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
-- Nodes are ordered by dragging them by their handle, or with the arrow keys on the handle.
-- The column Visibility shows a badge and, under it, what narrows the node: its roles, its languages, a blocked address, or that only administrators see it.
+- A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list as wide as the page and of fixed height, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
+- Nodes are ordered by dragging them by their handle, or with the arrow keys on the handle; the nodes selected among its siblings move with it. The lists have no pages, and the head checkbox selects every row.
+- The bar of the selection offers Show, Hide and Delete only when a selected node allows them, and asks before acting, listing the nodes left as they are. Hiding asks whether to hide from administrators too, which is on by default in the site administration.
+- Each node says whether Moodle manages it or it was added, and a menu Origin filters by it. The visibility shows a badge for each kind of restriction, with the details in a tooltip.
+- An empty secondary navigation finds its nodes from a page of the site, without leaving the management page.
+- The site administration groups the items of the General tab of Moodle under General.
 - One On and Off button next to the name of each navigation applies its changes or leaves the navigation as Moodle draws it. The settings page of the plugin is gone.
 - Site administrators see every node by default, even one that is hidden or restricted to roles they do not have, and their row says so. An option of each node applies its rules to administrators too.
 - The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity and of a category.

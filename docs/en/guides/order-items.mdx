@@ -1,17 +1,20 @@
 ---
 title: Order the items
-summary: Change the position of the items with the arrow buttons of their row.
+summary: Drag an item by its handle to its new place, or move it with the arrow keys.
 order: 40
 ---
 
-Move an item with the **Move up** and **Move down** buttons of its row. They are buttons, so they work with the keyboard and a screen reader, and the list is saved and drawn again at once.
+Drag an item by the handle at the start of its row and drop it where it goes. A line under or over a row shows where it will land. The order is saved as soon as you drop it, and the list is drawn again without reloading the page.
 
-<Screenshot src="asset:manage-primary.webp" alt="The management page, with the arrow buttons at the end of each row" caption="Each row has its arrow buttons." url="/local/extendednav/manage.php" />
+<Screenshot src="asset:manage-primary.webp" alt="The management page, with a handle at the start of each row" caption="Each row has its handle." url="/local/extendednav/manage.php" />
 
+With the keyboard, move the focus to the handle of an item and press the **Up arrow** or the **Down arrow**: the item moves one place.
+
+- An item moves among its siblings: the items with its parent, or the categories and pages of its category in the site administration.
+- Select several nodes and drag one of them: the nodes selected among its siblings move together, in the order they have.
 - Moving a parent moves its submenu items with it.
-- A submenu item only moves among its siblings.
-- An item that leaves its parent stays right below the group of that parent.
-- The arrows are off while a search or a filter is applied. Use the button that clears the filters to order again.
-- The navigations of a course, an activity and a category are ordered the same way, for the whole site or for one category or course.
+- The handles are not shown while a search or a filter is applied, because the list then shows only a part of the navigation. Use the button that clears the filters to order again.
+- On a narrow screen, such as a phone, the handles are not shown: order the navigation from a wider screen.
+- In a category or a course, ordering an item gives it the order of its own navigation. See [Change a navigation for a category or a course](page:guides/exceptions).
 
-The order of the list is the order of the menu, and an exported file keeps it: every item has its position in the field `order`.
+The order of the list is the order of the navigation, and an exported file keeps it: every item has its position in the field `order`.

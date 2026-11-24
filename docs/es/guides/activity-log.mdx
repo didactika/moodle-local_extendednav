@@ -1,13 +1,21 @@
 ---
 title: Registro de actividad
-summary: Vea quién creó, cambió o eliminó cada elemento, y cuándo.
+summary: Vea quién creó, cambió o eliminó cada nodo de una navegación, y cuándo.
 order: 60
 ---
 
-En la página de gestión, seleccione **Registro de actividad**. Las dos pestañas muestran el registro de la navegación principal y el del menú de usuario.
+En la página de gestión, seleccione **Registro de actividad**. La columna de la izquierda elige la navegación, como en la página de gestión.
 
-<Screenshot src="asset:activity.webp" alt="El registro de actividad de la navegación principal, con la hora, el usuario, la acción y la descripción de cada cambio" caption="El registro de actividad: una fila por cambio." url="/local/extendednav/activity.php" />
+<Screenshot src="asset:activity.webp" alt="El registro de actividad de la navegación principal, con la hora, el nodo, la acción, la persona y la dirección IP de cada cambio" caption="El registro de actividad: una fila por cambio, del más reciente al más antiguo." url="/local/extendednav/activity.php" />
 
-Cada fila muestra la hora, el usuario, la acción (creado, actualizado o eliminado), el evento y la descripción. Filtre por un periodo y por acción, y ordene por hora.
+Cada fila muestra cuándo se hizo el cambio, el nodo (un enlace a su formulario mientras existe), la acción (**Creado**, **Actualizado** o **Eliminado**), quién lo hizo y desde qué dirección IP. Seleccione la columna **Hora** para poner primero los cambios más antiguos.
 
-Los cambios de los elementos se registran como eventos en el almacén de registros del sitio, que el registro de actividad lee, de modo que siguen los ajustes de retención de su registro.
+| Filtro | Qué hace |
+|---|---|
+| Búsqueda | Encuentra un nodo por su clave, o una persona por su nombre |
+| **Acción** | Muestra solo los cambios de las acciones elegidas, con el número de cada una |
+| **Fecha** | Hoy, los últimos 7 días, este mes, los últimos 30 días, o dos días a su elección |
+
+El botón del final de la fila de filtros los borra. En una pantalla estrecha, los menús se agrupan en un único menú, **Filtros**. Nada recarga la página.
+
+Los cambios se registran como eventos en el registro estándar del sitio, que el registro de actividad lee, así que siguen la configuración de conservación del registro. Si el registro estándar está desactivado, la página lo indica.

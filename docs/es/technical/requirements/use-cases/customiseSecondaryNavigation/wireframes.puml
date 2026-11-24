@@ -4,7 +4,7 @@
   ==
   {
     Navegaciones | Se aplica a: ^Todo el sitio^
-    [ Añadir nodo ] | [ Importar ] | [ Exportar todo ]
+    [ Añadir nodo ] | [ Importar ] | [ Exportar v ]
     "Buscar nodos" | ^Visibilidad^
     Título | Visibilidad | URL | Acciones
   }

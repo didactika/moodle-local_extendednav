@@ -1,37 +1,48 @@
 ---
 title: Change the other navigations
-summary: Order, rename, hide and extend the navigation of a course, of an activity, of a category and of the site administration.
+summary: Order, rename, hide and extend the navigation of the site home, of a course, of an activity and of a category.
 order: 45
 ---
 
-Besides the primary navigation and the user menu, the plugin changes the navigations that Moodle draws under the header of a page: the one of a **course**, of the **site home**, of an **activity**, of a **category** and of the **site administration**.
+Besides the primary navigation and the user menu, the plugin changes the navigations that Moodle draws under the header of a page: the one of the **site home**, of a **course**, of an **activity** and of a **category**. The site administration has a page of its own: see [Shape the site administration](page:guides/site-administration).
 
 <Screenshot src="asset:manage-course.webp" alt="The management page with the course navigation chosen and its nodes listed" caption="The management page: the navigations to the left and the nodes of the one chosen to the right." url="/local/extendednav/manage.php?menu=course" />
 
 ## Choose the navigation
 
-On the management page, the column to the left lists the navigations in groups: the site (primary navigation and user menu), the course (course and site home), the activity, the category and the administration. On a narrow screen the column is a select above the list.
+On the management page, the column to the left lists the navigations in three groups: **Site** (primary navigation, user menu and site home), **Courses** (course, activity and category) and **Administration**. On a narrow screen the column is a select above the list.
+
+## Turn a navigation on or off
+
+The button next to the name of the navigation says whether its changes are applied. Press **On** to turn them off: Moodle then draws that navigation as it does without the plugin, and the other navigations keep their changes. Press **Off** to apply them again. Nothing is lost while a navigation is off.
 
 ## See what Moodle shows
 
-Moodle has no list of the nodes of these navigations: they depend on the page, on who looks and on the plugins that add theirs. The plugin does not build any page to find them. It records each node the first time a page shows it, so the list starts empty and fills as people use the site. A node of Moodle appears in the list with the link and the title Moodle gives it, and it can be changed from then on.
+Moodle has no list of the nodes of these navigations: they depend on the page, on who looks and on the plugins that add theirs. The plugin records each node the first time a page shows it, so the list fills as people use the site. A node of Moodle appears in the list with the link and the title Moodle gives it, and it can be changed from then on.
+
+While the list of a navigation is empty, select **Find the nodes**: the plugin opens a page of the site that shows that navigation (a course, an activity, a category or the site home), without leaving the management page, and lists what it finds. **Open a page that shows it** opens the same page in a new tab.
 
 ## What you can do with a node
 
 | Action | How |
 |---|---|
-| Hide or show it | The eye button of its row, or **Hide** and **Show** in the bar that appears when you select nodes |
-| Order it | The arrow buttons of its row. A node moves one place among the others |
+| Hide or show it | The eye button of its row, or **Hide** and **Show** in the bar that appears when you select nodes. Hiding asks whether to hide the nodes from administrators too |
+| Order it | Drag it by its handle; the nodes selected with it go too. See [Order the items](page:guides/order-items) |
 | Rename it or change its link | Edit it and fill **Title** or **URL**. An empty field keeps what Moodle gives |
 | Restrict it | Edit it and choose the roles or the languages that see it |
 | Decide where it goes | Edit it and choose **Where it goes**: where Moodle puts it, always in the **More** menu, or in the bar, out of the menu |
 | Add a node of your own | **Add node**. The title and the URL are required |
 
-In the **site administration** navigation a node can only be hidden and ordered: its title and its link are those of the administration pages, and changing them would leave an administrator without a way in.
-
 ## The list
 
-Search by title, key or link. The **Visibility** menu narrows the list to the nodes visible to everyone, restricted to roles or hidden, and says how many each has. The arrow at the end of the row clears the search and the filters.
+The list shows every node of the navigation, with no pages, so the whole navigation can be ordered. Search by title, key or link. Two menus narrow the list, and each says how many nodes each option has:
+
+- **Visibility**: the nodes visible to everyone, restricted or hidden.
+- **Origin**: the nodes of Moodle (or of another plugin), marked **Moodle**, and the nodes added on this page, marked **Added**.
+
+The column **Visibility** shows the visibility of each node and, beside it, a badge for each kind of restriction: **Roles**, **Languages**, **URL blocked**, **Admins too**, **Only you**. Place the pointer over them to read the details, such as the roles. The button at the end of the row of filters clears the search and the filters.
+
+The bar of the selection offers only what the nodes selected allow: **Show** when one of them is not visible to everyone, **Hide** when one of them is visible, and **Delete** when one of them was added. The question before the action lists the nodes it leaves as they are.
 
 <Screenshot src="asset:manage-selection.webp" alt="Two nodes selected, with the bar of actions over the list" caption="Select nodes to show, hide or delete them together." url="/local/extendednav/manage.php?menu=course" />
 

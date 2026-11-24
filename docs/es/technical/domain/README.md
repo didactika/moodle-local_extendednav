@@ -54,7 +54,7 @@ La posición vertical de una entidad expresa su importancia para el objetivo del
 | RN-007 | Reordenar mantiene a un padre con su submenú, y un elemento de submenú solo se mueve entre sus hermanos. | Node, Submenu | `node_manager::reorder` |
 | RN-008 | Un elemento de Moodle con campos vacíos conserva los valores de Moodle. | Node | `node_text` |
 | RN-009 | Un nodo de una navegación secundaria se encuentra cuando una página lo muestra, una sola vez, y desde entonces tiene una fila que se puede cambiar. | Node, Menu | `secondary::record_seen` |
-| RN-010 | En la navegación de la administración del sitio un nodo solo se puede ocultar y ordenar. | Node, Menu | `secondary::is_order_only` |
+| RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada.  Node, Menu | `admintree::apply` |
 | RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. | Node, Role | `node_access::is_allowed` |
 | RN-012 | Para cada nodo gana el ámbito más cercano a la página: el curso, luego las categorías que lo rodean y luego el sitio. | Node, Scope | `node_repository::get_scoped_nodes` |
 | RN-013 | Cuando un ámbito cambia el orden de un nodo, fija el orden de toda su navegación. | Node, Scope | `node_repository::get_scoped_nodes` |

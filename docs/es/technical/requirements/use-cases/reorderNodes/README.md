@@ -32,7 +32,7 @@ extends:
 
 ## Contexto
 
-El orden de la lista es el orden del menú. Un administrador pulsa los botones de flecha de la fila de un elemento, y los submenús se mantienen juntos.
+El orden de la lista es el orden del menú. La lista muestra todos los elementos, sin páginas. Un administrador arrastra un elemento por su asa, solo o con los elementos seleccionados entre sus hermanos, o lo mueve con las teclas de flecha sobre su asa; los submenús se mantienen juntos.
 
 ## Precondiciones
 
@@ -48,7 +48,7 @@ El orden de la lista es el orden del menú. Un administrador pulsa los botones d
 
 | Paso | Actor | Sistema |
 | --- | --- | --- |
-| 1 | Pulsa **Subir** o **Bajar** en la fila de un elemento. | Calcula el nuevo orden entre sus hermanos. |
+| 1 | Arrastra un elemento por su asa y lo suelta encima o debajo de un hermano. | Lleva consigo los elementos seleccionados entre sus hermanos, en su orden, y calcula el nuevo orden. |
 | 2 |  | Guarda el orden mediante la función de servicio web. |
 | 3 |  | Mantiene a un padre con sus elementos de submenú y dibuja la lista de nuevo. |
 
@@ -56,8 +56,9 @@ El orden de la lista es el orden del menú. Un administrador pulsa los botones d
 
 | ID | Empieza en el paso | Condición | Comportamiento | Termina |
 | --- | --- | --- | --- | --- |
-| A1 | 1 | Hay una búsqueda o un filtro aplicado. | Los botones están desactivados. | Paso 1 |
+| A1 | 1 | Hay una búsqueda o un filtro aplicado, o la pantalla mide menos de 768 px. | Las asas no se muestran. | Paso 1 |
 | A2 | 2 | El servidor rechaza el orden. | Muestra el error y deja la lista como estaba. | Paso 1 |
+| A3 | 1 | El administrador pulsa la tecla de flecha arriba o abajo sobre el asa. | Mueve el elemento un lugar entre sus hermanos. | Paso 2 |
 
 ## Reglas de negocio
 

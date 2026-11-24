@@ -4,7 +4,7 @@
   ==
   {
     Navigations | Applies to: ^Whole site^
-    [ Add node ] | [ Import ] | [ Export all ]
+    [ Add node ] | [ Import ] | [ Export v ]
     "Search nodes" | ^Visibility^
     Title | Visibility | URL | Actions
   }

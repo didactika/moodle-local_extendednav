@@ -32,7 +32,7 @@ extends:
 
 ## Context
 
-The order of the list is the order of the menu. An administrator presses the arrow buttons of the row of an item, and the submenus stay together.
+The order of the list is the order of the menu. The list shows every item, without pages. An administrator drags an item by its handle, alone or with the items selected among its siblings, or moves it with the arrow keys on its handle; the submenus stay together.
 
 ## Preconditions
 
@@ -48,7 +48,7 @@ The order of the list is the order of the menu. An administrator presses the arr
 
 | Step | Actor | System |
 | --- | --- | --- |
-| 1 | Presses **Move up** or **Move down** on the row of an item. | Computes the new order among its siblings. |
+| 1 | Drags an item by its handle and drops it over or under a sibling. | Takes with it the items selected among its siblings, in their order, and computes the new order. |
 | 2 |  | Saves the order through the web-service function. |
 | 3 |  | Keeps a parent with its submenu items, and draws the list again. |
 
@@ -56,8 +56,9 @@ The order of the list is the order of the menu. An administrator presses the arr
 
 | ID | Starts at step | Condition | Behaviour | Ends |
 | --- | --- | --- | --- | --- |
-| A1 | 1 | A search or a filter is applied. | The buttons are off. | Step 1 |
+| A1 | 1 | A search or a filter is applied, or the screen is narrower than 768 px. | The handles are not shown. | Step 1 |
 | A2 | 2 | The server refuses the order. | Shows the error and keeps the list as it was. | Step 1 |
+| A3 | 1 | The administrator presses the up or down arrow key on the handle. | Moves the item one place among its siblings. | Step 2 |
 
 ## Business rules
 

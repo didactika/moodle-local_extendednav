@@ -47,7 +47,7 @@ Una navegación cuesta trabajo construirla. Un administrador exporta sus element
 
 | Paso | Actor | Sistema |
 | --- | --- | --- |
-| 1 | Elige **Exportar todo**, o selecciona elementos y **Exportar los seleccionados**. | Escribe un archivo YAML con cada elemento y su posición. |
+| 1 | Abre **Exportar** y elige **Esta navegación** o **Todas las navegaciones**. | Escribe un único archivo YAML, con el mismo formato para ambos, con cada elemento, su navegación y su posición, y si cada navegación está activada. |
 | 2 | Elige **Importar**, sube un archivo y elige qué hacer con los elementos existentes. | Lee el archivo y valida cada elemento. |
 | 3 |  | Crea, actualiza u omite cada elemento, conservando su posición. |
 | 4 |  | Muestra los recuentos y las advertencias, como un idioma que no está instalado. |

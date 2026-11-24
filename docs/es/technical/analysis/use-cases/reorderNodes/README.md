@@ -19,7 +19,7 @@ Requisitos: [README](../../../requirements/use-cases/reorderNodes/README.md)
 
 | Clase | Estereotipo | Responsabilidad |
 | --- | --- | --- |
-| Página de gestión | frontera | Muestra los botones de flecha de cada fila. |
+| Página de gestión | frontera | Muestra el asa de cada fila y mueve las filas soltadas, con las filas seleccionadas entre sus hermanas. |
 | Servicio de orden | control | Recibe los ids en su nuevo orden. |
 | Gestor de nodos | control | Escribe las posiciones. |
 | Nodo | entidad | El elemento que se mueve. |

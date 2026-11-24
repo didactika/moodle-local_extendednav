@@ -1,13 +1,21 @@
 ---
 title: Activity log
-summary: See who created, changed or deleted each item, and when.
+summary: See who created, changed or deleted each node of a navigation, and when.
 order: 60
 ---
 
-On the management page, select **Activity log**. The two tabs show the log of the primary navigation and the log of the user menu.
+On the management page, select **Activity log**. The column to the left chooses the navigation, as on the management page.
 
-<Screenshot src="asset:activity.webp" alt="The activity log of the primary navigation, with the time, the user, the action and the description of each change" caption="The activity log: one row per change." url="/local/extendednav/activity.php" />
+<Screenshot src="asset:activity.webp" alt="The activity log of the primary navigation, with the time, the node, the action, the person and the IP address of each change" caption="The activity log: one row per change, the newest first." url="/local/extendednav/activity.php" />
 
-Each row shows the time, the user, the action (created, updated or deleted), the event and the description. Filter by a period and by action, and sort by time.
+Each row shows when the change was made, the node (a link to its form while it exists), the action (**Created**, **Updated** or **Deleted**), who made it and from which IP address. Select the column **Time** to put the oldest changes first.
 
-The changes of the items are recorded as events in the log store of the site, which the activity log reads, so they follow the retention settings of your log.
+| Filter | What it does |
+|---|---|
+| Search | Finds a node by its key, or a person by their name |
+| **Action** | Shows only the changes of the actions chosen, with the number of each |
+| **Date** | Today, the last 7 days, this month, the last 30 days, or two days of your own |
+
+The button at the end of the row of filters clears them. On a narrow screen the menus are grouped in one menu, **Filters**. Nothing reloads the page.
+
+The changes are recorded as events in the standard log of the site, which the activity log reads, so they follow the retention settings of the log. If the standard log is disabled, the page says so.

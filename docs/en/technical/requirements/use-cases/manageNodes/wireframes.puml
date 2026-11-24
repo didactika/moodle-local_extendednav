@@ -2,7 +2,7 @@
 {
   {* Primary navigation | User menu }
   ==
-  [ Add node ] | [ Import ] | [ Export all ] | [ Activity log ]
+  [ Add node ] | [ Import ] | [ Export v ] | [ Activity log ]
   {#
     Title | Visibility | Node key | URL | Actions
     Training | Visible to everyone | training | /course/index.php | [edit] [delete]

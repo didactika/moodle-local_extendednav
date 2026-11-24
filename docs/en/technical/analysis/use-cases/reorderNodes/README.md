@@ -19,7 +19,7 @@ Requirements: [README](../../../requirements/use-cases/reorderNodes/README.md)
 
 | Class | Stereotype | Responsibility |
 | --- | --- | --- |
-| Management page | boundary | Shows the arrow buttons of each row. |
+| Management page | boundary | Shows the handle of each row and moves the rows dropped, with the rows selected among their siblings. |
 | Reorder service | control | Receives the ids in their new order. |
 | Node manager | control | Writes the positions. |
 | Node | entity | The item that moves. |

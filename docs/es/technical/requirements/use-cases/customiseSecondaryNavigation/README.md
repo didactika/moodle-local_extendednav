@@ -58,7 +58,7 @@ Las navegaciones que Moodle dibuja bajo la cabecera de una página dependen de l
 | ID | Empieza en el paso | Condición | Comportamiento | Termina |
 | --- | --- | --- | --- | --- |
 | A1 | 1 | La navegación aún no tiene nodos. | La lista explica que los nodos de Moodle aparecen cuando una página los muestra, y ofrece añadir un nodo. | Paso 1 |
-| A2 | 2 | La navegación es la administración del sitio. | Un nodo solo se puede ocultar y ordenar; no hay formulario ni nodos propios. | Paso 1 |
+| A2 | 2 | La navegación es la administración del sitio. | La lista muestra un nivel del árbol; el primer nivel agrupa bajo General los elementos de la pestaña General de Moodle. | Paso 2 |
 | A3 | 2 | El servidor rechaza el cambio. | Muestra el error y deja la lista como estaba. | Paso 1 |
 
 ## Reglas de negocio
@@ -66,7 +66,7 @@ Las navegaciones que Moodle dibuja bajo la cabecera de una página dependen de l
 | ID | Regla |
 | --- | --- |
 | RN-009 | Un nodo de una navegación secundaria se encuentra cuando una página lo muestra, una sola vez, y desde entonces tiene una fila que se puede cambiar. |
-| RN-010 | En la navegación de la administración del sitio un nodo solo se puede ocultar y ordenar. |
+| RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada. |
 | RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. |
 
 ## Especificación
