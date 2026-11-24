@@ -17,11 +17,11 @@
 namespace local_extendednav\menu;
 
 use local_extendednav\hooks;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_icon;
-use local_extendednav\local\node_text;
-use local_extendednav\local\url_helper;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\text;
+use local_extendednav\local\support\url_helper;
 
 /**
  * The primary navigation.
@@ -449,15 +449,15 @@ class primary extends base {
      */
     private function build_state(\stdClass $cnode): \stdClass {
         $state = new \stdClass();
-        $state->shown = node_access::is_shown($cnode);
-        $state->title = node_text::get_title($cnode);
-        $state->tooltip = node_text::resolve($cnode->tooltip ?? '');
+        $state->shown = access::is_shown($cnode);
+        $state->title = text::get_title($cnode);
+        $state->tooltip = text::resolve($cnode->tooltip ?? '');
         $state->url = trim((string)($cnode->url ?? '')) === '' ? null : trim((string)$cnode->url);
         $state->icon = trim((string)($cnode->icon ?? ''));
         $state->parentkey = trim((string)($cnode->parentkey ?? '')) === '' ? null : trim((string)$cnode->parentkey);
-        $state->linkattributes = node_display::get_link_attributes($cnode);
+        $state->linkattributes = display::get_link_attributes($cnode);
 
-        if (node_access::is_protected($cnode)) {
+        if (access::is_protected($cnode)) {
             $state->parentkey = null;
         }
         if ($state->parentkey === 'siteadminnode') {
@@ -473,7 +473,7 @@ class primary extends base {
      * @return string HTML.
      */
     private function render_icon(string $icon): string {
-        $html = node_icon::render($icon);
+        $html = icon::render($icon);
         return $html === '' ? '' : $html . ' ';
     }
 }

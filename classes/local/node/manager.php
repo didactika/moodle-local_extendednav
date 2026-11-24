@@ -14,12 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 use local_extendednav\event\node_created;
 use local_extendednav\event\node_deleted;
 use local_extendednav\event\node_updated;
 use local_extendednav\menu_manager;
+use local_extendednav\local\listing\nodes;
+use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\support\url_helper;
 
 /**
  * Creates, updates, deletes and reorders nodes.
@@ -31,7 +34,7 @@ use local_extendednav\menu_manager;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_manager {
+class manager {
     /** @var string[] Fields an administrator can set on a node. */
     public const EDITABLE_FIELDS = [
         'nodekey', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
@@ -58,7 +61,7 @@ class node_manager {
             return $value === '' ? null : $value;
         };
         $list = static function ($value): ?string {
-            $items = is_array($value) ? $value : node_access::split_list((string)$value);
+            $items = is_array($value) ? $value : access::split_list((string)$value);
             $items = array_values(array_unique(array_filter(array_map('trim', array_map('strval', $items)))));
             return empty($items) ? null : implode(',', $items);
         };
@@ -70,12 +73,12 @@ class node_manager {
         $record->tooltip = $text($data['tooltip'] ?? null);
         $record->url = url_helper::normalise($text($data['url'] ?? null));
         $record->icon = $text($data['icon'] ?? null);
-        $record->visibility = isset($data['visibility']) ? (int)$data['visibility'] : node_access::VISIBILITY_ALL;
-        $record->roles = $record->visibility === node_access::VISIBILITY_ROLES ? $list($data['roles'] ?? null) : null;
+        $record->visibility = isset($data['visibility']) ? (int)$data['visibility'] : access::VISIBILITY_ALL;
+        $record->roles = $record->visibility === access::VISIBILITY_ROLES ? $list($data['roles'] ?? null) : null;
         $record->langs = $list($data['langs'] ?? null);
         $record->parentkey = $text($data['parentkey'] ?? null);
         $record->display = isset($data['display']) && is_numeric($data['display']) ? (int)$data['display']
-            : node_display::CURRENT;
+            : display::CURRENT;
         $size = static function ($value): ?int {
             if ($value === null || (is_string($value) && trim($value) === '')) {
                 return null;
@@ -83,7 +86,7 @@ class node_manager {
             // Anything that is not a whole number is kept as 0, so validation reports it.
             return is_numeric($value) && (int)$value == $value ? (int)$value : 0;
         };
-        $popup = $record->display === node_display::POPUP;
+        $popup = $record->display === display::POPUP;
         $record->popupwidth = $popup ? $size($data['popupwidth'] ?? null) : null;
         $record->popupheight = $popup ? $size($data['popupheight'] ?? null) : null;
 
@@ -100,7 +103,7 @@ class node_manager {
         }
 
         $record->blockaccess = 0;
-        if (!empty($data['blockaccess']) && $record->visibility !== node_access::VISIBILITY_ALL) {
+        if (!empty($data['blockaccess']) && $record->visibility !== access::VISIBILITY_ALL) {
             $record->blockaccess = empty(access_guard::get_node_paths($record)) ? 0 : 1;
         }
         return $record;
@@ -129,7 +132,7 @@ class node_manager {
         $record->timemodified = $record->timecreated;
         $record->id = (int)$DB->insert_record('local_extendednav', $record);
 
-        node_repository::purge();
+        repository::purge();
         if ($events) {
             node_created::create_from_record($record)->trigger();
         }
@@ -151,7 +154,7 @@ class node_manager {
         $DB->update_record('local_extendednav', $record);
 
         $saved = $DB->get_record('local_extendednav', ['id' => $record->id], '*', MUST_EXIST);
-        node_repository::purge();
+        repository::purge();
         if ($events) {
             node_updated::create_from_record($saved)->trigger();
         }
@@ -227,7 +230,7 @@ class node_manager {
                 self::reorder($menukey, $orders[$menukey]);
             }
         }
-        node_repository::purge();
+        repository::purge();
 
         if ($events) {
             foreach ($todelete as $record) {
@@ -298,7 +301,7 @@ class node_manager {
             }
         }
         $transaction->allow_commit();
-        node_repository::purge();
+        repository::purge();
     }
 
     /**
@@ -439,10 +442,10 @@ class node_manager {
             return $row;
         }
         if ($contextid === 0) {
-            return self::create(self::prepare(['nodekey' => $nodekey, 'visibility' => node_access::VISIBILITY_ALL], $menu), false);
+            return self::create(self::prepare(['nodekey' => $nodekey, 'visibility' => access::VISIBILITY_ALL], $menu), false);
         }
-        $seen = node_list::get_scope_nodes($menu, $contextid)[$nodekey] ?? null;
-        $defaults = ['nodekey' => $nodekey, 'visibility' => node_access::VISIBILITY_ALL];
+        $seen = nodes::get_scope_nodes($menu, $contextid)[$nodekey] ?? null;
+        $defaults = ['nodekey' => $nodekey, 'visibility' => access::VISIBILITY_ALL];
         $copy = $seen === null ? self::prepare($defaults, $menu) : clone $seen;
         unset($copy->id, $copy->timecreated, $copy->timemodified);
         $copy->contextid = $contextid;
@@ -459,7 +462,7 @@ class node_manager {
      * @param string $menu Menu key.
      * @param int $contextid Context of the scope, 0 for the whole site.
      * @param string[] $nodekeys Node keys.
-     * @param int $visibility One of the visibilities of node_access.
+     * @param int $visibility One of the visibilities of access.
      * @param int $hideadmins 1 to hide the nodes from administrators too, 0 not to, -1 to leave it as it is.
      * @return int Number of nodes changed.
      */
@@ -473,11 +476,11 @@ class node_manager {
         $changed = 0;
         foreach (array_unique($nodekeys) as $nodekey) {
             $row = self::ensure_row($menu, (string)$nodekey, $contextid);
-            if (node_access::is_protected($row)) {
+            if (access::is_protected($row)) {
                 continue;
             }
             $values = ['id' => $row->id, 'visibility' => $visibility];
-            $values['roles'] = $visibility === node_access::VISIBILITY_ROLES ? $row->roles : null;
+            $values['roles'] = $visibility === access::VISIBILITY_ROLES ? $row->roles : null;
             if ($hideadmins === 0 || $hideadmins === 1) {
                 $values['hideadmins'] = $hideadmins;
             }
@@ -496,8 +499,8 @@ class node_manager {
      * @param int $direction -1 to move it up, 1 to move it down.
      */
     public static function move(string $menu, int $contextid, string $nodekey, int $direction): void {
-        $keys = array_keys(node_list::get_scope_nodes($menu, $contextid));
-        $nodes = node_list::get_scope_nodes($menu, $contextid);
+        $keys = array_keys(nodes::get_scope_nodes($menu, $contextid));
+        $nodes = nodes::get_scope_nodes($menu, $contextid);
         $parent = (string)($nodes[$nodekey]->parentkey ?? '');
         // The siblings of the node, in order, and the position of the node among them.
         $siblings = array_values(array_filter(
@@ -538,7 +541,7 @@ class node_manager {
      * @param string $afterkey Key of the sibling they go after, instead of a sibling they go before.
      */
     public static function place(string $menu, int $contextid, array $nodekeys, string $beforekey, string $afterkey = ''): void {
-        $nodes = node_list::get_scope_nodes($menu, $contextid);
+        $nodes = nodes::get_scope_nodes($menu, $contextid);
         $nodekeys = array_values(array_unique(array_map('strval', $nodekeys)));
         if (empty($nodekeys) || array_diff($nodekeys, array_keys($nodes))) {
             throw new \invalid_parameter_exception('Unknown node.');
@@ -606,7 +609,7 @@ class node_manager {
      * @return \stdClass[]
      */
     public static function get_all_with(\stdClass $candidate, int $id = 0): array {
-        $nodes = node_repository::get_all();
+        $nodes = repository::get_all();
         foreach ($nodes as $key => $node) {
             if (
                 ($id && (int)$node->id === $id)

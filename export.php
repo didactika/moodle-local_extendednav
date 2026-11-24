@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_extendednav\local\node_importer;
+use local_extendednav\local\io\importer;
 use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -42,7 +42,7 @@ if (menu_manager::get_menu($menukey) === null) {
 $manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
 $menukeys = $everything ? array_keys(menu_manager::get_menus()) : [$menukey];
-$content = node_importer::export_file($menukeys);
+$content = importer::export_file($menukeys);
 if ($content === null) {
     redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }

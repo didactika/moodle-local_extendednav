@@ -14,9 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\support\url_helper;
 
 /**
  * Validation rules shared by the node form, the YAML import and the config sync.
@@ -26,7 +27,7 @@ use local_extendednav\menu_manager;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_validator {
+class validator {
     /** @var string Pattern of a FontAwesome icon, such as "fa-book" or "fa-solid fa-house". */
     private const ICON_FONTAWESOME = '~^(fa[a-z]?(-[a-z]+)?\s+)?fa-[a-z0-9-]+(\s+fa-[a-z0-9-]+)*$~';
 
@@ -39,7 +40,7 @@ class node_validator {
     /**
      * Validates one node.
      *
-     * @param \stdClass $node Node as it would be saved (see {@see node_manager::prepare()}).
+     * @param \stdClass $node Node as it would be saved (see {@see manager::prepare()}).
      * @param \stdClass[] $others The other nodes of the same menu, keyed by nodekey.
      * @return array With keys 'errors' (field => message) and 'warnings' (list of messages).
      */
@@ -103,19 +104,19 @@ class node_validator {
 
         $visibility = (int)$node->visibility;
         if (
-            !in_array($visibility, [node_access::VISIBILITY_HIDDEN, node_access::VISIBILITY_ALL,
-                node_access::VISIBILITY_ROLES], true)
+            !in_array($visibility, [access::VISIBILITY_HIDDEN, access::VISIBILITY_ALL,
+                access::VISIBILITY_ROLES], true)
         ) {
             $errors['visibility'] = get_string('err_invalid_visibility', 'local_extendednav');
         }
 
-        $roles = node_access::split_list($node->roles ?? '');
+        $roles = access::split_list($node->roles ?? '');
         foreach ($roles as $role) {
             if (clean_param($role, PARAM_ALPHANUMEXT) !== $role) {
                 $errors['roles'] = get_string('err_invalid_list', 'local_extendednav');
             }
         }
-        if (!isset($errors['roles']) && $visibility === node_access::VISIBILITY_ROLES) {
+        if (!isset($errors['roles']) && $visibility === access::VISIBILITY_ROLES) {
             if (empty($roles)) {
                 $errors['roles'] = get_string('required');
             } else {
@@ -126,7 +127,7 @@ class node_validator {
         }
 
         $installed = get_string_manager()->get_list_of_translations();
-        foreach (node_access::split_list($node->langs ?? '') as $lang) {
+        foreach (access::split_list($node->langs ?? '') as $lang) {
             if (!preg_match('/^[a-z0-9_]+$/', $lang)) {
                 $errors['langs'] = get_string('err_invalid_list', 'local_extendednav');
             } else if (!isset($installed[$lang])) {
@@ -134,16 +135,16 @@ class node_validator {
             }
         }
 
-        $display = (int)($node->display ?? node_display::CURRENT);
-        if (!node_display::is_valid($display)) {
+        $display = (int)($node->display ?? display::CURRENT);
+        if (!display::is_valid($display)) {
             $errors['display'] = get_string('err_invalid_display', 'local_extendednav');
-        } else if ($display === node_display::POPUP) {
+        } else if ($display === display::POPUP) {
             foreach (['popupwidth', 'popupheight'] as $field) {
                 $value = $node->$field ?? null;
-                if (!node_display::is_valid_size($value === null ? null : (int)$value)) {
+                if (!display::is_valid_size($value === null ? null : (int)$value)) {
                     $errors[$field] = get_string('err_popup_size', 'local_extendednav', (object)[
-                        'min' => node_display::MIN_SIZE,
-                        'max' => node_display::MAX_SIZE,
+                        'min' => display::MIN_SIZE,
+                        'max' => display::MAX_SIZE,
                     ]);
                 }
             }
@@ -151,10 +152,10 @@ class node_validator {
 
         $errors += self::validate_parent($node, $others);
 
-        if (node_access::is_protected($node)) {
+        if (access::is_protected($node)) {
             if (
-                $visibility !== node_access::VISIBILITY_ALL || !empty($node->blockaccess)
-                    || !empty(node_access::split_list($node->langs ?? ''))
+                $visibility !== access::VISIBILITY_ALL || !empty($node->blockaccess)
+                    || !empty(access::split_list($node->langs ?? ''))
             ) {
                 $errors['visibility'] = get_string('err_admin_hide', 'local_extendednav');
             }
@@ -230,7 +231,7 @@ class node_validator {
             }
         }
 
-        $isadmin = node_access::is_protected($node);
+        $isadmin = access::is_protected($node);
         if ($isadmin && $haschildren) {
             return ['parentkey' => get_string('err_admin_parent', 'local_extendednav')];
         }

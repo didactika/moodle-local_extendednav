@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node\manager::class)]
 /**
  * Tests for saving, deleting and ordering nodes.
  *
@@ -25,9 +25,9 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_manager
+ * @covers     \local_extendednav\local\node\manager
  */
-final class node_manager_test extends \advanced_testcase {
+final class manager_test extends \advanced_testcase {
     /**
      * Finds Moodle's primary navigation items for the tests.
      */
@@ -43,7 +43,7 @@ final class node_manager_test extends \advanced_testcase {
     public function test_prepare(): void {
         $this->resetAfterTest();
 
-        $record = node_manager::prepare([
+        $record = manager::prepare([
             'nodekey' => ' help ',
             'title' => '  ',
             'url' => 'course/view.php?id=2',
@@ -68,9 +68,9 @@ final class node_manager_test extends \advanced_testcase {
         $this->assertSame(800, $record->popupwidth);
         $this->assertNull($record->popupheight);
 
-        $record = node_manager::prepare(['nodekey' => 'help', 'display' => '1', 'popupwidth' => '800'], 'primary');
+        $record = manager::prepare(['nodekey' => 'help', 'display' => '1', 'popupwidth' => '800'], 'primary');
         $this->assertNull($record->popupwidth, 'The size only applies to pop-ups.');
-        $this->assertSame(0, node_manager::prepare(['nodekey' => 'help'], 'primary')->display);
+        $this->assertSame(0, manager::prepare(['nodekey' => 'help'], 'primary')->display);
     }
 
     /**
@@ -79,14 +79,14 @@ final class node_manager_test extends \advanced_testcase {
     public function test_prepare_block_access(): void {
         $this->resetAfterTest();
 
-        $hidden = node_manager::prepare(['nodekey' => 'x', 'url' => '/x.php', 'visibility' => 0, 'blockaccess' => 1], 'primary');
+        $hidden = manager::prepare(['nodekey' => 'x', 'url' => '/x.php', 'visibility' => 0, 'blockaccess' => 1], 'primary');
         $this->assertSame(1, $hidden->blockaccess);
 
-        $external = node_manager::prepare(['nodekey' => 'x', 'url' => 'https://example.org/', 'visibility' => 0,
+        $external = manager::prepare(['nodekey' => 'x', 'url' => 'https://example.org/', 'visibility' => 0,
             'blockaccess' => 1], 'primary');
         $this->assertSame(0, $external->blockaccess, 'External URLs cannot be blocked.');
 
-        $core = node_manager::prepare(['nodekey' => 'myhome', 'visibility' => 2, 'roles' => 'manager',
+        $core = manager::prepare(['nodekey' => 'myhome', 'visibility' => 2, 'roles' => 'manager',
             'blockaccess' => 1], 'primary');
         $this->assertSame(1, $core->blockaccess, 'Core nodes block their core URL.');
         $this->assertSame('manager', $core->roles);
@@ -99,14 +99,14 @@ final class node_manager_test extends \advanced_testcase {
         $this->resetAfterTest();
         $sink = $this->redirectEvents();
 
-        $created = node_manager::create(node_manager::prepare(
+        $created = manager::create(manager::prepare(
             ['nodekey' => 'help', 'title' => 'Help', 'url' => '/h.php'],
             'primary'
         ));
         $this->assertGreaterThan(0, $created->timecreated);
         $this->assertSame($created->timecreated, $created->timemodified);
 
-        $updated = node_manager::update((object)['id' => $created->id, 'title' => 'Help desk']);
+        $updated = manager::update((object)['id' => $created->id, 'title' => 'Help desk']);
         $this->assertSame('Help desk', $updated->title);
         $this->assertSame('/h.php', $updated->url);
 
@@ -123,7 +123,7 @@ final class node_manager_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $max = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', ['primary']);
-        $node = node_manager::create(node_manager::prepare(
+        $node = manager::create(manager::prepare(
             ['nodekey' => 'last', 'title' => 'Last', 'url' => '/l.php'],
             'primary'
         ), false);
@@ -142,7 +142,7 @@ final class node_manager_test extends \advanced_testcase {
         $custom = $generator->create_node(['nodekey' => 'help', 'title' => 'Help', 'url' => '/h.php']);
         $core = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'myhome']);
 
-        $this->assertSame(1, node_manager::delete([$custom, $core]));
+        $this->assertSame(1, manager::delete([$custom, $core]));
         $this->assertFalse($DB->record_exists('local_extendednav', ['id' => $custom->id]));
         $this->assertTrue($DB->record_exists('local_extendednav', ['id' => $core->id]));
     }
@@ -162,7 +162,7 @@ final class node_manager_test extends \advanced_testcase {
         )));
         $reversed = array_reverse($ids);
 
-        node_manager::reorder('primary', $reversed);
+        manager::reorder('primary', $reversed);
         $this->assertSame($reversed, array_map('intval', array_keys($DB->get_records(
             'local_extendednav',
             ['menu' => 'primary'],
@@ -170,7 +170,7 @@ final class node_manager_test extends \advanced_testcase {
             'id'
         ))));
 
-        node_manager::reorder('primary', [$ids[1]]);
+        manager::reorder('primary', [$ids[1]]);
         $expected = array_merge([$ids[1]], array_values(array_diff($reversed, [$ids[1]])));
         $this->assertSame($expected, array_map('intval', array_keys($DB->get_records(
             'local_extendednav',
@@ -189,7 +189,7 @@ final class node_manager_test extends \advanced_testcase {
         global $DB;
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'primary']);
-        return array_map(static fn(\stdClass $node): string => $node->nodekey, node_manager::group_by_parent($nodes));
+        return array_map(static fn(\stdClass $node): string => $node->nodekey, manager::group_by_parent($nodes));
     }
 
     /**
@@ -207,7 +207,7 @@ final class node_manager_test extends \advanced_testcase {
         $generator->create_node(['nodekey' => 'c', 'title' => 'C', 'url' => '/c.php', 'sortorder' => 3]);
         $generator->create_node(['nodekey' => 'b2', 'title' => 'B2', 'url' => '/b2.php', 'sortorder' => 4]);
         $DB->set_field_select('local_extendednav', 'parentkey', 'b', "nodekey IN ('b1', 'b2')");
-        node_repository::purge();
+        repository::purge();
     }
 
     /**
@@ -220,7 +220,7 @@ final class node_manager_test extends \advanced_testcase {
 
         // A child whose parent is missing is shown as a top-level node.
         $orphan = (object)['id' => 99, 'nodekey' => 'x', 'parentkey' => 'missing', 'sortorder' => 0];
-        $this->assertSame('x', node_manager::group_by_parent([$orphan])[0]->nodekey);
+        $this->assertSame('x', manager::group_by_parent([$orphan])[0]->nodekey);
     }
 
     /**
@@ -234,12 +234,12 @@ final class node_manager_test extends \advanced_testcase {
 
         $before = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'a']);
         $DB->set_field('local_extendednav', 'parentkey', 'b', ['id' => $before->id]);
-        node_manager::place_after_parent_change($before, 'b');
+        manager::place_after_parent_change($before, 'b');
         $this->assertSame(['b', 'b1', 'b2', 'a', 'c'], $this->get_shown_keys());
 
         $before = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'b1']);
         $DB->set_field('local_extendednav', 'parentkey', null, ['id' => $before->id]);
-        node_manager::place_after_parent_change($before, '');
+        manager::place_after_parent_change($before, '');
         $this->assertSame(['b', 'b2', 'a', 'b1', 'c'], $this->get_shown_keys());
     }
 
@@ -251,7 +251,7 @@ final class node_manager_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $this->create_tree();
-        node_manager::delete([$DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'b'])]);
+        manager::delete([$DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'b'])]);
 
         $this->assertSame(['a', 'b1', 'b2', 'c'], $this->get_shown_keys());
         $this->assertSame(0, $DB->count_records_select('local_extendednav', "menu = 'primary' AND parentkey IS NOT NULL"));

@@ -14,10 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\support;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\icon_catalogue::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node_icon::class)]
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\validator;
+
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\support\icon_catalogue::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\node\icon::class)]
 /**
  * Tests for the icons of the icon picker and how node icons are shown.
  *
@@ -26,8 +29,8 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\icon_catalogue
- * @covers     \local_extendednav\local\node_icon
+ * @covers     \local_extendednav\local\support\icon_catalogue
+ * @covers     \local_extendednav\local\node\icon
  */
 final class icon_catalogue_test extends \advanced_testcase {
     /**
@@ -40,7 +43,7 @@ final class icon_catalogue_test extends \advanced_testcase {
         $this->assertArrayHasKey('core:i/home', $icons);
         $this->assertStringContainsString(trim(explode(' ', trim($map['core:i/home']))[0]), $icons['core:i/home']['classes']);
         foreach (array_keys($icons) as $value) {
-            $this->assertTrue(node_validator::is_valid_icon($value), $value);
+            $this->assertTrue(validator::is_valid_icon($value), $value);
         }
     }
 
@@ -62,7 +65,7 @@ final class icon_catalogue_test extends \advanced_testcase {
         $values = array_merge(array_column($catalogue['fontawesome'], 'value'), array_column($catalogue['brands'], 'value'));
         $this->assertSame(count($values), count(array_unique($values)));
         foreach ($values as $value) {
-            $this->assertTrue(node_validator::is_fontawesome($value), $value);
+            $this->assertTrue(validator::is_fontawesome($value), $value);
         }
     }
 
@@ -82,19 +85,19 @@ final class icon_catalogue_test extends \advanced_testcase {
     public function test_node_icons(): void {
         $map = \core\output\icon_system::instance(\core\output\icon_system::FONTAWESOME)->get_icon_name_map();
 
-        $this->assertStringContainsString('fa-book', node_icon::render('fa-book'));
-        $this->assertNotSame('', node_icon::render('core:i/home'));
-        $this->assertSame(node_icon::render('i/home'), node_icon::render('core:i/home'), 'Core icons need no component.');
-        $big = node_icon::render('core:b/document-properties');
+        $this->assertStringContainsString('fa-book', icon::render('fa-book'));
+        $this->assertNotSame('', icon::render('core:i/home'));
+        $this->assertSame(icon::render('i/home'), icon::render('core:i/home'), 'Core icons need no component.');
+        $big = icon::render('core:b/document-properties');
         $this->assertStringContainsString('fa-wrench', $big);
         $this->assertStringNotContainsString('iconsize-big', $big, 'Big Moodle icons are shown at menu size.');
-        $this->assertSame('', node_icon::render('none'));
-        $this->assertSame('', node_icon::render('<b>x</b>'));
+        $this->assertSame('', icon::render('none'));
+        $this->assertSame('', icon::render('<b>x</b>'));
 
-        $this->assertSame('fa-brands fa-github', node_icon::get_fontawesome_classes('fa-brands fa-github'));
-        $this->assertSame(trim($map['core:i/home']), node_icon::get_fontawesome_classes('core:i/home'));
-        $this->assertSame(trim($map['core:i/home']), node_icon::get_fontawesome_classes('i/home'));
-        $this->assertNull(node_icon::get_fontawesome_classes('core:i/doesnotexist'));
-        $this->assertNull(node_icon::get_fontawesome_classes(''));
+        $this->assertSame('fa-brands fa-github', icon::get_fontawesome_classes('fa-brands fa-github'));
+        $this->assertSame(trim($map['core:i/home']), icon::get_fontawesome_classes('core:i/home'));
+        $this->assertSame(trim($map['core:i/home']), icon::get_fontawesome_classes('i/home'));
+        $this->assertNull(icon::get_fontawesome_classes('core:i/doesnotexist'));
+        $this->assertNull(icon::get_fontawesome_classes(''));
     }
 }

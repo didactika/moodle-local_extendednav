@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\listing;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\navigation\injector;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
 
 /**
  * Tests for the list of the nodes of a navigation.
@@ -25,10 +28,10 @@ use local_extendednav\menu_manager;
  * @category   test
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_list
+ * @covers     \local_extendednav\local\listing\nodes
  * @covers     \local_extendednav\menu\secondary
  */
-final class node_list_test extends \advanced_testcase {
+final class nodes_test extends \advanced_testcase {
     /**
      * Records nodes a course navigation shows.
      *
@@ -66,22 +69,22 @@ final class node_list_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $this->see_nodes(['participants', 'grades', 'badges']);
-        node_manager::set_visibility('course', 0, ['badges'], node_access::VISIBILITY_HIDDEN);
+        manager::set_visibility('course', 0, ['badges'], access::VISIBILITY_HIDDEN);
 
-        $all = node_list::get('course', 0);
+        $all = nodes::get('course', 0);
         $this->assertSame(3, $all['total']);
         $this->assertSame(['all' => 3, 'visible' => 2, 'roles' => 0, 'hidden' => 1], $all['counts']);
         $this->assertTrue($all['reorderable']);
 
-        $found = node_list::get('course', 0, 'grad');
+        $found = nodes::get('course', 0, 'grad');
         $this->assertSame(['grades'], array_column($found['rows'], 'nodekey'));
         $this->assertFalse($found['reorderable'], 'A part of the list is not moved.');
 
-        $hidden = node_list::get('course', 0, '', '0');
+        $hidden = nodes::get('course', 0, '', '0');
         $this->assertSame(['badges'], array_column($hidden['rows'], 'nodekey'));
         $this->assertSame(3, $hidden['counts']['all'], 'The counts do not depend on the visibility chosen.');
 
-        $both = node_list::get('course', 0, '', '0,1');
+        $both = nodes::get('course', 0, '', '0,1');
         $this->assertSame(3, $both['total']);
     }
 
@@ -93,24 +96,24 @@ final class node_list_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->see_nodes(['one', 'two', 'three']);
 
-        $page = node_list::get('course', 0, '', '', '', 1, 2);
+        $page = nodes::get('course', 0, '', '', '', 1, 2);
 
         $this->assertSame(3, $page['total']);
         $this->assertSame(['three'], array_column($page['rows'], 'nodekey'));
         $this->assertTrue($page['rows'][0]['last']);
-        $this->assertFalse(node_list::get('course', 0)['rows'][1]['first']);
-        $this->assertTrue(node_list::get('course', 0)['rows'][0]['first']);
+        $this->assertFalse(nodes::get('course', 0)['rows'][1]['first']);
+        $this->assertTrue(nodes::get('course', 0)['rows'][0]['first']);
     }
 
     /**
      * Only the navigations of a course, an activity and a category have exceptions.
      */
     public function test_which_navigations_have_scopes(): void {
-        $this->assertTrue(node_list::supports_scopes('course'));
-        $this->assertTrue(node_list::supports_scopes('activity'));
-        $this->assertTrue(node_list::supports_scopes('category'));
-        $this->assertFalse(node_list::supports_scopes('primary'));
-        $this->assertFalse(node_list::supports_scopes('admin'));
+        $this->assertTrue(nodes::supports_scopes('course'));
+        $this->assertTrue(nodes::supports_scopes('activity'));
+        $this->assertTrue(nodes::supports_scopes('category'));
+        $this->assertFalse(nodes::supports_scopes('primary'));
+        $this->assertFalse(nodes::supports_scopes('admin'));
     }
 
     /**
@@ -122,12 +125,12 @@ final class node_list_test extends \advanced_testcase {
         $category = $this->getDataGenerator()->create_category();
         $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
 
-        $this->assertSame('course', secondary_navigation::get_origin(\context_course::instance($course->id), (int)$course->id));
-        $this->assertSame('frontpage', secondary_navigation::get_origin(\context_course::instance(SITEID), SITEID));
-        $this->assertSame('activity', secondary_navigation::get_origin(\context_module::instance($page->cmid), (int)$course->id));
-        $this->assertSame('category', secondary_navigation::get_origin(\context_coursecat::instance($category->id), 0));
+        $this->assertSame('course', injector::get_origin(\context_course::instance($course->id), (int)$course->id));
+        $this->assertSame('frontpage', injector::get_origin(\context_course::instance(SITEID), SITEID));
+        $this->assertSame('activity', injector::get_origin(\context_module::instance($page->cmid), (int)$course->id));
+        $this->assertSame('category', injector::get_origin(\context_coursecat::instance($category->id), 0));
         // The site administration is shaped through its tree, not through its bar.
-        $this->assertNull(secondary_navigation::get_origin(\context_system::instance(), SITEID));
-        $this->assertNull(secondary_navigation::get_origin(\context_user::instance(get_admin()->id), SITEID));
+        $this->assertNull(injector::get_origin(\context_system::instance(), SITEID));
+        $this->assertNull(injector::get_origin(\context_user::instance(get_admin()->id), SITEID));
     }
 }

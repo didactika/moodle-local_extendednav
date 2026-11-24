@@ -16,10 +16,10 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_icon;
-use local_extendednav\local\node_text;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\text;
 
 /**
  * The user menu.
@@ -149,14 +149,14 @@ class usermenu extends base {
         $natives = $this->get_native_nodes();
         $lines = [];
         foreach ($customnodes as $node) {
-            if (!empty($node->parentkey) || !node_access::is_shown($node)) {
+            if (!empty($node->parentkey) || !access::is_shown($node)) {
                 continue;
             }
             $native = $natives[$node->nodekey] ?? null;
 
             // Keep the "identifier,component" form of core items so Moodle translates them itself.
             if (trim((string)$node->title) !== '') {
-                $title = format_string(node_text::resolve($node->title), true, ['escape' => false]);
+                $title = format_string(text::resolve($node->title), true, ['escape' => false]);
             } else {
                 $title = $native ? $native->text : '';
             }
@@ -181,7 +181,7 @@ class usermenu extends base {
         $roots = [];
         $children = [];
         foreach ($customnodes as $node) {
-            if (!node_access::is_shown($node)) {
+            if (!access::is_shown($node)) {
                 continue;
             }
             if (empty($node->parentkey)) {
@@ -195,19 +195,19 @@ class usermenu extends base {
         foreach ($roots as $nodekey => $node) {
             $haschildren = !empty($children[$nodekey]);
             $icon = trim((string)$node->icon);
-            $tooltip = node_text::resolve($node->tooltip ?? '');
+            $tooltip = text::resolve($node->tooltip ?? '');
             $attributes = [
                 'data-region' => 'local-extendednav-node-fix',
                 'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null),
-                'data-title' => strip_tags(format_string(node_text::get_title($node, $natives[$nodekey] ?? null))),
+                'data-title' => strip_tags(format_string(text::get_title($node, $natives[$nodekey] ?? null))),
             ];
             // The user menu shows FontAwesome icons only, so Moodle icons are turned into theirs.
-            $iconclasses = node_icon::get_fontawesome_classes($icon);
+            $iconclasses = icon::get_fontawesome_classes($icon);
             if ($iconclasses !== null) {
                 $attributes['data-icon'] = $iconclasses;
             }
             if (!$haschildren) {
-                $attributes += node_display::get_link_attributes($node);
+                $attributes += display::get_link_attributes($node);
             }
             if ($tooltip !== '') {
                 $attributes['data-tooltip'] = strip_tags(format_string($tooltip));
@@ -223,7 +223,7 @@ class usermenu extends base {
                 continue;
             }
             $parent = $parent ?? (object)['nodekey' => $parentkey, 'title' => null, 'url' => null];
-            $parenttitle = strip_tags(format_string(node_text::get_title($parent, $natives[$parentkey] ?? null)));
+            $parenttitle = strip_tags(format_string(text::get_title($parent, $natives[$parentkey] ?? null)));
             if ($parenttitle === '') {
                 continue;
             }
@@ -231,18 +231,18 @@ class usermenu extends base {
             $context = ['panelid' => 'carousel-item-extnav-' . preg_replace('/[^a-zA-Z0-9]/', '', $parentkey),
                 'title' => $parenttitle, 'items' => []];
             foreach ($items as $child) {
-                $title = strip_tags(format_string(node_text::get_title($child, $natives[$child->nodekey] ?? null)));
+                $title = strip_tags(format_string(text::get_title($child, $natives[$child->nodekey] ?? null)));
                 $url = $this->get_absolute_url($child, $natives[$child->nodekey] ?? null);
                 if ($title === '' || $url === '') {
                     continue;
                 }
                 $icon = trim((string)$child->icon);
-                $display = node_display::get_link_attributes($child);
+                $display = display::get_link_attributes($child);
                 $context['items'][] = [
                     'url' => $url,
                     'title' => $title,
-                    'tooltip' => strip_tags(format_string(node_text::resolve($child->tooltip ?? ''))),
-                    'icon' => node_icon::get_fontawesome_classes($icon) ?? false,
+                    'tooltip' => strip_tags(format_string(text::resolve($child->tooltip ?? ''))),
+                    'icon' => icon::get_fontawesome_classes($icon) ?? false,
                     'newwindow' => ($display['data-extnav-display'] ?? '') === 'new',
                     'popup' => ($display['data-extnav-display'] ?? '') === 'popup' ? [
                         'width' => $display['data-extnav-width'],

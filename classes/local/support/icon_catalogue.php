@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\support;
+
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\validator;
 
 /**
  * The icons offered by the icon picker: Moodle's own icons and the FontAwesome icons Moodle ships.
@@ -75,7 +78,7 @@ class icon_catalogue {
         $map = \core\output\icon_system::instance(\core\output\icon_system::FONTAWESOME)->get_icon_name_map();
         $icons = [];
         foreach ($map as $key => $classes) {
-            if (strpos((string)$classes, 'deprecated') !== false || !node_validator::is_valid_icon($key)) {
+            if (strpos((string)$classes, 'deprecated') !== false || !validator::is_valid_icon($key)) {
                 continue;
             }
             $icons[] = ['value' => $key, 'classes' => self::markup_classes((string)$classes), 'label' => $key, 'aliases' => []];
@@ -149,7 +152,7 @@ class icon_catalogue {
      */
     private static function markup_classes(string $mapped): string {
         $tokens = preg_split('/\s+/', trim($mapped));
-        $prefix = array_intersect($tokens, node_icon::FAMILIES) === [] ? 'fa ' : '';
+        $prefix = array_intersect($tokens, icon::FAMILIES) === [] ? 'fa ' : '';
         return 'icon ' . $prefix . implode(' ', $tokens) . ' fa-fw';
     }
 }

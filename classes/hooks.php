@@ -20,9 +20,9 @@ use core\hook\navigation\primary_extend;
 use core\hook\output\before_http_headers;
 use core\hook\output\before_standard_head_html_generation;
 use core\hook\output\before_standard_top_of_body_html_generation;
-use local_extendednav\local\access_guard;
-use local_extendednav\local\node_repository;
-use local_extendednav\local\secondary_navigation;
+use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\node\repository;
+use local_extendednav\local\navigation\injector;
 
 /**
  * Hook callbacks.
@@ -63,7 +63,7 @@ class hooks {
         global $PAGE;
         access_guard::check($PAGE);
         \local_extendednav\menu\admintree::apply_to_request();
-        secondary_navigation::apply();
+        injector::apply();
     }
 
     /**
@@ -83,7 +83,7 @@ class hooks {
         self::backup_core_menus();
 
         $primary = menu_manager::get_menu('primary');
-        $primary->inject_nodes(node_repository::get_menu_nodes('primary'), $hook->get_primaryview());
+        $primary->inject_nodes(repository::get_menu_nodes('primary'), $hook->get_primaryview());
 
         // The custom menu items are plugin nodes now; stop Moodle from adding them a second time.
         $CFG->custommenuitems = '';
@@ -127,7 +127,7 @@ class hooks {
             return;
         }
         $usermenu = menu_manager::get_menu('usermenu');
-        $html = $usermenu->build_browser_templates(node_repository::get_menu_nodes('usermenu'), $hook->renderer);
+        $html = $usermenu->build_browser_templates(repository::get_menu_nodes('usermenu'), $hook->renderer);
         if ($html !== '') {
             $hook->add_html($html);
             $PAGE->requires->js_call_amd('local_extendednav/usermenu', 'init');
@@ -157,7 +157,7 @@ class hooks {
         }
         self::$usermenuapplied = true;
         $usermenu = menu_manager::get_menu('usermenu');
-        $CFG->customusermenuitems = $usermenu->build_config_value(node_repository::get_menu_nodes('usermenu'));
+        $CFG->customusermenuitems = $usermenu->build_config_value(repository::get_menu_nodes('usermenu'));
     }
 
     /**

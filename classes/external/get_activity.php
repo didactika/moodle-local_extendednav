@@ -20,7 +20,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\activity_list;
+use local_extendednav\local\listing\activity;
 
 /**
  * One page of the activity log of a navigation, with the rows of each action.
@@ -83,10 +83,10 @@ final class get_activity extends node_service {
         );
         self::require_manage();
         self::validate_scope($params['menu'], 0);
-        if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > activity_list::MAX_PAGE_SIZE) {
+        if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > activity::MAX_PAGE_SIZE) {
             throw new \invalid_parameter_exception('Page must be non-negative and perpage between 0 and 100.');
         }
-        return activity_list::get(
+        return activity::get(
             $params['menu'],
             $params['search'],
             $params['status'],

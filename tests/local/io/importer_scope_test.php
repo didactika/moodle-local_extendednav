@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\io;
 
 use local_extendednav\menu_manager;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 
 /**
  * Tests for the export and the import of the nodes that apply to a category or a course.
@@ -25,9 +28,9 @@ use local_extendednav\menu_manager;
  * @category   test
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\node_importer
+ * @covers     \local_extendednav\local\io\importer
  */
-final class node_importer_scope_test extends \advanced_testcase {
+final class importer_scope_test extends \advanced_testcase {
     /**
      * An exception is exported with the course it is for, and imported back into it.
      */
@@ -39,24 +42,24 @@ final class node_importer_scope_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course(['shortname' => 'ENG1']);
         menu_manager::get_menu('course')->record_seen(['grades' => (object)['text' => 'Grades', 'action' => '/grade/']]);
         $contextid = \context_course::instance($course->id)->id;
-        node_manager::set_visibility('course', $contextid, ['grades'], node_access::VISIBILITY_HIDDEN);
+        manager::set_visibility('course', $contextid, ['grades'], access::VISIBILITY_HIDDEN);
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'course'], 'contextid ASC, id ASC');
         $site = $DB->get_records('local_extendednav', ['menu' => 'course', 'contextid' => 0]);
-        $exported = node_importer::export_nodes($nodes, $site);
+        $exported = importer::export_nodes($nodes, $site);
 
         $this->assertSame(['', 'course:ENG1'], array_column($exported, 'scope'));
         $this->assertSame(0, $exported[1]['visibility']);
 
         $DB->delete_records('local_extendednav', ['menu' => 'course', 'contextid' => $contextid]);
-        node_repository::purge();
+        repository::purge();
         $this->assertSame(0, $DB->count_records('local_extendednav', ['menu' => 'course', 'contextid' => $contextid]));
 
-        $result = (new node_importer('course', true))->import($exported);
+        $result = (new importer('course', true))->import($exported);
 
         $this->assertSame([], $result['errors']);
         $row = $DB->get_record('local_extendednav', ['menu' => 'course', 'nodekey' => 'grades', 'contextid' => $contextid]);
-        $this->assertSame(node_access::VISIBILITY_HIDDEN, (int)$row->visibility);
+        $this->assertSame(access::VISIBILITY_HIDDEN, (int)$row->visibility);
     }
 
     /**
@@ -67,13 +70,13 @@ final class node_importer_scope_test extends \advanced_testcase {
         $this->setAdminUser();
         menu_manager::get_menu('course')->record_seen(['grades' => (object)['text' => 'Grades', 'action' => '/grade/']]);
 
-        $nowhere = (new node_importer('course', true))->import([
+        $nowhere = (new importer('course', true))->import([
             ['nodekey' => 'grades', 'scope' => 'course:NOPE', 'visibility' => 0],
         ]);
         $this->assertNotEmpty($nowhere['errors']);
 
         $course = $this->getDataGenerator()->create_course(['shortname' => 'ENG2']);
-        $primary = (new node_importer('primary', true))->import([
+        $primary = (new importer('primary', true))->import([
             ['nodekey' => 'x', 'title' => 'X', 'url' => '/x.php', 'scope' => 'course:' . $course->shortname],
         ]);
         $this->assertNotEmpty($primary['errors']);
@@ -88,9 +91,9 @@ final class node_importer_scope_test extends \advanced_testcase {
         $child = $this->getDataGenerator()->create_category(['name' => 'History', 'parent' => $parent->id]);
         $contextid = \context_coursecat::instance($child->id)->id;
 
-        $this->assertSame('category:Humanities / History', node_importer::describe_scope($contextid));
-        $this->assertSame($contextid, node_importer::resolve_scope('category:Humanities / History'));
-        $this->assertNull(node_importer::resolve_scope('category:History'));
-        $this->assertSame('', node_importer::describe_scope(0));
+        $this->assertSame('category:Humanities / History', importer::describe_scope($contextid));
+        $this->assertSame($contextid, importer::resolve_scope('category:Humanities / History'));
+        $this->assertNull(importer::resolve_scope('category:History'));
+        $this->assertSame('', importer::describe_scope(0));
     }
 }

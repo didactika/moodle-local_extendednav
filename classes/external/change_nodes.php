@@ -19,9 +19,9 @@ namespace local_extendednav\external;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 
 /**
  * The actions of the management page that change nodes without reloading it: show or hide, delete or reset, and move.
@@ -75,10 +75,10 @@ final class change_nodes extends node_service {
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
-        if (!in_array($params['visibility'], [node_access::VISIBILITY_HIDDEN, node_access::VISIBILITY_ALL], true)) {
+        if (!in_array($params['visibility'], [access::VISIBILITY_HIDDEN, access::VISIBILITY_ALL], true)) {
             throw new \invalid_parameter_exception('Unsupported visibility.');
         }
-        $count = node_manager::set_visibility(
+        $count = manager::set_visibility(
             $params['menu'],
             $params['contextid'],
             $params['nodekeys'],
@@ -141,11 +141,11 @@ final class change_nodes extends node_service {
             ['menu' => $params['menu'], 'contextid' => $params['contextid']] + $inparams
         );
         if ($params['contextid'] === 0) {
-            return ['count' => node_manager::delete($records)];
+            return ['count' => manager::delete($records)];
         }
         // An exception is deleted whatever the navigation says about the node: the scope goes back to what it inherits.
         $DB->delete_records_list('local_extendednav', 'id', array_keys($records));
-        node_repository::purge();
+        repository::purge();
         return ['count' => count($records)];
     }
 
@@ -188,7 +188,7 @@ final class change_nodes extends node_service {
         if (!in_array($params['direction'], [-1, 1], true)) {
             throw new \invalid_parameter_exception('The direction is -1 or 1.');
         }
-        node_manager::move($params['menu'], $params['contextid'], $params['nodekey'], $params['direction']);
+        manager::move($params['menu'], $params['contextid'], $params['nodekey'], $params['direction']);
         return ['count' => 1];
     }
 
@@ -239,7 +239,7 @@ final class change_nodes extends node_service {
         );
         self::require_manage();
         self::validate_scope($params['menu'], $params['contextid']);
-        node_manager::place($params['menu'], $params['contextid'], $params['nodekeys'], $params['beforekey'], $params['afterkey']);
+        manager::place($params['menu'], $params['contextid'], $params['nodekeys'], $params['beforekey'], $params['afterkey']);
         return ['count' => count($params['nodekeys'])];
     }
 
@@ -276,7 +276,7 @@ final class change_nodes extends node_service {
         self::require_manage();
         self::validate_scope($params['menu'], 0);
         set_config('enabled_' . $params['menu'], $params['value'] ? 1 : 0, 'local_extendednav');
-        node_repository::purge();
+        repository::purge();
         return ['count' => $params['value'] ? 1 : 0];
     }
 

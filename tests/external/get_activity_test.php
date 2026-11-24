@@ -17,8 +17,8 @@
 namespace local_extendednav\external;
 
 use core_external\external_api;
-use local_extendednav\local\activity_list;
-use local_extendednav\local\node_manager;
+use local_extendednav\local\listing\activity;
+use local_extendednav\local\node\manager;
 
 /**
  * Tests for the activity log of a navigation.
@@ -28,7 +28,7 @@ use local_extendednav\local\node_manager;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\external\get_activity
- * @covers     \local_extendednav\local\activity_list
+ * @covers     \local_extendednav\local\listing\activity
  */
 final class get_activity_test extends \advanced_testcase {
     /**
@@ -44,14 +44,14 @@ final class get_activity_test extends \advanced_testcase {
         get_log_manager(true);
         $this->setAdminUser();
 
-        $create = static fn(string $key, string $menu): \stdClass => node_manager::create(
-            node_manager::prepare(['nodekey' => $key, 'title' => ucfirst($key), 'url' => '/my/'], $menu)
+        $create = static fn(string $key, string $menu): \stdClass => manager::create(
+            manager::prepare(['nodekey' => $key, 'title' => ucfirst($key), 'url' => '/my/'], $menu)
         );
         $node = $create('help_en', 'primary');
         // Two more nodes: one of the same navigation and one of another, which its log never shows.
         $create('guides', 'primary');
         $create('support', 'usermenu');
-        node_manager::update((object)['id' => $node->id, 'title' => 'Help and contact']);
+        manager::update((object)['id' => $node->id, 'title' => 'Help and contact']);
         return $node;
     }
 
@@ -102,7 +102,7 @@ final class get_activity_test extends \advanced_testcase {
      */
     public function test_a_deleted_node_has_no_link(): void {
         $node = $this->prepare();
-        node_manager::delete([$node]);
+        manager::delete([$node]);
 
         $result = get_activity::execute('primary', '', 'deleted');
 
@@ -125,9 +125,9 @@ final class get_activity_test extends \advanced_testcase {
      * A day that is not a date is ignored.
      */
     public function test_day_start(): void {
-        $this->assertNull(activity_list::day_start(''));
-        $this->assertNull(activity_list::day_start('2026-02-30'));
-        $this->assertNull(activity_list::day_start('yesterday'));
-        $this->assertIsInt(activity_list::day_start('2026-02-28'));
+        $this->assertNull(activity::day_start(''));
+        $this->assertNull(activity::day_start('2026-02-30'));
+        $this->assertNull(activity::day_start('yesterday'));
+        $this->assertIsInt(activity::day_start('2026-02-28'));
     }
 }

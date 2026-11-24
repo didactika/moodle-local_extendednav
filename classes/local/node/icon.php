@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 /**
  * Shows the icon of a node: a FontAwesome class, or a Moodle icon such as "core:i/home" (or "i/home" for core).
@@ -27,7 +27,7 @@ namespace local_extendednav\local;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_icon {
+class icon {
     /** @var string[] FontAwesome family classes, which mean the icon needs no default family. */
     public const FAMILIES = ['fa', 'fas', 'far', 'fab', 'fa-solid', 'fa-regular', 'fa-brands'];
 
@@ -41,10 +41,10 @@ class node_icon {
         global $OUTPUT;
 
         $icon = trim((string)$icon);
-        if ($icon === '' || node_validator::is_no_icon($icon) || !node_validator::is_valid_icon($icon)) {
+        if ($icon === '' || validator::is_no_icon($icon) || !validator::is_valid_icon($icon)) {
             return '';
         }
-        if (node_validator::is_fontawesome($icon)) {
+        if (validator::is_fontawesome($icon)) {
             return \html_writer::tag('i', '', ['class' => 'icon fa ' . $icon . ' fa-fw', 'aria-hidden' => 'true']);
         }
         // Use the FontAwesome icon Moodle maps it to, at menu size: pix_icon() shows "b/" icons 64 pixels big.
@@ -72,10 +72,10 @@ class node_icon {
      */
     public static function get_fontawesome_classes(?string $icon): ?string {
         $icon = trim((string)$icon);
-        if ($icon === '' || node_validator::is_no_icon($icon) || !node_validator::is_valid_icon($icon)) {
+        if ($icon === '' || validator::is_no_icon($icon) || !validator::is_valid_icon($icon)) {
             return null;
         }
-        if (node_validator::is_fontawesome($icon)) {
+        if (validator::is_fontawesome($icon)) {
             return $icon;
         }
         [$component, $name] = self::split($icon);

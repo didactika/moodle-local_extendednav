@@ -20,7 +20,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\node_list;
+use local_extendednav\local\listing\nodes;
 
 /**
  * The categories and courses a navigation can have exceptions for: the ones that have them and the ones a search finds.
@@ -59,7 +59,7 @@ final class get_scopes extends node_service {
         $params = self::validate_parameters(self::execute_parameters(), compact('menu', 'search'));
         self::require_manage();
         self::validate_scope($params['menu'], 0);
-        if (!node_list::supports_scopes($params['menu'])) {
+        if (!nodes::supports_scopes($params['menu'])) {
             return ['scopes' => []];
         }
         $search = trim($params['search']);

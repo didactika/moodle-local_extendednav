@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\navigation;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\access_guard::class)]
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\repository;
+
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\local\navigation\access_guard::class)]
 /**
  * Tests for URL blocking and fallback pages.
  *
@@ -25,7 +28,7 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_extendednav\local\access_guard
+ * @covers     \local_extendednav\local\navigation\access_guard
  */
 final class access_guard_test extends \advanced_testcase {
     /** @var \local_extendednav_generator Plugin generator. */
@@ -43,7 +46,7 @@ final class access_guard_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        node_access::reset_caches();
+        access::reset_caches();
 
         $generator = $this->getDataGenerator();
         $this->navgenerator = $generator->get_plugin_generator('local_extendednav');
@@ -140,7 +143,7 @@ final class access_guard_test extends \advanced_testcase {
         $DB->insert_record('local_extendednav', (object)['menu' => 'primary', 'nodekey' => 'partner', 'title' => 'Partner',
             'url' => 'https://partner.example.org/mod/page/view.php?id=7', 'visibility' => 0, 'blockaccess' => 1,
             'sortorder' => 50]);
-        node_repository::purge();
+        repository::purge();
 
         $this->assertNull(access_guard::evaluate('/mod/page/view.php?id=7', $this->student->id));
     }
@@ -161,16 +164,16 @@ final class access_guard_test extends \advanced_testcase {
      * The fallback check reports when users would have no page to land on.
      */
     public function test_check_fallbacks(): void {
-        $this->assertNull(access_guard::check_fallbacks(node_repository::get_all()));
+        $this->assertNull(access_guard::check_fallbacks(repository::get_all()));
 
         $this->navgenerator->create_node(['nodekey' => 'myhome', 'visibility' => 0, 'blockaccess' => 1]);
         $this->navgenerator->create_node(['nodekey' => 'home', 'visibility' => 0, 'blockaccess' => 1]);
         $this->navgenerator->create_node(['nodekey' => 'mycourses', 'visibility' => 2, 'roles' => 'editingteacher',
             'blockaccess' => 1]);
-        $this->assertSame(access_guard::FALLBACKS_BLOCKED_FOR_SOME, access_guard::check_fallbacks(node_repository::get_all()));
+        $this->assertSame(access_guard::FALLBACKS_BLOCKED_FOR_SOME, access_guard::check_fallbacks(repository::get_all()));
 
         $this->navgenerator->create_node(['nodekey' => 'mycourses', 'visibility' => 0, 'blockaccess' => 1]);
-        $this->assertSame(access_guard::FALLBACKS_BLOCKED, access_guard::check_fallbacks(node_repository::get_all()));
+        $this->assertSame(access_guard::FALLBACKS_BLOCKED, access_guard::check_fallbacks(repository::get_all()));
     }
 
     /**
@@ -184,6 +187,6 @@ final class access_guard_test extends \advanced_testcase {
             $this->navgenerator->create_node(['nodekey' => $key, 'visibility' => 0, 'blockaccess' => 1]);
         }
         $this->assertSame('/mod/page/view.php?id=3', access_guard::evaluate('/my/', $this->student->id));
-        $this->assertNull(access_guard::check_fallbacks(node_repository::get_all()));
+        $this->assertNull(access_guard::check_fallbacks(repository::get_all()));
     }
 }

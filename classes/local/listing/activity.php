@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\listing;
 
 /**
  * One page of the activity log of a navigation: who created, changed or deleted each node, and when.
@@ -26,7 +26,7 @@ namespace local_extendednav\local;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class activity_list {
+final class activity {
     /** @var string[] Actions the events of the nodes record. */
     public const ACTIONS = ['created', 'updated', 'deleted'];
 

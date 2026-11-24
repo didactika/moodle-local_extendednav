@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_extendednav\local;
+namespace local_extendednav\local\node;
 
 /**
  * Resolves node titles.
@@ -24,7 +24,7 @@ namespace local_extendednav\local;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class node_text {
+class text {
     /**
      * Converts a "identifier,component" title to the language string it names.
      *
