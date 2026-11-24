@@ -1,13 +1,13 @@
 ---
 id: UC-007
 name: setScopeException
-title: Change a navigation for a category or a course
+title: Change a navigation for a category, a course or an activity
 status: draft
 origin: code
 sourceOfTruth: code
 ---
 
-# UC-007 Change a navigation for a category or a course — design
+# UC-007 Change a navigation for a category, a course or an activity — design
 
 | Overview | Requirements | Analysis | Design | Implementation | Tests |
 | --- | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ Analysis: [README](../../../analysis/use-cases/setScopeException/README.md)
 | Operation | Input | Output | Errors |
 | --- | --- | --- | --- |
 | `local_extendednav_get_scopes(menu, search)` | the navigation and a part of a name | the scopes: context, name, type and changes | no capability, unknown navigation |
-| `local_extendednav_delete_nodes(menu, contextid, nodekeys)` | the scope and the nodes | how many exceptions were removed | no capability, a scope that is not a category or a course |
+| `local_extendednav_delete_nodes(menu, contextid, nodekeys)` | the scope and the nodes | how many exceptions were removed | no capability, a scope that is not a category, a course or an activity |
 
 ## Data touched
 

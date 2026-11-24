@@ -1,16 +1,20 @@
 ---
 title: Change the other navigations
-summary: Order, rename, hide and extend the navigation of the site home, of a course, of an activity and of a category.
+summary: Order, rename, hide and extend the navigation of the site home, of a course, of each kind of activity and of a category.
 order: 45
 ---
 
-Besides the primary navigation and the user menu, the plugin changes the navigations that Moodle draws under the header of a page: the one of the **site home**, of a **course**, of an **activity** and of a **category**. The site administration has a page of its own: see [Shape the site administration](page:guides/site-administration).
+Besides the primary navigation and the user menu, the plugin changes the navigations that Moodle draws under the header of a page: the one of the **site home**, of a **course**, of each **kind of activity** (forums, assignments, quizzes and the rest) and of a **category**. The site administration has a page of its own: see [Shape the site administration](page:guides/site-administration).
 
 <Screenshot src="asset:manage-course.webp" alt="The management page with the course navigation chosen and its nodes listed" caption="The management page: the navigations to the left and the nodes of the one chosen to the right." url="/local/extendednav/manage.php?menu=course" />
 
 ## Choose the navigation
 
-On the management page, the column to the left lists the navigations in three groups: **Site** (primary navigation, user menu and site home), **Courses** (course, activity and category) and **Administration**. On a narrow screen the column is a select above the list.
+On the management page, the column to the left lists the navigations in four groups: **Site** (primary navigation, user menu and site home), **Courses** (course and category), **Activities** (one navigation for each kind of activity) and **Administration**. Under **Activities**, the kinds the site uses come first; the others are under **Other kinds**, which opens them. On a narrow screen the column is a select above the list, with the same groups.
+
+Each kind of activity has a navigation of its own because each kind has its own items: a forum has **Subscriptions**, an assignment has **Submissions**, and a plugin can add an item to one kind only. A change made in the navigation of the forums applies to every forum, and to no other kind.
+
+<Screenshot src="asset:manage-activity.webp" alt="The management page with the navigation of the forums chosen under Activities" caption="The navigation of one kind of activity, with the kinds the site uses under Activities." url="/local/extendednav/manage.php?menu=mod_forum" />
 
 ## Turn a navigation on or off
 
@@ -19,6 +23,8 @@ The button next to the name of the navigation says whether its changes are appli
 ## See what Moodle shows
 
 Moodle has no list of the nodes of these navigations: they depend on the page, on who looks and on the plugins that add theirs. The plugin records each node the first time a page shows it, so the list fills as people use the site. A node of Moodle appears in the list with the link and the title Moodle gives it, and it can be changed from then on.
+
+Each kind of activity is also looked through once a day: the scheduled task **Find the items of the navigation of each kind of activity** builds the navigation of the most recent activities of every kind, as an administrator, and lists every item it finds. An item that a plugin adds only to some activities (a report for the assignments that use it, for example) appears as soon as one activity of the site has it. On the list of a kind of activity, **Find items** does the same at once for that kind, and says how many activities it reviewed and how many items it added.
 
 While the list of a navigation is empty, select **Find the nodes**: the plugin opens a page of the site that shows that navigation (a course, an activity, a category or the site home), without leaving the management page, and lists what it finds. **Open a page that shows it** opens the same page in a new tab.
 
@@ -40,7 +46,11 @@ The list shows every node of the navigation, with no pages, so the whole navigat
 - **Visibility**: the nodes visible to everyone, restricted or hidden.
 - **Origin**: the nodes of Moodle (or of another plugin), marked **Moodle**, and the nodes added on this page, marked **Added**.
 
-The column **Visibility** shows the visibility of each node and, beside it, a badge for each kind of restriction: **Roles**, **Languages**, **URL blocked**, **Admins too**, **Only you**. Place the pointer over them to read the details, such as the roles. The button at the end of the row of filters clears the search and the filters.
+The column **Visibility** shows the visibility of each node and, beside it, a badge for each kind of restriction: **Roles**, **Languages**, **URL blocked**, **Admins too**, **Only admins**. Place the pointer over a badge to read its restriction in a sentence. Select a badge to open **Who sees**, which lists every restriction of the node, one row for each badge, with the button **Edit node**. The button at the end of the row of filters clears the search and the filters.
+
+<Screenshot src="asset:restrictions-dialog.webp" alt="The dialog Who sees, with a row for each badge of the visibility of a node" caption="Select a badge to read every restriction of the node." url="/local/extendednav/manage.php?menu=primary" />
+
+The buttons of each row are always in the same place: show or hide first, then edit, then delete. A row without one of them leaves its place empty, so each action is in one column and the titles start on the same line.
 
 The bar of the selection offers only what the nodes selected allow: **Show** when one of them is not visible to everyone, **Hide** when one of them is visible, and **Delete** when one of them was added. The question before the action lists the nodes it leaves as they are.
 

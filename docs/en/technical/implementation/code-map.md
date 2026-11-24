@@ -17,7 +17,11 @@ sourceOfTruth: code
 | Who sees a node | methods | `classes/local/node/access.php:112`, `:166` | yes |
 | Block a page | methods | `classes/local/navigation/access_guard.php:51`, `:79` | yes |
 | Hooks | class | `classes/hooks.php`, `db/hooks.php` | yes |
-| Menus | classes | `classes/menu/primary.php`, `classes/menu/usermenu.php` | yes |
+| Menus | classes | `classes/menu/primary.php`, `classes/menu/usermenu.php`, `classes/menu/secondary.php`, `classes/menu/activity.php`, `classes/menu/admintree.php` | yes |
+| Navigation of each kind of activity | classes | `classes/menu/activity.php`, `classes/local/navigation/discovery.php`, `classes/task/discover_nodes.php` | yes |
+| Pages of a category, a course or an activity | files | `context.php`, `classes/local/navigation/context_scope.php`, `lib.php` | yes |
+| Backup and restore | classes | `backup/moodle2/backup_local_extendednav_plugin.class.php`, `backup/moodle2/restore_local_extendednav_plugin.class.php` | yes |
+| Change from the single navigation of the activities | files | `db/upgradelib.php`, `classes/task/split_activity_navigation.php` | yes |
 | Management pages | files | `manage.php`, `edit.php`, `import.php`, `export.php`, `activity.php` | yes |
 | Web services | files | `classes/external/reorder_nodes.php`, `classes/external/get_icons.php` | yes |
 | Events | classes | `classes/event/` | yes |

@@ -15,7 +15,7 @@ Además de su visibilidad y sus roles, un nodo puede tener las **Restricciones d
 | **Perfil de usuario** | Muestra el nodo a las personas cuyo campo del perfil tiene un valor, como un departamento o una ciudad |
 | Otras restricciones | Las que añaden los plugins del sitio, como las cohortes cuando ese plugin está instalado |
 
-Deben cumplirse todas las restricciones, y también la visibilidad: un nodo restringido a algunos roles y a un grupo se muestra a las personas con uno de esos roles que están en ese grupo. Los grupos y los agrupamientos se ofrecen en las excepciones de un curso, donde el nodo pertenece a ese curso.
+Deben cumplirse todas las restricciones, y también la visibilidad: un nodo restringido a algunos roles y a un grupo se muestra a las personas con uno de esos roles que están en ese grupo. Los grupos y los agrupamientos se ofrecen en las excepciones de un curso o de una actividad, donde el nodo pertenece a ese curso. Una **Calificación** o la **Finalización de actividad** necesitan las actividades de un curso, por lo que solo se ofrecen en las excepciones de un curso o de una actividad, nunca en un nodo de todo el sitio o de una categoría.
 
 ## Nodos con fechas
 
@@ -23,11 +23,11 @@ Un nodo con fecha de inicio aparece por sí solo cuando llega la fecha, y un nod
 
 | Insignia | Cuándo |
 |---|---|
-| **Con condiciones** | El nodo es para todos y tiene restricciones; sitúe el puntero sobre ella para leerlas |
+| **Con condiciones** | El nodo es para todos y tiene restricciones; sitúe el puntero sobre ella para leerlas, o selecciónela para abrir **Quién ve** |
 | **Programado** | Todavía no ha llegado la fecha de inicio |
 | **Finalizado** | Ha pasado la fecha de fin; el nodo sigue en la lista, oculto, hasta que lo cambie o lo elimine |
 
 > [!NOTE]
-> Los administradores ven todos los nodos de forma predeterminada, también los programados o finalizados, marcados como **Solo usted**. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
+> Los administradores ven todos los nodos de forma predeterminada, también los programados o finalizados, marcados como **Solo administradores**. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
 
 Las restricciones ocultan el nodo de la navegación; no bloquean la página a la que enlaza. Para bloquear también la página, use **Bloquear el acceso por URL** con un nodo oculto o restringido.

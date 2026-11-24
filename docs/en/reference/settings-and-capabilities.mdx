@@ -24,12 +24,16 @@ Whether a node is also hidden from administrators is decided in the form of each
 | Capability | Default roles | Allows the user to |
 |---|---|---|
 | `local/extendednav:manage` | None | Manage the items, import, export and see the activity log, in the system context |
-| `local/extendednav:managecontext` | Manager | Change the navigations of a category or a course, and of everything inside it, from its page **Navigation** |
+| `local/extendednav:managecontext` | Manager | Change the navigations of a category, a course or an activity, and of everything inside it, from its page **Navigation** |
 
 The users who have this capability find the management page in the same place as the administrators.
 
 > [!WARNING]
 > Whoever holds `local/extendednav:manage` decides the menu of every user and which pages are blocked. Give it only to people you would trust with the navigation of the site.
+
+## Scheduled task
+
+**Find the items of the navigation of each kind of activity** runs once a day, at night. It builds, as an administrator, the navigation of the most recent activities of each kind and lists the items Moodle and its plugins add to them, so they can be changed before anyone opens such an activity. It sends nothing to the browser and changes nothing on the activities. Its schedule is set in **Site administration > Server > Tasks > Scheduled tasks**.
 
 ## Privacy
 
@@ -37,4 +41,4 @@ The plugin stores navigation items, not personal data, and implements the Privac
 
 ## Backup
 
-The nodes of the site and the exceptions of the categories are configuration of the site: use the YAML export to copy them. The exceptions of a course are part of the backup of the course.
+The nodes of the site and the exceptions of the categories are configuration of the site: use the YAML export to copy them. The exceptions of a course and of its activities are part of the backup of the course, and of the backup of each activity.

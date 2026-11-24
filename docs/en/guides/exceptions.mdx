@@ -1,41 +1,49 @@
 ---
-title: Change a navigation for a category or a course
-summary: Give a category or a course its own order, names and nodes, while the rest of the site keeps the navigation of the site.
+title: Change a navigation for a category, a course or an activity
+summary: Give a category, a course or an activity its own order, names and nodes, while the rest of the site keeps the navigation of the site.
 order: 46
 ---
 
-The navigation of a course, of an activity and of a category can be changed for the whole site and, as an exception, for a **category** or a **course**. Everything inside a category follows it, and a course can change what its category sets.
+The navigation of a course, of each kind of activity and of a category can be changed for the whole site and, as an exception, for a **category**, a **course** or one **activity**. Everything inside a category follows it, a course can change what its category sets, and an activity can change what its course sets.
 
-## Open the navigation of a category or a course
+## Open the navigation of a category, a course or an activity
 
-In a course, open the menu of the course (**More**) and select **Navigation**. In a category, open the menu of the category and select **Navigation**. The page lists the navigations that the category or the course can change: a course changes its own navigation and the one of its activities; a category also changes its own and the ones of the courses inside it.
+In a course, open the menu of the course (**More**) and select **Navigation**. In an activity, open the menu of the activity and select **Navigation**. In a category, open the menu of the category and select **Navigation**. The page lists the navigations that the context can change, in a select above the list:
+
+| Context | Navigations it changes |
+|---|---|
+| Activity | Its own navigation, for that activity only |
+| Course | The navigation of the course, and the navigation of each kind of activity the course has (all its forums, all its assignments) |
+| Category | The navigation of the category, the one of the courses inside it, and the one of each kind of activity |
+
+<Screenshot src="asset:context-activity.webp" alt="The page Navigation of a forum, with an item hidden only for that forum" caption="The navigation of one activity, changed from the activity." url="/local/extendednav/context.php" />
 
 <Screenshot src="asset:context-course.webp" alt="The page Navigation of a course, with the course navigation and a node changed only for the course" caption="The navigation of a course, changed from the course." url="/local/extendednav/context.php" />
 
 ## Who can do it
 
-Whoever manages the navigation of the site can change the navigation of every category and course. Whoever has the capability **Manage the navigation of a category or a course** (`local/extendednav:managecontext`) in a category or a course can change that one and everything inside it. Managers have it by default; give it to other roles, such as teachers, in a course or a category with the permissions of Moodle.
+Whoever manages the navigation of the site can change the navigation of every category, course and activity, without being enrolled in the course. Whoever has the capability **Manage the navigation of a category, a course or an activity** (`local/extendednav:managecontext`) in a category, a course or an activity can change that one and everything inside it. Managers have it by default; give it to other roles, such as teachers, in a course or a category with the permissions of Moodle.
 
 ## See every exception
 
-In **Site administration > Appearance > Extended navigation > Exceptions of categories and courses**, the list shows every category and course that changes a navigation, with the number of nodes it changes in each one. Search by name, narrow the list to categories or to courses, and select one to open its page.
+In **Site administration > Appearance > Extended navigation > Exceptions of categories, courses and activities**, the list shows every category, course and activity that changes a navigation, with the number of nodes it changes in each one. An activity shows its course and categories under its name. Search by the name of a category or a course (an activity is found by its course), narrow the list to categories, courses or activities, and select one to open its page.
 
-<Screenshot src="asset:exceptions-overview.webp" alt="The list of the categories and courses that change a navigation" caption="Every exception of the site, in one list." url="/local/extendednav/exceptions.php" />
+<Screenshot src="asset:exceptions-overview.webp" alt="The list of the categories, courses and activities that change a navigation" caption="Every exception of the site, in one list." url="/local/extendednav/exceptions.php" />
 
 ## Make an exception
 
-The list shows what the pages of the category or the course show: the nodes of the site and the ones it inherits. Change a node as you would for the site: hide it, move it or edit it. The first change of a node gives the category or the course a row of its own, which starts as a copy of the node it replaces. The row shows **Exception**; a node that comes from a category around it shows **Inherited**.
+The list shows what the pages of the category, the course or the activity show: the nodes of the site and the ones it inherits. Change a node as you would for the site: hide it, move it or edit it. The first change of a node gives the category, the course or the activity a row of its own, which starts as a copy of the node it replaces. The row shows **Exception**; a node that comes from a category around it shows **Inherited**.
 
-- The nearest scope wins: the course over its category, and the category over the site.
+- The nearest scope wins: the activity over its course, the course over its category, and the category over the site.
 - When a category or a course changes the order of any node, it sets the order of its whole navigation.
 - A node added for a course exists only there.
 
 ## Go back to the site
 
-The button at the end of the row of an exception (**Go back**) removes the changes of the category or the course for that node, and its navigation follows the site again. Deleting a node of the site removes its exceptions too.
+The button at the end of the row of an exception (**Go back**) removes the changes of the category, the course or the activity for that node, and its navigation follows the site again. Deleting a node of the site removes its exceptions too.
 
 ## Export and import
 
-The exceptions of a **course** are part of the course: they go in its backup and come back when it is restored, also as a new course or into another one, with the groups, the groupings and the dates of their conditions matched to the course restored. A node that the course already changes is kept as it is.
+The exceptions of a **course** and of its **activities** are part of the course: they go in the backup of the course, or of the activity, and come back when it is restored, also as a new course or into another one. The groups, the groupings, the dates, the grade items and the activities of their conditions are matched to the ones restored. A node that the course or the activity already changes is kept as it is. A backup made with a version before 2.0, which had a single navigation for every activity, gives each node to the kinds of activity that have it.
 
 The exceptions of a **category** belong to the site, as Moodle does not back up categories: **Export > This navigation** and **Export > Every navigation** include them, each with its category (`scope`). On import, the category is looked up by its full name, with its parents. See [The YAML format](page:reference/yaml-format).

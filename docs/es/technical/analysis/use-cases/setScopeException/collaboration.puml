@@ -12,7 +12,7 @@ class "Gestor de nodos" as c3 <<control>>
 class "Ámbito" as c4 <<entity>>
 class "Nodo" as c5 <<entity>>
 
-user --> c0 : 1: busca una categoría o un curso
+user --> c0 : 1: busca una categoría, un curso o una actividad
 c0 --> c1
 c1 --> c2
 c2 --> c3

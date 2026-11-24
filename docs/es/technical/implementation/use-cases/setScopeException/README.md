@@ -1,13 +1,13 @@
 ---
 id: UC-007
 name: setScopeException
-title: Cambiar una navegación para una categoría o un curso
+title: Cambiar una navegación para una categoría, un curso o una actividad
 status: draft
 origin: code
 sourceOfTruth: code
 ---
 
-# UC-007 Cambiar una navegación para una categoría o un curso — implementación
+# UC-007 Cambiar una navegación para una categoría, un curso o una actividad — implementación
 
 | Resumen | Requisitos | Análisis | Diseño | Implementación | Pruebas |
 | --- | --- | --- | --- | --- | --- |

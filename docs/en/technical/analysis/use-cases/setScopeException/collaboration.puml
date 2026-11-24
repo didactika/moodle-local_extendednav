@@ -12,7 +12,7 @@ class "Node manager" as c3 <<control>>
 class "Scope" as c4 <<entity>>
 class "Node" as c5 <<entity>>
 
-user --> c0 : 1: searches a category or a course
+user --> c0 : 1: searches a category, a course or an activity
 c0 --> c1
 c1 --> c2
 c2 --> c3

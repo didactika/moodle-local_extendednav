@@ -24,7 +24,8 @@ sourceOfTruth: model
 | UC-004 | [Show the menus of a user](./use-cases/showMenus/README.md) | System | Display | RF-004 | [card](../analysis/use-cases/showMenus/README.md) | [card](../design/use-cases/showMenus/README.md) | [card](../implementation/use-cases/showMenus/README.md) |
 | UC-005 | [Block the pages of hidden items](./use-cases/blockUrl/README.md) | System | Display | RF-005 | [card](../analysis/use-cases/blockUrl/README.md) | [card](../design/use-cases/blockUrl/README.md) | [card](../implementation/use-cases/blockUrl/README.md) |
 | UC-006 | [Customise a secondary navigation](./use-cases/customiseSecondaryNavigation/README.md) | Administrator | Navigation | RF-007 | [card](../analysis/use-cases/customiseSecondaryNavigation/README.md) | [card](../design/use-cases/customiseSecondaryNavigation/README.md) | [card](../implementation/use-cases/customiseSecondaryNavigation/README.md) |
-| UC-007 | [Change a navigation for a category or a course](./use-cases/setScopeException/README.md) | Administrator | Navigation | RF-008 | [card](../analysis/use-cases/setScopeException/README.md) | [card](../design/use-cases/setScopeException/README.md) | [card](../implementation/use-cases/setScopeException/README.md) |
+| UC-007 | [Change a navigation for a category, a course or an activity](./use-cases/setScopeException/README.md) | Administrator | Navigation | RF-008 | [card](../analysis/use-cases/setScopeException/README.md) | [card](../design/use-cases/setScopeException/README.md) | [card](../implementation/use-cases/setScopeException/README.md) |
+| UC-008 | [Find the items of the navigation of each kind of activity](./use-cases/discoverActivityItems/README.md) | System | Navigation | RF-012 | [card](../analysis/use-cases/discoverActivityItems/README.md) | [card](../design/use-cases/discoverActivityItems/README.md) | [card](../implementation/use-cases/discoverActivityItems/README.md) |
 
 ### Use-case diagram
 

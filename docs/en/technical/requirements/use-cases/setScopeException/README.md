@@ -1,7 +1,7 @@
 ---
 id: UC-007
 name: setScopeException
-title: Change a navigation for a category or a course
+title: Change a navigation for a category, a course or an activity
 actor: Administrator
 package: Navigation
 status: draft
@@ -12,7 +12,7 @@ includes:
 extends: 
 ---
 
-# UC-007 Change a navigation for a category or a course
+# UC-007 Change a navigation for a category, a course or an activity
 
 | Overview | Requirements | Analysis | Design | Implementation | Tests |
 | --- | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ extends:
 | --- | --- |
 | Actor | Administrator |
 | Package | Navigation |
-| Goal | Give a category or a course its own version of a navigation, while the rest of the site keeps the navigation of the site. |
+| Goal | Give a category, a course or an activity its own version of a navigation, while the rest of the site keeps the navigation of the site. |
 | Type | Primary, essential |
 | Level | User goal |
 | Requirement | RF-008 |
@@ -32,7 +32,7 @@ extends:
 
 ## Context
 
-A category or a course sometimes needs another order, other names or other nodes than the site. An administrator sets an exception for it; everything inside a category follows it, and a course can change what its category sets.
+A category, a course or an activity sometimes needs another order, other names or other nodes than the site. An administrator sets an exception for it; everything inside a category follows it, and a course can change what its category sets.
 
 ## Preconditions
 
@@ -48,7 +48,7 @@ A category or a course sometimes needs another order, other names or other nodes
 
 | Step | Actor | System |
 | --- | --- | --- |
-| 1 | Opens **Applies to** and searches for a category or a course. | Lists the scopes that have changes and the ones the search finds. |
+| 1 | Opens **Applies to** and searches for a category, a course or an activity. | Lists the scopes that have changes and the ones the search finds. |
 | 2 | Chooses the scope. | Lists what its pages show: the nodes of the site and the ones it inherits, marked as exception or inherited. |
 | 3 | Hides, moves or edits a node. | Makes a row of the scope as a copy of the node it replaces, if it has none, and changes it. |
 | 4 | Goes back to the site for a node. | Deletes the row of the scope, and the node is the one of the site again. |

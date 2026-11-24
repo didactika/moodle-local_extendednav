@@ -17,7 +17,11 @@ sourceOfTruth: code
 | Quién ve un nodo | métodos | `classes/local/node/access.php:112`, `:166` | sí |
 | Bloquear una página | métodos | `classes/local/navigation/access_guard.php:51`, `:79` | sí |
 | Ganchos | clase | `classes/hooks.php`, `db/hooks.php` | sí |
-| Menús | clases | `classes/menu/primary.php`, `classes/menu/usermenu.php` | sí |
+| Menús | clases | `classes/menu/primary.php`, `classes/menu/usermenu.php`, `classes/menu/secondary.php`, `classes/menu/activity.php`, `classes/menu/admintree.php` | sí |
+| Navegación de cada tipo de actividad | clases | `classes/menu/activity.php`, `classes/local/navigation/discovery.php`, `classes/task/discover_nodes.php` | sí |
+| Páginas de una categoría, un curso o una actividad | archivos | `context.php`, `classes/local/navigation/context_scope.php`, `lib.php` | sí |
+| Copia de seguridad y restauración | clases | `backup/moodle2/backup_local_extendednav_plugin.class.php`, `backup/moodle2/restore_local_extendednav_plugin.class.php` | sí |
+| Paso desde la navegación única de las actividades | archivos | `db/upgradelib.php`, `classes/task/split_activity_navigation.php` | sí |
 | Páginas de gestión | archivos | `manage.php`, `edit.php`, `import.php`, `export.php`, `activity.php` | sí |
 | Servicios web | archivos | `classes/external/reorder_nodes.php`, `classes/external/get_icons.php` | sí |
 | Eventos | clases | `classes/event/` | sí |

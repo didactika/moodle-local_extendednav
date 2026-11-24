@@ -11,9 +11,13 @@ rectangle "local_extendednav" {
     usecase "Mostrar los menús de un usuario" as UC_showMenus
     usecase "Bloquear las páginas de los elementos ocultos" as UC_blockUrl
   }
+  package "Navigation" {
+    usecase "Buscar los elementos de la navegación de cada tipo de actividad" as UC_discoverActivityItems
+  }
 }
 
 A_System --> UC_showMenus
 A_System --> UC_blockUrl
+A_System --> UC_discoverActivityItems
 
 @enduml

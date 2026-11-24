@@ -1,13 +1,13 @@
 ---
 id: UC-007
 name: setScopeException
-title: Change a navigation for a category or a course
+title: Change a navigation for a category, a course or an activity
 status: draft
 origin: code
 sourceOfTruth: code
 ---
 
-# UC-007 Change a navigation for a category or a course — implementation
+# UC-007 Change a navigation for a category, a course or an activity — implementation
 
 | Overview | Requirements | Analysis | Design | Implementation | Tests |
 | --- | --- | --- | --- | --- | --- |

@@ -18,7 +18,7 @@ The same format holds one navigation or every navigation. An exported file also 
 | Field | Description |
 |---|---|
 | `nodekey` | Key of the item, unique within its menu. Use the key of an item of Moodle (for example `myhome`) to change it |
-| `menu` | Navigation of the item: `primary`, `usermenu`, `frontpage` (site home), `course`, `activity`, `category` or `admin` (site administration). It is the navigation chosen on the management page when omitted |
+| `menu` | Navigation of the item: `primary`, `usermenu`, `frontpage` (site home), `course`, `category`, `admin` (site administration), or `mod_` and the name of a module for a kind of activity (`mod_forum`, `mod_assign`). It is the navigation chosen on the management page when omitted. A file of a version before 2.0 can say `activity`, the single navigation of every activity: an item of Moodle goes to each kind that has it, and an item added goes to every kind |
 | `native` | `1` for an item of Moodle. An item of Moodle that this site does not have is left out with a warning |
 | `order` | Position of the item in its navigation, 1 being the first. In the site administration, its position among the categories and pages of its category. On import, an item without it keeps its place, or goes last when it is new |
 | `title` | Display text. Empty on an item of Moodle keeps the title of Moodle |

@@ -11,9 +11,13 @@ rectangle "local_extendednav" {
     usecase "Show the menus of a user" as UC_showMenus
     usecase "Block the pages of hidden items" as UC_blockUrl
   }
+  package "Navigation" {
+    usecase "Find the items of the navigation of each kind of activity" as UC_discoverActivityItems
+  }
 }
 
 A_System --> UC_showMenus
 A_System --> UC_blockUrl
+A_System --> UC_discoverActivityItems
 
 @enduml

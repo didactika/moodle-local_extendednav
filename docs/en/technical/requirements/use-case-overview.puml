@@ -13,7 +13,8 @@ rectangle "local_extendednav" {
     usecase "Reorder the items" as UC_reorderNodes
     usecase "Import and export items" as UC_importNodes
     usecase "Customise a secondary navigation" as UC_customiseSecondaryNavigation
-    usecase "Change a navigation for a category or a course" as UC_setScopeException
+    usecase "Change a navigation for a category, a course or an activity" as UC_setScopeException
+    usecase "Find the items of the navigation of each kind of activity" as UC_discoverActivityItems
   }
   package "Display" {
     usecase "Show the menus of a user" as UC_showMenus
@@ -28,5 +29,6 @@ A_System --> UC_showMenus
 A_System --> UC_blockUrl
 A_Administrator --> UC_customiseSecondaryNavigation
 A_Administrator --> UC_setScopeException
+A_System --> UC_discoverActivityItems
 
 @enduml

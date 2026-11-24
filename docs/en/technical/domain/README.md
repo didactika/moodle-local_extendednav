@@ -33,7 +33,7 @@ The vertical position of an entity expresses its importance to the project objec
 | Entity | Level | Definition | Key attributes | Omitted attributes and why |
 | --- | --- | --- | --- | --- |
 | Node | 1 | An item of the primary navigation or of the user menu, added by the plugin or an item of Moodle that the plugin changes. | `nodekey`, `menu`, `title`, `url`, `visibility`, `blockaccess` | The rest are in the [data model](../design/data-model/data-model.svg). |
-| Menu | 2 | One of the two menus: the primary navigation or the user menu. | `primary`, `usermenu` | It is a class of the plugin, not a table. |
+| Menu | 2 | One of the navigations: the primary navigation, the user menu, the secondary navigation of the site home, of a course and of a category, the navigation of each kind of activity, and the site administration. | `primary`, `usermenu`, `frontpage`, `course`, `category`, `mod_<module>`, `admin` | It is a class of the plugin, not a table. |
 | Visibility | 2 | Who sees a node: everyone, the users with some roles, or nobody. | `visibility` | |
 | Role | 3 | A role that may see a restricted node. | role shortname | It is Moodle's `role`. |
 | Condition | 3 | An access restriction of Moodle on a node: a date, a group, a grouping, a profile field or a condition of a plugin. | `availability` | It is Moodle's availability tree, kept as JSON in the node. |
@@ -63,7 +63,11 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-015 | A node is shown only when its visibility, its roles and its access restrictions (Moodle's Restrict access) all let the user see it; a node of a course is checked in that course. | Node, Condition | `availability::allows` |
 | RN-016 | The dates of the restrictions make a node scheduled before its start and ended after its end; it appears and disappears on its own. | Node, Condition | `availability::period` |
 | RN-017 | The exceptions of a course travel in the backup of the course; the file of the site holds the nodes of the site and the exceptions of its categories. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
-| RN-018 | A category or a course changes its navigations on its own page, by whoever manages the navigation of the site or holds local/extendednav:managecontext in that context; the site administration only lists them. | Node, Scope | `context_scope::require_manage`, `node_service::require_scope` |
+| RN-018 | A category, a course or an activity changes its navigations on its own page, by whoever manages the navigation of the site or holds local/extendednav:managecontext in that context; the site administration only lists them. | Node, Scope | `context_scope::require_manage`, `node_service::require_scope` |
+| RN-019 | Each kind of activity has its own navigation: a change made in it applies to every activity of that kind and to no other kind. | Menu, Node | `activity::from_key`, `injector::get_origin` |
+| RN-020 | An item of the navigation of a kind of activity is listed as soon as one activity of that kind shows it, on a page or when the activities are looked through. | Menu, Node | `secondary::record_seen`, `discovery::kind` |
+| RN-021 | An item that Moodle numbers is known by the path of its address, so it has the same key on every page. | Node | `secondary::key_of` |
+| RN-022 | The changes of the single navigation of the activities of a version before 2.0 go to each kind that has the item; an item added goes to every kind; a change made for one activity goes to its kind only. | Menu, Node | `split_activity_navigation::execute` |
 
 ## Lifecycles
 

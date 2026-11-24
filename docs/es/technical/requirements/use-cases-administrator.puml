@@ -12,7 +12,7 @@ rectangle "local_extendednav" {
     usecase "Reordenar los elementos" as UC_reorderNodes
     usecase "Importar y exportar elementos" as UC_importNodes
     usecase "Personalizar una navegación secundaria" as UC_customiseSecondaryNavigation
-    usecase "Cambiar una navegación para una categoría o un curso" as UC_setScopeException
+    usecase "Cambiar una navegación para una categoría, un curso o una actividad" as UC_setScopeException
   }
 }
 

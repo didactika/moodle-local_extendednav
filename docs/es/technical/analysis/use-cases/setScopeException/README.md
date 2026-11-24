@@ -1,13 +1,13 @@
 ---
 id: UC-007
 name: setScopeException
-title: Cambiar una navegación para una categoría o un curso
+title: Cambiar una navegación para una categoría, un curso o una actividad
 status: draft
 origin: code
 sourceOfTruth: code
 ---
 
-# UC-007 Cambiar una navegación para una categoría o un curso — realización del análisis
+# UC-007 Cambiar una navegación para una categoría, un curso o una actividad — realización del análisis
 
 | Resumen | Requisitos | Análisis | Diseño | Implementación | Pruebas |
 | --- | --- | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ Requisitos: [README](../../../requirements/use-cases/setScopeException/README.md
 | Servicio de ámbitos | control | Encuentra las categorías y cursos con cambios y los que halla una búsqueda. |
 | Repositorio de nodos | control | Devuelve los nodos que se aplican a un contexto, ganando el ámbito más cercano. |
 | Gestor de nodos | control | Hace las excepciones y las cambia. |
-| Ámbito | entity | Una categoría o un curso que cambia una navegación. |
+| Ámbito | entity | Una categoría, un curso o una actividad que cambia una navegación. |
 | Nodo | entity | Un nodo de una navegación y sus reglas. |
 
 ## Colaboración

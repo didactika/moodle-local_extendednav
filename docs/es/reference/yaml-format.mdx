@@ -18,7 +18,7 @@ El mismo formato contiene una navegación o todas. Un archivo exportado empieza 
 | Campo | Descripción |
 |---|---|
 | `nodekey` | Clave del elemento, única dentro de su menú. Use la clave de un elemento de Moodle (por ejemplo `myhome`) para cambiarlo |
-| `menu` | Navegación del elemento: `primary`, `usermenu`, `frontpage` (página principal del sitio), `course`, `activity`, `category` o `admin` (administración del sitio). Es la navegación elegida en la página de gestión cuando se omite |
+| `menu` | Navegación del elemento: `primary`, `usermenu`, `frontpage` (página principal del sitio), `course`, `category`, `admin` (administración del sitio), o `mod_` y el nombre de un módulo para un tipo de actividad (`mod_forum`, `mod_assign`). Es la navegación elegida en la página de gestión cuando se omite. Un archivo de una versión anterior a la 2.0 puede indicar `activity`, la navegación única de todas las actividades: un elemento de Moodle va a cada tipo que lo tiene, y un elemento añadido va a todos los tipos |
 | `native` | `1` para un elemento de Moodle. Un elemento de Moodle que este sitio no tiene se omite con un aviso |
 | `order` | Posición del elemento en su navegación, siendo 1 la primera. En la administración del sitio, su posición entre las categorías y páginas de su categoría. Al importar, un elemento sin ella conserva su lugar, o va al final cuando es nuevo |
 | `title` | Texto que se muestra. Vacío en un elemento de Moodle conserva el título de Moodle |

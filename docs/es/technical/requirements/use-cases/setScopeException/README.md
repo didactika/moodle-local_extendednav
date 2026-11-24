@@ -1,7 +1,7 @@
 ---
 id: UC-007
 name: setScopeException
-title: Cambiar una navegación para una categoría o un curso
+title: Cambiar una navegación para una categoría, un curso o una actividad
 actor: Administrator
 package: Navigation
 status: draft
@@ -12,7 +12,7 @@ includes:
 extends: 
 ---
 
-# UC-007 Cambiar una navegación para una categoría o un curso
+# UC-007 Cambiar una navegación para una categoría, un curso o una actividad
 
 | Resumen | Requisitos | Análisis | Diseño | Implementación | Pruebas |
 | --- | --- | --- | --- | --- | --- |
@@ -32,7 +32,7 @@ extends:
 
 ## Contexto
 
-A veces una categoría o un curso necesitan otro orden, otros nombres u otros nodos que el sitio. Un administrador fija una excepción para ella; todo lo que hay dentro de una categoría la sigue, y un curso puede cambiar lo que fija su categoría.
+A veces una categoría, un curso o una actividad necesitan otro orden, otros nombres u otros nodos que el sitio. Un administrador fija una excepción para ella; todo lo que hay dentro de una categoría la sigue, y un curso puede cambiar lo que fija su categoría.
 
 ## Precondiciones
 
@@ -48,7 +48,7 @@ A veces una categoría o un curso necesitan otro orden, otros nombres u otros no
 
 | Paso | Actor | Sistema |
 | --- | --- | --- |
-| 1 | Abre **Se aplica a** y busca una categoría o un curso. | Lista los ámbitos que tienen cambios y los que encuentra la búsqueda. |
+| 1 | Abre **Se aplica a** y busca una categoría, un curso o una actividad. | Lista los ámbitos que tienen cambios y los que encuentra la búsqueda. |
 | 2 | Elige el ámbito. | Lista lo que muestran sus páginas: los nodos del sitio y los que hereda, marcados como excepción o heredado. |
 | 3 | Oculta, mueve o edita un nodo. | Si no la tiene, hace una fila del ámbito como copia del nodo al que sustituye, y la cambia. |
 | 4 | Vuelve al sitio para un nodo. | Elimina la fila del ámbito, y el nodo vuelve a ser el del sitio. |

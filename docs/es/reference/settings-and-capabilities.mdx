@@ -24,12 +24,16 @@ Si un nodo también se oculta a los administradores se decide en el formulario d
 | Capacidad | Roles predeterminados | Permite al usuario |
 |---|---|---|
 | `local/extendednav:manage` | Ninguno | Gestionar los elementos, importar, exportar y ver el registro de actividad, en el contexto del sistema |
-| `local/extendednav:managecontext` | Gestor | Cambiar las navegaciones de una categoría o un curso, y de todo lo que contiene, desde su página **Navegación** |
+| `local/extendednav:managecontext` | Gestor | Cambiar las navegaciones de una categoría, un curso o una actividad, y de todo lo que contiene, desde su página **Navegación** |
 
 Los usuarios que tienen esta capacidad encuentran la página de gestión en el mismo lugar que los administradores.
 
 > [!WARNING]
 > Quien tenga `local/extendednav:manage` decide el menú de cada usuario y qué páginas se bloquean. Concédala solo a personas en quienes confiaría para la navegación del sitio.
+
+## Tarea programada
+
+**Buscar los elementos de la navegación de cada tipo de actividad** se ejecuta una vez al día, por la noche. Construye, como administrador, la navegación de las actividades más recientes de cada tipo y enumera los elementos que Moodle y sus plugins les añaden, para que se puedan cambiar antes de que alguien abra una de esas actividades. No envía nada al navegador ni cambia nada en las actividades. Su programación se ajusta en **Administración del sitio > Servidor > Tareas > Tareas programadas**.
 
 ## Privacidad
 
@@ -37,4 +41,4 @@ El plugin almacena elementos de navegación, no datos personales, e implementa l
 
 ## Copia de seguridad
 
-Los nodos del sitio y las excepciones de las categorías son configuración del sitio: use la exportación YAML para copiarlos. Las excepciones de un curso forman parte de la copia de seguridad del curso.
+Los nodos del sitio y las excepciones de las categorías son configuración del sitio: use la exportación YAML para copiarlos. Las excepciones de un curso y de sus actividades forman parte de la copia de seguridad del curso, y de la copia de seguridad de cada actividad.

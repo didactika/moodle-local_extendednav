@@ -1,16 +1,20 @@
 ---
 title: Cambiar las otras navegaciones
-summary: Ordene, renombre, oculte y amplíe la navegación de la página principal del sitio, de un curso, de una actividad y de una categoría.
+summary: Ordene, renombre, oculte y amplíe la navegación de la página principal del sitio, de un curso, de cada tipo de actividad y de una categoría.
 order: 45
 ---
 
-Además de la navegación principal y el menú de usuario, el plugin cambia las navegaciones que Moodle dibuja bajo la cabecera de una página: la de la **página principal del sitio**, la de un **curso**, la de una **actividad** y la de una **categoría**. La administración del sitio tiene su propia página: consulte [Dar forma a la administración del sitio](page:guides/site-administration).
+Además de la navegación principal y el menú de usuario, el plugin cambia las navegaciones que Moodle dibuja bajo la cabecera de una página: la de la **página principal del sitio**, la de un **curso**, la de cada **tipo de actividad** (foros, tareas, cuestionarios y los demás) y la de una **categoría**. La administración del sitio tiene su propia página: consulte [Dar forma a la administración del sitio](page:guides/site-administration).
 
 <Screenshot src="asset:manage-course.webp" alt="La página de gestión con la navegación del curso elegida y sus nodos en lista" caption="La página de gestión: las navegaciones a la izquierda y los nodos de la elegida a la derecha." url="/local/extendednav/manage.php?menu=course" />
 
 ## Elegir la navegación
 
-En la página de gestión, la columna de la izquierda enumera las navegaciones en tres grupos: **Sitio** (navegación principal, menú de usuario y página principal), **Cursos** (curso, actividad y categoría) y **Administración**. En una pantalla estrecha, la columna es un selector sobre la lista.
+En la página de gestión, la columna de la izquierda enumera las navegaciones en cuatro grupos: **Sitio** (navegación principal, menú de usuario y página principal), **Cursos** (curso y categoría), **Actividades** (una navegación para cada tipo de actividad) y **Administración**. En **Actividades**, primero aparecen los tipos que usa el sitio; los demás están en **Otros tipos**, que los muestra. En una pantalla estrecha, la columna es un selector sobre la lista, con los mismos grupos.
+
+Cada tipo de actividad tiene su propia navegación porque cada tipo tiene sus propios elementos: un foro tiene **Suscripciones**, una tarea tiene **Entregas**, y un plugin puede añadir un elemento a un solo tipo. Un cambio hecho en la navegación de los foros se aplica a todos los foros y a ningún otro tipo.
+
+<Screenshot src="asset:manage-activity.webp" alt="La página de gestión con la navegación de los foros elegida en Actividades" caption="La navegación de un tipo de actividad, con los tipos que usa el sitio en Actividades." url="/local/extendednav/manage.php?menu=mod_forum" />
 
 ## Activar o desactivar una navegación
 
@@ -19,6 +23,8 @@ El botón junto al nombre de la navegación indica si sus cambios se aplican. Pu
 ## Ver lo que muestra Moodle
 
 Moodle no tiene una lista de los nodos de estas navegaciones: dependen de la página, de quién mira y de los plugins que añaden los suyos. El plugin registra cada nodo la primera vez que una página lo muestra, así que la lista se llena a medida que se usa el sitio. Un nodo de Moodle aparece en la lista con el enlace y el título que le da Moodle, y desde entonces se puede cambiar.
+
+Además, cada tipo de actividad se revisa una vez al día: la tarea programada **Buscar los elementos de la navegación de cada tipo de actividad** construye la navegación de las actividades más recientes de cada tipo, como administrador, y enumera todos los elementos que encuentra. Un elemento que un plugin añade solo a algunas actividades (por ejemplo, un informe para las tareas que lo usan) aparece en cuanto una actividad del sitio lo tiene. En la lista de un tipo de actividad, **Buscar elementos** hace lo mismo al momento para ese tipo e indica cuántas actividades ha revisado y cuántos elementos ha añadido.
 
 Mientras la lista de una navegación está vacía, seleccione **Buscar los nodos**: el plugin abre una página del sitio que muestra esa navegación (un curso, una actividad, una categoría o la página principal), sin salir de la página de gestión, y enumera lo que encuentra. **Abrir una página que la muestra** abre la misma página en una pestaña nueva.
 
@@ -40,7 +46,11 @@ La lista muestra todos los nodos de la navegación, sin páginas, de modo que to
 - **Visibilidad**: los nodos visibles para todos, restringidos u ocultos.
 - **Origen**: los nodos de Moodle (o de otro plugin), marcados como **Moodle**, y los nodos añadidos en esta página, marcados como **Añadido**.
 
-La columna **Visibilidad** muestra la visibilidad de cada nodo y, a su lado, una insignia por cada tipo de restricción: **Roles**, **Idiomas**, **URL bloqueada**, **También administradores**, **Solo usted**. Sitúe el puntero sobre ellas para leer los detalles, como los roles. El botón del final de la fila de filtros borra la búsqueda y los filtros.
+La columna **Visibilidad** muestra la visibilidad de cada nodo y, a su lado, una insignia por cada tipo de restricción: **Roles**, **Idiomas**, **URL bloqueada**, **También administradores**, **Solo administradores**. Sitúe el puntero sobre una insignia para leer su restricción en una frase. Seleccione una insignia para abrir **Quién ve**, que enumera todas las restricciones del nodo, una fila por insignia, con el botón **Editar nodo**. El botón del final de la fila de filtros borra la búsqueda y los filtros.
+
+<Screenshot src="asset:restrictions-dialog.webp" alt="El diálogo Quién ve, con una fila por cada insignia de la visibilidad de un nodo" caption="Seleccione una insignia para leer todas las restricciones del nodo." url="/local/extendednav/manage.php?menu=primary" />
+
+Los botones de cada fila están siempre en el mismo sitio: primero mostrar u ocultar, después editar y, al final, eliminar. Una fila sin alguno de ellos deja su sitio vacío, de modo que cada acción queda en una columna y los títulos empiezan a la misma altura.
 
 La barra de la selección ofrece solo lo que permiten los nodos seleccionados: **Mostrar** cuando alguno no es visible para todos, **Ocultar** cuando alguno es visible, y **Eliminar** cuando alguno se añadió. La pregunta antes de la acción enumera los nodos que deja como están.
 
