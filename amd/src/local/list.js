@@ -31,6 +31,7 @@ import Pending from 'core/pending';
 import {getString} from 'core/str';
 import {debounce, describeError, fitPageSizes, pageRange, pageSize} from 'local_extendednav/local/ui';
 import {init as initSelectMenus} from 'local_extendednav/local/select_menu';
+import * as checkMenu from 'local_extendednav/local/check_menu';
 
 /** Milliseconds a load may take before the skeleton appears, so a fast answer does not flash. */
 const SKELETON_DELAY = 300;
@@ -49,6 +50,7 @@ export default class List {
      * @param {string} [options.prefix] Prefix of its parameters in the address.
      * @param {Function} [options.empty] Returns the context of the empty state, given whether filters are applied.
      * @param {Function} [options.onRender] Called after the rows are drawn.
+     * @param {Function} [options.onSelection] Called with the rows selected, each time the selection changes.
      * @param {Function} [options.isFiltered] Whether filters other than the search and the statuses are applied.
      * @param {Object} [options.cleared] The state that clears every filter.
      * @param {Function} [options.onClear] Called with that state, to empty the fields of the filters.
@@ -123,25 +125,8 @@ export default class List {
         }
         this.root.addEventListener('click', (event) => this.click(event));
         this.root.addEventListener('change', (event) => this.change(event));
-        // The menu of the statuses closes with a click outside it or with Escape.
-        const menu = this.root.querySelector('[data-menu="status"]');
-        if (menu) {
-            document.addEventListener('pointerdown', (event) => {
-                if (event.target instanceof Node && !menu.contains(event.target)) {
-                    this.openStatusMenu(false);
-                }
-            });
-            // Escape closes it in the capture phase of the window: Bootstrap 5 listens to the keys of every dropdown menu of
-            // the document and fails on one that has no button of its own.
-            window.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && !menu.querySelector('.dropdown-menu').hidden) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    this.openStatusMenu(false);
-                    menu.querySelector('[data-menu-toggle]').focus();
-                }
-            }, true);
-        }
+        // The menus of checkboxes that filter the list close with a press outside them or with Escape.
+        checkMenu.wire(this.filterMenus());
         const perpage = this.region('perpage');
         if (perpage) {
             perpage.value = String(this.state.perpage);
@@ -163,7 +148,8 @@ export default class List {
      * @returns {Promise<void>}
      */
     async update(changes) {
-        const filterchanged = ['search', 'status', 'scope'].some((key) => key in changes && changes[key] !== this.state[key]);
+        const filterchanged = ['search', 'scope', ...this.filterKeys()]
+            .some((key) => key in changes && changes[key] !== this.state[key]);
         this.state = {...this.state, ...changes};
         // Changing the filter, the search or the page clears the selection, unless all of them were chosen on purpose.
         if (filterchanged || ('page' in changes && !this.allMatching)) {
@@ -242,9 +228,10 @@ export default class List {
     async render(response) {
         this.region('tablewrap')?.removeAttribute('aria-busy');
         this.total = response.total;
-        this.rows = response.rows;
         const context = this.options.context ? this.options.context(response, this.state) : {rows: response.rows};
         context.rows = context.rows.map((row) => ({...row, isselected: this.allMatching || this.selected.has(row.id)}));
+        // The list keeps the rows as they are drawn, with what the page adds to them (whether each can be selected).
+        this.rows = context.rows;
         // The template draws the whole table, headers included; the control that had the focus gets it back.
         const focus = document.activeElement?.closest('[data-focuskey]')?.dataset.focuskey;
         const {html, js} = await Templates.renderForPromise(this.options.template, context);
@@ -312,7 +299,7 @@ export default class List {
         }
         const filtered = this.options.isFiltered
             ? this.options.isFiltered(this.state)
-            : Boolean(this.state.search) || Boolean(this.state.status);
+            : Boolean(this.state.search) || this.filterKeys().some((key) => Boolean(this.state[key]));
         const context = this.options.empty ? this.options.empty(filtered, this.state) : {};
         const {html, js} = await Templates.renderForPromise('local_extendednav/list/empty', {...context, filtered});
         Templates.replaceNodeContents(region, html, js);
@@ -325,8 +312,7 @@ export default class List {
      * @returns {Promise<void>}
      */
     async showError(error) {
-        const message = await getString('error_loading', 'local_extendednav', describeError(error));
-        const {html, js} = await Templates.renderForPromise('local_extendednav/list/error', {message});
+        const {html, js} = await Templates.renderForPromise('local_extendednav/list/error', {message: describeError(error)});
         const region = this.region('error');
         Templates.replaceNodeContents(region, html, js);
         region.hidden = false;
@@ -336,61 +322,33 @@ export default class List {
     }
 
     /**
-     * The statuses chosen in the menu.
+     * The menus of checkboxes that filter the list.
      *
-     * @returns {string[]} Their keys.
+     * @returns {HTMLElement[]}
      */
-    chosenStatuses() {
-        return String(this.state.status || '').split(',').filter(Boolean);
+    filterMenus() {
+        return Array.from(this.root.querySelectorAll('[data-filter]'));
     }
 
     /**
-     * Opens or closes the menu of the statuses.
+     * The keys of the state that the menus filter.
      *
-     * @param {boolean} show Whether it opens.
+     * @returns {string[]}
      */
-    openStatusMenu(show) {
-        const menu = this.root.querySelector('[data-menu="status"]');
-        if (!menu) {
-            return;
-        }
-        menu.querySelector('.dropdown-menu').hidden = !show;
-        menu.querySelector('[data-menu-toggle]').setAttribute('aria-expanded', show ? 'true' : 'false');
+    filterKeys() {
+        return this.filterMenus().map((menu) => menu.dataset.filter);
     }
 
     /**
-     * Writes the counts of the menu of the statuses, what the menu says, and the number of results.
+     * Writes the counts of the menus that filter, what each menu says, and the number of results.
      *
-     * @param {Object} counts Rows of each status.
+     * @param {Object} counts Rows of each count key.
      */
     renderCounts(counts) {
-        const chosen = this.chosenStatuses();
-        const menu = this.root.querySelector('[data-menu="status"]');
-        if (menu) {
-            menu.querySelectorAll('[data-status]').forEach((box) => {
-                box.checked = chosen.includes(box.dataset.status);
-            });
-            menu.querySelectorAll('[data-status-count]').forEach((count) => {
-                if (counts[count.dataset.statusCount] !== undefined) {
-                    count.textContent = counts[count.dataset.statusCount];
-                }
-            });
-            // The button says what it filters, the one status chosen, or how many are.
-            const label = menu.querySelector('[data-region="menu-label"]');
-            let text = label.dataset.label;
-            if (chosen.length === 1) {
-                text = menu.querySelector(`[data-status="${chosen[0]}"]`)?.nextElementSibling?.textContent.trim() || text;
-            } else if (chosen.length > 1) {
-                text = `${label.dataset.label}: ${chosen.length}`;
-            }
-            label.textContent = text;
-            const toggle = menu.querySelector('[data-menu-toggle]');
-            toggle.classList.toggle('border-primary', chosen.length > 0);
-            menu.querySelector('[data-menu-clear]').hidden = chosen.length === 0;
-        }
+        this.filterMenus().forEach((menu) => checkMenu.paint(menu, this.state[menu.dataset.filter], counts));
         const reset = this.root.querySelector('[data-region="filters"] [data-action="clearfilters"]');
         if (reset) {
-            reset.disabled = !this.state.search && chosen.length === 0;
+            reset.disabled = !this.state.search && !this.filterKeys().some((key) => Boolean(this.state[key]));
         }
         const count = this.region('count');
         if (count) {
@@ -442,15 +400,15 @@ export default class List {
      * @param {Event} event The click.
      */
     click(event) {
-        const menu = event.target.closest('[data-menu="status"]');
+        const menu = event.target.closest('[data-filter]');
         if (menu && event.target.closest('[data-menu-toggle]')) {
-            this.openStatusMenu(menu.querySelector('.dropdown-menu').hidden);
+            checkMenu.open(menu, menu.querySelector(':scope > .dropdown-menu').hidden);
             return;
         }
         if (menu && event.target.closest('[data-menu-clear]')) {
-            this.openStatusMenu(false);
-            this.update({status: '', page: 0});
-            menu.querySelector('[data-menu-toggle]').focus();
+            checkMenu.open(menu, false);
+            this.update({[menu.dataset.filter]: '', page: 0});
+            menu.querySelector(':scope > [data-menu-toggle]').focus();
             return;
         }
         const sort = event.target.closest('th[data-sort] > .btn');
@@ -470,7 +428,8 @@ export default class List {
             if (search) {
                 search.value = '';
             }
-            const cleared = action === 'clearfilters' ? (this.options.cleared || {status: ''}) : {};
+            const emptied = Object.fromEntries(this.filterKeys().map((key) => [key, '']));
+            const cleared = action === 'clearfilters' ? {...emptied, ...this.options.cleared} : {};
             this.options.onClear?.(cleared);
             this.update({search: '', ...cleared, page: 0});
         } else if (action === 'retry') {
@@ -489,10 +448,9 @@ export default class List {
      * @param {Event} event The change.
      */
     change(event) {
-        if (event.target.matches('[data-status]')) {
-            const chosen = Array.from(this.root.querySelectorAll('[data-status]'))
-                .filter((box) => box.checked).map((box) => box.dataset.status);
-            this.update({status: chosen.join(','), page: 0});
+        const menu = event.target.matches('[data-option]') ? event.target.closest('[data-filter]') : null;
+        if (menu) {
+            this.update({[menu.dataset.filter]: checkMenu.read(menu), page: 0});
         } else if (event.target.matches('[data-region="perpage"]')) {
             this.update({perpage: Number(event.target.value), page: 0});
         } else if (event.target.matches('[data-region="selectpage"]')) {
@@ -565,6 +523,7 @@ export default class List {
             page.indeterminate = chosen > 0 && chosen < selectable.length;
             page.disabled = selectable.length === 0;
         }
+        this.options.onSelection?.(this.selectedRows());
         const bar = this.region('floatbar');
         if (!bar) {
             return;
@@ -581,11 +540,23 @@ export default class List {
             return text;
         }).catch(() => null);
         const all = bar.querySelector('[data-action="selectall"]');
+        if (!all) {
+            return;
+        }
         const pagefull = selectable.length > 0 && selectable.every((row) => this.selected.has(row.id));
         all.hidden = this.allMatching || !pagefull || this.total <= selectable.length;
         getString('select_all_matching', 'local_extendednav', this.total).then((text) => {
             all.textContent = text;
             return text;
         }).catch(() => null);
+    }
+
+    /**
+     * The rows drawn that are selected.
+     *
+     * @returns {Object[]}
+     */
+    selectedRows() {
+        return this.rows.filter((row) => row.selectable && (this.allMatching || this.selected.has(row.id)));
     }
 }

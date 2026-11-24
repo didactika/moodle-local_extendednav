@@ -26,7 +26,7 @@
     Example context (json):
     {
         "origins": [
-            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true}]}
+            {"label": "Courses", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true, "icon": "i/course", "off": false}]}
         ],
         "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}]
     }
@@ -38,15 +38,17 @@
             {{#originoptions}}<option value="{{url}}" {{#selected}}selected{{/selected}}>{{name}}</option>{{/originoptions}}
         </select>
     </div>
-    <div class="d-none d-lg-grid gap-3">
+    <div class="card d-none d-lg-block">
         {{#origins}}
-            <div>
-                <p class="small fw-bold text-uppercase text-muted mb-1 px-2">{{label}}</p>
-                <div class="list-group">
-                    {{#items}}
-                        <a class="list-group-item list-group-item-action {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>{{name}}</a>
-                    {{/items}}
-                </div>
+            <p class="small fw-bold text-uppercase text-muted mb-0 px-3 pt-3 pb-1">{{label}}</p>
+            <div class="list-group list-group-flush">
+                {{#items}}
+                    <a class="list-group-item list-group-item-action d-flex align-items-center gap-2 {{#active}}active{{/active}}" href="{{url}}" {{#active}}aria-current="page"{{/active}}>
+                        {{#pix}}{{icon}}, core{{/pix}}
+                        <span class="text-truncate">{{name}}</span>
+                        <span class="badge rounded-pill text-bg-secondary ms-auto ml-auto" {{^off}}hidden{{/off}}>{{#str}}navigation_off, local_extendednav{{/str}}</span>
+                    </a>
+                {{/items}}
             </div>
         {{/origins}}
     </div>

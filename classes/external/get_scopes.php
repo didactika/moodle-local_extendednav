@@ -42,7 +42,7 @@ final class get_scopes extends node_service {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
-            'search' => new external_value(PARAM_TEXT, 'Part of the name of a category or a course.', VALUE_DEFAULT, ''),
+            'search' => new external_value(PARAM_RAW, 'Part of the name of a category or a course.', VALUE_DEFAULT, ''),
         ]);
     }
 

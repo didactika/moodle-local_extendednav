@@ -177,19 +177,25 @@ final class node_services_test extends \advanced_testcase {
     }
 
     /**
-     * A node is placed before a sibling, or at the end, as when it is dragged.
+     * Nodes are placed before a sibling, after one, or at the end, together and in their order, as when they are dragged.
      */
     public function test_place(): void {
         $this->prepare();
 
-        change_nodes::place('course', 0, 'three', 'one');
+        change_nodes::place('course', 0, ['three'], 'one');
         $this->assertSame(['three', 'one', 'two'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
 
-        change_nodes::place('course', 0, 'three', '');
+        change_nodes::place('course', 0, ['three'], '');
         $this->assertSame(['one', 'two', 'three'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
 
+        // Two nodes move together, in the order they have.
+        change_nodes::place('course', 0, ['three', 'two'], '', 'one');
+        $this->assertSame(['one', 'two', 'three'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
+        change_nodes::place('course', 0, ['two', 'three'], 'one');
+        $this->assertSame(['two', 'three', 'one'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
+
         $this->expectException(\invalid_parameter_exception::class);
-        change_nodes::place('course', 0, 'one', 'nothing');
+        change_nodes::place('course', 0, ['one'], 'nothing');
     }
 
     /**

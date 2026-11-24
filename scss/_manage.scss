@@ -19,11 +19,33 @@
         min-width: 0;
     }
 
-    & [data-region="origins"] .list-group-item.active {
-        border-color: var(--dd-primary);
-        background-color: var(--dd-primary-soft);
-        color: var(--dd-primary-ink);
-        font-weight: 600;
+    // The column of the navigations: a card with flush lists, the icon of each navigation tinted as its text, and the one open
+    // tinted with a line of the primary colour on its side, drawn as a shadow so the text never moves.
+    & [data-region="origins"] .list-group-item {
+        padding: 0.5rem 1rem;
+        border-color: var(--dd-hairline);
+        color: var(--dd-ink);
+
+        & .icon {
+            margin-right: 0;
+            color: var(--dd-muted);
+        }
+
+        &.active {
+            border-color: var(--dd-hairline);
+            background-color: var(--dd-primary-soft);
+            box-shadow: inset 3px 0 0 var(--dd-primary);
+            color: var(--dd-primary-ink);
+            font-weight: 600;
+
+            & .icon {
+                color: currentColor;
+            }
+        }
+    }
+
+    & [data-region="origins"] > .card {
+        overflow: hidden;
     }
 }
 

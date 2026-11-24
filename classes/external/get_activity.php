@@ -39,7 +39,7 @@ final class get_activity extends node_service {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'menu' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
-            'search' => new external_value(PARAM_TEXT, 'Part of a node key or of the name of a person.', VALUE_DEFAULT, ''),
+            'search' => new external_value(PARAM_RAW, 'Part of a node key or of the name of a person.', VALUE_DEFAULT, ''),
             'status' => new external_value(
                 PARAM_TEXT,
                 'Actions separated by commas: created, updated, deleted. Empty for all of them.',

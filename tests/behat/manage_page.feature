@@ -22,6 +22,8 @@ Feature: Order, hide and select nodes on the management page
   @javascript
   Scenario: A node is hidden and shown again without reloading the page
     When I click on "Hide First" "button" in the "First" "table_row"
+    And I should see "Hide from administrators too" in the "Hide First?" "dialogue"
+    And I click on "Hide" "button" in the "Hide First?" "dialogue"
     Then I should see "Not visible" in the "First" "table_row"
     And I click on "Show First" "button" in the "First" "table_row"
     And I should see "Visible to everyone" in the "First" "table_row"
@@ -32,6 +34,8 @@ Feature: Order, hide and select nodes on the management page
     And I click on "Select First" "checkbox"
     And I should see "1 selected"
     And I should see "Hide" in the "[data-region='floatbar']" "css_element"
+    And I should see "Delete" in the "[data-region='floatbar']" "css_element"
+    And I should not see "Show" in the "[data-region='floatbar']" "css_element"
     And I click on "Select all" "checkbox"
     And I click on "Select all" "checkbox"
     And ".card[data-region='floatbar']" "css_element" should not be visible
@@ -50,3 +54,19 @@ Feature: Order, hide and select nodes on the management page
     When I click on "Course navigation" "link" in the "[data-region='origins']" "css_element"
     Then I should see "Course navigation" in the "[data-region='origin']" "css_element"
     And I should see "Applies to"
+
+  @javascript
+  Scenario: The nodes of Moodle and the nodes added are told apart and filtered
+    Then I should see "Added" in the "First" "table_row"
+    And I should see "Moodle" in the "myhome" "table_row"
+    And I click on "[data-menu='origin'] [data-menu-toggle]" "css_element"
+    And I click on "[data-menu='origin'] [data-option='custom']" "css_element"
+    And I should see "First" in the "[data-region='tablewrap']" "css_element"
+    And I should not see "myhome" in the "[data-region='tablewrap']" "css_element"
+
+  @javascript
+  Scenario: Hiding several nodes says which ones it leaves as they are
+    When I click on "Select all" "checkbox"
+    And I click on "Hide" "button" in the "[data-region='floatbar']" "css_element"
+    Then I should see "of the selected nodes are left as they are" in the ".modal.show" "css_element"
+    And I should see "Site administration" in the ".modal.show" "css_element"

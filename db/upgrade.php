@@ -96,5 +96,12 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112502, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112504) {
+        // A node of the site administration is hidden from administrators too by default.
+        $DB->set_field('local_extendednav', 'hideadmins', 1, ['menu' => 'admin']);
+
+        upgrade_plugin_savepoint(true, 2026112504, 'local', 'extendednav');
+    }
+
     return true;
 }

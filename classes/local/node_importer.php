@@ -108,7 +108,8 @@ class node_importer {
             }
         }
         return $menu->is_native($row->nodekey) && (int)$row->visibility === node_access::VISIBILITY_ALL
-            && empty($row->blockaccess) && empty($row->display) && empty($row->placement) && empty($row->hideadmins)
+            && empty($row->blockaccess) && empty($row->display) && empty($row->placement)
+            && (int)$row->hideadmins === ($row->menu === \local_extendednav\menu\admintree::KEY ? 1 : 0)
             && (int)$row->contextid === 0;
     }
 

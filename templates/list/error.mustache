@@ -17,17 +17,20 @@
 {{!
     @template local_extendednav/list/error
 
-    What a list shows where its rows were when they did not load, with the way to try again.
+    What a list shows where its rows were when they did not load: the same place as the empty state, with what went wrong
+    and the way to try again.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 
     Example context (json):
     {
-        "message": "The list did not load: the server did not answer in time."
+        "message": "The server did not answer in time."
     }
 }}
-<div class="alert alert-danger d-flex flex-wrap align-items-center justify-content-between" role="status">
-    <span>{{message}}</span>
-    <button type="button" class="btn btn-outline-danger btn-sm" data-action="retry">{{#str}}try_again, local_extendednav{{/str}}</button>
+<div class="d-flex flex-column align-items-center gap-2 px-4 py-5 text-center" role="alert">
+    <span class="icon-box text-danger">{{#pix}}i/warning, core{{/pix}}</span>
+    <p class="fw-bold mb-0">{{#str}}error_loading_title, local_extendednav{{/str}}</p>
+    <p class="text-muted mb-0">{{message}}</p>
+    <button type="button" class="btn btn-outline-secondary" data-action="retry">{{#pix}}i/reload, core{{/pix}} {{#str}}try_again, local_extendednav{{/str}}</button>
 </div>

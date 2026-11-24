@@ -103,6 +103,11 @@ class menu_manager {
             'origin_group_course' => ['course', 'activity', 'category'],
             'origin_group_admin' => ['admin'],
         ];
+        // The icon of Moodle that stands for each navigation in the column.
+        $icons = [
+            'primary' => 'i/menu', 'usermenu' => 'i/user', 'frontpage' => 'i/home', 'course' => 'i/course',
+            'activity' => 'i/activities', 'category' => 'i/withsubcat', 'admin' => 'i/settings',
+        ];
         $origins = [];
         $options = [];
         foreach ($groups as $string => $keys) {
@@ -113,7 +118,14 @@ class menu_manager {
                     continue;
                 }
                 $url = (new \moodle_url($script, ['menu' => $key]))->out(false);
-                $items[] = ['key' => $key, 'name' => $menu->get_name(), 'url' => $url, 'active' => $key === $current];
+                $items[] = [
+                    'key' => $key,
+                    'name' => $menu->get_name(),
+                    'url' => $url,
+                    'active' => $key === $current,
+                    'icon' => $icons[$key] ?? 'i/navigationitem',
+                    'off' => !self::is_enabled($key),
+                ];
                 $options[] = ['name' => $menu->get_name(), 'url' => $url, 'selected' => $key === $current];
             }
             $origins[] = ['label' => get_string($string, 'local_extendednav'), 'items' => $items];

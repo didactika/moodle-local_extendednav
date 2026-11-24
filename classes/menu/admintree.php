@@ -38,6 +38,9 @@ class admintree extends base {
     /** @var string[] Nodes that are never hidden, so the way to this plugin is always there. */
     public const PROTECTED = ['appearance', 'local_extendednav_cat', 'local_extendednav_manage'];
 
+    /** @var string Key of the group General of the list, which holds the items of the top level that are not tabs. */
+    public const GENERAL = 'admingeneral';
+
     /** @var array|null The nodes of the tree, found once per request. */
     private static ?array $tree = null;
 
@@ -199,7 +202,7 @@ class admintree extends base {
             $new[] = (object)[
                 'menu' => self::KEY, 'contextid' => 0, 'nodekey' => $key, 'parentkey' => $native->parentkey ?: null,
                 'visibility' => node_access::VISIBILITY_ALL, 'blockaccess' => 0, 'display' => 0, 'placement' => 0,
-                'hideadmins' => 0, 'sortorder' => $sortorder++, 'timecreated' => $now, 'timemodified' => $now,
+                'hideadmins' => 1, 'sortorder' => $sortorder++, 'timecreated' => $now, 'timemodified' => $now,
             ];
         }
         if (!empty($new)) {
@@ -339,6 +342,31 @@ class admintree extends base {
             self::$applied = true;
             self::apply($ADMIN);
         }
+    }
+
+    /**
+     * Returns the items of the top level that Moodle lists in the tab General of the site administration.
+     *
+     * Moodle makes a tab of a top-level category with 8 children or more, or with a child that has children of its own; every
+     * other item of the top level, page or small category, goes in General.
+     *
+     * @param \stdClass[] $nodes Every node of the tree, keyed by node key.
+     * @return array Keys of the items of General, as keys.
+     */
+    public static function general_keys(array $nodes): array {
+        $children = [];
+        foreach ($nodes as $key => $node) {
+            $children[(string)($node->parentkey ?? '')][] = (string)$key;
+        }
+        $general = [];
+        foreach ($children[''] ?? [] as $key) {
+            $own = $children[$key] ?? [];
+            $deep = array_filter($own, static fn(string $child): bool => !empty($children[$child]));
+            if (count($own) < 8 && empty($deep)) {
+                $general[$key] = true;
+            }
+        }
+        return $general;
     }
 
     /**
