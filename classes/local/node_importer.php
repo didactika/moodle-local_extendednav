@@ -29,12 +29,12 @@ use local_extendednav\menu_manager;
 class node_importer {
     /** @var string[] Keys written for each node, in order. */
     public const EXPORT_FIELDS = [
-        'nodekey', 'menu', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight',
+        'nodekey', 'menu', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
+        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
     ];
 
     /** @var string[] Fields written as whole numbers. */
-    private const INT_FIELDS = ['order', 'visibility', 'blockaccess', 'display'];
+    private const INT_FIELDS = ['order', 'visibility', 'blockaccess', 'display', 'placement', 'hideadmins'];
 
     /** @var string[] Fields written as whole numbers, or empty when not set. */
     private const OPTIONAL_INT_FIELDS = ['popupwidth', 'popupheight'];
@@ -68,12 +68,71 @@ class node_importer {
         foreach (node_manager::group_by_parent($menunodes) as $index => $node) {
             $positions[(int)$node->id] = $index + 1;
         }
+        // The exceptions of a category or a course are numbered among themselves.
+        $ranks = [];
+        $scoped = array_filter($nodes, static fn(\stdClass $node): bool => (int)($node->contextid ?? 0) !== 0);
+        usort(
+            $scoped,
+            static fn(\stdClass $a, \stdClass $b): int => [(int)$a->sortorder, (int)$a->id] <=> [(int)$b->sortorder, (int)$b->id]
+        );
+        $counters = [];
+        foreach ($scoped as $node) {
+            $group = $node->menu . '@' . $node->contextid;
+            $counters[$group] = ($counters[$group] ?? 0) + 1;
+            $ranks[(int)$node->id] = $counters[$group];
+        }
         $exported = [];
         foreach ($nodes as $node) {
-            $exported[] = self::export_node($node, $positions[(int)$node->id] ?? null);
+            $exported[] = self::export_node($node, $positions[(int)$node->id] ?? $ranks[(int)$node->id] ?? null);
         }
-        usort($exported, static fn(array $a, array $b): int => $a['order'] <=> $b['order']);
+        usort($exported, static fn(array $a, array $b): int => [$a['scope'], $a['order']] <=> [$b['scope'], $b['order']]);
         return $exported;
+    }
+
+    /**
+     * Describes the category or the course a node applies to, as the file names it.
+     *
+     * @param int $contextid Context id, 0 for the whole site.
+     * @return string Empty for the whole site, "course:shortname" or "category:Parent / Name".
+     */
+    public static function describe_scope(int $contextid): string {
+        if ($contextid === 0) {
+            return '';
+        }
+        $context = \context::instance_by_id($contextid, IGNORE_MISSING);
+        if (!$context) {
+            return '';
+        }
+        if ($context->contextlevel === CONTEXT_COURSE) {
+            return 'course:' . get_course($context->instanceid)->shortname;
+        }
+        $category = \core_course_category::get($context->instanceid, IGNORE_MISSING, true);
+        return $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
+    }
+
+    /**
+     * Finds the category or the course a file names.
+     *
+     * @param string $scope As {@see describe_scope()} writes it.
+     * @return int|null The context id, or null when nothing matches.
+     */
+    public static function resolve_scope(string $scope): ?int {
+        global $DB;
+
+        [$type, $name] = array_pad(explode(':', trim($scope), 2), 2, '');
+        $name = trim($name);
+        if ($type === 'course') {
+            $id = $DB->get_field('course', 'id', ['shortname' => $name]);
+            return $id ? (int)\context_course::instance((int)$id)->id : null;
+        }
+        if ($type === 'category') {
+            foreach (\core_course_category::get_all(['returnhidden' => true]) as $category) {
+                if ($category->get_nested_name(false, ' / ') === $name) {
+                    return (int)\context_coursecat::instance((int)$category->id)->id;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -86,6 +145,7 @@ class node_importer {
     public static function export_node(\stdClass $node, ?int $order = null): array {
         $node = clone $node;
         $node->order = $order ?? 0;
+        $node->scope = self::describe_scope((int)($node->contextid ?? 0));
         $data = [];
         foreach (self::EXPORT_FIELDS as $field) {
             $value = $node->$field ?? null;
@@ -116,6 +176,16 @@ class node_importer {
         foreach (node_repository::get_all() as $node) {
             $existing[$node->menu][$node->nodekey] = $node;
         }
+
+        // The nodes of a category or a course are checked with the rest and saved after the ones of the site.
+        $scoped = [];
+        foreach ($items as $index => $item) {
+            if (is_array($item) && trim((string)($item['scope'] ?? '')) !== '') {
+                $scoped[$index] = $item;
+                unset($items[$index]);
+            }
+        }
+        $scopedrecords = $this->prepare_scoped($scoped, $errors, $warnings, $counts);
 
         // Build the records and drop the ones that are skipped.
         $batch = [];
@@ -209,10 +279,85 @@ class node_importer {
                 self::apply_orders($menukey, $orders[$menukey], $ids);
             }
         }
+        foreach ($scopedrecords as $record) {
+            if (isset($record->id)) {
+                node_manager::update($record);
+                $counts['updated']++;
+            } else {
+                node_manager::create($record);
+                $counts['created']++;
+            }
+        }
         if (access_guard::check_fallbacks(node_repository::get_all()) === access_guard::FALLBACKS_BLOCKED_FOR_SOME) {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
         return ['errors' => [], 'warnings' => $warnings, 'counts' => $counts];
+    }
+
+    /**
+     * Checks the nodes of a file that apply to a category or a course, and builds the records to save.
+     *
+     * @param array $items The nodes of the file that name a scope, keyed by their place in the file.
+     * @param array $errors The errors found, to add to.
+     * @param array $warnings The warnings found, to add to.
+     * @param array $counts The nodes kept, to add to.
+     * @return \stdClass[] The records to save.
+     */
+    private function prepare_scoped(array $items, array &$errors, array &$warnings, array &$counts): array {
+        $records = [];
+        foreach ($items as $index => $item) {
+            $label = get_string('import_entry', 'local_extendednav', $index + 1);
+            $menukey = isset($item['menu']) && trim((string)$item['menu']) !== ''
+                ? trim((string)$item['menu']) : $this->defaultmenu;
+            $contextid = self::resolve_scope((string)$item['scope']);
+            if (menu_manager::get_menu($menukey) === null) {
+                $errors[] = $label . ': ' . get_string('err_invalid_menu', 'local_extendednav');
+                continue;
+            }
+            if ($contextid === null || !node_list::supports_scopes($menukey)) {
+                $errors[] = $label . ': ' . get_string('err_import_scope', 'local_extendednav', s((string)$item['scope']));
+                continue;
+            }
+            $values = array_intersect_key($item, array_flip(node_manager::EDITABLE_FIELDS));
+            $record = node_manager::prepare($values, $menukey);
+            $record->contextid = $contextid;
+            $label = $menukey . '@' . $item['scope'] . '/' . $record->nodekey;
+
+            // The key of a node of a category or a course repeats the one of the site on purpose: it is checked against its own.
+            $others = node_repository::get_exceptions($menukey, $contextid);
+            $current = null;
+            foreach ($others as $other) {
+                if ($other->nodekey === $record->nodekey) {
+                    $current = $other;
+                }
+            }
+            if (isset($records[$menukey . '@' . $contextid . '/' . $record->nodekey])) {
+                $errors[] = $label . ': ' . get_string('err_import_duplicate', 'local_extendednav');
+                continue;
+            }
+            if ($current !== null && !$this->overwrite) {
+                $counts['skipped']++;
+                continue;
+            }
+            $others = array_column($others, null, 'nodekey');
+            unset($others[$record->nodekey]);
+            $result = node_validator::validate($record, $others);
+            foreach ($result['errors'] as $field => $message) {
+                $errors[] = $label . ' (' . $field . '): ' . $message;
+            }
+            foreach ($result['warnings'] as $message) {
+                $warnings[] = $label . ': ' . $message;
+            }
+            $order = $item['order'] ?? '';
+            if ($order !== '' && $order !== null && is_numeric($order)) {
+                $record->sortorder = (int)$order;
+            }
+            if ($current !== null) {
+                $record->id = $current->id;
+            }
+            $records[$menukey . '@' . $contextid . '/' . $record->nodekey] = $record;
+        }
+        return array_values($records);
     }
 
     /**

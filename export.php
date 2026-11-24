@@ -41,7 +41,8 @@ if (menu_manager::get_menu($menukey) === null) {
 $manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
 if ($all) {
-    $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey, 'contextid' => 0], 'sortorder ASC, id ASC');
+    // Every node of the navigation: the ones of the site and the exceptions of the categories and the courses.
+    $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey], 'contextid ASC, sortorder ASC, id ASC');
     $filename = 'extendednav_' . $menukey . '_all_' . date('Ymd_His') . '.yaml';
 } else {
     require_sesskey();
@@ -54,7 +55,7 @@ if (empty($nodes)) {
     redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }
 
-$menunodes = $all ? $nodes : $DB->get_records('local_extendednav', ['menu' => $menukey, 'contextid' => 0]);
+$menunodes = $DB->get_records('local_extendednav', ['menu' => $menukey, 'contextid' => 0]);
 $content = \local_extendednav\yaml::dump(['nodes' => node_importer::export_nodes($nodes, $menunodes)]);
 
 send_file($content, $filename, 0, 0, true, true, 'application/yaml');
