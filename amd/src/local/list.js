@@ -118,6 +118,12 @@ export default class List {
             search.value = this.state.search || '';
             const run = debounce(() => this.update({search: search.value.trim(), page: 0}), 300);
             search.addEventListener('input', run);
+            // A value set at once, without typing (pasted, or chosen from the history of the field), searches too.
+            search.addEventListener('change', () => {
+                if (search.value.trim() !== this.state.search) {
+                    this.update({search: search.value.trim(), page: 0});
+                }
+            });
             this.region('searchform')?.addEventListener('submit', (event) => {
                 event.preventDefault();
                 this.update({search: search.value.trim(), page: 0});
