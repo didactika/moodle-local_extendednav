@@ -19,14 +19,14 @@ Design: [README](../../../design/use-cases/blockUrl/README.md)
 
 | Element | Kind | Location | Verified |
 | --- | --- | --- | --- |
-| `access_guard` | service | `classes/local/access_guard.php` | yes |
-| `url_helper` | service | `classes/local/url_helper.php` | yes |
+| `access_guard` | service | `classes/local/navigation/access_guard.php` | yes |
+| `url_helper` | service | `classes/local/support/url_helper.php` | yes |
 | Restricted page | page | `restricted.php` | yes |
 
 ## Tests
 
 | Test | Covers | Location |
 | --- | --- | --- |
-| Blocking and fallbacks | main flow, RN-004, RN-005 | `tests/local/access_guard_test.php` |
-| Matching of URLs | RN-004 | `tests/local/url_helper_test.php` |
+| Blocking and fallbacks | main flow, RN-004, RN-005 | `tests/local/navigation/access_guard_test.php` |
+| Matching of URLs | RN-004 | `tests/local/support/url_helper_test.php` |
 | Behat journey of blocking | main flow | `tests/behat/block_access.feature` |

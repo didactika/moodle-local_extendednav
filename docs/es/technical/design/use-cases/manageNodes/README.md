@@ -19,10 +19,10 @@ Análisis: [README](../../../analysis/use-cases/manageNodes/README.md)
 
 | Elemento de diseño | Tipo | Código |
 | --- | --- | --- |
-| `node_validator::validate` | servicio | `classes/local/node_validator.php:46` |
-| `node_manager::create` | servicio | `classes/local/node_manager.php:104` |
-| `node_manager::update` | servicio | `classes/local/node_manager.php:134` |
-| `node_manager::delete` | servicio | `classes/local/node_manager.php:159` |
+| `validator::validate` | servicio | `classes/local/node/validator.php:46` |
+| `manager::create` | servicio | `classes/local/node/manager.php:104` |
+| `manager::update` | servicio | `classes/local/node/manager.php:134` |
+| `manager::delete` | servicio | `classes/local/node/manager.php:159` |
 
 ## Secuencia
 
@@ -32,7 +32,7 @@ Análisis: [README](../../../analysis/use-cases/manageNodes/README.md)
 
 | Operación | Entrada | Salida | Errores |
 | --- | --- | --- | --- |
-| `node_manager::create(record, events)` | el elemento | el registro guardado con su id | elemento no válido |
+| `manager::create(record, events)` | el elemento | el registro guardado con su id | elemento no válido |
 
 ## Datos que toca
 

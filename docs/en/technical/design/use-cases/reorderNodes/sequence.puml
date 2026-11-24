@@ -6,7 +6,7 @@ skinparam responseMessageBelowArrow true
 actor "Administrator" as actor
 participant "manage.js" as js
 participant "reorder_nodes" as service
-participant "node_manager" as manager
+participant "manager" as manager
 database "local_extendednav" as table
 
 actor -> js : presses Move up or Move down

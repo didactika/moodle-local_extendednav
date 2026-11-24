@@ -6,8 +6,8 @@ skinparam responseMessageBelowArrow true
 actor "Administrator" as actor
 participant "edit.php" as page
 participant "node_form" as form
-participant "node_validator" as validator
-participant "node_manager" as manager
+participant "validator" as validator
+participant "manager" as manager
 database "local_extendednav" as table
 
 actor -> page : fields of the item

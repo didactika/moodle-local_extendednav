@@ -20,18 +20,18 @@ Diseño: [README](../../../design/use-cases/customiseSecondaryNavigation/README.
 | Elemento | Tipo | Ubicación | Verificado |
 | --- | --- | --- | --- |
 | `get_nodes`, `change_nodes` | servicio web | `classes/external/get_nodes.php`, `classes/external/change_nodes.php` | sí |
-| `node_list` | clase | `classes/local/node_list.php` | sí |
+| `nodes` | clase | `classes/local/listing/nodes.php` | sí |
 | `secondary` | menú | `classes/menu/secondary.php` | sí |
-| `secondary_navigation` | clase | `classes/local/secondary_navigation.php` | sí |
+| `injector` | clase | `classes/local/navigation/injector.php` | sí |
 | Página de gestión | AMD y plantilla | `amd/src/manage.js`, `templates/manage/page.mustache`, `templates/list/nodes_table.mustache` | sí |
 
 ## Pruebas
 
 | Prueba | Cubre | Ubicación |
 | --- | --- | --- |
-| La lista, sus filtros, cuentas y páginas | flujo principal | `tests/local/node_list_test.php` |
+| La lista, sus filtros, cuentas y páginas | flujo principal | `tests/local/listing/nodes_test.php` |
 | Los servicios de la página | flujo principal | `tests/external/node_services_test.php` |
-| Mover nodos | flujo principal | `tests/local/node_scope_test.php` |
-| Un nodo visto por primera vez | RN-009 | `tests/local/node_list_test.php` |
-| Un nodo oculto y otro renombrado en un curso | flujo principal | `tests/behat/secondary_navigation.feature` |
+| Mover nodos | flujo principal | `tests/local/node/scope_test.php` |
+| Un nodo visto por primera vez | RN-009 | `tests/local/listing/nodes_test.php` |
+| Un nodo oculto y otro renombrado en un curso | flujo principal | `tests/behat/injector.feature` |
 | Recorrido Behat de la página de gestión | flujo principal | `tests/behat/manage_page.feature` |

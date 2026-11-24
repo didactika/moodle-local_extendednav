@@ -12,11 +12,11 @@ package "Entry points" {
   class observer
 }
 package "Services" {
-  class node_manager
-  class node_validator
-  class node_importer
-  class node_repository
-  class node_access
+  class manager
+  class validator
+  class importer
+  class repository
+  class access
   class access_guard
   class url_helper
   class menu_manager
@@ -27,21 +27,21 @@ package "Menus" {
   class usermenu
 }
 
-pages --> node_manager
-pages --> node_importer
-reorder_nodes --> node_manager
+pages --> manager
+pages --> importer
+reorder_nodes --> manager
 hooks --> menu_manager
 hooks --> access_guard
-observer --> node_manager
-node_manager --> node_repository
-node_manager --> node_validator
-node_importer --> node_validator
-node_importer --> yaml
-access_guard --> node_access
+observer --> manager
+manager --> repository
+manager --> validator
+importer --> validator
+importer --> yaml
+access_guard --> access
 access_guard --> url_helper
 menu_manager --> primary
 menu_manager --> usermenu
-primary --> node_access
-usermenu --> node_access
+primary --> access
+usermenu --> access
 
 @enduml

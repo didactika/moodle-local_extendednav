@@ -19,8 +19,8 @@ Análisis: [README](../../../analysis/use-cases/importNodes/README.md)
 
 | Elemento de diseño | Tipo | Código |
 | --- | --- | --- |
-| `node_importer::import` | servicio | `classes/local/node_importer.php:110` |
-| `node_importer::export_nodes` | servicio | `classes/local/node_importer.php:66` |
+| `importer::import` | servicio | `classes/local/io/importer.php:110` |
+| `exporter::export_nodes` | servicio | `classes/local/io/importer.php:66` |
 | `yaml::parse` | servicio | `classes/yaml.php:61` |
 
 ## Secuencia
@@ -31,7 +31,7 @@ Análisis: [README](../../../analysis/use-cases/importNodes/README.md)
 
 | Operación | Entrada | Salida | Errores |
 | --- | --- | --- | --- |
-| `node_importer::import(items)` | los elementos leídos del archivo | los errores, las advertencias y los recuentos | elementos no válidos |
+| `importer::import(items)` | los elementos leídos del archivo | los errores, las advertencias y los recuentos | elementos no válidos |
 
 ## Datos que toca
 

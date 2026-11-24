@@ -6,7 +6,7 @@ skinparam responseMessageBelowArrow true
 actor "Administrador" as p0
 participant "manage.js" as p1
 participant "get_scopes / change_nodes" as p2
-participant "node_manager" as p3
+participant "manager" as p3
 database "local_extendednav" as p4
 
 p0 -> p1 : actúa sobre la lista

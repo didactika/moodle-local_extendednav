@@ -19,10 +19,10 @@ Analysis: [README](../../../analysis/use-cases/manageNodes/README.md)
 
 | Design element | Kind | Code target |
 | --- | --- | --- |
-| `node_validator::validate` | service | `classes/local/node_validator.php:46` |
-| `node_manager::create` | service | `classes/local/node_manager.php:104` |
-| `node_manager::update` | service | `classes/local/node_manager.php:134` |
-| `node_manager::delete` | service | `classes/local/node_manager.php:159` |
+| `validator::validate` | service | `classes/local/node/validator.php:46` |
+| `manager::create` | service | `classes/local/node/manager.php:104` |
+| `manager::update` | service | `classes/local/node/manager.php:134` |
+| `manager::delete` | service | `classes/local/node/manager.php:159` |
 
 ## Sequence
 
@@ -32,7 +32,7 @@ Analysis: [README](../../../analysis/use-cases/manageNodes/README.md)
 
 | Operation | Input | Output | Errors |
 | --- | --- | --- | --- |
-| `node_manager::create(record, events)` | the item | the saved record with its id | invalid item |
+| `manager::create(record, events)` | the item | the saved record with its id | invalid item |
 
 ## Data touched
 

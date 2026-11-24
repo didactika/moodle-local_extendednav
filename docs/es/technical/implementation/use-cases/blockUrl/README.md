@@ -19,14 +19,14 @@ Diseño: [README](../../../design/use-cases/blockUrl/README.md)
 
 | Elemento | Tipo | Ubicación | Verificado |
 | --- | --- | --- | --- |
-| `access_guard` | servicio | `classes/local/access_guard.php` | sí |
-| `url_helper` | servicio | `classes/local/url_helper.php` | sí |
+| `access_guard` | servicio | `classes/local/navigation/access_guard.php` | sí |
+| `url_helper` | servicio | `classes/local/support/url_helper.php` | sí |
 | Página restringida | página | `restricted.php` | sí |
 
 ## Pruebas
 
 | Prueba | Cubre | Ubicación |
 | --- | --- | --- |
-| Bloqueo y páginas de reserva | flujo principal, RN-004, RN-005 | `tests/local/access_guard_test.php` |
-| Coincidencia de URL | RN-004 | `tests/local/url_helper_test.php` |
+| Bloqueo y páginas de reserva | flujo principal, RN-004, RN-005 | `tests/local/navigation/access_guard_test.php` |
+| Coincidencia de URL | RN-004 | `tests/local/support/url_helper_test.php` |
 | Recorrido Behat del bloqueo | flujo principal | `tests/behat/block_access.feature` |

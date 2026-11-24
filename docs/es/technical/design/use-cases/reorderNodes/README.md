@@ -20,7 +20,7 @@ Análisis: [README](../../../analysis/use-cases/reorderNodes/README.md)
 | Elemento de diseño | Tipo | Código |
 | --- | --- | --- |
 | `reorder_nodes::execute` | servicio | `classes/external/reorder_nodes.php:58` |
-| `node_manager::reorder` | servicio | `classes/local/node_manager.php:248` |
+| `manager::reorder` | servicio | `classes/local/node/manager.php:248` |
 
 ## Secuencia
 

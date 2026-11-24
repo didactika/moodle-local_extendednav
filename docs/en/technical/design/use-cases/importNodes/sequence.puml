@@ -6,8 +6,8 @@ skinparam responseMessageBelowArrow true
 actor "Administrator" as actor
 participant "import.php" as page
 participant "yaml" as yaml
-participant "node_importer" as importer
-participant "node_validator" as validator
+participant "importer" as importer
+participant "validator" as validator
 database "local_extendednav" as table
 
 actor -> page : file, what to do with existing items

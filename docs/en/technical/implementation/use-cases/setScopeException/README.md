@@ -20,17 +20,17 @@ Design: [README](../../../design/use-cases/setScopeException/README.md)
 | Element | Kind | Location | Verified |
 | --- | --- | --- | --- |
 | `get_scopes` | web service | `classes/external/get_scopes.php` | yes |
-| `node_repository` | class | `classes/local/node_repository.php` | yes |
-| `node_manager` | class | `classes/local/node_manager.php` | yes |
+| `repository` | class | `classes/local/node/repository.php` | yes |
+| `manager` | class | `classes/local/node/manager.php` | yes |
 | Scope menu | AMD | `amd/src/manage.js` | yes |
 
 ## Tests
 
 | Test | Covers | Location |
 | --- | --- | --- |
-| The nearest scope wins | RN-012 | `tests/local/node_scope_test.php` |
-| An exception leaves the site alone | main flow | `tests/local/node_scope_test.php` |
-| Moving in a scope | RN-013 | `tests/local/node_scope_test.php` |
-| Deleting a node | RN-014 | `tests/local/node_scope_test.php` |
+| The nearest scope wins | RN-012 | `tests/local/node/scope_test.php` |
+| An exception leaves the site alone | main flow | `tests/local/node/scope_test.php` |
+| Moving in a scope | RN-013 | `tests/local/node/scope_test.php` |
+| Deleting a node | RN-014 | `tests/local/node/scope_test.php` |
 | The scopes of a navigation | main flow | `tests/external/node_services_test.php` |
-| Export and import of an exception | main flow | `tests/local/node_importer_scope_test.php` |
+| Export and import of an exception | main flow | `tests/local/io/importer_scope_test.php` |

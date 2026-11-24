@@ -45,20 +45,20 @@ The vertical position of an entity expresses its importance to the project objec
 
 | ID | Rule | Entities | Source |
 | --- | --- | --- | --- |
-| RN-001 | A node is shown to a user when its visibility allows them and its languages include their current language; a hidden parent hides its submenu. | Node, Role, Language | `node_access::is_shown` |
-| RN-002 | A node key is unique within its menu, and only letters, numbers, underscores and hyphens are allowed. | Node | `node_validator::validate` |
-| RN-003 | A change that would leave every user without a landing page is refused, and Site administration can never be hidden or nested. | Node | `node_validator::validate` |
+| RN-001 | A node is shown to a user when its visibility allows them and its languages include their current language; a hidden parent hides its submenu. | Node, Role, Language | `access::is_shown` |
+| RN-002 | A node key is unique within its menu, and only letters, numbers, underscores and hyphens are allowed. | Node | `validator::validate` |
+| RN-003 | A change that would leave every user without a landing page is refused, and Site administration can never be hidden or nested. | Node | `validator::validate` |
 | RN-004 | A blocked URL sends the user to the first fallback page they may open; when none is allowed, to an explanation page. | Node | `access_guard::evaluate` |
 | RN-005 | Site administrators, external URLs and the pages of administration, login and plugins are never blocked. | Node | `access_guard::is_immune` |
-| RN-006 | The whole of an import file is checked before anything is saved. | ImportFile | `node_importer::import` |
-| RN-007 | Reordering keeps a parent with its submenu, and a submenu item moves only among its siblings. | Node, Submenu | `node_manager::reorder` |
-| RN-008 | An item of Moodle with empty fields keeps the values of Moodle. | Node | `node_text` |
+| RN-006 | The whole of an import file is checked before anything is saved. | ImportFile | `importer::import` |
+| RN-007 | Reordering keeps a parent with its submenu, and a submenu item moves only among its siblings. | Node, Submenu | `manager::reorder` |
+| RN-008 | An item of Moodle with empty fields keeps the values of Moodle. | Node | `text` |
 | RN-009 | A node of a secondary navigation is found when a page shows it, once, and from then on it has a row that can be changed. | Node, Menu | `secondary::record_seen` |
 | RN-010 | In the site administration every category and page, at any depth, can be renamed, hidden and ordered; a link of the plugin goes in a category; its nodes are hidden from administrators too by default.  Node, Menu | `admintree::apply` |
-| RN-011 | A site administrator sees every node, unless the plugin or the node hides it from administrators too. | Node, Role | `node_access::is_allowed` |
-| RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. | Node, Scope | `node_repository::get_scoped_nodes` |
-| RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. | Node, Scope | `node_repository::get_scoped_nodes` |
-| RN-014 | Deleting a node of the site deletes its exceptions. | Node, Scope | `node_manager::delete` |
+| RN-011 | A site administrator sees every node, unless the plugin or the node hides it from administrators too. | Node, Role | `access::is_allowed` |
+| RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. | Node, Scope | `repository::get_scoped_nodes` |
+| RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. | Node, Scope | `repository::get_scoped_nodes` |
+| RN-014 | Deleting a node of the site deletes its exceptions. | Node, Scope | `manager::delete` |
 
 ## Lifecycles
 

@@ -19,7 +19,7 @@ Design: [README](../../../design/use-cases/importNodes/README.md)
 
 | Element | Kind | Location | Verified |
 | --- | --- | --- | --- |
-| `node_importer` | service | `classes/local/node_importer.php` | yes |
+| `importer` | service | `classes/local/io/importer.php` | yes |
 | `yaml` | service | `classes/yaml.php` | yes |
 | Import and export pages | pages | `import.php`, `export.php` | yes |
 | `import_form` | form | `classes/form/import_form.php` | yes |
@@ -28,6 +28,6 @@ Design: [README](../../../design/use-cases/importNodes/README.md)
 
 | Test | Covers | Location |
 | --- | --- | --- |
-| Importing and exporting nodes | main flow | `tests/local/node_importer_test.php` |
+| Importing and exporting nodes | main flow | `tests/local/io/importer_test.php` |
 | The YAML reader and writer | main flow | `tests/yaml_test.php` |
 | Behat journey of import and export | main flow | `tests/behat/import_export.feature` |

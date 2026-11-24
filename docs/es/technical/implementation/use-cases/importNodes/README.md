@@ -19,7 +19,7 @@ Diseño: [README](../../../design/use-cases/importNodes/README.md)
 
 | Elemento | Tipo | Ubicación | Verificado |
 | --- | --- | --- | --- |
-| `node_importer` | servicio | `classes/local/node_importer.php` | sí |
+| `importer` | servicio | `classes/local/io/importer.php` | sí |
 | `yaml` | servicio | `classes/yaml.php` | sí |
 | Páginas de importación y exportación | páginas | `import.php`, `export.php` | sí |
 | `import_form` | formulario | `classes/form/import_form.php` | sí |
@@ -28,6 +28,6 @@ Diseño: [README](../../../design/use-cases/importNodes/README.md)
 
 | Prueba | Cubre | Ubicación |
 | --- | --- | --- |
-| Importar y exportar nodos | flujo principal | `tests/local/node_importer_test.php` |
+| Importar y exportar nodos | flujo principal | `tests/local/io/importer_test.php` |
 | El lector y el escritor de YAML | flujo principal | `tests/yaml_test.php` |
 | Recorrido Behat de importar y exportar | flujo principal | `tests/behat/import_export.feature` |

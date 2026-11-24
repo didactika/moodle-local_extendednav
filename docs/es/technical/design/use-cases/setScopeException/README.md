@@ -20,8 +20,8 @@ Análisis: [README](../../../analysis/use-cases/setScopeException/README.md)
 | Elemento de diseño | Tipo | Destino en el código |
 | --- | --- | --- |
 | `get_scopes::execute` | service | `classes/external/get_scopes.php` |
-| `node_repository::get_scoped_nodes` | service | `classes/local/node_repository.php` |
-| `node_manager::ensure_row`, `set_visibility`, `save_order` | service | `classes/local/node_manager.php` |
+| `repository::get_scoped_nodes` | service | `classes/local/node/repository.php` |
+| `manager::ensure_row`, `set_visibility`, `save_order` | service | `classes/local/node/manager.php` |
 
 ## Secuencia
 

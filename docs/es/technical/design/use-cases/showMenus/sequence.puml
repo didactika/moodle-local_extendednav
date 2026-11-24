@@ -7,7 +7,7 @@ participant "Moodle" as moodle
 participant "hooks" as hooks
 participant "menu_manager" as manager
 participant "menu" as menu
-participant "node_access" as access
+participant "access" as access
 database "local_extendednav" as table
 
 moodle -> hooks : primary_extend

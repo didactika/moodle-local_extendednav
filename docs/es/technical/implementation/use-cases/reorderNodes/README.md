@@ -22,12 +22,12 @@ Diseño: [README](../../../design/use-cases/reorderNodes/README.md)
 | `reorder_nodes` | servicio web | `classes/external/reorder_nodes.php` | sí |
 | Pantalla de gestión | AMD | `amd/src/manage.js` | sí |
 | `change_nodes::move` | servicio web | `classes/external/change_nodes.php` | sí |
-| `node_manager::move` | método | `classes/local/node_manager.php` | sí |
+| `manager::move` | método | `classes/local/node/manager.php` | sí |
 
 ## Pruebas
 
 | Prueba | Cubre | Ubicación |
 | --- | --- | --- |
 | Reordenar mediante el servicio | flujo principal | `tests/external/reorder_nodes_test.php` |
-| Agrupación y posiciones | RN-007 | `tests/local/node_manager_test.php` |
+| Agrupación y posiciones | RN-007 | `tests/local/node/manager_test.php` |
 | Recorrido Behat de la página de gestión | flujo principal | `tests/behat/manage_page.feature` |

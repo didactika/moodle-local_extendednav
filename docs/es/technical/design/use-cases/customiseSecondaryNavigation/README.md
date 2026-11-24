@@ -21,10 +21,10 @@ Análisis: [README](../../../analysis/use-cases/customiseSecondaryNavigation/REA
 | --- | --- | --- |
 | `get_nodes::execute` | service | `classes/external/get_nodes.php` |
 | `change_nodes::set_visibility`, `delete`, `move` | service | `classes/external/change_nodes.php` |
-| `node_list::get` | service | `classes/local/node_list.php` |
-| `node_manager::set_visibility`, `move` | service | `classes/local/node_manager.php` |
+| `nodes::get` | service | `classes/local/listing/nodes.php` |
+| `manager::set_visibility`, `move` | service | `classes/local/node/manager.php` |
 | `secondary::record_seen` | service | `classes/menu/secondary.php` |
-| `secondary_navigation::apply` | service | `classes/local/secondary_navigation.php` |
+| `injector::apply` | service | `classes/local/navigation/injector.php` |
 
 ## Secuencia
 

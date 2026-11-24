@@ -45,20 +45,20 @@ La posición vertical de una entidad expresa su importancia para el objetivo del
 
 | ID | Regla | Entidades | Fuente |
 | --- | --- | --- | --- |
-| RN-001 | Un nodo se muestra a un usuario cuando su visibilidad se lo permite y sus idiomas incluyen el idioma actual del usuario; un padre oculto oculta su submenú. | Node, Role, Language | `node_access::is_shown` |
-| RN-002 | Una clave de nodo es única dentro de su menú, y solo se permiten letras, números, guiones bajos y guiones. | Node | `node_validator::validate` |
-| RN-003 | Se rechaza un cambio que dejaría a todos los usuarios sin una página de destino, y la Administración del sitio nunca puede ocultarse ni anidarse. | Node | `node_validator::validate` |
+| RN-001 | Un nodo se muestra a un usuario cuando su visibilidad se lo permite y sus idiomas incluyen el idioma actual del usuario; un padre oculto oculta su submenú. | Node, Role, Language | `access::is_shown` |
+| RN-002 | Una clave de nodo es única dentro de su menú, y solo se permiten letras, números, guiones bajos y guiones. | Node | `validator::validate` |
+| RN-003 | Se rechaza un cambio que dejaría a todos los usuarios sin una página de destino, y la Administración del sitio nunca puede ocultarse ni anidarse. | Node | `validator::validate` |
 | RN-004 | Una URL bloqueada envía al usuario a la primera página de reserva que pueda abrir; si ninguna está permitida, a una página explicativa. | Node | `access_guard::evaluate` |
 | RN-005 | Los administradores del sitio, las URL externas y las páginas de administración, de inicio de sesión y de plugins nunca se bloquean. | Node | `access_guard::is_immune` |
-| RN-006 | Todo un archivo de importación se comprueba antes de guardar nada. | ImportFile | `node_importer::import` |
-| RN-007 | Reordenar mantiene a un padre con su submenú, y un elemento de submenú solo se mueve entre sus hermanos. | Node, Submenu | `node_manager::reorder` |
-| RN-008 | Un elemento de Moodle con campos vacíos conserva los valores de Moodle. | Node | `node_text` |
+| RN-006 | Todo un archivo de importación se comprueba antes de guardar nada. | ImportFile | `importer::import` |
+| RN-007 | Reordenar mantiene a un padre con su submenú, y un elemento de submenú solo se mueve entre sus hermanos. | Node, Submenu | `manager::reorder` |
+| RN-008 | Un elemento de Moodle con campos vacíos conserva los valores de Moodle. | Node | `text` |
 | RN-009 | Un nodo de una navegación secundaria se encuentra cuando una página lo muestra, una sola vez, y desde entonces tiene una fila que se puede cambiar. | Node, Menu | `secondary::record_seen` |
 | RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada.  Node, Menu | `admintree::apply` |
-| RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. | Node, Role | `node_access::is_allowed` |
-| RN-012 | Para cada nodo gana el ámbito más cercano a la página: el curso, luego las categorías que lo rodean y luego el sitio. | Node, Scope | `node_repository::get_scoped_nodes` |
-| RN-013 | Cuando un ámbito cambia el orden de un nodo, fija el orden de toda su navegación. | Node, Scope | `node_repository::get_scoped_nodes` |
-| RN-014 | Eliminar un nodo del sitio elimina sus excepciones. | Node, Scope | `node_manager::delete` |
+| RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. | Node, Role | `access::is_allowed` |
+| RN-012 | Para cada nodo gana el ámbito más cercano a la página: el curso, luego las categorías que lo rodean y luego el sitio. | Node, Scope | `repository::get_scoped_nodes` |
+| RN-013 | Cuando un ámbito cambia el orden de un nodo, fija el orden de toda su navegación. | Node, Scope | `repository::get_scoped_nodes` |
+| RN-014 | Eliminar un nodo del sitio elimina sus excepciones. | Node, Scope | `manager::delete` |
 
 ## Ciclos de vida
 

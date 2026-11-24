@@ -30,5 +30,5 @@ Design: [README](../../../design/use-cases/showMenus/README.md)
 | --- | --- | --- |
 | The primary navigation | main flow | `tests/menu/primary_test.php` |
 | The user menu | main flow | `tests/menu/usermenu_test.php` |
-| Who sees a node | RN-001 | `tests/local/node_access_test.php` |
+| Who sees a node | RN-001 | `tests/local/node/access_test.php` |
 | Behat journeys of the menus | main flow | `tests/behat/primary_navigation.feature`, `tests/behat/user_menu.feature` |

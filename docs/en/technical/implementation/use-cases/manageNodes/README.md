@@ -20,14 +20,14 @@ Design: [README](../../../design/use-cases/manageNodes/README.md)
 | Element | Kind | Location | Verified |
 | --- | --- | --- | --- |
 | `node_form` | form | `classes/form/node_form.php` | yes |
-| `node_manager` | service | `classes/local/node_manager.php` | yes |
+| `manager` | service | `classes/local/node/manager.php` | yes |
 | Events of the nodes | events | `classes/event/` | yes |
-| Item form screen | AMD | `amd/src/node_form.js` | yes |
+| Item form screen | AMD | `amd/src/form/node_form.js` | yes |
 
 ## Tests
 
 | Test | Covers | Location |
 | --- | --- | --- |
-| Creating, changing and deleting nodes | main flow | `tests/local/node_manager_test.php` |
-| The rules of validation | alternative flows, RN-002, RN-003 | `tests/local/node_validator_test.php` |
+| Creating, changing and deleting nodes | main flow | `tests/local/node/manager_test.php` |
+| The rules of validation | alternative flows, RN-002, RN-003 | `tests/local/node/validator_test.php` |
 | Behat journey of the form | main flow | `tests/behat/node_form.feature` |

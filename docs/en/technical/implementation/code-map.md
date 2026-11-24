@@ -10,12 +10,12 @@ sourceOfTruth: code
 | Model element | Kind | Code location | Verified |
 | --- | --- | --- | --- |
 | Node | table | `db/install.xml` (`local_extendednav`) | yes |
-| Changing nodes | methods | `classes/local/node_manager.php:104`, `:134`, `:159`, `:248` | yes |
-| Validation | method | `classes/local/node_validator.php:46` | yes |
-| Import and export | methods | `classes/local/node_importer.php:66`, `:110` | yes |
+| Changing nodes | methods | `classes/local/node/manager.php:104`, `:134`, `:159`, `:248` | yes |
+| Validation | method | `classes/local/node/validator.php:46` | yes |
+| Import and export | methods | `classes/local/io/importer.php:66`, `:110` | yes |
 | YAML | class | `classes/yaml.php` | yes |
-| Who sees a node | methods | `classes/local/node_access.php:112`, `:166` | yes |
-| Block a page | methods | `classes/local/access_guard.php:51`, `:79` | yes |
+| Who sees a node | methods | `classes/local/node/access.php:112`, `:166` | yes |
+| Block a page | methods | `classes/local/navigation/access_guard.php:51`, `:79` | yes |
 | Hooks | class | `classes/hooks.php`, `db/hooks.php` | yes |
 | Menus | classes | `classes/menu/primary.php`, `classes/menu/usermenu.php` | yes |
 | Management pages | files | `manage.php`, `edit.php`, `import.php`, `export.php`, `activity.php` | yes |

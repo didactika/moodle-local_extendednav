@@ -20,18 +20,18 @@ Design: [README](../../../design/use-cases/customiseSecondaryNavigation/README.m
 | Element | Kind | Location | Verified |
 | --- | --- | --- | --- |
 | `get_nodes`, `change_nodes` | web service | `classes/external/get_nodes.php`, `classes/external/change_nodes.php` | yes |
-| `node_list` | class | `classes/local/node_list.php` | yes |
+| `nodes` | class | `classes/local/listing/nodes.php` | yes |
 | `secondary` | menu | `classes/menu/secondary.php` | yes |
-| `secondary_navigation` | class | `classes/local/secondary_navigation.php` | yes |
+| `injector` | class | `classes/local/navigation/injector.php` | yes |
 | Management page | AMD and template | `amd/src/manage.js`, `templates/manage/page.mustache`, `templates/list/nodes_table.mustache` | yes |
 
 ## Tests
 
 | Test | Covers | Location |
 | --- | --- | --- |
-| The list, its filters, counts and pages | main flow | `tests/local/node_list_test.php` |
+| The list, its filters, counts and pages | main flow | `tests/local/listing/nodes_test.php` |
 | The services of the page | main flow | `tests/external/node_services_test.php` |
-| Moving nodes | main flow | `tests/local/node_scope_test.php` |
-| A node seen for the first time | RN-009 | `tests/local/node_list_test.php` |
-| A hidden node and a renamed one in a course | main flow | `tests/behat/secondary_navigation.feature` |
+| Moving nodes | main flow | `tests/local/node/scope_test.php` |
+| A node seen for the first time | RN-009 | `tests/local/listing/nodes_test.php` |
+| A hidden node and a renamed one in a course | main flow | `tests/behat/injector.feature` |
 | Behat journey of the management page | main flow | `tests/behat/manage_page.feature` |

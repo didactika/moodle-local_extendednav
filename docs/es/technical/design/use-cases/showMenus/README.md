@@ -21,7 +21,7 @@ Análisis: [README](../../../analysis/use-cases/showMenus/README.md)
 | --- | --- | --- |
 | `hooks::extend_primary_navigation` | gancho | `classes/hooks.php:74` |
 | `hooks::before_top_of_body` | gancho | `classes/hooks.php:108` |
-| `node_access::is_shown` | servicio | `classes/local/node_access.php:166` |
+| `access::is_shown` | servicio | `classes/local/node/access.php:166` |
 
 ## Secuencia
 

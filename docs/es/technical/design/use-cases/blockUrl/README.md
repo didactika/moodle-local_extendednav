@@ -20,8 +20,8 @@ Análisis: [README](../../../analysis/use-cases/blockUrl/README.md)
 | Elemento de diseño | Tipo | Código |
 | --- | --- | --- |
 | `hooks::before_http_headers` | gancho | `classes/hooks.php:61` |
-| `access_guard::check` | servicio | `classes/local/access_guard.php:51` |
-| `access_guard::evaluate` | servicio | `classes/local/access_guard.php:79` |
+| `access_guard::check` | servicio | `classes/local/navigation/access_guard.php:51` |
+| `access_guard::evaluate` | servicio | `classes/local/navigation/access_guard.php:79` |
 
 ## Secuencia
 

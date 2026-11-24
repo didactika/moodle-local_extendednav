@@ -12,7 +12,7 @@ sourceOfTruth: code
 Extended navigation is a Moodle local plugin with three layers:
 
 - **Entry points**: the management pages (`manage.php`, `edit.php`, `import.php`, `export.php`, `activity.php`), two web-service functions for ordering and icons, the hooks of Moodle and an observer.
-- **Services**: classes in `classes/local/` and the menus of `classes/menu/`. `node_manager` and `node_importer` change nodes, `node_validator` refuses the invalid ones, `node_access` and `access_guard` decide who sees and who opens.
+- **Services**: classes in `classes/local/` and the menus of `classes/menu/`. `manager` and `importer` change nodes, `validator` refuses the invalid ones, `access` and `access_guard` decide who sees and who opens.
 - **Persistence**: one table, `local_extendednav`.
 
 Two decisions shape the design. First, **the menus are built on each request through the hooks API**, so a change shows at once and nothing of Moodle is rewritten in its tables. Second, **the guard reads the same nodes and the same rules as the menus**, so a page is blocked exactly for the users who do not see its item.
