@@ -25,6 +25,12 @@ namespace local_extendednav\local\io;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class scope {
+    /** @var string[] Names already found in this request, keyed by context id. */
+    private static array $names = [];
+
+    /** @var int[]|null Context of each category, keyed by its nested name; built once per request. */
+    private static ?array $categories = null;
+
     /**
      * Describes the category or the course a node applies to, as the file names it.
      *
@@ -35,15 +41,43 @@ final class scope {
         if ($contextid === 0) {
             return '';
         }
-        $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if (!$context) {
-            return '';
+        if (!isset(self::$names[$contextid])) {
+            self::preload([$contextid]);
         }
-        if ($context->contextlevel === CONTEXT_COURSE) {
-            return 'course:' . get_course($context->instanceid)->shortname;
+        return self::$names[$contextid] ?? '';
+    }
+
+    /**
+     * Finds the names of many contexts at once: a file of thousands of exceptions costs a few queries, not one per node.
+     *
+     * @param int[] $contextids Context ids.
+     */
+    public static function preload(array $contextids): void {
+        global $DB;
+
+        $missing = array_values(array_diff(array_unique(array_filter(array_map('intval', $contextids))), array_keys(self::$names)));
+        if (empty($missing)) {
+            return;
         }
-        $category = \core_course_category::get($context->instanceid, IGNORE_MISSING, true);
-        return $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
+        $contexts = $DB->get_records_list('context', 'id', $missing, '', 'id, contextlevel, instanceid');
+        $courseids = [];
+        foreach ($contexts as $context) {
+            if ((int)$context->contextlevel === CONTEXT_COURSE) {
+                $courseids[] = (int)$context->instanceid;
+            }
+        }
+        $courses = $courseids ? $DB->get_records_list('course', 'id', $courseids, '', 'id, shortname') : [];
+        foreach ($missing as $contextid) {
+            $context = $contexts[$contextid] ?? null;
+            $name = '';
+            if ($context && (int)$context->contextlevel === CONTEXT_COURSE && isset($courses[$context->instanceid])) {
+                $name = 'course:' . $courses[$context->instanceid]->shortname;
+            } else if ($context && (int)$context->contextlevel === CONTEXT_COURSECAT) {
+                $category = \core_course_category::get((int)$context->instanceid, IGNORE_MISSING, true);
+                $name = $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
+            }
+            self::$names[$contextid] = $name;
+        }
     }
 
     /**
@@ -57,17 +91,36 @@ final class scope {
 
         [$type, $name] = array_pad(explode(':', trim($scope), 2), 2, '');
         $name = trim($name);
+        $known = array_search($type . ':' . $name, self::$names, true);
+        if ($known !== false) {
+            return (int)$known;
+        }
+        $contextid = null;
         if ($type === 'course') {
             $id = $DB->get_field('course', 'id', ['shortname' => $name]);
-            return $id ? (int)\context_course::instance((int)$id)->id : null;
-        }
-        if ($type === 'category') {
-            foreach (\core_course_category::get_all(['returnhidden' => true]) as $category) {
-                if ($category->get_nested_name(false, ' / ') === $name) {
-                    return (int)\context_coursecat::instance((int)$category->id)->id;
+            $contextid = $id ? (int)\context_course::instance((int)$id)->id : null;
+        } else if ($type === 'category') {
+            // The nested names of the categories are worked out once, whatever the number of nodes of the file.
+            if (self::$categories === null) {
+                self::$categories = [];
+                foreach (\core_course_category::get_all(['returnhidden' => true]) as $category) {
+                    $nested = $category->get_nested_name(false, ' / ');
+                    self::$categories[$nested] = (int)\context_coursecat::instance((int)$category->id)->id;
                 }
             }
+            $contextid = self::$categories[$name] ?? null;
         }
-        return null;
+        if ($contextid !== null) {
+            self::$names[$contextid] = $type . ':' . $name;
+        }
+        return $contextid;
+    }
+
+    /**
+     * Forgets the names found in this request, after categories or courses change.
+     */
+    public static function reset(): void {
+        self::$names = [];
+        self::$categories = null;
     }
 }

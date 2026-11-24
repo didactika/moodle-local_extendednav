@@ -42,6 +42,9 @@ if (menu_manager::get_menu($menukey) === null) {
 $manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
 $menukeys = $everything ? array_keys(menu_manager::get_menus()) : [$menukey];
+// A navigation with thousands of exceptions makes a file of megabytes.
+\core_php_time_limit::raise();
+raise_memory_limit(MEMORY_EXTRA);
 $content = exporter::export_file($menukeys);
 if ($content === null) {
     redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);

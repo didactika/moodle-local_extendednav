@@ -93,6 +93,36 @@ final class manager_test extends \advanced_testcase {
     }
 
     /**
+     * Saving many nodes creates the new ones, updates the changed ones, and neither writes nor logs the ones that do not change.
+     */
+    public function test_save_many(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $first = manager::create(manager::prepare(['nodekey' => 'one', 'title' => 'One', 'url' => '/one.php'], 'primary'));
+        $second = manager::create(manager::prepare(['nodekey' => 'two', 'title' => 'Two', 'url' => '/two.php'], 'primary'));
+        $DB->set_field('local_extendednav', 'timemodified', 1, ['id' => $second->id]);
+
+        $changed = manager::prepare(['nodekey' => 'one', 'title' => 'First', 'url' => '/one.php'], 'primary');
+        $changed->id = $first->id;
+        $same = manager::prepare(['nodekey' => 'two', 'title' => 'Two', 'url' => '/two.php'], 'primary');
+        $same->id = $second->id;
+        $new = manager::prepare(['nodekey' => 'three', 'title' => 'Three', 'url' => '/three.php'], 'primary');
+
+        $sink = $this->redirectEvents();
+        $saved = manager::save_many(['one' => $changed, 'two' => $same, 'three' => $new]);
+        $events = $sink->get_events();
+
+        $this->assertSame(['one', 'two', 'three'], array_keys($saved));
+        $this->assertSame('First', $DB->get_field('local_extendednav', 'title', ['id' => $first->id]));
+        $this->assertEquals(1, $DB->get_field('local_extendednav', 'timemodified', ['id' => $second->id]));
+        $this->assertTrue($DB->record_exists('local_extendednav', ['menu' => 'primary', 'nodekey' => 'three']));
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(\local_extendednav\event\node_updated::class, $events[0]);
+        $this->assertInstanceOf(\local_extendednav\event\node_created::class, $events[1]);
+    }
+
+    /**
      * Creating and updating set timestamps and trigger events.
      */
     public function test_create_and_update(): void {
