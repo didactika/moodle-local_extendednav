@@ -15,11 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Exports navigation nodes as a YAML file.
+ * Downloads the nodes of one navigation, or of every navigation, as a YAML file.
+ *
+ * Both files have the same format, so the import page reads either: every node names its navigation, and the file says which
+ * navigations are on.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
- * @author     Miguel Rivas Morantes <miguelrivasmorantes@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,30 +34,18 @@ require_once($CFG->libdir . '/filelib.php');
 
 admin_externalpage_setup('local_extendednav_manage');
 
-$all = optional_param('all', 0, PARAM_BOOL);
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
-$nodeids = optional_param_array('nodeids', [], PARAM_INT);
+$everything = optional_param('everything', 0, PARAM_BOOL);
 if (menu_manager::get_menu($menukey) === null) {
     $menukey = 'primary';
 }
 $manageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 
-if ($all) {
-    // Every node of the navigation: the ones of the site and the exceptions of the categories and the courses.
-    $nodes = $DB->get_records('local_extendednav', ['menu' => $menukey], 'contextid ASC, sortorder ASC, id ASC');
-    $filename = 'extendednav_' . $menukey . '_all_' . date('Ymd_His') . '.yaml';
-} else {
-    require_sesskey();
-    $nodes = empty($nodeids) ? [] : $DB->get_records_list('local_extendednav', 'id', $nodeids, 'sortorder ASC, id ASC');
-    $nodes = array_filter($nodes, static fn(\stdClass $node): bool => $node->menu === $menukey);
-    $filename = 'extendednav_' . $menukey . '_selected_' . date('Ymd_His') . '.yaml';
-}
-
-if (empty($nodes)) {
+$menukeys = $everything ? array_keys(menu_manager::get_menus()) : [$menukey];
+$content = node_importer::export_file($menukeys);
+if ($content === null) {
     redirect($manageurl, get_string('no_nodes_export', 'local_extendednav'), null, \core\output\notification::NOTIFY_ERROR);
 }
 
-$menunodes = $DB->get_records('local_extendednav', ['menu' => $menukey, 'contextid' => 0]);
-$content = \local_extendednav\yaml::dump(['nodes' => node_importer::export_nodes($nodes, $menunodes)]);
-
+$filename = 'extendednav_' . ($everything ? 'all' : $menukey) . '_' . date('Ymd_His') . '.yaml';
 send_file($content, $filename, 0, 0, true, true, 'application/yaml');

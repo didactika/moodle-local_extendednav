@@ -30,9 +30,17 @@ Feature: Customise the navigation of a course
     And I am on "Course 1" course homepage
     Then I should see "Participants" in the ".moremenu" "css_element"
 
-  Scenario: An administrator is held to the rules when the plugin says so
-    Given the following config values are set as admin:
-      | hide_from_admins | 1 | local_extendednav |
+  Scenario: An administrator is held to the rules when the node says so
+    Given the following "local_extendednav > nodes" exist:
+      | menu   | nodekey      | visibility | hideadmins |
+      | course | editsettings | 0     | 1          |
     When I log in as "admin"
     And I am on "Course 1" course homepage
-    Then I should not see "Participants" in the ".moremenu" "css_element"
+    Then I should not see "Settings" in the ".moremenu" "css_element"
+
+  Scenario: A navigation that is turned off is shown as Moodle draws it
+    Given the following config values are set as admin:
+      | enabled_course | 0 | local_extendednav |
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    Then I should see "Participants" in the ".moremenu" "css_element"

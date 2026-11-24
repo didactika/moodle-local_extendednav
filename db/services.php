@@ -80,12 +80,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
-    'local_extendednav_set_setting' => [
+    'local_extendednav_place_node' => [
         'classname' => \local_extendednav\external\change_nodes::class,
-        'methodname' => 'set_setting',
-        'description' => 'Turns on or off the plugin or the hiding of nodes from administrators.',
+        'methodname' => 'place',
+        'description' => 'Places a node before another one among its siblings, as when it is dragged.',
         'type' => 'write',
         'ajax' => true,
-        'capabilities' => 'moodle/site:config',
+        'capabilities' => 'local/extendednav:manage',
+    ],
+    'local_extendednav_set_enabled' => [
+        'classname' => \local_extendednav\external\change_nodes::class,
+        'methodname' => 'set_enabled',
+        'description' => 'Turns the changes of one navigation on or off.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
     ],
 ];

@@ -90,7 +90,6 @@ $tablehtml = ob_get_clean();
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_extendednav/activity_toolbar', [
     'tabs' => $tabs,
-    'backurl' => (new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]))->out(false),
 ]);
 echo $OUTPUT->render_from_template('local_extendednav/activity_filters', [
     'menu' => $menukey,

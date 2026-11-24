@@ -13,8 +13,8 @@ Feature: Order, hide and select nodes on the management page
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
 
   @javascript
-  Scenario: A node is moved with the buttons
-    When I click on "Move down" "button" in the "First" "table_row"
+  Scenario: A node is moved with the keyboard on its handle
+    When I press key "40" in "Drag First to move it" "button"
     Then "Second" "table_row" should appear before "First" "table_row"
     And I reload the page
     And "Second" "table_row" should appear before "First" "table_row"

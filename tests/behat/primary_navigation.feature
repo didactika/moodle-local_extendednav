@@ -109,11 +109,11 @@ Feature: Change the primary navigation
     When I log in as "student1"
     Then "Library" "link" should exist in the ".primary-navigation .dropdown-menu" "css_element"
 
-  Scenario: Nothing changes while the plugin is disabled
+  Scenario: Nothing changes while the primary navigation is turned off
     Given the following "local_extendednav > nodes" exist:
       | nodekey   | visibility |
       | mycourses | 0          |
     And the following config values are set as admin:
-      | enable_plugin | 0 | local_extendednav |
+      | enabled_primary | 0 | local_extendednav |
     When I log in as "student1"
     Then I should see "My courses" in the ".primary-navigation" "css_element"

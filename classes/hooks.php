@@ -62,6 +62,7 @@ class hooks {
     public static function before_http_headers(before_http_headers $hook): void {
         global $PAGE;
         access_guard::check($PAGE);
+        \local_extendednav\menu\admintree::apply_to_request();
         secondary_navigation::apply();
     }
 
@@ -76,7 +77,7 @@ class hooks {
     public static function extend_primary_navigation(primary_extend $hook): void {
         global $CFG;
 
-        if (self::$discovering || !self::is_active()) {
+        if (self::$discovering || !self::is_active() || !menu_manager::is_enabled('primary')) {
             return;
         }
         self::backup_core_menus();
@@ -87,7 +88,9 @@ class hooks {
         // The custom menu items are plugin nodes now; stop Moodle from adding them a second time.
         $CFG->custommenuitems = '';
 
-        self::apply_user_menu();
+        if (menu_manager::is_enabled('usermenu')) {
+            self::apply_user_menu();
+        }
     }
 
     /**
@@ -96,7 +99,7 @@ class hooks {
      * @param before_standard_head_html_generation $hook The hook.
      */
     public static function before_standard_head(before_standard_head_html_generation $hook): void {
-        if (self::is_active()) {
+        if (self::is_active() && menu_manager::is_enabled('usermenu')) {
             self::backup_core_menus();
             self::apply_user_menu();
         }
@@ -120,7 +123,7 @@ class hooks {
             }
         }
 
-        if (!self::is_active()) {
+        if (!self::is_active() || !menu_manager::is_enabled('usermenu')) {
             return;
         }
         $usermenu = menu_manager::get_menu('usermenu');

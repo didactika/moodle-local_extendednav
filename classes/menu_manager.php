@@ -43,11 +43,24 @@ class menu_manager {
             'primary' => new \local_extendednav\menu\primary(),
             'usermenu' => new \local_extendednav\menu\usermenu(),
         ];
-        // The secondary navigations: course, site home, activity, category and site administration.
+        // The secondary navigations: course, site home, activity and category.
         foreach (array_keys(\local_extendednav\menu\secondary::ORIGINS) as $origin) {
             $menus[$origin] = new \local_extendednav\menu\secondary($origin);
         }
+        // The site administration, with every category and page of its tree.
+        $menus[\local_extendednav\menu\admintree::KEY] = new \local_extendednav\menu\admintree();
         return $menus;
+    }
+
+    /**
+     * Whether the changes of a navigation are applied: the plugin is on and the navigation has not been turned off.
+     *
+     * @param string $key Navigation key.
+     * @return bool
+     */
+    public static function is_enabled(string $key): bool {
+        return (bool)get_config('local_extendednav', 'enable_plugin')
+            && get_config('local_extendednav', 'enabled_' . $key) !== '0';
     }
 
     /**

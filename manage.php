@@ -24,6 +24,7 @@
  */
 
 use local_extendednav\local\node_list;
+use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -56,12 +57,10 @@ if ($contextid !== 0) {
 $pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []));
 $PAGE->set_url($pageurl);
 
-// The navigations, in groups: the ones of the site, of a course, of an activity, of a category and of the administration.
+// The navigations, in groups: the ones of the whole site, the ones of the courses and the site administration.
 $groups = [
-    'origin_group_site' => ['primary', 'usermenu'],
-    'origin_group_course' => ['course', 'frontpage'],
-    'origin_group_activity' => ['activity'],
-    'origin_group_category' => ['category'],
+    'origin_group_site' => ['primary', 'usermenu', 'frontpage'],
+    'origin_group_course' => ['course', 'activity', 'category'],
     'origin_group_admin' => ['admin'],
 ];
 $origins = [];
@@ -78,8 +77,7 @@ foreach ($groups as $string => $keys) {
 }
 
 $scopeparams = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []);
-$config = json_encode(['menu' => $menukey, 'contextid' => $contextid]);
-$syscontext = context_system::instance();
+$config = json_encode(['menu' => $menukey, 'contextid' => $contextid, 'tree' => $menukey === admintree::KEY]);
 
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
@@ -88,15 +86,14 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'name' => $menu->get_name(),
     'origins' => $origins,
     'originoptions' => $originoptions,
-    'cansettings' => has_capability('moodle/site:config', $syscontext),
-    'enabled' => (bool)get_config('local_extendednav', 'enable_plugin'),
-    'hideadmins' => (bool)get_config('local_extendednav', 'hide_from_admins'),
+    'enabled' => get_config('local_extendednav', 'enabled_' . $menukey) !== '0',
     'hasscopes' => $hasscopes,
     'scopename' => $scopename,
-    'canadd' => !node_list::is_order_only($menukey),
+    'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', $scopeparams))->out(false),
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
-    'exporturl' => (new moodle_url('/local/extendednav/export.php', ['all' => 1, 'menu' => $menukey]))->out(false),
+    'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey]))->out(false),
+    'exporteverythingurl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'everything' => 1]))->out(false),
     'activityurl' => (new moodle_url('/local/extendednav/activity.php', ['menu' => $menukey]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
 ]);

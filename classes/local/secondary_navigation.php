@@ -45,6 +45,9 @@ class secondary_navigation {
         if ($origin === null) {
             return;
         }
+        if (!menu_manager::is_enabled($origin)) {
+            return;
+        }
         $menu = menu_manager::get_menu($origin);
         $view = $PAGE->secondarynav;
 
@@ -82,8 +85,6 @@ class secondary_navigation {
                 return 'activity';
             case CONTEXT_COURSECAT:
                 return 'category';
-            case CONTEXT_SYSTEM:
-                return 'admin';
             default:
                 return null;
         }
@@ -99,7 +100,6 @@ class secondary_navigation {
     private static function inject(secondary $menu, array $nodes, \core\navigation\views\secondary $view): void {
         global $PAGE;
 
-        $orderonly = $menu->is_order_only();
         $needsscript = false;
         $shown = [];
         foreach ($nodes as $key => $record) {
@@ -110,11 +110,11 @@ class secondary_navigation {
                 }
                 continue;
             }
-            $title = $orderonly ? '' : node_text::get_title($record);
-            $url = $orderonly || trim((string)($record->url ?? '')) === '' ? null : trim((string)$record->url);
+            $title = node_text::get_title($record);
+            $url = trim((string)($record->url ?? '')) === '' ? null : trim((string)$record->url);
             if (!$node) {
                 // A node Moodle does not show on this page is never added in its place; only nodes of the plugin are.
-                if ($orderonly || $menu->is_native($key) || $title === '' || $url === null) {
+                if ($menu->is_native($key) || $title === '' || $url === null) {
                     continue;
                 }
                 $node = \navigation_node::create(
@@ -134,21 +134,19 @@ class secondary_navigation {
                     $node->action = new \moodle_url($url);
                 }
             }
-            if (!$orderonly) {
-                $tooltip = node_text::resolve($record->tooltip ?? '');
-                if ($tooltip !== '') {
-                    $node->title(format_string($tooltip, true, ['escape' => false]));
-                }
-                $attributes = node_display::get_link_attributes($record);
-                if (!empty($attributes)) {
-                    // The navigation prints no link attributes, so they go on a hidden marker the script reads.
-                    $node->text .= \html_writer::span('', 'local-extendednav-display', ['hidden' => 'hidden'] + $attributes);
-                    $needsscript = true;
-                }
-                $placement = (int)($record->placement ?? 0);
-                if ($placement === 1 || $placement === 2) {
-                    $node->set_force_into_more_menu($placement === 1);
-                }
+            $tooltip = node_text::resolve($record->tooltip ?? '');
+            if ($tooltip !== '') {
+                $node->title(format_string($tooltip, true, ['escape' => false]));
+            }
+            $attributes = node_display::get_link_attributes($record);
+            if (!empty($attributes)) {
+                // The navigation prints no link attributes, so they go on a hidden marker the script reads.
+                $node->text .= \html_writer::span('', 'local-extendednav-display', ['hidden' => 'hidden'] + $attributes);
+                $needsscript = true;
+            }
+            $placement = (int)($record->placement ?? 0);
+            if ($placement === 1 || $placement === 2) {
+                $node->set_force_into_more_menu($placement === 1);
             }
             $shown[$key] = $node;
         }

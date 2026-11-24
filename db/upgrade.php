@@ -78,5 +78,23 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112500, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112501) {
+        // The setting page is gone: the plugin keeps the value it had, and is on when it never had one.
+        if (get_config('local_extendednav', 'enable_plugin') === false) {
+            set_config('enable_plugin', 1, 'local_extendednav');
+        }
+        unset_config('hide_from_admins', 'local_extendednav');
+
+        upgrade_plugin_savepoint(true, 2026112501, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112502) {
+        // The site administration is read from its tree now: the nodes recorded from its bar are not needed any more. The
+        // rows keep their keys, which are the names of the categories of the tree.
+        unset_config('nativenodes_admin', 'local_extendednav');
+
+        upgrade_plugin_savepoint(true, 2026112502, 'local', 'extendednav');
+    }
+
     return true;
 }

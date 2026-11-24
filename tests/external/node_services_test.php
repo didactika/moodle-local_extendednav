@@ -177,22 +177,37 @@ final class node_services_test extends \advanced_testcase {
     }
 
     /**
-     * Only who may configure the site turns the settings on and off.
+     * A node is placed before a sibling, or at the end, as when it is dragged.
      */
-    public function test_set_setting(): void {
+    public function test_place(): void {
         $this->prepare();
 
-        try {
-            change_nodes::set_setting('hide_from_admins', true);
-            $this->fail('The capability to configure the site is required.');
-        } catch (\required_capability_exception $e) {
-            $this->assertEmpty(get_config('local_extendednav', 'hide_from_admins'));
-        }
+        change_nodes::place('course', 0, 'three', 'one');
+        $this->assertSame(['three', 'one', 'two'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
 
-        $this->setAdminUser();
-        change_nodes::set_setting('hide_from_admins', true);
-        $this->assertSame('1', get_config('local_extendednav', 'hide_from_admins'));
+        change_nodes::place('course', 0, 'three', '');
+        $this->assertSame(['one', 'two', 'three'], array_column(get_nodes::execute('course')['rows'], 'nodekey'));
+
         $this->expectException(\invalid_parameter_exception::class);
-        change_nodes::set_setting('anything', true);
+        change_nodes::place('course', 0, 'one', 'nothing');
+    }
+
+    /**
+     * Each navigation is turned on and off by itself.
+     */
+    public function test_set_enabled(): void {
+        $this->prepare();
+        $this->assertTrue(\local_extendednav\menu_manager::is_enabled('course'));
+
+        change_nodes::set_enabled('course', false);
+
+        $this->assertFalse(\local_extendednav\menu_manager::is_enabled('course'));
+        $this->assertTrue(\local_extendednav\menu_manager::is_enabled('activity'), 'The others stay on.');
+        change_nodes::set_enabled('course', true);
+        $this->assertTrue(\local_extendednav\menu_manager::is_enabled('course'));
+
+        $this->setUser($this->getDataGenerator()->create_user());
+        $this->expectException(\required_capability_exception::class);
+        change_nodes::set_enabled('course', false);
     }
 }

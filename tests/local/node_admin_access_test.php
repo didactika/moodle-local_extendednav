@@ -78,20 +78,6 @@ final class node_admin_access_test extends \advanced_testcase {
     }
 
     /**
-     * The setting of the plugin hides every node from the administrators too.
-     */
-    public function test_the_setting_applies_the_rules_to_administrators(): void {
-        $this->resetAfterTest();
-        $admin = get_admin();
-        $node = $this->node(['visibility' => node_access::VISIBILITY_HIDDEN]);
-        $this->assertTrue(node_access::is_allowed($node, $admin->id));
-
-        set_config('hide_from_admins', 1, 'local_extendednav');
-
-        $this->assertFalse(node_access::is_allowed($node, $admin->id));
-    }
-
-    /**
      * The language of a node still applies to administrators: it is not a permission.
      */
     public function test_the_language_still_applies(): void {

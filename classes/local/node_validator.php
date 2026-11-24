@@ -249,6 +249,10 @@ class node_validator {
         if ($parent === null && !$menu->is_native($parentkey)) {
             return ['parentkey' => get_string('err_parent_missing', 'local_extendednav', s($parentkey))];
         }
+        // The site administration is a tree of any depth, whose structure is Moodle's: the levels of a menu do not apply.
+        if ($menu instanceof \local_extendednav\menu\admintree) {
+            return [];
+        }
         if ($node->menu === 'primary' && $parentkey === 'siteadminnode') {
             return ['parentkey' => get_string('err_admin_parent', 'local_extendednav')];
         }
