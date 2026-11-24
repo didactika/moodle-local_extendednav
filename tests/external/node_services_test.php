@@ -45,6 +45,7 @@ final class node_services_test extends \advanced_testcase {
         }
         $this->setAdminUser();
         menu_manager::get_menu('course')->record_seen($seen);
+        menu_manager::get_menu('mod_forum')->record_seen($seen);
 
         $user = $this->getDataGenerator()->create_user();
         $roleid = $this->getDataGenerator()->create_role();
@@ -167,15 +168,21 @@ final class node_services_test extends \advanced_testcase {
         $contextid = \context_course::instance($course->id)->id;
         change_nodes::set_visibility('course', $contextid, ['one', 'two'], access::VISIBILITY_HIDDEN);
         change_nodes::set_visibility('course', \context_coursecat::instance($category->id)->id, ['one'], access::VISIBILITY_HIDDEN);
+        $forum = $this->getDataGenerator()->create_module('forum', ['course' => $course->id]);
+        change_nodes::set_visibility('mod_forum', \context_module::instance($forum->cmid)->id, ['one'], access::VISIBILITY_HIDDEN);
 
         $all = external_api::clean_returnvalue(get_exceptions::execute_returns(), get_exceptions::execute());
-        $this->assertSame(2, $all['total']);
-        $this->assertSame(['category' => 1, 'course' => 1], $all['counts']);
+        $this->assertSame(3, $all['total']);
+        $this->assertSame(['category' => 1, 'course' => 1, 'activity' => 1], $all['counts']);
+        $activity = array_values(array_filter($all['rows'], static fn(array $row): bool => $row['kind'] === 'activity'))[0];
+        $this->assertSame('Humanities / Ancient history', $activity['path']);
+        $this->assertSame('mod_forum', $activity['component']);
+        $this->assertSame(1, get_exceptions::execute('', 'activity')['total']);
         $course = array_values(array_filter($all['rows'], static fn(array $row): bool => $row['kind'] === 'course'))[0];
         $this->assertSame(2, $course['total']);
         $this->assertSame('Humanities', $course['path']);
 
-        $this->assertSame(1, get_exceptions::execute('ancient')['total']);
+        $this->assertSame(2, get_exceptions::execute('ancient')['total'], 'An activity is found by its course.');
         $this->assertSame(1, get_exceptions::execute('', 'category')['total']);
         $this->assertSame(0, get_exceptions::execute('nothing')['total']);
     }
