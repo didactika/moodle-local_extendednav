@@ -14,7 +14,8 @@ Feature: Order, hide and select nodes on the management page
 
   @javascript
   Scenario: A node is moved with the keyboard on its handle
-    When I press key "40" in "Drag First to move it" "button"
+    When I click on "Drag First to move it" "button"
+    And I press the down key
     Then "Second" "table_row" should appear before "First" "table_row"
     And I reload the page
     And "Second" "table_row" should appear before "First" "table_row"
@@ -31,19 +32,18 @@ Feature: Order, hide and select nodes on the management page
   @javascript
   Scenario: Selecting nodes shows the bulk actions
     Then ".card[data-region='floatbar']" "css_element" should not be visible
-    And I click on "Select First" "checkbox"
+    And I click on "tr[data-key='first'] [data-region='selectrow']" "css_element"
     And I should see "1 selected"
     And I should see "Hide" in the "[data-region='floatbar']" "css_element"
     And I should see "Delete" in the "[data-region='floatbar']" "css_element"
     And I should not see "Show" in the "[data-region='floatbar']" "css_element"
-    And I click on "Select all" "checkbox"
-    And I click on "Select all" "checkbox"
+    And I click on "[data-region='selectpage']" "css_element"
+    And I click on "[data-region='selectpage']" "css_element"
     And ".card[data-region='floatbar']" "css_element" should not be visible
 
   @javascript
   Scenario: The list is searched and filtered by visibility
     When I set the field "Search nodes" to "Second"
-    And I press key "13" in the field "Search nodes"
     Then I should see "Second" in the "[data-region='tablewrap']" "css_element"
     And I should not see "First" in the "[data-region='tablewrap']" "css_element"
     And I click on "Clear filters" "button"
@@ -66,7 +66,7 @@ Feature: Order, hide and select nodes on the management page
 
   @javascript
   Scenario: Hiding several nodes says which ones it leaves as they are
-    When I click on "Select all" "checkbox"
+    When I click on "[data-region='selectpage']" "css_element"
     And I click on "Hide" "button" in the "[data-region='floatbar']" "css_element"
     Then I should see "of the selected nodes are left as they are" in the ".modal.show" "css_element"
     And I should see "Site administration" in the ".modal.show" "css_element"

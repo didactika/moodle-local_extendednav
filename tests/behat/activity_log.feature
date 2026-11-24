@@ -29,10 +29,8 @@ Feature: Read the activity log of a navigation
   Scenario: The search finds a node by its key
     When I follow "Activity log"
     And I set the field "Search by node key or person" to "nothing like this"
-    And I press key "13" in the field "Search by node key or person"
     Then I should see "No results"
     And I set the field "Search by node key or person" to "staffhelp"
-    And I press key "13" in the field "Search by node key or person"
     And I should see "staffhelp" in the "[data-region='tablewrap']" "css_element"
 
   @javascript

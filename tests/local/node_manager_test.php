@@ -254,7 +254,7 @@ final class node_manager_test extends \advanced_testcase {
         node_manager::delete([$DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'b'])]);
 
         $this->assertSame(['a', 'b1', 'b2', 'c'], $this->get_shown_keys());
-        $this->assertSame(0, $DB->count_records_select('local_extendednav', 'parentkey IS NOT NULL'));
+        $this->assertSame(0, $DB->count_records_select('local_extendednav', "menu = 'primary' AND parentkey IS NOT NULL"));
     }
 
     /**

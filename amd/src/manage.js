@@ -140,8 +140,10 @@ export const init = async(selector) => {
                 selectedKeys: () => instance.selectedRows().map((row) => row.nodekey),
                 place: (nodekeys, beforekey, afterkey) => change(() => call('local_extendednav_place_node',
                     {nodekeys, beforekey, afterkey}), nodekeys.length),
-                move: (nodekey, direction) => change(() => call('local_extendednav_move_node', {nodekey, direction}))
-                    .then(() => root.querySelector(`tr[data-key="${nodekey}"] [data-region="handle"]`)?.focus()),
+                move: async(nodekey, direction) => {
+                    await change(() => call('local_extendednav_move_node', {nodekey, direction}));
+                    root.querySelector(`tr[data-key="${nodekey}"] [data-region="handle"]`)?.focus();
+                },
             });
         },
         onSelection: (rows) => actions?.paintBar(rows),
