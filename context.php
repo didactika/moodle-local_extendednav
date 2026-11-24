@@ -66,9 +66,7 @@ if ($scope->is_user()) {
         : get_string('personal_preferences_of', 'local_extendednav', $scope->name());
     $PAGE->set_title($title);
     $PAGE->set_heading($scope->name());
-    $preferencesurl = new moodle_url('/user/preferences.php', $own ? [] : ['userid' => $scope->context()->instanceid]);
-    $PAGE->navbar->add(get_string('preferences'), $preferencesurl);
-    $PAGE->navbar->add($title, $PAGE->url);
+    // Moodle builds the breadcrumb itself, Preferences and the item of the plugin that opens this page.
 } else {
     $PAGE->set_title(get_string('context_navigation', 'local_extendednav') . ' - ' . $scope->name());
     $PAGE->set_heading($scope->name());
@@ -87,6 +85,9 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
         'menu' => $menukey,
         'contextid' => $contextid,
         'tree' => nodes::is_tree($menukey),
+        'treetop' => $menu->get_name(),
+        // Hiding from administrators and blocking the address restrict a node: they take the capability of the restrictions.
+        'canrestrict' => $scope->can('changeconditions'),
         'sampleurl' => $sample ? $sample->out(false) : '',
     ]),
     'name' => $menu->get_name(),

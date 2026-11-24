@@ -39,19 +39,21 @@ const LISTED = 8;
  * @param {string} options.button Words of the button that runs it.
  * @param {string} [options.tone] Colour of the action: primary, secondary, success or danger.
  * @param {string} [options.icon] Icon of Moodle of the action.
- * @param {Object} [options.option] A switch: label, help and whether it starts on.
+ * @param {Object[]} [options.switches] Switches of the action, each with key, label, help and whether it starts on.
  * @param {Object} [options.skipped] The nodes left out: text (with {$a} for their number), more (with {$a}) and names.
  * @param {HTMLElement} options.trigger Element that gets the focus back.
- * @param {Function} options.action Runs the action, given whether the switch is on; a rejection is shown in the dialog.
+ * @param {Function} options.action Runs the action, given whether each switch is on, by its key; a rejection is shown in the
+ *     dialog.
  * @returns {Promise<void>}
  */
-export const confirmAction = async({title, text, button, tone = 'primary', icon = 'i/info', option, skipped, trigger, action}) => {
+export const confirmAction = async({title, text, button, tone = 'primary', icon = 'i/info', switches = [], skipped, trigger,
+        action}) => {
     const names = skipped?.names ?? [];
     const context = {
         text,
         tone,
         icon,
-        option: option ? {...option, id: `len-option-${Date.now()}`} : null,
+        switches: switches.map((option, index) => ({...option, id: `len-option-${Date.now()}-${index}`})),
         skipped: names.length ? {
             text: skipped.text.replace('{$a}', names.length),
             names: names.slice(0, LISTED),
@@ -70,7 +72,11 @@ export const confirmAction = async({title, text, button, tone = 'primary', icon 
         save.disabled = true;
         alert.hidden = true;
         try {
-            await action(Boolean(root.querySelector('[data-region="option"]')?.checked));
+            const chosen = {};
+            root.querySelectorAll('[data-region="option"]').forEach((input) => {
+                chosen[input.dataset.key] = input.checked;
+            });
+            await action(chosen);
             modal.destroy();
         } catch (error) {
             alert.textContent = describeError(error);

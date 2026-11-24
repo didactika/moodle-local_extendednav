@@ -69,6 +69,29 @@ class preferences extends base {
     }
 
     /**
+     * Returns the titles and addresses of Moodle's sections and items, the titles in the language of the page: Moodle builds
+     * the preferences of the current user, and the names it gives them now are the ones a page shows.
+     *
+     * @return array By key, with title and url.
+     */
+    public function get_placeholders(): array {
+        global $PAGE;
+
+        $placeholders = parent::get_placeholders();
+        try {
+            $PAGE->settingsnav->find('usercurrentsettings', null);
+        } catch (\Throwable $e) {
+            return $placeholders;
+        }
+        foreach (\local_extendednav\local\navigation\preferences_injector::$texts as $key => $text) {
+            if (isset($placeholders[$key]) && $text !== '') {
+                $placeholders[$key]['title'] = $text;
+            }
+        }
+        return $placeholders;
+    }
+
+    /**
      * The items of a Moodle setting do not apply here.
      *
      * @param string $line Line without the leading dashes.

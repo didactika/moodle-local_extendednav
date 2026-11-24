@@ -83,17 +83,14 @@
             }
         }
 
-        // Bootstrap 4 draws the cross as the character ×, which sits on its line of text: its box is the size of the glyph,
-        // so it is in the centre of the circle.
-        & .close {
+        // Moodle 4 draws the cross as the character ×, in .close or in .btn-close, and it sits on its line of text: its box is
+        // the size of the glyph, so it is in the centre of the circle.
+        & .close > span,
+        & .btn-close > span {
+            display: block;
+            height: 1em;
             font-size: 1.5rem;
-            line-height: 1;
-
-            & > span {
-                display: block;
-                height: 1em;
-                line-height: 0.95;
-            }
+            line-height: 0.8;
         }
     }
 
@@ -150,3 +147,12 @@
     }
 }
 
+
+// The steps of the guided tours have no arrow: the box, with its rounded corners, and the element lit around it say where each
+// step points.
+.path-local-extendednav,
+#page-user-preferences {
+    & [data-role="flexitour-step"] [data-role="arrow"] {
+        display: none;
+    }
+}

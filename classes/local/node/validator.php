@@ -87,8 +87,11 @@ class validator {
         }
 
         $url = (string)($node->url ?? '');
-        // In the site administration a node of the plugin without a link is a category, which lists what is in it.
-        if ($url === '' && !$isnative && !$menu instanceof \local_extendednav\menu\admintree) {
+        // A node of the plugin without a link groups others: a tab or a category of the site administration, a section of the
+        // preferences, a submenu at the top of a menu. Only the secondary navigations, which have no submenus, need one.
+        $groups = !$menu instanceof \local_extendednav\menu\secondary
+            && ($menu instanceof \local_extendednav\menu\admintree || (string)($node->parentkey ?? '') === '');
+        if ($url === '' && !$isnative && !$groups) {
             $errors['url'] = get_string('required');
         } else if ($url !== '') {
             if (url_helper::has_forbidden_scheme($url)) {

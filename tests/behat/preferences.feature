@@ -21,7 +21,7 @@ Feature: Arrange one's own preferences
     And I click on "Open User account" "button"
     And I click on "Hide Forum preferences" "button"
     And I wait until the page is ready
-    And I follow "Preferences" in the user menu
+    And I visit "/user/preferences.php"
     Then I should not see "Forum preferences"
     And I log out
     And I log in as "student2"
@@ -34,7 +34,7 @@ Feature: Arrange one's own preferences
     And I click on "Open User account" "button"
     And I click on "Show Forum preferences" "button"
     And I wait until the page is ready
-    And I follow "Preferences" in the user menu
+    And I visit "/user/preferences.php"
     And I should see "Forum preferences"
 
   Scenario: A user without the capability keeps the page of the site

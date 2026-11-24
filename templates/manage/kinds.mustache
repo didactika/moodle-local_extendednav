@@ -28,7 +28,7 @@
     {
         "name": "Activities", "description": "Order, rename, hide and extend the navigations of Moodle.", "origins": [], "originoptions": [],
         "rows": [{"key": "mod_forum", "name": "Forum", "component": "mod_forum", "url": "#", "activities": 12,
-            "usage": "12 activities in 4 courses", "changes": [{"label": "2 hidden"}], "exceptions": 3,
+            "usage": "12 activities in 4 courses", "itemslabel": "10 items", "changes": [{"label": "2 hidden"}], "exceptions": 3,
             "lastchange": "24/11/26", "off": false}]
     }
 }}
@@ -77,9 +77,10 @@
                                         </span>
                                     </th>
                                     <td class="d-none d-md-table-cell">
-                                        <span class="d-inline-flex flex-wrap gap-1">
+                                        <span class="d-inline-flex flex-wrap align-items-center gap-1">
+                                            <span class="small text-muted me-1 mr-1">{{itemslabel}}</span>
                                             {{#changes}}<span class="badge rounded-pill text-bg-light">{{label}}</span>{{/changes}}
-                                            {{^changes}}<span class="small text-muted">{{#str}}kinds_nochanges, local_extendednav{{/str}}</span>{{/changes}}
+
                                         </span>
                                     </td>
                                     <td class="text-end text-right d-none d-md-table-cell">{{#exceptions}}{{exceptions}}{{/exceptions}}{{^exceptions}}<span class="text-muted">—</span>{{/exceptions}}</td>

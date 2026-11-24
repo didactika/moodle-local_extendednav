@@ -28,6 +28,7 @@ use local_extendednav\menu_manager;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\external\manage_navigation
+ * @covers     \local_extendednav\external\search_export
  */
 final class manage_navigation_test extends \advanced_testcase {
     /**
@@ -133,5 +134,67 @@ final class manage_navigation_test extends \advanced_testcase {
         ) {
             $this->assertContains($function, $functions);
         }
+    }
+
+    /**
+     * The selects of the export find ten at a time, the first ones before anything is typed.
+     */
+    public function test_the_export_finds_ten_at_a_time(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        for ($i = 1; $i <= 15; $i++) {
+            $this->getDataGenerator()->create_user(['firstname' => 'Ana', 'lastname' => 'Search' . $i]);
+            $this->getDataGenerator()->create_course(['fullname' => 'Algebra ' . $i]);
+        }
+
+        $this->assertCount(search_export::LIMIT, search_export::execute('users', '')['results']);
+        $this->assertCount(search_export::LIMIT, search_export::execute('users', 'Search')['results']);
+        $this->assertCount(1, search_export::execute('users', 'Search15')['results']);
+        $this->assertCount(search_export::LIMIT, search_export::execute('courses', 'Algebra')['results']);
+        $site = array_column(search_export::execute('site', '')['results'], 'value');
+        $this->assertContains('preferences', $site);
+        $this->assertNotContains('profile', $site);
+        $this->assertSame(['mod_forum'], array_column(search_export::execute('kinds', 'Forum')['results'], 'value'));
+
+        $this->setUser($this->getDataGenerator()->create_user());
+        $this->expectException(\required_capability_exception::class);
+        search_export::execute('users', '');
+    }
+
+    /**
+     * A tab of the plugin is listed at the top of the site administration while it holds nothing, as a folder.
+     */
+    public function test_an_empty_tab_is_listed(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        manage_navigation::save_node('admin', 0, 'mytools', ['title' => 'My tools']);
+
+        $rows = array_column(\local_extendednav\local\listing\nodes::get('admin', 0)['rows'], null, 'nodekey');
+        $this->assertArrayHasKey('mytools', $rows, 'It is not hidden in General.');
+        $this->assertTrue($rows['mytools']['haschildren'], 'It opens, to add its pages.');
+    }
+
+    /**
+     * Hiding from the dialog also blocks the address when asked, never one of another site.
+     */
+    public function test_hiding_blocks_the_address(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        manage_navigation::save_node('primary', 0, 'inside', ['title' => 'Inside', 'url' => '/inside.php']);
+        manage_navigation::save_node('primary', 0, 'outside', ['title' => 'Outside', 'url' => 'https://example.org/']);
+
+        change_nodes::set_visibility('primary', 0, ['inside', 'outside'], 0, 1, 1);
+        $rows = $DB->get_records_menu('local_extendednav', ['menu' => 'primary', 'contextid' => 0], '', 'nodekey, blockaccess');
+        $this->assertSame(1, (int)$rows['inside']);
+        $this->assertSame(0, (int)$rows['outside'], 'An address of another site is never blocked.');
+
+        change_nodes::set_visibility('primary', 0, ['inside'], 1);
+        $this->assertSame(
+            0,
+            (int)$DB->get_field('local_extendednav', 'blockaccess', ['menu' => 'primary', 'nodekey' => 'inside']),
+            'A node shown again is not blocked.'
+        );
     }
 }

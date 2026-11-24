@@ -381,7 +381,12 @@ class admintree extends base {
             $children[(string)($node->parentkey ?? '')][] = (string)$key;
         }
         $general = [];
+        $tree = new self();
         foreach ($children[''] ?? [] as $key) {
+            // A tab of the plugin is a tab, even while it holds nothing, so it can be opened to add its pages.
+            if (!$tree->is_native($key) && trim((string)($nodes[$key]->url ?? '')) === '') {
+                continue;
+            }
             $own = $children[$key] ?? [];
             $deep = array_filter($own, static fn(string $child): bool => !empty($children[$child]));
             if (count($own) < 8 && empty($deep)) {

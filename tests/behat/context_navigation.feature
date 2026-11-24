@@ -9,6 +9,7 @@ Feature: Change the navigations of a course from the course
     And the following "users" exist:
       | username | firstname | lastname |
       | teacher1 | Teacher   | One      |
+      | teacher2 | Teacher   | Two      |
     And the following "courses" exist:
       | fullname | shortname |
       | Course 1 | C1        |
@@ -17,6 +18,7 @@ Feature: Change the navigations of a course from the course
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | teacher1 | C2     | editingteacher |
+      | teacher2 | C2     | teacher        |
     And the following "permission overrides" exist:
       | capability                      | permission | role           | contextlevel | reference |
       | local/extendednav:managecontext | Allow      | editingteacher | Course       | C1        |
@@ -28,14 +30,13 @@ Feature: Change the navigations of a course from the course
     And I am on "Course 1" course homepage
     When I navigate to "Navigation" in current page administration
     Then I should see "Course navigation" in the "[data-region='head']" "css_element"
-    And I should not see "Import"
     And I click on "Hide Participants" "button" in the "Participants" "table_row"
     And I click on "Hide" "button" in the "Hide Participants?" "dialogue"
     And I should see "Not visible" in the "Participants" "table_row"
     And I should see "Exception" in the "Participants" "table_row"
 
-  Scenario: The page of a course is only for whoever may manage its navigation
-    Given I log in as "teacher1"
+  Scenario: The page of a course is only for whoever may see or manage its navigation
+    Given I log in as "teacher2"
     When I am on "Course 2" course homepage
     Then I should not see "Navigation" in the ".secondary-navigation" "css_element"
 

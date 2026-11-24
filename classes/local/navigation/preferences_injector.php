@@ -41,6 +41,9 @@ final class preferences_injector {
     /** @var string Key of the items outside every section, which Moodle shows last, under Miscellaneous. */
     public const LOOSE = 'miscellaneous';
 
+    /** @var string[] The names Moodle gives the sections and items in this request, in the language of the page, by key. */
+    public static array $texts = [];
+
     /** @var string Key of the section of the plugin. */
     public const SECTION = 'local_extendednav';
 
@@ -91,9 +94,11 @@ final class preferences_injector {
         foreach ($groups as $groupkey => $group) {
             $text = $group['node'] ? self::text_of($group['node']) : get_string('miscellaneous');
             $seen[$groupkey] = (object)['text' => $text, 'action' => '', 'parent' => ''];
+            self::$texts[$groupkey] = $text;
             foreach ($group['items'] as $itemkey => $item) {
                 $action = $item->action instanceof \moodle_url ? (string)url_helper::to_site_path($item->action->out(false)) : '';
                 $seen[$itemkey] = (object)['text' => self::text_of($item), 'action' => $action, 'parent' => $groupkey];
+                self::$texts[$itemkey] = self::text_of($item);
             }
         }
         (new preferences())->record_seen($seen);
@@ -118,6 +123,17 @@ final class preferences_injector {
             return;
         }
         self::record($groups);
+        // Moodle shows the items outside every section last, under Miscellaneous. They go in a section of their own, with the same
+        // name, so it can be ordered, renamed and hidden as any other.
+        if (isset($groups[self::LOOSE])) {
+            $groups[self::LOOSE]['node'] = \navigation_node::create(
+                get_string('miscellaneous'),
+                null,
+                \navigation_node::TYPE_CONTAINER,
+                null,
+                self::LOOSE
+            );
+        }
 
         $context = \context_user::instance((int)$user->id);
         // With the navigation turned off, the site changes nothing, and each user still arranges their own page.
@@ -189,12 +205,7 @@ final class preferences_injector {
             }
         }
 
-        // The items outside every section stay at the end, where Moodle shows them.
-        $groupkeys = array_values(array_diff(self::order(array_keys($groups), $rows), [self::LOOSE]));
-        if (isset($groups[self::LOOSE])) {
-            $groupkeys[] = self::LOOSE;
-        }
-        foreach ($groupkeys as $groupkey) {
+        foreach (self::order(array_keys($groups), $rows) as $groupkey) {
             if (!self::shown($groupkey, $rows)) {
                 continue;
             }

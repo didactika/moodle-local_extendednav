@@ -90,6 +90,8 @@ $config = json_encode([
     'menu' => $menukey,
     'contextid' => 0,
     'tree' => nodes::is_tree($menukey),
+    'treetop' => $menu->get_name(),
+    'canrestrict' => true,
     'sampleurl' => $sample ? $sample->out(false) : '',
 ]);
 

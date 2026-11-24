@@ -16,7 +16,7 @@
 
 namespace local_extendednav\form;
 
-use local_extendednav\menu\activity;
+use local_extendednav\external\search_export;
 use local_extendednav\menu_manager;
 
 /**
@@ -29,9 +29,6 @@ use local_extendednav\menu_manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class export_form extends \moodleform {
-    /** @var string[] The navigations of the site, in the order of the column of the management page. */
-    public const SITE = ['primary', 'usermenu', 'preferences', 'frontpage', 'course', 'category', 'admin'];
-
     /**
      * Form definition.
      */
@@ -41,61 +38,55 @@ class export_form extends \moodleform {
 
         $mform->addElement('header', 'navigationshdr', get_string('export_navigations', 'local_extendednav'));
         $mform->setExpanded('navigationshdr');
-        $checks = [];
-        foreach (self::SITE as $key) {
-            $menu = menu_manager::get_menu($key);
-            $checks[] = $mform->createElement('advcheckbox', $key, '', $menu->get_name(), ['group' => 1]);
-        }
-        $mform->addGroup($checks, 'site', get_string('export_site_navigations', 'local_extendednav'), '<br>', true);
-        if (in_array($current, self::SITE, true)) {
-            $mform->setDefault('site[' . $current . ']', 1);
-        }
-        $kinds = [];
-        foreach (array_keys(activity::types()) as $modname) {
-            $menu = new activity($modname);
-            $kinds[$menu->get_key()] = $menu->get_short_name();
-        }
-        \core_collator::asort($kinds);
-        $mform->addElement('autocomplete', 'kinds', get_string('export_kinds', 'local_extendednav'), $kinds, [
-            'multiple' => true,
-            'noselectionstring' => get_string('export_none', 'local_extendednav'),
-        ]);
-        if (isset($kinds[$current])) {
+        $this->add_search('site', get_string('export_site_navigations', 'local_extendednav'));
+        $this->add_search('kinds', get_string('export_kinds', 'local_extendednav'));
+        if (in_array($current, search_export::SITE, true)) {
+            $mform->setDefault('site', [$current]);
+        } else if (menu_manager::get_menu($current) !== null) {
             $mform->setDefault('kinds', [$current]);
         }
         $mform->addElement('advcheckbox', 'withsite', get_string('export_withsite', 'local_extendednav'));
         $mform->addHelpButton('withsite', 'export_withsite', 'local_extendednav');
         $mform->setDefault('withsite', 1);
 
-        // The users are many: a search finds them, a few at a time.
         $mform->addElement('header', 'usershdr', get_string('export_users', 'local_extendednav'));
-        $mform->addElement('autocomplete', 'users', get_string('export_users_chosen', 'local_extendednav'), [], [
-            'multiple' => true,
-            'ajax' => 'core_user/form_user_selector',
-            'valuehtmlcallback' => static function ($userid): string {
-                $user = \core_user::get_user((int)$userid);
-                return $user ? fullname($user) : '';
-            },
-            'noselectionstring' => get_string('export_none', 'local_extendednav'),
-        ]);
+        $this->add_search('users', get_string('export_users_chosen', 'local_extendednav'));
         $mform->addHelpButton('users', 'export_users_chosen', 'local_extendednav');
 
         // Courses and categories travel with the backups of Moodle; a file can still hold the changes of some of them.
         $mform->addElement('header', 'contextshdr', get_string('export_contexts', 'local_extendednav'));
         $mform->addElement('static', 'contextsnote', '', get_string('export_contexts_note', 'local_extendednav'));
-        $mform->addElement('course', 'courses', get_string('export_courses', 'local_extendednav'), [
-            'multiple' => true,
-            'noselectionstring' => get_string('export_none', 'local_extendednav'),
-        ]);
-        $mform->addElement(
-            'autocomplete',
-            'categories',
-            get_string('export_categories', 'local_extendednav'),
-            \core_course_category::make_categories_list(),
-            ['multiple' => true, 'noselectionstring' => get_string('export_none', 'local_extendednav')]
-        );
+        $this->add_search('courses', get_string('export_courses', 'local_extendednav'));
+        $this->add_search('categories', get_string('export_categories', 'local_extendednav'));
 
         $this->add_action_buttons(true, get_string('export', 'local_extendednav'));
+    }
+
+    /**
+     * Adds a select that offers the first results and finds more, a few at a time, as the user types.
+     *
+     * @param string $kind site, kinds, users, courses or categories.
+     * @param string $label Label of the field.
+     */
+    private function add_search(string $kind, string $label): void {
+        $options = [];
+        foreach (search_export::find($kind, '') as $result) {
+            $options[$result['value']] = $result['label'];
+        }
+        $current = $this->_customdata['menu'] ?? '';
+        if (($kind === 'site' || $kind === 'kinds') && $current !== '' && !isset($options[$current])) {
+            $menu = menu_manager::get_menu($current);
+            if ($menu !== null && ($kind === 'site') === in_array($current, search_export::SITE, true)) {
+                $options[$current] = search_export::label_of($kind, $current);
+            }
+        }
+        $this->_form->addElement('autocomplete', $kind, $label, $options, [
+            'multiple' => true,
+            'ajax' => 'local_extendednav/form/export_search',
+            'valuehtmlcallback' => static fn($value): string => s(search_export::label_of($kind, (string)$value)),
+            'noselectionstring' => get_string('export_none', 'local_extendednav'),
+            'data-kind' => $kind,
+        ]);
     }
 
     /**
@@ -108,7 +99,7 @@ class export_form extends \moodleform {
         if ($data === null) {
             return null;
         }
-        $menus = array_keys(array_filter((array)($data->site ?? [])));
+        $menus = array_values((array)($data->site ?? []));
         $menus = array_merge($menus, array_values((array)($data->kinds ?? [])));
         $contexts = !empty($data->withsite) ? [0] : [];
         $users = array_filter(array_map('intval', (array)($data->users ?? [])));
@@ -137,7 +128,7 @@ class export_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        $menus = array_filter((array)($data['site'] ?? [])) || !empty($data['kinds']);
+        $menus = !empty($data['site']) || !empty($data['kinds']);
         $where = !empty($data['withsite']) || !empty($data['users']) || !empty($data['courses']) || !empty($data['categories']);
         if (!$where || (!$menus && empty($data['users']))) {
             $errors['withsite'] = get_string('export_nothing', 'local_extendednav');

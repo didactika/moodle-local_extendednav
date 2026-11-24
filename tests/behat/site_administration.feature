@@ -49,6 +49,9 @@ Feature: Shape the site administration
       | Title    | Didactika tools |
     And "#fitem_id_url" "css_element" should not be visible
     And I press "Save changes"
+    And I should see "Didactika tools" in the "[data-region='path']" "css_element"
+    And I click on "Site administration" "button" in the "[data-region='path']" "css_element"
+    And I should see "Empty, not shown" in the "Didactika tools" "table_row"
     And I click on "Open Users" "button"
     And I follow "Add node"
     Then the field "Parent" matches value "Users"
