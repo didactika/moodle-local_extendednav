@@ -99,17 +99,17 @@ const isExternal = (value, wwwroot) => {
 };
 
 /**
- * Hides each section of the form whose fields are all hidden, such as Where it goes for a tab, which has no parent: a heading
- * over nothing says nothing. The section comes back as soon as one of its fields does.
+ * Hides each section of the form with no field to show, such as Where it goes for a tab or a section, which have no parent:
+ * a heading over nothing says nothing. The section comes back as soon as one of its fields does.
  *
  * @param {HTMLFormElement} form The form.
  */
 const hideEmptySections = (form) => {
     const isHidden = (item) => item.hidden || item.classList.contains('d-none') || window.getComputedStyle(item).display === 'none';
     const update = () => {
-        form.querySelectorAll('fieldset[id^="id_"]').forEach((section) => {
+        form.querySelectorAll('fieldset.collapsible[id^="id_"]').forEach((section) => {
             const items = [...section.querySelectorAll('.fitem')];
-            const empty = items.length > 0 && items.every(isHidden);
+            const empty = items.every(isHidden);
             if (section.hidden !== empty) {
                 section.hidden = empty;
             }
