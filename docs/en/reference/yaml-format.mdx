@@ -32,7 +32,8 @@ The same format holds one navigation or every navigation. An exported file also 
 | `parentkey` | Key of the parent item, to show this item in its submenu. In the site administration, the key of the category the item is in |
 | `display` | How the link opens: `0` current window, `1` new window, `2` pop-up |
 | `popupwidth`, `popupheight` | Width and height of the pop-up in pixels, from 100 to 9999. Used when `display` is `2` |
-| `scope` | The category or the course the node is an exception for: `course:shortname` or `category:Parent / Name`. Empty means the whole site |
+| `scope` | The category the node is an exception for: `category:Parent / Name`. Empty means the whole site. The exceptions of a course travel in the backup of the course; a file may still name a course as `course:shortname` |
+| `availability` | Access restrictions of Moodle, in JSON, as Restrict access of an activity saves them. See [Show a node to some people or for a time](page:guides/conditions) |
 | `placement` | Where a node of a secondary navigation goes: `0` where Moodle puts it, `1` always in the More menu, `2` never in the More menu |
 | `hideadmins` | `1` to hide the node from site administrators too |
 

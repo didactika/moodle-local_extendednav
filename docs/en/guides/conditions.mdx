@@ -1,0 +1,33 @@
+---
+title: Show a node to some people or for a time
+summary: Use Moodle's Restrict access on a node, with dates that make it appear and end on its own.
+order: 42
+---
+
+Besides its visibility and its roles, a node can have the **Access restrictions** of Moodle, the same ones as Restrict access of an activity. Open the form of the node and, under **Who sees it**, select **Add restriction**.
+
+<Screenshot src="asset:node-form-conditions.webp" alt="The form of a node with a restriction by date in Access restrictions" caption="Access restrictions in the form of a node." url="/local/extendednav/edit.php" />
+
+| Restriction | What it does |
+|---|---|
+| **Date** | Shows the node from a date, until a date, or between two |
+| **Group** and **Grouping** | Shows the node of a course to the members of a group or a grouping of that course |
+| **User profile** | Shows the node to the people whose profile field has a value, such as a department or a city |
+| Other restrictions | The ones the plugins of the site add, such as cohorts when that plugin is installed |
+
+Every restriction has to be met, and so does the visibility: a node restricted to some roles and to a group is shown to the people with one of those roles who are in that group. Groups and groupings are offered for the exceptions of a course, where the node belongs to that course.
+
+## Nodes with dates
+
+A node with a start date appears on its own when the date comes, and a node with an end date disappears on its own when it ends: there is nothing to do on the day. On the management page, the column **Visibility** says:
+
+| Badge | When |
+|---|---|
+| **With conditions** | The node is for everyone and has restrictions; place the pointer over it to read them |
+| **Scheduled** | The start date has not come yet |
+| **Ended** | The end date has passed; the node stays on the list, hidden, until you change or delete it |
+
+> [!NOTE]
+> Administrators see every node by default, also the ones that are scheduled or have ended, marked **Only you**. See [Administrators see every node](page:concepts/administrators-see-everything).
+
+The restrictions hide the node from the navigation; they do not block the page it links to. To block the page too, use **Block URL access** with a hidden or restricted node.

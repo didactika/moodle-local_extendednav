@@ -28,4 +28,6 @@ El botón del final de la fila de una excepción (**Volver**) quita los cambios 
 
 ## Exportar e importar
 
-**Exportar > Esta navegación** y **Exportar > Todas las navegaciones** incluyen las excepciones, cada una con la categoría o el curso al que pertenece (`scope`). Al importar, el ámbito se busca por el nombre corto del curso o por el nombre completo de la categoría, con sus padres. Consulte [El formato YAML](page:reference/yaml-format).
+Las excepciones de un **curso** forman parte del curso: van en su copia de seguridad y vuelven al restaurarla, también como curso nuevo o en otro curso, con los grupos, los agrupamientos y las fechas de sus condiciones ajustados al curso restaurado. Un nodo que el curso ya cambia se conserva como está.
+
+Las excepciones de una **categoría** pertenecen al sitio, ya que Moodle no hace copias de seguridad de las categorías: **Exportar > Esta navegación** y **Exportar > Todas las navegaciones** las incluyen, cada una con su categoría (`scope`). Al importar, la categoría se busca por su nombre completo, con sus padres. Consulte [El formato YAML](page:reference/yaml-format).

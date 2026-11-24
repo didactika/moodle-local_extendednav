@@ -1,0 +1,33 @@
+---
+title: Mostrar un nodo a algunas personas o durante un tiempo
+summary: Use la restricción de acceso de Moodle en un nodo, con fechas que lo hacen aparecer y terminar por sí solo.
+order: 42
+---
+
+Además de su visibilidad y sus roles, un nodo puede tener las **Restricciones de acceso** de Moodle, las mismas que la restricción de acceso de una actividad. Abra el formulario del nodo y, en **Quién lo ve**, seleccione **Añadir restricción**.
+
+<Screenshot src="asset:node-form-conditions.webp" alt="El formulario de un nodo con una restricción por fecha en Restricciones de acceso" caption="Las restricciones de acceso en el formulario de un nodo." url="/local/extendednav/edit.php" />
+
+| Restricción | Qué hace |
+|---|---|
+| **Fecha** | Muestra el nodo desde una fecha, hasta una fecha o entre dos |
+| **Grupo** y **Agrupamiento** | Muestra el nodo de un curso a los miembros de un grupo o de un agrupamiento de ese curso |
+| **Perfil de usuario** | Muestra el nodo a las personas cuyo campo del perfil tiene un valor, como un departamento o una ciudad |
+| Otras restricciones | Las que añaden los plugins del sitio, como las cohortes cuando ese plugin está instalado |
+
+Deben cumplirse todas las restricciones, y también la visibilidad: un nodo restringido a algunos roles y a un grupo se muestra a las personas con uno de esos roles que están en ese grupo. Los grupos y los agrupamientos se ofrecen en las excepciones de un curso, donde el nodo pertenece a ese curso.
+
+## Nodos con fechas
+
+Un nodo con fecha de inicio aparece por sí solo cuando llega la fecha, y un nodo con fecha de fin desaparece por sí solo cuando termina: no hay nada que hacer ese día. En la página de gestión, la columna **Visibilidad** indica:
+
+| Insignia | Cuándo |
+|---|---|
+| **Con condiciones** | El nodo es para todos y tiene restricciones; sitúe el puntero sobre ella para leerlas |
+| **Programado** | Todavía no ha llegado la fecha de inicio |
+| **Finalizado** | Ha pasado la fecha de fin; el nodo sigue en la lista, oculto, hasta que lo cambie o lo elimine |
+
+> [!NOTE]
+> Los administradores ven todos los nodos de forma predeterminada, también los programados o finalizados, marcados como **Solo usted**. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
+
+Las restricciones ocultan el nodo de la navegación; no bloquean la página a la que enlaza. Para bloquear también la página, use **Bloquear el acceso por URL** con un nodo oculto o restringido.

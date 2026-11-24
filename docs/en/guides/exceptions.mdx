@@ -28,4 +28,6 @@ The button at the end of the row of an exception (**Go back**) removes the chang
 
 ## Export and import
 
-**Export > This navigation** and **Export > Every navigation** include the exceptions, each with the category or the course it is for (`scope`). On import, the scope is looked up by the short name of the course or by the full name of the category, with its parents. See [The YAML format](page:reference/yaml-format).
+The exceptions of a **course** are part of the course: they go in its backup and come back when it is restored, also as a new course or into another one, with the groups, the groupings and the dates of their conditions matched to the course restored. A node that the course already changes is kept as it is.
+
+The exceptions of a **category** belong to the site, as Moodle does not back up categories: **Export > This navigation** and **Export > Every navigation** include them, each with its category (`scope`). On import, the category is looked up by its full name, with its parents. See [The YAML format](page:reference/yaml-format).

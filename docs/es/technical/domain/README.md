@@ -36,6 +36,7 @@ La posición vertical de una entidad expresa su importancia para el objetivo del
 | Menu | 2 | Uno de los dos menús: la navegación principal o el menú de usuario. | `primary`, `usermenu` | Es una clase del plugin, no una tabla. |
 | Visibility | 2 | Quién ve un nodo: todos, los usuarios con algunos roles o nadie. | `visibility` | |
 | Role | 3 | Un rol que puede ver un nodo restringido. | nombre corto del rol | Es el `role` de Moodle. |
+| Condition | 3 | Una restricción de acceso de Moodle sobre un nodo: una fecha, un grupo, un agrupamiento, un campo del perfil o una condición de un plugin. | `availability` | Es el árbol de disponibilidad de Moodle, guardado como JSON en el nodo. |
 | Language | 3 | Un idioma al que se limita un nodo. | código de idioma | Es una lista de códigos en el nodo. |
 | Submenu | 3 | Los nodos que se muestran bajo un nodo padre, a un nivel de profundidad. | `parentkey` | |
 | ActivityRecord | 4 | Un evento del registro de Moodle escrito cuando un nodo se crea, cambia o elimina. | evento, usuario, hora | Es el registro de Moodle. |
@@ -54,11 +55,14 @@ La posición vertical de una entidad expresa su importancia para el objetivo del
 | RN-007 | Reordenar mantiene a un padre con su submenú, y un elemento de submenú solo se mueve entre sus hermanos. | Node, Submenu | `manager::reorder` |
 | RN-008 | Un elemento de Moodle con campos vacíos conserva los valores de Moodle. | Node | `text` |
 | RN-009 | Un nodo de una navegación secundaria se encuentra cuando una página lo muestra, una sola vez, y desde entonces tiene una fila que se puede cambiar. | Node, Menu | `secondary::record_seen` |
-| RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada.  Node, Menu | `admintree::apply` |
+| RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada. | Node, Menu | `admintree::apply` |
 | RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. | Node, Role | `access::is_allowed` |
 | RN-012 | Para cada nodo gana el ámbito más cercano a la página: el curso, luego las categorías que lo rodean y luego el sitio. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-013 | Cuando un ámbito cambia el orden de un nodo, fija el orden de toda su navegación. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-014 | Eliminar un nodo del sitio elimina sus excepciones. | Node, Scope | `manager::delete` |
+| RN-015 | Un nodo se muestra solo cuando su visibilidad, sus roles y sus restricciones de acceso (la restricción de acceso de Moodle) permiten verlo al usuario; un nodo de un curso se comprueba en ese curso. | Node, Condition | `availability::allows` |
+| RN-016 | Las fechas de las restricciones hacen que un nodo esté programado antes de su inicio y finalizado después de su fin; aparece y desaparece por sí solo. | Node, Condition | `availability::period` |
+| RN-017 | Las excepciones de un curso viajan en la copia de seguridad del curso; el archivo del sitio contiene los nodos del sitio y las excepciones de sus categorías. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
 
 ## Ciclos de vida
 

@@ -32,7 +32,8 @@ El mismo formato contiene una navegación o todas. Un archivo exportado empieza 
 | `parentkey` | Clave del elemento padre, para mostrar este elemento en su submenú. En la administración del sitio, la clave de la categoría en la que está el elemento |
 | `display` | Cómo se abre el enlace: `0` ventana actual, `1` ventana nueva, `2` ventana emergente |
 | `popupwidth`, `popupheight` | Ancho y alto de la ventana emergente en píxeles, de 100 a 9999. Se usan cuando `display` es `2` |
-| `scope` | La categoría o el curso para el que el nodo es una excepción: `course:nombrecorto` o `category:Padre / Nombre`. Vacío significa todo el sitio |
+| `scope` | La categoría para la que el nodo es una excepción: `category:Padre / Nombre`. Vacío significa todo el sitio. Las excepciones de un curso viajan en la copia de seguridad del curso; un archivo puede seguir nombrando un curso como `course:nombrecorto` |
+| `availability` | Restricciones de acceso de Moodle, en JSON, como las guarda la restricción de acceso de una actividad. Consulte [Mostrar un nodo a algunas personas o durante un tiempo](page:guides/conditions) |
 | `placement` | Dónde va un nodo de una navegación secundaria: `0` donde lo pone Moodle, `1` siempre en el menú Más, `2` nunca en el menú Más |
 | `hideadmins` | `1` para ocultar el nodo también a los administradores del sitio |
 

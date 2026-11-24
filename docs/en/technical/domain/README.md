@@ -36,6 +36,7 @@ The vertical position of an entity expresses its importance to the project objec
 | Menu | 2 | One of the two menus: the primary navigation or the user menu. | `primary`, `usermenu` | It is a class of the plugin, not a table. |
 | Visibility | 2 | Who sees a node: everyone, the users with some roles, or nobody. | `visibility` | |
 | Role | 3 | A role that may see a restricted node. | role shortname | It is Moodle's `role`. |
+| Condition | 3 | An access restriction of Moodle on a node: a date, a group, a grouping, a profile field or a condition of a plugin. | `availability` | It is Moodle's availability tree, kept as JSON in the node. |
 | Language | 3 | A language to which a node is limited. | language code | It is a list of codes in the node. |
 | Submenu | 3 | The nodes shown under a parent node, one level deep. | `parentkey` | |
 | ActivityRecord | 4 | An event of the log of Moodle written when a node is created, changed or deleted. | event, user, time | It is Moodle's log. |
@@ -54,11 +55,14 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-007 | Reordering keeps a parent with its submenu, and a submenu item moves only among its siblings. | Node, Submenu | `manager::reorder` |
 | RN-008 | An item of Moodle with empty fields keeps the values of Moodle. | Node | `text` |
 | RN-009 | A node of a secondary navigation is found when a page shows it, once, and from then on it has a row that can be changed. | Node, Menu | `secondary::record_seen` |
-| RN-010 | In the site administration every category and page, at any depth, can be renamed, hidden and ordered; a link of the plugin goes in a category; its nodes are hidden from administrators too by default.  Node, Menu | `admintree::apply` |
+| RN-010 | In the site administration every category and page, at any depth, can be renamed, hidden and ordered; a link of the plugin goes in a category; its nodes are hidden from administrators too by default. | Node, Menu | `admintree::apply` |
 | RN-011 | A site administrator sees every node, unless the plugin or the node hides it from administrators too. | Node, Role | `access::is_allowed` |
 | RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-014 | Deleting a node of the site deletes its exceptions. | Node, Scope | `manager::delete` |
+| RN-015 | A node is shown only when its visibility, its roles and its access restrictions (Moodle's Restrict access) all let the user see it; a node of a course is checked in that course. | Node, Condition | `availability::allows` |
+| RN-016 | The dates of the restrictions make a node scheduled before its start and ended after its end; it appears and disappears on its own. | Node, Condition | `availability::period` |
+| RN-017 | The exceptions of a course travel in the backup of the course; the file of the site holds the nodes of the site and the exceptions of its categories. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
 
 ## Lifecycles
 
