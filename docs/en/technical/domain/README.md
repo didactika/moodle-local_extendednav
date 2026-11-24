@@ -63,6 +63,7 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-015 | A node is shown only when its visibility, its roles and its access restrictions (Moodle's Restrict access) all let the user see it; a node of a course is checked in that course. | Node, Condition | `availability::allows` |
 | RN-016 | The dates of the restrictions make a node scheduled before its start and ended after its end; it appears and disappears on its own. | Node, Condition | `availability::period` |
 | RN-017 | The exceptions of a course travel in the backup of the course; the file of the site holds the nodes of the site and the exceptions of its categories. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
+| RN-018 | A category or a course changes its navigations on its own page, by whoever manages the navigation of the site or holds local/extendednav:managecontext in that context; the site administration only lists them. | Node, Scope | `context_scope::require_manage`, `node_service::require_scope` |
 
 ## Lifecycles
 

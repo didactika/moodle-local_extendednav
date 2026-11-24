@@ -63,6 +63,7 @@ La posición vertical de una entidad expresa su importancia para el objetivo del
 | RN-015 | Un nodo se muestra solo cuando su visibilidad, sus roles y sus restricciones de acceso (la restricción de acceso de Moodle) permiten verlo al usuario; un nodo de un curso se comprueba en ese curso. | Node, Condition | `availability::allows` |
 | RN-016 | Las fechas de las restricciones hacen que un nodo esté programado antes de su inicio y finalizado después de su fin; aparece y desaparece por sí solo. | Node, Condition | `availability::period` |
 | RN-017 | Las excepciones de un curso viajan en la copia de seguridad del curso; el archivo del sitio contiene los nodos del sitio y las excepciones de sus categorías. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
+| RN-018 | Una categoría o un curso cambia sus navegaciones en su propia página, por quien gestiona la navegación del sitio o tiene local/extendednav:managecontext en ese contexto; la administración del sitio solo las enumera. | Node, Scope | `context_scope::require_manage`, `node_service::require_scope` |
 
 ## Ciclos de vida
 

@@ -6,17 +6,25 @@ order: 46
 
 The navigation of a course, of an activity and of a category can be changed for the whole site and, as an exception, for a **category** or a **course**. Everything inside a category follows it, and a course can change what its category sets.
 
-## Choose the scope
+## Open the navigation of a category or a course
 
-On the management page, open **Applies to** and search for the category or the course. The menu also lists the ones that already have changes, with how many. Choose **Whole site** to go back.
+In a course, open the menu of the course (**More**) and select **Navigation**. In a category, open the menu of the category and select **Navigation**. The page lists the navigations that the category or the course can change: a course changes its own navigation and the one of its activities; a category also changes its own and the ones of the courses inside it.
 
-<Screenshot src="asset:manage-scope-menu.webp" alt="The menu that chooses the scope, with a search and the courses found" caption="Search a category or a course to change its navigation." url="/local/extendednav/manage.php?menu=course" />
+<Screenshot src="asset:context-course.webp" alt="The page Navigation of a course, with the course navigation and a node changed only for the course" caption="The navigation of a course, changed from the course." url="/local/extendednav/context.php" />
+
+## Who can do it
+
+Whoever manages the navigation of the site can change the navigation of every category and course. Whoever has the capability **Manage the navigation of a category or a course** (`local/extendednav:managecontext`) in a category or a course can change that one and everything inside it. Managers have it by default; give it to other roles, such as teachers, in a course or a category with the permissions of Moodle.
+
+## See every exception
+
+In **Site administration > Appearance > Extended navigation > Exceptions of categories and courses**, the list shows every category and course that changes a navigation, with the number of nodes it changes in each one. Search by name, narrow the list to categories or to courses, and select one to open its page.
+
+<Screenshot src="asset:exceptions-overview.webp" alt="The list of the categories and courses that change a navigation" caption="Every exception of the site, in one list." url="/local/extendednav/exceptions.php" />
 
 ## Make an exception
 
-With a category or a course chosen, the list shows what its pages show: the nodes of the site and the ones it inherits. Change a node as you would for the site: hide it, move it or edit it. The first change of a node gives the category or the course a row of its own, which starts as a copy of the node it replaces. The row shows **Exception**; a node that comes from a category around it shows **Inherited**.
-
-<Screenshot src="asset:manage-exception.webp" alt="The navigation of a course, with a node marked as an exception" caption="A node changed only for this course." url="/local/extendednav/manage.php?menu=course" />
+The list shows what the pages of the category or the course show: the nodes of the site and the ones it inherits. Change a node as you would for the site: hide it, move it or edit it. The first change of a node gives the category or the course a row of its own, which starts as a copy of the node it replaces. The row shows **Exception**; a node that comes from a category around it shows **Inherited**.
 
 - The nearest scope wins: the course over its category, and the category over the site.
 - When a category or a course changes the order of any node, it sets the order of its whole navigation.

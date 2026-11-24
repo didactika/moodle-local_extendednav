@@ -6,17 +6,25 @@ order: 46
 
 La navegación de un curso, de una actividad y de una categoría se puede cambiar para todo el sitio y, como excepción, para una **categoría** o un **curso**. Todo lo que hay dentro de una categoría la sigue, y un curso puede cambiar lo que fija su categoría.
 
-## Elegir el ámbito
+## Abrir la navegación de una categoría o un curso
 
-En la página de gestión, abra **Se aplica a** y busque la categoría o el curso. El menú también enumera los que ya tienen cambios, con cuántos. Elija **Todo el sitio** para volver.
+En un curso, abra el menú del curso (**Más**) y seleccione **Navegación**. En una categoría, abra el menú de la categoría y seleccione **Navegación**. La página enumera las navegaciones que la categoría o el curso pueden cambiar: un curso cambia su propia navegación y la de sus actividades; una categoría cambia además la suya y las de los cursos que contiene.
 
-<Screenshot src="asset:manage-scope-menu.webp" alt="El menú que elige el ámbito, con un buscador y los cursos encontrados" caption="Busque una categoría o un curso para cambiar su navegación." url="/local/extendednav/manage.php?menu=course" />
+<Screenshot src="asset:context-course.webp" alt="La página Navegación de un curso, con la navegación del curso y un nodo cambiado solo para el curso" caption="La navegación de un curso, cambiada desde el curso." url="/local/extendednav/context.php" />
+
+## Quién puede hacerlo
+
+Quien gestiona la navegación del sitio puede cambiar la navegación de todas las categorías y cursos. Quien tiene la capacidad **Gestionar la navegación de una categoría o un curso** (`local/extendednav:managecontext`) en una categoría o un curso puede cambiar esa categoría o ese curso y todo lo que contiene. Los gestores la tienen de forma predeterminada; concédala a otros roles, como el profesorado, en un curso o una categoría con los permisos de Moodle.
+
+## Ver todas las excepciones
+
+En **Administración del sitio > Apariencia > Navegación ampliada > Excepciones de categorías y cursos**, la lista muestra todas las categorías y cursos que cambian una navegación, con el número de nodos que cambian en cada una. Busque por nombre, reduzca la lista a categorías o a cursos y seleccione uno para abrir su página.
+
+<Screenshot src="asset:exceptions-overview.webp" alt="La lista de las categorías y cursos que cambian una navegación" caption="Todas las excepciones del sitio, en una lista." url="/local/extendednav/exceptions.php" />
 
 ## Hacer una excepción
 
-Con una categoría o un curso elegidos, la lista muestra lo que muestran sus páginas: los nodos del sitio y los que hereda. Cambie un nodo como lo haría para el sitio: ocúltelo, muévalo o edítelo. El primer cambio de un nodo da a la categoría o al curso una fila propia, que empieza como copia del nodo al que sustituye. La fila muestra **Excepción**; un nodo que viene de una categoría que lo rodea muestra **Heredado**.
-
-<Screenshot src="asset:manage-exception.webp" alt="La navegación de un curso, con un nodo marcado como excepción" caption="Un nodo cambiado solo para este curso." url="/local/extendednav/manage.php?menu=course" />
+La lista muestra lo que muestran las páginas de la categoría o el curso: los nodos del sitio y los que hereda. Cambie un nodo como lo haría para el sitio: ocúltelo, muévalo o edítelo. El primer cambio de un nodo da a la categoría o al curso una fila propia, que empieza como copia del nodo al que sustituye. La fila muestra **Excepción**; un nodo que viene de una categoría que lo rodea muestra **Heredado**.
 
 - Gana el ámbito más cercano: el curso sobre su categoría, y la categoría sobre el sitio.
 - Cuando una categoría o un curso cambia el orden de un nodo, fija el orden de toda su navegación.
