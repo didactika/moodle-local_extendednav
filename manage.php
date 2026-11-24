@@ -24,6 +24,7 @@
  */
 
 use local_extendednav\local\listing\nodes;
+use local_extendednav\local\navigation\context_scope;
 use local_extendednav\local\navigation\sample_page;
 use local_extendednav\menu\admintree;
 use local_extendednav\menu_manager;
@@ -34,7 +35,11 @@ require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('local_extendednav_manage');
 
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
+// The navigations of a category or a course are changed on the page of that context.
 $contextid = optional_param('contextid', 0, PARAM_INT);
+if ($contextid && ($scope = context_scope::from_id($contextid))) {
+    redirect($scope->url($menukey));
+}
 
 $menu = menu_manager::get_menu($menukey);
 if ($menu === null) {
@@ -42,32 +47,20 @@ if ($menu === null) {
     $menu = menu_manager::get_menu($menukey);
 }
 $hasscopes = nodes::supports_scopes($menukey);
-$scopename = get_string('applies_whole_site', 'local_extendednav');
-if ($contextid !== 0) {
-    $context = $hasscopes ? context::instance_by_id($contextid, IGNORE_MISSING) : false;
-    if ($context && in_array($context->contextlevel, [CONTEXT_COURSECAT, CONTEXT_COURSE], true)) {
-        $scopename = $context->contextlevel === CONTEXT_COURSE
-            ? format_string(get_course($context->instanceid)->fullname, true, ['context' => $context])
-            : (core_course_category::get($context->instanceid, IGNORE_MISSING, true)?->get_formatted_name()
-                ?? $context->get_context_name(false, true));
-    } else {
-        $contextid = 0;
-    }
-}
 
-$pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []));
+$pageurl = new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 $PAGE->set_url($pageurl);
 
 // The navigations, in groups: the ones of the whole site, the ones of the courses and the site administration.
 $groups = menu_manager::get_origin_groups($menukey, '/local/extendednav/manage.php');
 ['origins' => $origins, 'originoptions' => $originoptions] = $groups;
 
-$scopeparams = ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : []);
+$scopeparams = ['menu' => $menukey];
 // A page that shows the navigation, so its nodes can be found from the empty list.
 $sample = sample_page::for_navigation($menukey);
 $config = json_encode([
     'menu' => $menukey,
-    'contextid' => $contextid,
+    'contextid' => 0,
     'tree' => $menukey === admintree::KEY,
     'sampleurl' => $sample ? $sample->out(false) : '',
 ]);
@@ -80,8 +73,9 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'origins' => $origins,
     'originoptions' => $originoptions,
     'enabled' => get_config('local_extendednav', 'enabled_' . $menukey) !== '0',
+    'sitewide' => true,
     'hasscopes' => $hasscopes,
-    'scopename' => $scopename,
+    'exceptionsurl' => (new moodle_url('/local/extendednav/exceptions.php', ['menu' => $menukey]))->out(false),
     'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', $scopeparams))->out(false),
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),

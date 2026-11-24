@@ -76,8 +76,7 @@ final class get_nodes extends node_service {
             self::execute_parameters(),
             compact('menu', 'contextid', 'search', 'visibility', 'parent', 'page', 'perpage', 'origin')
         );
-        self::require_manage();
-        self::validate_scope($params['menu'], $params['contextid']);
+        self::require_scope($params['menu'], $params['contextid']);
         if ($params['page'] < 0 || $params['perpage'] < 0 || $params['perpage'] > nodes::MAX_PAGE_SIZE) {
             throw new \invalid_parameter_exception('Page must be non-negative and perpage between 0 and 100.');
         }

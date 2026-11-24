@@ -24,6 +24,7 @@
  */
 
 use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\navigation\context_scope;
 use local_extendednav\local\node\access;
 use local_extendednav\local\node\display;
 use local_extendednav\local\listing\nodes;
@@ -33,8 +34,6 @@ use local_extendednav\menu_manager;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
-
-admin_externalpage_setup('local_extendednav_manage');
 
 $id = optional_param('id', 0, PARAM_INT);
 $menukey = optional_param('menu', 'primary', PARAM_ALPHANUMEXT);
@@ -55,6 +54,23 @@ if ($contextid !== 0 && !nodes::supports_scopes($menukey)) {
     $contextid = 0;
 }
 
+// A node of a category or a course is changed by whoever manages the navigations of that context, on its pages; the nodes
+// of the site, in the site administration.
+$scope = $contextid ? context_scope::from_id($contextid) : null;
+if ($scope !== null) {
+    if ($scope->is_course()) {
+        require_login($scope->context()->instanceid);
+    } else {
+        require_login();
+        $PAGE->set_context($scope->context());
+    }
+    $scope->require_manage();
+    $PAGE->set_pagelayout('admin');
+} else {
+    $contextid = 0;
+    admin_externalpage_setup('local_extendednav_manage');
+}
+
 // A node that a category or a course only inherits is changed with an exception: the form starts from the node it sees, and
 // saving it gives the scope a row of its own.
 $inherited = null;
@@ -72,10 +88,7 @@ $heading = get_string($id ? 'edit_node' : 'add_node', 'local_extendednav') . ' (
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 
-$manageurl = new moodle_url(
-    '/local/extendednav/manage.php',
-    ['menu' => $menukey] + ($contextid ? ['contextid' => $contextid] : [])
-);
+$manageurl = $scope !== null ? $scope->url($menukey) : new moodle_url('/local/extendednav/manage.php', ['menu' => $menukey]);
 $source = $node ?? $inherited;
 $form = new \local_extendednav\form\node_form(
     $url,

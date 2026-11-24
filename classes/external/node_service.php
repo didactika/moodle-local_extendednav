@@ -44,6 +44,27 @@ abstract class node_service extends external_api {
     }
 
     /**
+     * Requires the right to change a navigation in a scope: the whole site needs the capability that manages the navigation;
+     * a category or a course needs it, or the capability that manages the navigation of that context.
+     *
+     * @param string $menu Navigation key.
+     * @param int $contextid Context of the scope, 0 for the whole site.
+     */
+    protected static function require_scope(string $menu, int $contextid): void {
+        if ($contextid === 0) {
+            self::require_manage();
+            self::validate_scope($menu, 0);
+            return;
+        }
+        $context = \context::instance_by_id($contextid);
+        self::validate_context($context);
+        if (!has_capability('local/extendednav:manage', \context_system::instance())) {
+            require_capability('local/extendednav:managecontext', $context);
+        }
+        self::validate_scope($menu, $contextid);
+    }
+
+    /**
      * Checks a navigation and a scope.
      *
      * @param string $menu Navigation key.

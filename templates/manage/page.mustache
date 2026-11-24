@@ -17,8 +17,9 @@
 {{!
     @template local_extendednav/manage/page
 
-    The management page: the navigations to the left (a select on a narrow screen), and to the right the name with its On and Off button, the scope
-    of the changes, the actions and the list of the nodes of the navigation chosen.
+    The page of the navigations: the navigations to the left (a select on a narrow screen), and to the right the name, the actions
+    and the list of the nodes of the navigation chosen. For the whole site (sitewide) it has the On and Off button, the import, the
+    export and the way to the exceptions; for a category or a course it says what the changes reach.
 
     @copyright  2026 Didactika.org
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,8 +33,10 @@
         ],
         "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}],
         "enabled": true,
+        "sitewide": true,
         "hasscopes": true,
-        "scopename": "Whole site",
+        "exceptionsurl": "#",
+        "scopename": "",
         "addurl": "#",
         "importurl": "#",
         "exporturl": "#",
@@ -44,7 +47,8 @@
     }
 }}
 <div class="len" data-region="manage" data-config="{{config}}">
-    <p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>
+    {{#sitewide}}<p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>{{/sitewide}}
+    {{^sitewide}}<p class="text-muted mb-0">{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}</p>{{/sitewide}}
 
     <div data-region="layout">
         {{> local_extendednav/manage/origins }}
@@ -53,15 +57,18 @@
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <h2 class="h4 fw-bold mb-0">{{name}}</h2>
-                    <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
-                        <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
-                        <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/uncheckedcircle, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
-                    </button>
+                    {{#sitewide}}
+                        <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
+                            <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
+                            <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/uncheckedcircle, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
+                        </button>
+                    {{/sitewide}}
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-2" data-region="actions">
                     {{#canadd}}
                         <a class="btn btn-primary" href="{{addurl}}">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
                     {{/canadd}}
+                    {{#sitewide}}
                     <a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>
                     <span class="dropdown d-inline-flex position-relative" data-menu="export">
                         <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-menu-toggle aria-haspopup="true" aria-expanded="false">{{#pix}}t/download, core{{/pix}} {{#str}}export, local_extendednav{{/str}}</button>
@@ -77,24 +84,13 @@
                             </a>
                         </span>
                     </span>
+                    {{/sitewide}}
                 </div>
             </div>
 
-            {{#hasscopes}}
-                <div class="d-flex flex-wrap align-items-center gap-2" data-region="scope">
-                    <span class="fw-bold">{{#str}}applies_to, local_extendednav{{/str}}</span>
-                    <span class="dropdown d-inline-flex" data-menu="scope">
-                        <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"><span data-region="menu-label">{{scopename}}</span></button>
-                        <span class="dropdown-menu show" hidden>
-                            <span class="d-block px-3 pt-2 pb-1">
-                                <input type="search" class="form-control" data-region="scopesearch" autocomplete="off" aria-label="{{#str}}scope_search, local_extendednav{{/str}}" placeholder="{{#str}}scope_search, local_extendednav{{/str}}">
-                            </span>
-                            <span class="d-block" data-region="scopelist" role="listbox"></span>
-                        </span>
-                    </span>
-                    <span class="small text-muted">{{#str}}applies_to_help, local_extendednav{{/str}}</span>
-                </div>
-            {{/hasscopes}}
+            {{#sitewide}}{{#hasscopes}}
+                <p class="small text-muted mb-0" data-region="scope">{{#str}}exceptions_where, local_extendednav{{/str}} <a href="{{exceptionsurl}}">{{#str}}exceptions_overview, local_extendednav{{/str}}</a></p>
+            {{/hasscopes}}{{/sitewide}}
 
             <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{searchlabel}}">
                 <div class="card">

@@ -28,7 +28,7 @@ use local_extendednav\menu_manager;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\external\get_nodes
- * @covers     \local_extendednav\external\get_scopes
+ * @covers     \local_extendednav\external\get_exceptions
  * @covers     \local_extendednav\external\change_nodes
  */
 final class node_services_test extends \advanced_testcase {
@@ -158,22 +158,46 @@ final class node_services_test extends \advanced_testcase {
     }
 
     /**
-     * The scopes are the ones with exceptions and the ones a search finds.
+     * The overview lists the categories and courses that change a navigation, with the nodes of each, and finds them by name.
      */
-    public function test_get_scopes(): void {
+    public function test_get_exceptions(): void {
         $this->prepare();
         $category = $this->getDataGenerator()->create_category(['name' => 'Humanities']);
         $course = $this->getDataGenerator()->create_course(['fullname' => 'Ancient history', 'category' => $category->id]);
         $contextid = \context_course::instance($course->id)->id;
-        change_nodes::set_visibility('course', $contextid, ['one'], access::VISIBILITY_HIDDEN);
+        change_nodes::set_visibility('course', $contextid, ['one', 'two'], access::VISIBILITY_HIDDEN);
+        change_nodes::set_visibility('course', \context_coursecat::instance($category->id)->id, ['one'], access::VISIBILITY_HIDDEN);
 
-        $none = external_api::clean_returnvalue(get_scopes::execute_returns(), get_scopes::execute('course', ''));
-        $this->assertSame([$contextid], array_column($none['scopes'], 'contextid'));
-        $this->assertSame(1, $none['scopes'][0]['exceptions']);
+        $all = external_api::clean_returnvalue(get_exceptions::execute_returns(), get_exceptions::execute());
+        $this->assertSame(2, $all['total']);
+        $this->assertSame(['category' => 1, 'course' => 1], $all['counts']);
+        $course = array_values(array_filter($all['rows'], static fn(array $row): bool => $row['kind'] === 'course'))[0];
+        $this->assertSame(2, $course['total']);
+        $this->assertSame('Humanities', $course['path']);
 
-        $found = get_scopes::execute('course', 'human');
-        $this->assertContains('category', array_column($found['scopes'], 'type'));
-        $this->assertSame([], get_scopes::execute('primary', 'human')['scopes']);
+        $this->assertSame(1, get_exceptions::execute('ancient')['total']);
+        $this->assertSame(1, get_exceptions::execute('', 'category')['total']);
+        $this->assertSame(0, get_exceptions::execute('nothing')['total']);
+    }
+
+    /**
+     * Whoever manages the navigation of a course changes its exceptions, and only there.
+     */
+    public function test_a_course_manager_changes_only_their_course(): void {
+        $this->prepare();
+        $course = $this->getDataGenerator()->create_course();
+        $other = $this->getDataGenerator()->create_course();
+        $teacher = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('local/extendednav:managecontext', CAP_ALLOW, $roleid, \context_course::instance($course->id));
+        role_assign($roleid, $teacher->id, \context_course::instance($course->id));
+        $this->setUser($teacher);
+
+        $own = \context_course::instance($course->id)->id;
+        $this->assertSame(1, change_nodes::set_visibility('course', $own, ['one'], access::VISIBILITY_HIDDEN)['count']);
+
+        $this->expectException(equired_capability_exception::class);
+        change_nodes::set_visibility('course', \context_course::instance($other->id)->id, ['one'], access::VISIBILITY_HIDDEN);
     }
 
     /**
