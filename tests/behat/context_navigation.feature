@@ -84,7 +84,8 @@ Feature: Change the navigations of a course from the course
     And I log in as "admin"
     And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
-    When I set the field "len-origin-kinds" to "Forum"
+    When I click on "Activities" "link" in the "[data-region='origins']" "css_element"
+    And I click on "Forum" "link" in the "[data-region='tablewrap']" "css_element"
     Then I should see "Forum navigation"
     And I press "Find items"
     And I should see "Subscriptions" in the "[data-region='tablewrap']" "css_element"

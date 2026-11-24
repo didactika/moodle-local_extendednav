@@ -49,10 +49,14 @@ final class exporter {
      * are on. In the site administration only the nodes that were changed are written, and the ones of a category that was
      * ordered by hand, so the file does not repeat hundreds of pages as Moodle draws them.
      *
+     * Given contexts, the file holds the nodes those categories, courses and activities change, each with its scope, and no
+     * node of the site.
+     *
      * @param string[] $menukeys Navigation keys.
+     * @param int[]|null $contextids Contexts whose nodes are written, or null for the file of the site.
      * @return string|null The YAML text, or null when there is nothing to export.
      */
-    public static function export_file(array $menukeys): ?string {
+    public static function export_file(array $menukeys, ?array $contextids = null): ?string {
         global $DB;
 
         $nodes = [];
@@ -65,14 +69,30 @@ final class exporter {
             $menu->ensure_synced();
             // The file of the site holds what belongs to the site: its nodes and the exceptions of its categories, which Moodle
             // does not back up. The exceptions of a course travel with the course, in its backup.
-            $rows = $DB->get_records_sql(
-                'SELECT n.*
-                   FROM {local_extendednav} n
-              LEFT JOIN {context} ctx ON ctx.id = n.contextid
-                  WHERE n.menu = :menu AND (n.contextid = 0 OR ctx.contextlevel = :category)
-               ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC',
-                ['menu' => $menukey, 'category' => CONTEXT_COURSECAT]
-            );
+            if ($contextids !== null) {
+                if (!$contextids) {
+                    continue;
+                }
+                [$insql, $params] = $DB->get_in_or_equal(array_map('intval', $contextids), SQL_PARAMS_NAMED);
+                $rows = $DB->get_records_sql(
+                    "SELECT n.* FROM {local_extendednav} n
+                      WHERE n.menu = :menu AND n.contextid $insql
+                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC",
+                    ['menu' => $menukey] + $params
+                );
+                if (!$rows) {
+                    continue;
+                }
+            } else {
+                $rows = $DB->get_records_sql(
+                    'SELECT n.*
+                       FROM {local_extendednav} n
+                  LEFT JOIN {context} ctx ON ctx.id = n.contextid
+                      WHERE n.menu = :menu AND (n.contextid = 0 OR ctx.contextlevel = :category)
+                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC',
+                    ['menu' => $menukey, 'category' => CONTEXT_COURSECAT]
+                );
+            }
             if ($menukey === \local_extendednav\menu\admintree::KEY) {
                 $ordered = \local_extendednav\menu\admintree::get_ordered_parents();
                 $rows = array_filter($rows, static fn(\stdClass $row): bool => !self::is_untouched($row, $menu)

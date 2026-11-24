@@ -36,6 +36,9 @@ class importer {
     /** @var string Menu used for nodes that do not name one. */
     private string $defaultmenu;
 
+    /** @var int[] Contexts the nodes of the file go to, whatever the file says, or none to follow the file. */
+    private array $targets = [];
+
     /** @var bool Whether nodes that already exist are replaced (true) or skipped (false). */
     private bool $overwrite;
 
@@ -45,7 +48,8 @@ class importer {
      * @param string $defaultmenu Menu used for nodes that do not name one.
      * @param bool $overwrite Whether nodes that already exist are replaced (true) or skipped (false).
      */
-    public function __construct(string $defaultmenu, bool $overwrite) {
+    public function __construct(string $defaultmenu, bool $overwrite, array $targets = []) {
+        $this->targets = array_values(array_filter(array_map('intval', $targets)));
         $this->defaultmenu = $defaultmenu;
         $this->overwrite = $overwrite;
     }
@@ -62,6 +66,9 @@ class importer {
         $warnings = [];
         $counts = ['created' => 0, 'updated' => 0, 'skipped' => 0];
         $items = $this->expand_legacy_activities($items, $warnings, $counts);
+        if ($this->targets) {
+            $items = $this->give_to_targets($items, $counts);
+        }
 
         $existing = [];
         foreach (repository::get_all() as $node) {
@@ -198,6 +205,41 @@ class importer {
             $warnings[] = get_string('warn_fallbacks_blocked_for_some', 'local_extendednav');
         }
         return ['errors' => [], 'warnings' => $warnings, 'counts' => $counts];
+    }
+
+    /**
+     * Gives every node of the file to each context chosen: the scope of the file is replaced by the one of the context, and a
+     * node of a navigation that the context does not change is left out (the navigation of a category goes to categories only,
+     * and the one of a kind of activity to an activity of that kind, to its course or to a category).
+     *
+     * @param array $items Nodes read from the file.
+     * @param int[] $counts Counts, whose skipped grows with the nodes left out.
+     * @return array The nodes, one for each context that takes them.
+     */
+    private function give_to_targets(array $items, array &$counts): array {
+        $given = [];
+        foreach ($this->targets as $contextid) {
+            $context = \local_extendednav\local\navigation\context_scope::from_id($contextid);
+            if ($context === null) {
+                continue;
+            }
+            $scope = scope::describe($contextid);
+            foreach ($items as $item) {
+                $menukey = is_array($item) ? (trim((string)($item['menu'] ?? '')) ?: $this->defaultmenu) : '';
+                $unsupported = !nodes::supports_scopes($menukey)
+                    || ($menukey === 'category' && $context->kind() !== 'category')
+                    || ($context->is_activity() && !in_array($menukey, $context->menus(), true));
+                if ($unsupported) {
+                    $counts['skipped']++;
+                    continue;
+                }
+                // A node the file has more than once (for the site and for a context) is given once: the last one, which is
+                // the most specific, as the file lists the site first.
+                $key = $contextid . '|' . $menukey . '|' . trim((string)($item['nodekey'] ?? ''));
+                $given[$key] = ['menu' => $menukey, 'scope' => $scope] + $item;
+            }
+        }
+        return array_values($given);
     }
 
     /**

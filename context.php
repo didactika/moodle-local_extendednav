@@ -83,6 +83,9 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'scopename' => $scope->name(),
     'canadd' => true,
     'addurl' => (new moodle_url('/local/extendednav/edit.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
+    // What this category, course or activity changes, to a file and from one.
+    'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
+    'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'contextid' => $contextid]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
     // The kinds of restriction the menu Restriction of the list offers.
     'restrictions' => \local_extendednav\local\listing\nodes::restriction_options(),

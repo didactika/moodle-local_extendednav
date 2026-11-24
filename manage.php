@@ -110,6 +110,7 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
     'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey]))->out(false),
     'exporteverythingurl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'everything' => 1]))->out(false),
+    'exportchooseurl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'choose' => 1]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
     // The kinds of restriction the menu Restriction of the list offers.
     'restrictions' => \local_extendednav\local\listing\nodes::restriction_options(),

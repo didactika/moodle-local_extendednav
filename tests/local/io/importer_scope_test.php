@@ -34,6 +34,14 @@ use local_extendednav\local\node\repository;
  */
 final class importer_scope_test extends \advanced_testcase {
     /**
+     * Forgets the names of the scopes read by another test: the contexts of a test reuse the ids of the ones before.
+     */
+    protected function setUp(): void {
+        parent::setUp();
+        scope::reset();
+    }
+
+    /**
      * An exception is exported with the course it is for, and imported back into it.
      */
     public function test_an_exception_goes_out_and_comes_back(): void {
@@ -62,6 +70,61 @@ final class importer_scope_test extends \advanced_testcase {
         $this->assertSame([], $result['errors']);
         $row = $DB->get_record('local_extendednav', ['menu' => 'course', 'nodekey' => 'grades', 'contextid' => $contextid]);
         $this->assertSame(access::VISIBILITY_HIDDEN, (int)$row->visibility);
+    }
+
+    /**
+     * An activity is written by its course and its ID number, or its number in the site, and found again by them.
+     */
+    public function test_the_scope_of_an_activity(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course(['shortname' => 'ENG1']);
+        $named = $this->getDataGenerator()->create_module('forum', ['course' => $course->id, 'idnumber' => 'news']);
+        $plain = $this->getDataGenerator()->create_module('forum', ['course' => $course->id]);
+        scope::reset();
+
+        $this->assertSame('activity:ENG1/news', scope::describe(\context_module::instance($named->cmid)->id));
+        $this->assertSame('activity:ENG1/#' . $plain->cmid, scope::describe(\context_module::instance($plain->cmid)->id));
+        scope::reset();
+        $this->assertSame(\context_module::instance($named->cmid)->id, scope::resolve('activity:ENG1/news'));
+        $this->assertSame(\context_module::instance($plain->cmid)->id, scope::resolve('activity:ENG1/#' . $plain->cmid));
+        $this->assertNull(scope::resolve('activity:ENG1/nothing'));
+        $this->assertNull(scope::resolve('activity:NONE/news'));
+    }
+
+    /**
+     * The file of some contexts holds only their changes, and the nodes of a file go to the courses chosen, each as a change
+     * of its own, leaving out the navigation of a category.
+     */
+    public function test_a_file_goes_to_the_contexts_chosen(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $from = $this->getDataGenerator()->create_course(['shortname' => 'FROM']);
+        $one = $this->getDataGenerator()->create_course(['shortname' => 'ONE']);
+        $two = $this->getDataGenerator()->create_course(['shortname' => 'TWO']);
+        menu_manager::get_menu('course')->record_seen(['grades' => (object)['text' => 'Grades', 'action' => '/grade/']]);
+        menu_manager::get_menu('category')->record_seen(['cohort' => (object)['text' => 'Cohorts', 'action' => '/cohort/']]);
+        $fromcontext = \context_course::instance($from->id)->id;
+        manager::set_visibility('course', $fromcontext, ['grades'], access::VISIBILITY_HIDDEN);
+        manager::set_visibility('category', 0, ['cohort'], access::VISIBILITY_HIDDEN);
+
+        $file = exporter::export_file(['course', 'category'], [$fromcontext]);
+        $parsed = \local_extendednav\yaml::parse($file);
+        $this->assertSame(['course:FROM'], array_values(array_unique(array_column($parsed['nodes'], 'scope'))));
+        $this->assertNull(exporter::export_file(['category'], [$fromcontext]), 'The course changes no category.');
+
+        $withsite = \local_extendednav\yaml::parse(exporter::export_file(['course', 'category'], [0, $fromcontext]));
+        $targets = [\context_course::instance($one->id)->id, \context_course::instance($two->id)->id];
+        $result = (new importer('course', true, $targets))->import($withsite['nodes']);
+
+        $this->assertSame([], $result['errors']);
+        foreach ($targets as $contextid) {
+            $row = $DB->get_record('local_extendednav', ['menu' => 'course', 'nodekey' => 'grades', 'contextid' => $contextid]);
+            $this->assertSame(access::VISIBILITY_HIDDEN, (int)$row->visibility);
+            $this->assertFalse($DB->record_exists('local_extendednav', ['menu' => 'category', 'contextid' => $contextid]));
+        }
+        $this->assertGreaterThan(0, $result['counts']['skipped'], 'The navigation of a category is left out of a course.');
     }
 
     /**

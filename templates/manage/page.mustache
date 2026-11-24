@@ -41,6 +41,7 @@
         "importurl": "#",
         "exporturl": "#",
         "exporteverythingurl": "#",
+        "exportchooseurl": "#",
         "canadd": true,
         "candiscover": false,
         "searchlabel": "Search nodes",
@@ -83,8 +84,17 @@
                             <span class="d-block fw-bold">{{#str}}export_everything, local_extendednav{{/str}}</span>
                             <span class="d-block small text-muted">{{#str}}export_everything_help, local_extendednav{{/str}}</span>
                         </a>
+                        <span class="dropdown-divider d-block" role="separator"></span>
+                        <a class="dropdown-item" href="{{exportchooseurl}}">
+                            <span class="d-block fw-bold">{{#str}}export_choose, local_extendednav{{/str}}</span>
+                            <span class="d-block small text-muted">{{#str}}export_choose_help, local_extendednav{{/str}}</span>
+                        </a>
                     </span>
                 </span>
+                {{/sitewide}}
+                {{^sitewide}}
+                    {{#importurl}}<a class="btn btn-outline-secondary" href="{{importurl}}">{{#pix}}i/import, core{{/pix}} {{#str}}import, local_extendednav{{/str}}</a>{{/importurl}}
+                    {{#exporturl}}<a class="btn btn-outline-secondary" href="{{exporturl}}">{{#pix}}t/download, core{{/pix}} {{#str}}export, local_extendednav{{/str}}</a>{{/exporturl}}
                 {{/sitewide}}
             </div>
         </div>
