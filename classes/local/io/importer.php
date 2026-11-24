@@ -19,13 +19,13 @@ namespace local_extendednav\local\io;
 use local_extendednav\menu_manager;
 use local_extendednav\local\listing\nodes;
 use local_extendednav\local\navigation\access_guard;
-use local_extendednav\local\node\access;
 use local_extendednav\local\node\manager;
 use local_extendednav\local\node\repository;
 use local_extendednav\local\node\validator;
 
 /**
- * Imports and exports nodes in the YAML file format.
+ * Reads a YAML file of navigations: checks every node first, then creates or replaces them, places them in the order of
+ * the file and turns each navigation on or off as the file says. The file is the one exporter writes.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -33,18 +33,6 @@ use local_extendednav\local\node\validator;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class importer {
-    /** @var string[] Keys written for each node, in order. */
-    public const EXPORT_FIELDS = [
-        'nodekey', 'menu', 'native', 'scope', 'order', 'title', 'tooltip', 'url', 'icon', 'visibility', 'roles',
-        'blockaccess', 'langs', 'parentkey', 'display', 'popupwidth', 'popupheight', 'placement', 'hideadmins',
-    ];
-
-    /** @var string[] Fields written as whole numbers. */
-    private const INT_FIELDS = ['native', 'order', 'visibility', 'blockaccess', 'display', 'placement', 'hideadmins'];
-
-    /** @var string[] Fields written as whole numbers, or empty when not set. */
-    private const OPTIONAL_INT_FIELDS = ['popupwidth', 'popupheight'];
-
     /** @var string Menu used for nodes that do not name one. */
     private string $defaultmenu;
 
@@ -60,182 +48,6 @@ class importer {
     public function __construct(string $defaultmenu, bool $overwrite) {
         $this->defaultmenu = $defaultmenu;
         $this->overwrite = $overwrite;
-    }
-
-    /**
-     * Builds the file of one navigation or of several, in the one format the import reads.
-     *
-     * Every node names its navigation and, when it is one, says it is a node of Moodle; the file also says which navigations
-     * are on. In the site administration only the nodes that were changed are written, and the ones of a category that was
-     * ordered by hand, so the file does not repeat hundreds of pages as Moodle draws them.
-     *
-     * @param string[] $menukeys Navigation keys.
-     * @return string|null The YAML text, or null when there is nothing to export.
-     */
-    public static function export_file(array $menukeys): ?string {
-        global $DB;
-
-        $nodes = [];
-        $navigations = [];
-        foreach ($menukeys as $menukey) {
-            $menu = menu_manager::get_menu($menukey);
-            if ($menu === null) {
-                continue;
-            }
-            $menu->ensure_synced();
-            $rows = $DB->get_records('local_extendednav', ['menu' => $menukey], 'contextid ASC, sortorder ASC, id ASC');
-            if ($menukey === \local_extendednav\menu\admintree::KEY) {
-                $ordered = \local_extendednav\menu\admintree::get_ordered_parents();
-                $rows = array_filter($rows, static fn(\stdClass $row): bool => !self::is_untouched($row, $menu)
-                    || isset($ordered[(string)($row->parentkey ?? '')]));
-            }
-            $site = array_filter($rows, static fn(\stdClass $row): bool => (int)$row->contextid === 0);
-            $depth = $menukey === \local_extendednav\menu\admintree::KEY ? 20 : 2;
-            array_push($nodes, ...self::export_nodes($rows, $site, $depth));
-            $navigations[$menukey] = ['enabled' => menu_manager::is_enabled($menukey) ? 1 : 0];
-        }
-        if (empty($nodes)) {
-            return null;
-        }
-        return \local_extendednav\yaml::dump(['format' => 2, 'navigations' => $navigations, 'nodes' => $nodes]);
-    }
-
-    /**
-     * Whether a row is a node of Moodle that nothing has changed.
-     *
-     * @param \stdClass $row Row.
-     * @param \local_extendednav\menu\base $menu Its navigation.
-     * @return bool
-     */
-    private static function is_untouched(\stdClass $row, $menu): bool {
-        foreach (['title', 'tooltip', 'url', 'icon', 'roles', 'langs'] as $field) {
-            if (trim((string)($row->$field ?? '')) !== '') {
-                return false;
-            }
-        }
-        return $menu->is_native($row->nodekey) && (int)$row->visibility === access::VISIBILITY_ALL
-            && empty($row->blockaccess) && empty($row->display) && empty($row->placement)
-            && (int)$row->hideadmins === ($row->menu === \local_extendednav\menu\admintree::KEY ? 1 : 0)
-            && (int)$row->contextid === 0;
-    }
-
-    /**
-     * Returns the exported form of nodes of one menu, with their position in the menu.
-     *
-     * @param \stdClass[] $nodes Nodes to export.
-     * @param \stdClass[] $menunodes Every node of their menu, to number the positions as the management page lists them.
-     * @param int $depth Depth of the menu: 2 for a menu, more for the tree of the site administration, whose nodes are numbered
-     *     among the others of their category, since a tree has a different number of pages on each site.
-     * @return array[]
-     */
-    public static function export_nodes(array $nodes, array $menunodes, int $depth = 2): array {
-        $positions = [];
-        $siblings = [];
-        foreach (manager::group_by_parent($menunodes, $depth) as $index => $node) {
-            if ($depth > 2) {
-                $parent = (string)($node->parentkey ?? '');
-                $siblings[$parent] = ($siblings[$parent] ?? 0) + 1;
-                $positions[(int)$node->id] = $siblings[$parent];
-            } else {
-                $positions[(int)$node->id] = $index + 1;
-            }
-        }
-        // The exceptions of a category or a course are numbered among themselves.
-        $ranks = [];
-        $scoped = array_filter($nodes, static fn(\stdClass $node): bool => (int)($node->contextid ?? 0) !== 0);
-        usort(
-            $scoped,
-            static fn(\stdClass $a, \stdClass $b): int => [(int)$a->sortorder, (int)$a->id] <=> [(int)$b->sortorder, (int)$b->id]
-        );
-        $counters = [];
-        foreach ($scoped as $node) {
-            $group = $node->menu . '@' . $node->contextid;
-            $counters[$group] = ($counters[$group] ?? 0) + 1;
-            $ranks[(int)$node->id] = $counters[$group];
-        }
-        $exported = [];
-        foreach ($nodes as $node) {
-            $exported[] = self::export_node($node, $positions[(int)$node->id] ?? $ranks[(int)$node->id] ?? null);
-        }
-        usort(
-            $exported,
-            static fn(array $a, array $b): int => [$a['menu'], $a['scope'], $a['parentkey'], $a['order']]
-                <=> [$b['menu'], $b['scope'], $b['parentkey'], $b['order']]
-        );
-        return $exported;
-    }
-
-    /**
-     * Describes the category or the course a node applies to, as the file names it.
-     *
-     * @param int $contextid Context id, 0 for the whole site.
-     * @return string Empty for the whole site, "course:shortname" or "category:Parent / Name".
-     */
-    public static function describe_scope(int $contextid): string {
-        if ($contextid === 0) {
-            return '';
-        }
-        $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if (!$context) {
-            return '';
-        }
-        if ($context->contextlevel === CONTEXT_COURSE) {
-            return 'course:' . get_course($context->instanceid)->shortname;
-        }
-        $category = \core_course_category::get($context->instanceid, IGNORE_MISSING, true);
-        return $category ? 'category:' . $category->get_nested_name(false, ' / ') : '';
-    }
-
-    /**
-     * Finds the category or the course a file names.
-     *
-     * @param string $scope As {@see describe_scope()} writes it.
-     * @return int|null The context id, or null when nothing matches.
-     */
-    public static function resolve_scope(string $scope): ?int {
-        global $DB;
-
-        [$type, $name] = array_pad(explode(':', trim($scope), 2), 2, '');
-        $name = trim($name);
-        if ($type === 'course') {
-            $id = $DB->get_field('course', 'id', ['shortname' => $name]);
-            return $id ? (int)\context_course::instance((int)$id)->id : null;
-        }
-        if ($type === 'category') {
-            foreach (\core_course_category::get_all(['returnhidden' => true]) as $category) {
-                if ($category->get_nested_name(false, ' / ') === $name) {
-                    return (int)\context_coursecat::instance((int)$category->id)->id;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the exported form of a node.
-     *
-     * @param \stdClass $node Node record.
-     * @param int|null $order Position of the node in its menu, 1 being the first.
-     * @return array
-     */
-    public static function export_node(\stdClass $node, ?int $order = null): array {
-        $node = clone $node;
-        $node->order = $order ?? 0;
-        $node->scope = self::describe_scope((int)($node->contextid ?? 0));
-        $menu = menu_manager::get_menu((string)$node->menu);
-        $node->native = $menu !== null && $menu->is_native((string)$node->nodekey) ? 1 : 0;
-        $data = [];
-        foreach (self::EXPORT_FIELDS as $field) {
-            $value = $node->$field ?? null;
-            if (in_array($field, self::INT_FIELDS, true)) {
-                $data[$field] = (int)$value;
-            } else if (in_array($field, self::OPTIONAL_INT_FIELDS, true)) {
-                $data[$field] = $value === null ? '' : (int)$value;
-            } else {
-                $data[$field] = $value === null ? '' : (string)$value;
-            }
-        }
-        return $data;
     }
 
     /**
@@ -412,7 +224,7 @@ class importer {
             $label = get_string('import_entry', 'local_extendednav', $index + 1);
             $menukey = isset($item['menu']) && trim((string)$item['menu']) !== ''
                 ? trim((string)$item['menu']) : $this->defaultmenu;
-            $contextid = self::resolve_scope((string)$item['scope']);
+            $contextid = scope::resolve((string)$item['scope']);
             if (menu_manager::get_menu($menukey) === null) {
                 $errors[] = $label . ': ' . get_string('err_invalid_menu', 'local_extendednav');
                 continue;

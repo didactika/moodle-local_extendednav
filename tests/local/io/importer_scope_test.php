@@ -29,6 +29,8 @@ use local_extendednav\local\node\repository;
  * @copyright  2026 Didactika.org
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\local\io\importer
+ * @covers     \local_extendednav\local\io\exporter
+ * @covers     \local_extendednav\local\io\scope
  */
 final class importer_scope_test extends \advanced_testcase {
     /**
@@ -46,7 +48,7 @@ final class importer_scope_test extends \advanced_testcase {
 
         $nodes = $DB->get_records('local_extendednav', ['menu' => 'course'], 'contextid ASC, id ASC');
         $site = $DB->get_records('local_extendednav', ['menu' => 'course', 'contextid' => 0]);
-        $exported = importer::export_nodes($nodes, $site);
+        $exported = exporter::export_nodes($nodes, $site);
 
         $this->assertSame(['', 'course:ENG1'], array_column($exported, 'scope'));
         $this->assertSame(0, $exported[1]['visibility']);
@@ -91,9 +93,9 @@ final class importer_scope_test extends \advanced_testcase {
         $child = $this->getDataGenerator()->create_category(['name' => 'History', 'parent' => $parent->id]);
         $contextid = \context_coursecat::instance($child->id)->id;
 
-        $this->assertSame('category:Humanities / History', importer::describe_scope($contextid));
-        $this->assertSame($contextid, importer::resolve_scope('category:Humanities / History'));
-        $this->assertNull(importer::resolve_scope('category:History'));
-        $this->assertSame('', importer::describe_scope(0));
+        $this->assertSame('category:Humanities / History', scope::describe($contextid));
+        $this->assertSame($contextid, scope::resolve('category:Humanities / History'));
+        $this->assertNull(scope::resolve('category:History'));
+        $this->assertSame('', scope::describe(0));
     }
 }
