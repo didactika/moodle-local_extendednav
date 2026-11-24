@@ -253,8 +253,9 @@ class node_form extends \moodleform {
         $mform->hideIf('langs', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
 
         // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
-        // has. Its editor is drawn by Moodle's script in place of this field.
-        if (!empty($CFG->enableavailability)) {
+        // has. Its editor is drawn by Moodle's script in place of this field. Whoever may not restrict the nodes here does not
+        // get the field, nor the script, which would wait for it.
+        if (!empty($CFG->enableavailability) && !in_array('availability', $this->_customdata['locked'] ?? [], true)) {
             $mform->addElement(
                 'textarea',
                 'availabilityconditionsjson',
