@@ -34,6 +34,7 @@ $string['activity_from'] = 'From';
 $string['activity_log'] = 'Activity log';
 $string['activity_node'] = 'Node';
 $string['activity_nolog'] = 'The standard log is disabled, so the changes are not recorded. Enable it in Site administration > Plugins > Logging.';
+$string['activity_report'] = 'Extended navigation activity';
 $string['activity_search'] = 'Search by node key or person';
 $string['activity_to'] = 'Until';
 $string['add_node'] = 'Add node';

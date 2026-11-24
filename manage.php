@@ -87,7 +87,6 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'importurl' => (new moodle_url('/local/extendednav/import.php', ['menu' => $menukey]))->out(false),
     'exporturl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey]))->out(false),
     'exporteverythingurl' => (new moodle_url('/local/extendednav/export.php', ['menu' => $menukey, 'everything' => 1]))->out(false),
-    'activityurl' => (new moodle_url('/local/extendednav/activity.php', ['menu' => $menukey]))->out(false),
     'searchlabel' => get_string('search_nodes', 'local_extendednav'),
 ]);
 $PAGE->requires->js_call_amd('local_extendednav/manage', 'init', ['[data-region="manage"]']);

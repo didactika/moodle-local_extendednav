@@ -17,18 +17,18 @@ Feature: Read the activity log of a navigation
 
   @javascript
   Scenario: A node that is created is listed, and the menu of the actions narrows the list
-    When I follow "Activity log"
+    When I navigate to "Reports > Extended navigation activity" in site administration
     Then I should see "staffhelp" in the "[data-region='tablewrap']" "css_element"
     And I should see "Created" in the "[data-region='tablewrap']" "css_element"
     And I click on "[data-menu='status'] [data-menu-toggle]" "css_element"
-    And I click on "[data-status='deleted']" "css_element"
+    And I click on "[data-option='deleted']" "css_element"
     And I should see "No results"
     And I click on "Clear filters" "button" in the "[data-region='empty']" "css_element"
     And I should see "staffhelp" in the "[data-region='tablewrap']" "css_element"
 
   @javascript
   Scenario: The search finds a node by its key
-    When I follow "Activity log"
+    When I navigate to "Reports > Extended navigation activity" in site administration
     And I set the field "Search by node key or person" to "nothing like this"
     Then I should see "No results"
     And I set the field "Search by node key or person" to "staffhelp"

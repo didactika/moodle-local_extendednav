@@ -1151,6 +1151,14 @@
     --dd-c: var(--dd-primary);
 }
 
+.len .btn-link.btn-icon.text-body,
+.path-local-extendednav .modal .btn-link.btn-icon.text-body,
+.path-admin-local-extendednav .modal .btn-link.btn-icon.text-body,
+#page-admin-setting-local_extendednav_settings .modal .btn-link.btn-icon.text-body,
+#page-local-extendednav-manage .modal .btn-link.btn-icon.text-body {
+    --dd-c: var(--dd-ink);
+}
+
 .len .btn-link.btn-icon.text-info,
 .path-local-extendednav .modal .btn-link.btn-icon.text-info,
 .path-admin-local-extendednav .modal .btn-link.btn-icon.text-info,

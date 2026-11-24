@@ -63,7 +63,16 @@ final class exporter {
                 continue;
             }
             $menu->ensure_synced();
-            $rows = $DB->get_records('local_extendednav', ['menu' => $menukey], 'contextid ASC, sortorder ASC, id ASC');
+            // The file of the site holds what belongs to the site: its nodes and the exceptions of its categories, which Moodle
+            // does not back up. The exceptions of a course travel with the course, in its backup.
+            $rows = $DB->get_records_sql(
+                'SELECT n.*
+                   FROM {local_extendednav} n
+              LEFT JOIN {context} ctx ON ctx.id = n.contextid
+                  WHERE n.menu = :menu AND (n.contextid = 0 OR ctx.contextlevel = :category)
+               ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC',
+                ['menu' => $menukey, 'category' => CONTEXT_COURSECAT]
+            );
             if ($menukey === \local_extendednav\menu\admintree::KEY) {
                 $ordered = \local_extendednav\menu\admintree::get_ordered_parents();
                 $rows = array_filter($rows, static fn(\stdClass $row): bool => !self::is_untouched($row, $menu)

@@ -221,6 +221,11 @@
             --dd-c: var(--dd-primary);
         }
 
+        // An action in the colour of the text, such as hiding a node: the ink, never the muted grey of a disabled button.
+        &.text-body {
+            --dd-c: var(--dd-ink);
+        }
+
         &.text-info {
             --dd-c: var(--dd-info);
         }
