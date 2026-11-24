@@ -16,14 +16,15 @@ sourceOfTruth: code
 | RF-003 | Un administrador puede exportar elementos a un archivo YAML e importarlos desde uno, comprobando antes todo el archivo. | Debería | `classes/local/io/importer.php` | UC-003 |
 | RF-004 | Cada usuario ve los elementos que sus roles e idioma permiten, en ambos menús. | Debe | `classes/hooks.php` | UC-004 |
 | RF-005 | Una página puede bloquearse para los usuarios que no pueden ver su elemento. | Debe | `classes/local/navigation/access_guard.php` | UC-005 |
-| RF-006 | Los cambios de los elementos quedan registrados en el registro de actividad. | Podría | `classes/event/` | UC-001 |
+| RF-006 | Los cambios de los elementos quedan registrados en el registro de actividad, cada uno con los campos que tocó y sus valores antes y después. | Podría | `classes/event/` | UC-001 |
 | RF-007 | Un administrador puede ordenar, renombrar, ocultar y ampliar la navegación de un curso, de la página principal del sitio, de cada tipo de actividad, de una categoría y de la administración del sitio. | Debe | `classes/local/navigation/injector.php` | UC-006 |
 | RF-008 | Una categoría o un curso pueden cambiar una navegación para sí mismos, y todo lo que hay dentro los sigue. | Debería | `classes/local/node/repository.php` | UC-007 |
 | RF-009 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. | Debe | `classes/local/node/access.php` | UC-004 |
 | RF-010 | La exportación y la importación de nodos incluyen las excepciones de categorías y cursos. | Debería | `classes/local/io/importer.php` | UC-003 |
-| RF-011 | La página de gestión lista, filtra, ordena y cambia nodos sin recargar la página. | Debe | `amd/src/manage.js` | UC-001, UC-002, UC-006 |
+| RF-011 | La página de gestión lista, filtra (por visibilidad, origen y tipo de restricción), ordena y cambia nodos sin recargar la página. | Debe | `amd/src/manage.js` | UC-001, UC-002, UC-006 |
 | RF-012 | Cada tipo de actividad tiene su propia navegación, cuyos elementos se encuentran en las actividades del sitio, también los que un plugin añade solo a algunas actividades. | Debe | `classes/menu/activity.php`, `classes/local/navigation/discovery.php` | UC-006, UC-008 |
 | RF-013 | Una actividad cambia su propia navegación desde su página, y los cambios de un curso y de sus actividades viajan en sus copias de seguridad. | Debería | `classes/local/navigation/context_scope.php`, `backup/moodle2/` | UC-007 |
+| RF-014 | Un nodo de la administración del sitio sin enlace es una categoría del plugin, que contiene enlaces y otras categorías; en el nivel superior es una pestaña cuando contiene una categoría. | Debería | `classes/menu/admintree.php` | UC-006 |
 
 ## No funcionales
 

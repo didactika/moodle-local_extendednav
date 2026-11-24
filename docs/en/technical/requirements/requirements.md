@@ -16,14 +16,15 @@ sourceOfTruth: code
 | RF-003 | An administrator can export items to a YAML file and import them from one, checking the whole file first. | Should | `classes/local/io/importer.php` | UC-003 |
 | RF-004 | Each user sees the items that their roles and language allow, in both menus. | Must | `classes/hooks.php` | UC-004 |
 | RF-005 | A page can be blocked for the users who cannot see its item. | Must | `classes/local/navigation/access_guard.php` | UC-005 |
-| RF-006 | The changes to the items are recorded in the activity log. | Could | `classes/event/` | UC-001 |
+| RF-006 | The changes to the items are recorded in the activity log, each with the fields it touched and their values before and after. | Could | `classes/event/` | UC-001 |
 | RF-007 | An administrator can order, rename, hide and extend the navigation of a course, of the site home, of each kind of activity, of a category and of the site administration. | Must | `classes/local/navigation/injector.php` | UC-006 |
 | RF-008 | A category or a course can change a navigation for itself, and everything inside it follows. | Should | `classes/local/node/repository.php` | UC-007 |
 | RF-009 | A site administrator sees every node unless the plugin or the node hides it from administrators too. | Must | `classes/local/node/access.php` | UC-004 |
 | RF-010 | The export and the import of nodes include the exceptions of categories and courses. | Should | `classes/local/io/importer.php` | UC-003 |
-| RF-011 | The management page lists, filters, orders and changes nodes without reloading the page. | Must | `amd/src/manage.js` | UC-001, UC-002, UC-006 |
+| RF-011 | The management page lists, filters (by visibility, origin and kind of restriction), orders and changes nodes without reloading the page. | Must | `amd/src/manage.js` | UC-001, UC-002, UC-006 |
 | RF-012 | Each kind of activity has a navigation of its own, whose items are found in the activities of the site, also the ones a plugin adds to some activities only. | Must | `classes/menu/activity.php`, `classes/local/navigation/discovery.php` | UC-006, UC-008 |
 | RF-013 | An activity changes its own navigation from its page, and the changes of a course and of its activities travel in their backups. | Should | `classes/local/navigation/context_scope.php`, `backup/moodle2/` | UC-007 |
+| RF-014 | A node of the site administration without a link is a category of the plugin, which holds links and other categories; at the top it is a tab when it holds a category. | Should | `classes/menu/admintree.php` | UC-006 |
 
 ## Non-functional
 
