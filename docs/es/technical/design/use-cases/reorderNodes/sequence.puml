@@ -9,7 +9,7 @@ participant "reorder_nodes" as service
 participant "node_manager" as manager
 database "local_extendednav" as table
 
-actor -> js : drags an item, or chooses a position
+actor -> js : pulsa Subir o Bajar
 js -> service : menu, ordered ids
 service -> manager : reorder(menu, ids)
 manager -> table : the new position of each item

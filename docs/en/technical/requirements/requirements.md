@@ -17,6 +17,11 @@ sourceOfTruth: code
 | RF-004 | Each user sees the items that their roles and language allow, in both menus. | Must | `classes/hooks.php` | UC-004 |
 | RF-005 | A page can be blocked for the users who cannot see its item. | Must | `classes/local/access_guard.php` | UC-005 |
 | RF-006 | The changes to the items are recorded in the activity log. | Could | `classes/event/` | UC-001 |
+| RF-007 | An administrator can order, rename, hide and extend the navigation of a course, of the site home, of an activity, of a category and of the site administration. | Must | `classes/local/secondary_navigation.php` | UC-006 |
+| RF-008 | A category or a course can change a navigation for itself, and everything inside it follows. | Should | `classes/local/node_repository.php` | UC-007 |
+| RF-009 | A site administrator sees every node unless the plugin or the node hides it from administrators too. | Must | `classes/local/node_access.php` | UC-004 |
+| RF-010 | The export and the import of nodes include the exceptions of categories and courses. | Should | `classes/local/node_importer.php` | UC-003 |
+| RF-011 | The management page lists, filters, orders and changes nodes without reloading the page. | Must | `amd/src/manage.js` | UC-001, UC-002, UC-006 |
 
 ## Non-functional
 
@@ -26,6 +31,7 @@ sourceOfTruth: code
 | RNF-002 | Availability | The plugin never leaves every user without a landing page. | `node_validator::validate` | Must |
 | RNF-003 | Privacy | The plugin stores no personal data. | `classes/privacy/provider.php` (null provider) | Must |
 | RNF-004 | Integrity | An import changes nothing if any item is invalid. | `node_importer::import` | Must |
+| RNF-005 | Performance | A page that has nothing customised in its navigation reads nothing but the cache of the plugin, and the nodes of a navigation are found without building any page. | `secondary_navigation::apply`, `secondary::record_seen` | Must |
 
 ## Business rules
 

@@ -1,16 +1,17 @@
 ---
 title: Ordenar los elementos
-summary: Cambie la posición de los elementos arrastrándolos, o con una lista de posiciones.
+summary: Cambie la posición de los elementos con los botones de flecha de su fila.
 order: 40
 ---
 
-Arrastre un elemento por el asa de la columna **Orden**, o seleccione el asa para abrir una lista de posiciones que funciona con el teclado.
+Mueva un elemento con los botones **Subir** y **Bajar** de su fila. Son botones, así que funcionan con el teclado y con un lector de pantalla, y la lista se guarda y se dibuja de nuevo al instante.
 
-<Screenshot src="asset:manage-primary.webp" alt="La página de gestión, con el asa de cada elemento en la columna Orden" caption="La columna Orden tiene un asa para cada elemento." url="/local/extendednav/manage.php" />
+<Screenshot src="asset:manage-primary.webp" alt="La página de gestión, con los botones de flecha al final de cada fila" caption="Cada fila tiene sus botones de flecha." url="/local/extendednav/manage.php" />
 
 - Mover un padre mueve consigo a sus elementos de submenú.
 - Un elemento de submenú solo se mueve entre sus hermanos.
 - Un elemento que sale de su padre queda justo debajo del grupo de ese padre.
-- El orden está desactivado mientras se aplica un filtro. Use **Borrar** para volver a ordenar.
+- Las flechas están desactivadas mientras se aplica una búsqueda o un filtro. Use el botón que borra los filtros para volver a ordenar.
+- Las navegaciones de un curso, una actividad y una categoría se ordenan igual, para todo el sitio o para una categoría o un curso.
 
 El orden de la lista es el orden del menú, y un archivo exportado lo conserva: cada elemento tiene su posición en el campo `order`.

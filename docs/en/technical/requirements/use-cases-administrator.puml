@@ -11,11 +11,15 @@ rectangle "local_extendednav" {
     usecase "Add, change or delete an item" as UC_manageNodes
     usecase "Reorder the items" as UC_reorderNodes
     usecase "Import and export items" as UC_importNodes
+    usecase "Customise a secondary navigation" as UC_customiseSecondaryNavigation
+    usecase "Change a navigation for a category or a course" as UC_setScopeException
   }
 }
 
 A_Administrator --> UC_manageNodes
 A_Administrator --> UC_reorderNodes
 A_Administrator --> UC_importNodes
+A_Administrator --> UC_customiseSecondaryNavigation
+A_Administrator --> UC_setScopeException
 
 @enduml

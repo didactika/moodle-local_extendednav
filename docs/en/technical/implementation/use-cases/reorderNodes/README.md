@@ -21,7 +21,8 @@ Design: [README](../../../design/use-cases/reorderNodes/README.md)
 | --- | --- | --- | --- |
 | `reorder_nodes` | web service | `classes/external/reorder_nodes.php` | yes |
 | Management screen | AMD | `amd/src/manage.js` | yes |
-| `nodes_table` | table | `classes/table/nodes_table.php` | yes |
+| `change_nodes::move` | web service | `classes/external/change_nodes.php` | yes |
+| `node_manager::move` | method | `classes/local/node_manager.php` | yes |
 
 ## Tests
 

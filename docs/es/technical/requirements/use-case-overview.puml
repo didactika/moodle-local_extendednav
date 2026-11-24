@@ -9,13 +9,15 @@ actor "System" as A_System
 
 rectangle "local_extendednav" {
   package "Navigation" {
-    usecase "Add, change or delete an item" as UC_manageNodes
-    usecase "Reorder the items" as UC_reorderNodes
-    usecase "Import and export items" as UC_importNodes
+    usecase "Añadir, cambiar o eliminar un elemento" as UC_manageNodes
+    usecase "Reordenar los elementos" as UC_reorderNodes
+    usecase "Importar y exportar elementos" as UC_importNodes
+    usecase "Personalizar una navegación secundaria" as UC_customiseSecondaryNavigation
+    usecase "Cambiar una navegación para una categoría o un curso" as UC_setScopeException
   }
   package "Display" {
-    usecase "Show the menus of a user" as UC_showMenus
-    usecase "Block the pages of hidden items" as UC_blockUrl
+    usecase "Mostrar los menús de un usuario" as UC_showMenus
+    usecase "Bloquear las páginas de los elementos ocultos" as UC_blockUrl
   }
 }
 
@@ -24,5 +26,7 @@ A_Administrator --> UC_reorderNodes
 A_Administrator --> UC_importNodes
 A_System --> UC_showMenus
 A_System --> UC_blockUrl
+A_Administrator --> UC_customiseSecondaryNavigation
+A_Administrator --> UC_setScopeException
 
 @enduml

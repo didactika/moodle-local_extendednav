@@ -1,0 +1,39 @@
+---
+title: Cambiar las otras navegaciones
+summary: Ordene, renombre, oculte y amplíe la navegación de un curso, de una actividad, de una categoría y de la administración del sitio.
+order: 45
+---
+
+Además de la navegación principal y el menú de usuario, el plugin cambia las navegaciones que Moodle dibuja bajo la cabecera de una página: la de un **curso**, la de la **página principal del sitio**, la de una **actividad**, la de una **categoría** y la de la **administración del sitio**.
+
+<Screenshot src="asset:manage-course.webp" alt="La página de gestión con la navegación del curso elegida y sus nodos en lista" caption="La página de gestión: las navegaciones a la izquierda y los nodos de la elegida a la derecha." url="/local/extendednav/manage.php?menu=course" />
+
+## Elegir la navegación
+
+En la página de gestión, la columna de la izquierda enumera las navegaciones por grupos: el sitio (navegación principal y menú de usuario), el curso (curso y página principal), la actividad, la categoría y la administración. En una pantalla estrecha, la columna es un selector sobre la lista.
+
+## Ver lo que muestra Moodle
+
+Moodle no tiene una lista de los nodos de estas navegaciones: dependen de la página, de quién mira y de los plugins que añaden los suyos. El plugin no construye ninguna página para encontrarlos. Registra cada nodo la primera vez que una página lo muestra, así que la lista empieza vacía y se llena a medida que se usa el sitio. Un nodo de Moodle aparece en la lista con el enlace y el título que le da Moodle, y desde entonces se puede cambiar.
+
+## Qué se puede hacer con un nodo
+
+| Acción | Cómo |
+|---|---|
+| Ocultarlo o mostrarlo | El botón del ojo de su fila, o **Ocultar** y **Mostrar** en la barra que aparece al seleccionar nodos |
+| Ordenarlo | Los botones de flecha de su fila. Un nodo se mueve un lugar entre los demás |
+| Renombrarlo o cambiar su enlace | Edítelo y rellene **Título** o **URL**. Un campo vacío conserva lo que da Moodle |
+| Restringirlo | Edítelo y elija los roles o los idiomas que lo ven |
+| Decidir dónde va | Edítelo y elija **Dónde va**: donde lo pone Moodle, siempre en el menú **Más**, o en la barra, fuera del menú |
+| Añadir un nodo propio | **Añadir nodo**. El título y la URL son obligatorios |
+
+En la navegación de la **administración del sitio** un nodo solo se puede ocultar y ordenar: su título y su enlace son los de las páginas de administración, y cambiarlos dejaría a un administrador sin acceso.
+
+## La lista
+
+Busque por título, clave o enlace. El menú **Visibilidad** reduce la lista a los nodos visibles para todos, restringidos a roles u ocultos, e indica cuántos hay de cada uno. La flecha circular del final de la fila borra la búsqueda y los filtros.
+
+<Screenshot src="asset:manage-selection.webp" alt="Dos nodos seleccionados, con la barra de acciones sobre la lista" caption="Seleccione nodos para mostrarlos, ocultarlos o eliminarlos a la vez." url="/local/extendednav/manage.php?menu=course" />
+
+> [!NOTE]
+> Nada recarga la página: un cambio se guarda al pulsar su botón y la lista se dibuja de nuevo al instante.

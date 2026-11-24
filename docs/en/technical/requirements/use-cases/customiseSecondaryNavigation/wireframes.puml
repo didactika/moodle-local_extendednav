@@ -1,0 +1,12 @@
+@startsalt
+{
+  {* Course navigation }
+  ==
+  {
+    Navigations | Applies to: ^Whole site^
+    [ Add node ] | [ Import ] | [ Export all ]
+    "Search nodes" | ^Visibility^
+    Title | Visibility | URL | Actions
+  }
+}
+@endsalt

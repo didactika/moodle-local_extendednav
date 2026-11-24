@@ -8,14 +8,18 @@ actor "Administrator" as A_Administrator
 
 rectangle "local_extendednav" {
   package "Navigation" {
-    usecase "Add, change or delete an item" as UC_manageNodes
-    usecase "Reorder the items" as UC_reorderNodes
-    usecase "Import and export items" as UC_importNodes
+    usecase "Añadir, cambiar o eliminar un elemento" as UC_manageNodes
+    usecase "Reordenar los elementos" as UC_reorderNodes
+    usecase "Importar y exportar elementos" as UC_importNodes
+    usecase "Personalizar una navegación secundaria" as UC_customiseSecondaryNavigation
+    usecase "Cambiar una navegación para una categoría o un curso" as UC_setScopeException
   }
 }
 
 A_Administrator --> UC_manageNodes
 A_Administrator --> UC_reorderNodes
 A_Administrator --> UC_importNodes
+A_Administrator --> UC_customiseSecondaryNavigation
+A_Administrator --> UC_setScopeException
 
 @enduml

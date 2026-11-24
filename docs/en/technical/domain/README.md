@@ -53,6 +53,12 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-006 | The whole of an import file is checked before anything is saved. | ImportFile | `node_importer::import` |
 | RN-007 | Reordering keeps a parent with its submenu, and a submenu item moves only among its siblings. | Node, Submenu | `node_manager::reorder` |
 | RN-008 | An item of Moodle with empty fields keeps the values of Moodle. | Node | `node_text` |
+| RN-009 | A node of a secondary navigation is found when a page shows it, once, and from then on it has a row that can be changed. | Node, Menu | `secondary::record_seen` |
+| RN-010 | In the navigation of the site administration a node can only be hidden and ordered. | Node, Menu | `secondary::is_order_only` |
+| RN-011 | A site administrator sees every node, unless the plugin or the node hides it from administrators too. | Node, Role | `node_access::is_allowed` |
+| RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. | Node, Scope | `node_repository::get_scoped_nodes` |
+| RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. | Node, Scope | `node_repository::get_scoped_nodes` |
+| RN-014 | Deleting a node of the site deletes its exceptions. | Node, Scope | `node_manager::delete` |
 
 ## Lifecycles
 

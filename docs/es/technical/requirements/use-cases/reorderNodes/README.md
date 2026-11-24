@@ -32,7 +32,7 @@ extends:
 
 ## Contexto
 
-El orden de la lista es el orden del menú. Un administrador arrastra un elemento, o elige una posición con el teclado, y los submenús se mantienen juntos.
+El orden de la lista es el orden del menú. Un administrador pulsa los botones de flecha de la fila de un elemento, y los submenús se mantienen juntos.
 
 ## Precondiciones
 
@@ -48,15 +48,15 @@ El orden de la lista es el orden del menú. Un administrador arrastra un element
 
 | Paso | Actor | Sistema |
 | --- | --- | --- |
-| 1 | Arrastra un elemento por su asa, o abre su lista de posiciones. | Calcula el nuevo orden del menú. |
-| 2 | Lo suelta. | Guarda el orden mediante la función de servicio web. |
-| 3 |  | Mantiene a un padre con sus elementos de submenú. |
+| 1 | Pulsa **Subir** o **Bajar** en la fila de un elemento. | Calcula el nuevo orden entre sus hermanos. |
+| 2 |  | Guarda el orden mediante la función de servicio web. |
+| 3 |  | Mantiene a un padre con sus elementos de submenú y dibuja la lista de nuevo. |
 
 ## Flujos alternativos
 
 | ID | Empieza en el paso | Condición | Comportamiento | Termina |
 | --- | --- | --- | --- | --- |
-| A1 | 1 | Hay un filtro aplicado. | El orden está desactivado. | Paso 1 |
+| A1 | 1 | Hay una búsqueda o un filtro aplicado. | Los botones están desactivados. | Paso 1 |
 | A2 | 2 | El servidor rechaza el orden. | Muestra el error y deja la lista como estaba. | Paso 1 |
 
 ## Reglas de negocio

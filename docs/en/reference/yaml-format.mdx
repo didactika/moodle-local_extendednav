@@ -22,6 +22,9 @@ An import file is a YAML file with a `nodes` list. Each entry describes one item
 | `parentkey` | Key of the parent item, to show this item in its submenu |
 | `display` | How the link opens: `0` current window, `1` new window, `2` pop-up |
 | `popupwidth`, `popupheight` | Width and height of the pop-up in pixels, from 100 to 9999. Used when `display` is `2` |
+| `scope` | The category or the course the node is an exception for: `course:shortname` or `category:Parent / Name`. Empty means the whole site |
+| `placement` | Where a node of a secondary navigation goes: `0` where Moodle puts it, `1` always in the More menu, `2` never in the More menu |
+| `hideadmins` | `1` to hide the node from site administrators too |
 
 ## Example
 

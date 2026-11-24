@@ -8,6 +8,7 @@ entity local_extendednav {
   --
   nodekey : char
   menu : char
+  contextid : int
   parentkey : char
   title : text
   tooltip : text
@@ -20,6 +21,8 @@ entity local_extendednav {
   display : int
   popupwidth : int
   popupheight : int
+  placement : int
+  hideadmins : bool
   sortorder : int
   timecreated : int
   timemodified : int

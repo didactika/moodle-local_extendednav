@@ -8,8 +8,8 @@ actor "System" as A_System
 
 rectangle "local_extendednav" {
   package "Display" {
-    usecase "Show the menus of a user" as UC_showMenus
-    usecase "Block the pages of hidden items" as UC_blockUrl
+    usecase "Mostrar los menús de un usuario" as UC_showMenus
+    usecase "Bloquear las páginas de los elementos ocultos" as UC_blockUrl
   }
 }
 

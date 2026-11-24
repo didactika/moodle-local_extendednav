@@ -32,7 +32,7 @@ extends:
 
 ## Context
 
-The order of the list is the order of the menu. An administrator drags an item, or chooses a position with the keyboard, and the submenus stay together.
+The order of the list is the order of the menu. An administrator presses the arrow buttons of the row of an item, and the submenus stay together.
 
 ## Preconditions
 
@@ -48,15 +48,15 @@ The order of the list is the order of the menu. An administrator drags an item, 
 
 | Step | Actor | System |
 | --- | --- | --- |
-| 1 | Drags an item by its handle, or opens its list of positions. | Computes the new order of the menu. |
-| 2 | Drops it. | Saves the order through the web-service function. |
-| 3 |  | Keeps a parent with its submenu items. |
+| 1 | Presses **Move up** or **Move down** on the row of an item. | Computes the new order among its siblings. |
+| 2 |  | Saves the order through the web-service function. |
+| 3 |  | Keeps a parent with its submenu items, and draws the list again. |
 
 ## Alternative flows
 
 | ID | Starts at step | Condition | Behaviour | Ends |
 | --- | --- | --- | --- | --- |
-| A1 | 1 | A filter is applied. | Ordering is off. | Step 1 |
+| A1 | 1 | A search or a filter is applied. | The buttons are off. | Step 1 |
 | A2 | 2 | The server refuses the order. | Shows the error and keeps the list as it was. | Step 1 |
 
 ## Business rules

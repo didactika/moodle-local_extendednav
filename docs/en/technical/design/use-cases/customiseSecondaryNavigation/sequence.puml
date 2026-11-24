@@ -1,0 +1,20 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+actor "Administrator" as p0
+participant "manage.js" as p1
+participant "get_nodes / change_nodes" as p2
+participant "node_list / node_manager" as p3
+database "local_extendednav" as p4
+
+p0 -> p1 : acts on the list
+p1 -> p2 : web-service function
+p2 -> p3 : applies the rules
+p3 -> p4 : reads and writes the rows
+p3 --> p2 : done
+p2 --> p1 : rows and counts
+p1 --> p0 : the list drawn again
+
+@enduml

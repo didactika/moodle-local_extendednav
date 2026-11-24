@@ -1,0 +1,31 @@
+---
+title: Change a navigation for a category or a course
+summary: Give a category or a course its own order, names and nodes, while the rest of the site keeps the navigation of the site.
+order: 46
+---
+
+The navigation of a course, of an activity and of a category can be changed for the whole site and, as an exception, for a **category** or a **course**. Everything inside a category follows it, and a course can change what its category sets.
+
+## Choose the scope
+
+On the management page, open **Applies to** and search for the category or the course. The menu also lists the ones that already have changes, with how many. Choose **Whole site** to go back.
+
+<Screenshot src="asset:manage-scope-menu.webp" alt="The menu that chooses the scope, with a search and the courses found" caption="Search a category or a course to change its navigation." url="/local/extendednav/manage.php?menu=course" />
+
+## Make an exception
+
+With a category or a course chosen, the list shows what its pages show: the nodes of the site and the ones it inherits. Change a node as you would for the site: hide it, move it or edit it. The first change of a node gives the category or the course a row of its own, which starts as a copy of the node it replaces. The row shows **Exception**; a node that comes from a category around it shows **Inherited**.
+
+<Screenshot src="asset:manage-exception.webp" alt="The navigation of a course, with a node marked as an exception" caption="A node changed only for this course." url="/local/extendednav/manage.php?menu=course" />
+
+- The nearest scope wins: the course over its category, and the category over the site.
+- When a category or a course changes the order of any node, it sets the order of its whole navigation.
+- A node added for a course exists only there.
+
+## Go back to the site
+
+The button at the end of the row of an exception (**Go back**) removes the changes of the category or the course for that node, and its navigation follows the site again. Deleting a node of the site removes its exceptions too.
+
+## Export and import
+
+**Export all** includes the exceptions, each with the category or the course it is for (`scope`). On import, the scope is looked up by the short name of the course or by the full name of the category, with its parents. See [The YAML format](page:reference/yaml-format).

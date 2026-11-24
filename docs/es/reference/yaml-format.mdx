@@ -22,6 +22,9 @@ Un archivo de importación es un archivo YAML con una lista `nodes`. Cada entrad
 | `parentkey` | Clave del elemento padre, para mostrar este elemento en su submenú |
 | `display` | Cómo se abre el enlace: `0` ventana actual, `1` ventana nueva, `2` ventana emergente |
 | `popupwidth`, `popupheight` | Ancho y alto de la ventana emergente en píxeles, de 100 a 9999. Se usan cuando `display` es `2` |
+| `scope` | La categoría o el curso para el que el nodo es una excepción: `course:nombrecorto` o `category:Padre / Nombre`. Vacío significa todo el sitio |
+| `placement` | Dónde va un nodo de una navegación secundaria: `0` donde lo pone Moodle, `1` siempre en el menú Más, `2` nunca en el menú Más |
+| `hideadmins` | `1` para ocultar el nodo también a los administradores del sitio |
 
 ## Ejemplo
 

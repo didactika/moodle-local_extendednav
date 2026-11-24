@@ -1,0 +1,31 @@
+---
+title: Cambiar una navegación para una categoría o un curso
+summary: Dé a una categoría o a un curso su propio orden, nombres y nodos, mientras el resto del sitio conserva la navegación del sitio.
+order: 46
+---
+
+La navegación de un curso, de una actividad y de una categoría se puede cambiar para todo el sitio y, como excepción, para una **categoría** o un **curso**. Todo lo que hay dentro de una categoría la sigue, y un curso puede cambiar lo que fija su categoría.
+
+## Elegir el ámbito
+
+En la página de gestión, abra **Se aplica a** y busque la categoría o el curso. El menú también enumera los que ya tienen cambios, con cuántos. Elija **Todo el sitio** para volver.
+
+<Screenshot src="asset:manage-scope-menu.webp" alt="El menú que elige el ámbito, con un buscador y los cursos encontrados" caption="Busque una categoría o un curso para cambiar su navegación." url="/local/extendednav/manage.php?menu=course" />
+
+## Hacer una excepción
+
+Con una categoría o un curso elegidos, la lista muestra lo que muestran sus páginas: los nodos del sitio y los que hereda. Cambie un nodo como lo haría para el sitio: ocúltelo, muévalo o edítelo. El primer cambio de un nodo da a la categoría o al curso una fila propia, que empieza como copia del nodo al que sustituye. La fila muestra **Excepción**; un nodo que viene de una categoría que lo rodea muestra **Heredado**.
+
+<Screenshot src="asset:manage-exception.webp" alt="La navegación de un curso, con un nodo marcado como excepción" caption="Un nodo cambiado solo para este curso." url="/local/extendednav/manage.php?menu=course" />
+
+- Gana el ámbito más cercano: el curso sobre su categoría, y la categoría sobre el sitio.
+- Cuando una categoría o un curso cambia el orden de un nodo, fija el orden de toda su navegación.
+- Un nodo añadido para un curso solo existe allí.
+
+## Volver al sitio
+
+El botón del final de la fila de una excepción (**Volver**) quita los cambios de la categoría o del curso para ese nodo, y su navegación vuelve a seguir al sitio. Eliminar un nodo del sitio elimina también sus excepciones.
+
+## Exportar e importar
+
+**Exportar todo** incluye las excepciones, cada una con la categoría o el curso al que pertenece (`scope`). Al importar, el ámbito se busca por el nombre corto del curso o por el nombre completo de la categoría, con sus padres. Consulte [El formato YAML](page:reference/yaml-format).
