@@ -46,10 +46,10 @@ final class availability_test extends \advanced_testcase {
      * @return \stdClass
      */
     private static function node(string $key, ?string $availability): \stdClass {
-        return manager::create(manager::prepare(
-            ['nodekey' => $key, 'title' => ucfirst($key), 'url' => '/my/', 'availability' => $availability],
-            'primary'
-        ));
+        return manager::create(manager::prepare([
+            'nodekey' => $key, 'title' => ucfirst($key), 'url' => '/my/', 'availability' => $availability,
+            'visibility' => $availability === null ? access::VISIBILITY_ALL : access::VISIBILITY_ROLES,
+        ], 'primary'));
     }
 
     /**
@@ -72,6 +72,40 @@ final class availability_test extends \advanced_testcase {
         $this->assertTrue(access::is_shown($plain, (int)$user->id));
         $this->assertTrue(access::is_shown($soon, (int)get_admin()->id));
         $this->assertTrue(access::is_admin_only($soon, (int)get_admin()->id));
+    }
+
+    /**
+     * Restricted is limited by roles, by access restrictions or by both; visible to everyone keeps its access restrictions
+     * from before, unused; restricted with neither is refused.
+     */
+    public function test_restricted_by_roles_or_conditions(): void {
+        $this->resetAfterTest();
+        set_config('enableavailability', 1);
+        $user = $this->getDataGenerator()->create_user();
+        $teacher = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user((int)$teacher->id, (int)$course->id, 'editingteacher');
+        $later = self::dates([['d' => '>=', 't' => time() + DAYSECS]]);
+        $open = self::dates([['d' => '>=', 't' => time() - DAYSECS]]);
+
+        $dated = self::node('dated', $later);
+        $this->assertSame(access::VISIBILITY_ROLES, (int)$dated->visibility);
+        $this->assertFalse(access::is_shown($dated, (int)$user->id), 'Access restrictions alone restrict the node.');
+
+        $everyone = manager::update((object)(['visibility' => access::VISIBILITY_ALL] + (array)$dated));
+        availability::reset();
+        $this->assertTrue(access::is_shown($everyone, (int)$user->id), 'Visible to everyone has no limits.');
+        $this->assertSame($later, $everyone->availability, 'The access restrictions are kept for when it is restricted again.');
+
+        $both = self::node('both', $open);
+        $both = manager::update((object)(['roles' => 'editingteacher'] + (array)$both));
+        $this->assertFalse(access::is_shown($both, (int)$user->id), 'The roles and the access restrictions both apply.');
+        $this->assertTrue(access::is_shown($both, (int)$teacher->id));
+
+        $empty = manager::prepare(['nodekey' => 'empty', 'title' => 'Empty', 'url' => '/my/',
+            'visibility' => access::VISIBILITY_ROLES], 'primary');
+        $this->assertArrayHasKey('roles', validator::validate($empty, [])['errors']);
+        $this->assertFalse(access::is_allowed_by_rules($empty, (int)$user->id), 'Restricted with neither is shown to nobody.');
     }
 
     /**

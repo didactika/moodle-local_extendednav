@@ -20,6 +20,10 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+### Changed
+
+- The visibility of a node is Visible to everyone, with no limits; Restricted, by roles, by Moodle's access restrictions or by both, at least one of them; or Not visible. Restricted no longer requires roles, and a node restricted only by access restrictions can block its URL and apply its rules to administrators too. Visible to everyone offers no access restrictions and no Hide from administrators too; the restrictions a node had are kept, unused, for when it is restricted again. The upgrade makes every node visible to everyone with access restrictions restricted, so it is shown to the same people; a file of an earlier version is imported the same way, and a node visible to everyone is exported without its unused restrictions. In the form, Block URL access is right above Hide from administrators too, at the end of Who sees it. The badge With conditions is gone: a restricted node shows its conditions as a badge, as its roles.
+
 ### Added
 
 - The page Navigation status, under Appearance > Extended navigation, lists every navigation with its own switch, in groups, and the switch of the whole plugin on top. Off, the plugin changes no navigation and blocks no page, and the switches of the navigations stay grey and locked with the state each goes back to; turning it off asks first. The management page says when the plugin is off. The web service local_extendednav_set_plugin_enabled turns the plugin on or off, and local_extendednav_get_navigations says whether it is on.

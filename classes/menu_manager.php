@@ -354,8 +354,7 @@ class menu_manager {
                 if ($visibility === \local_extendednav\local\node\access::VISIBILITY_HIDDEN) {
                     $changes['hidden']++;
                 } else if (
-                    $visibility === \local_extendednav\local\node\access::VISIBILITY_ROLES
-                    || !empty($record->availability) || !empty($record->langs)
+                    $visibility === \local_extendednav\local\node\access::VISIBILITY_ROLES || !empty($record->langs)
                 ) {
                     $changes['restricted']++;
                 }

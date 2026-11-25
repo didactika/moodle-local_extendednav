@@ -236,6 +236,48 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', access::VISIBILITY_ROLES);
 
+        $mform->addElement(
+            'autocomplete',
+            'langs',
+            get_string('langs', 'local_extendednav'),
+            $this->get_language_options($current),
+            [
+                'multiple' => true,
+                'noselectionstring' => get_string('langs_all', 'local_extendednav'),
+            ]
+        );
+        $mform->setType('langs', PARAM_ALPHANUMEXT);
+        $mform->addHelpButton('langs', 'langs', 'local_extendednav');
+        // A node nobody sees has no language to show in: the field is hidden while it is not visible.
+        $mform->hideIf('langs', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
+
+        // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
+        // has. Its editor is drawn by Moodle's script in place of this field. Whoever may not restrict the nodes here does not
+        // get the field, nor the script, which would wait for it.
+        if (!empty($CFG->enableavailability) && !in_array('availability', $this->_customdata['locked'] ?? [], true)) {
+            $mform->addElement(
+                'textarea',
+                'availabilityconditionsjson',
+                get_string('accessrestrictions', 'availability'),
+                ['class' => 'd-none']
+            );
+            $mform->addHelpButton('availabilityconditionsjson', 'conditions', 'local_extendednav');
+            // Access restrictions are one of the two ways to restrict a node, with the roles: a node visible to everyone has none,
+            // and one nobody sees has nobody to restrict.
+            $mform->hideIf('availabilityconditionsjson', 'visibility', 'neq', access::VISIBILITY_ROLES);
+            $mform->addElement('html', $OUTPUT->container(
+                $OUTPUT->render_from_template('core/loading', []),
+                'd-flex justify-content-center py-3',
+                'availabilityconditions-loading'
+            ));
+            $course = $this->course_for_conditions($contextid);
+            \core_availability\frontend::include_all_javascript($course);
+            // A grade or the completion of an activity needs the activities of one course: outside a course they are not offered.
+            if ((int)$course->id === (int)SITEID) {
+                $PAGE->requires->js_call_amd('local_extendednav/form/conditions', 'init', [['grade', 'completion']]);
+            }
+        }
+
         // The pages of the administration are never blocked: Moodle checks their capabilities. Only a node with an address of the
         // site can block it: a submenu or a section has none, and neither has an item of the preferences whose address is not
         // typed here and that Moodle draws without one.
@@ -253,50 +295,12 @@ class node_form extends \moodleform {
             }
         }
 
-        $mform->addElement(
-            'autocomplete',
-            'langs',
-            get_string('langs', 'local_extendednav'),
-            $this->get_language_options($current),
-            [
-                'multiple' => true,
-                'noselectionstring' => get_string('langs_all', 'local_extendednav'),
-            ]
-        );
-        $mform->setType('langs', PARAM_ALPHANUMEXT);
-        $mform->addHelpButton('langs', 'langs', 'local_extendednav');
-        // A node nobody sees has no language or condition to meet: those fields are hidden while it is not visible.
-        $mform->hideIf('langs', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
-
-        // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
-        // has. Its editor is drawn by Moodle's script in place of this field. Whoever may not restrict the nodes here does not
-        // get the field, nor the script, which would wait for it.
-        if (!empty($CFG->enableavailability) && !in_array('availability', $this->_customdata['locked'] ?? [], true)) {
-            $mform->addElement(
-                'textarea',
-                'availabilityconditionsjson',
-                get_string('accessrestrictions', 'availability'),
-                ['class' => 'd-none']
-            );
-            $mform->addHelpButton('availabilityconditionsjson', 'conditions', 'local_extendednav');
-            $mform->hideIf('availabilityconditionsjson', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
-            $mform->addElement('html', $OUTPUT->container(
-                $OUTPUT->render_from_template('core/loading', []),
-                'd-flex justify-content-center py-3',
-                'availabilityconditions-loading'
-            ));
-            $course = $this->course_for_conditions($contextid);
-            \core_availability\frontend::include_all_javascript($course);
-            // A grade or the completion of an activity needs the activities of one course: outside a course they are not offered.
-            if ((int)$course->id === (int)SITEID) {
-                $PAGE->requires->js_call_amd('local_extendednav/form/conditions', 'init', [['grade', 'completion']]);
-            }
-        }
-
         $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
         $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
-        // A node of the site administration is hidden from administrators too, unless they choose otherwise.
+        // A node of the site administration is hidden from administrators too, unless they choose otherwise. A node visible to
+        // everyone has no rule to apply to them.
         $mform->setDefault('hideadmins', $istree ? 1 : 0);
+        $mform->hideIf('hideadmins', 'visibility', 'eq', access::VISIBILITY_ALL);
 
         // Where it goes.
         $mform->addElement('header', 'placeheader', get_string('form_section_place', 'local_extendednav'));
