@@ -162,7 +162,7 @@ class nodes {
         $parents = [];
         foreach ($all as $node) {
             if ((string)($node->parentkey ?? '') !== '') {
-                $parents[(string)$node->parentkey] = ($parents[(string)$node->parentkey] ?? 0) + 1;
+                $parents[(string)$node->parentkey] = true;
             }
         }
         // In a category, a course or an activity, each action takes the capability of its kind of change.
@@ -181,10 +181,6 @@ class nodes {
             $row['tree'] = $istree;
             // Only the primary navigation and the user menu draw icons: the others keep no room for one.
             $row['withicons'] = in_array($menukey, ['primary', 'usermenu'], true);
-            // A folder says how many items it holds, so it is clear that it opens.
-            $count = (int)($parents[$node->nodekey] ?? 0);
-            $row['childlabel'] = !$row['haschildren'] ? '' : ($count === 0 ? get_string('folder_empty', 'local_extendednav')
-                : get_string($count === 1 ? 'folder_one' : 'folder_items', 'local_extendednav', $count));
             // Moodle shows a tab or a category of the administration only once it holds a page, and says nothing of an empty one.
             if ($group && !isset($parents[$node->nodekey]) && $menu instanceof admintree) {
                 $row['flags'][] = [
@@ -240,7 +236,6 @@ class nodes {
             'canedit' => false,
             'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true, 'tree' => true,
             'withicons' => false,
-            'childlabel' => '',
         ];
     }
 

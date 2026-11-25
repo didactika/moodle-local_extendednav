@@ -36,7 +36,7 @@
                 "flags": [{"label": "Roles", "detail": "Roles: teacher"}], "details": ["Roles: teacher"], "hasdetails": true,
                 "visibilitydetail": "Shown only to the roles chosen.",
                 "exception": false, "inherited": false, "candelete": false, "canhide": true, "canshow": true,
-                "isselected": false, "editurl": "#", "canedit": true, "depth": 0, "haschildren": false, "virtual": false, "tree": true, "childlabel": "", "withicons": false, "scopenote": "",
+                "isselected": false, "editurl": "#", "canedit": true, "depth": 0, "haschildren": false, "virtual": false, "tree": true, "withicons": false, "scopenote": "",
                 "openlabel": "Open Grades", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
                 "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": false,
                 "selectable": true, "canmove": true, "draglabel": "Drag Grades to move it"
@@ -72,7 +72,7 @@
                         {{#withicons}}<span class="text-muted" data-region="nodeicon">{{#icon}}{{{icon}}}{{/icon}}</span>{{/withicons}}
                         <span class="d-flex flex-column overflow-hidden">
                             {{#haschildren}}
-                                <button type="button" class="btn btn-link p-0 fw-bold text-start text-left text-truncate" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{title}}</button>
+                                <button type="button" class="btn btn-link p-0 fw-bold text-start text-left d-inline-flex align-items-center gap-1 mw-100" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}"><span class="text-truncate">{{title}}</span>{{^virtual}}<span class="text-muted small flex-shrink-0" aria-hidden="true">{{#pix}}i/folder, core{{/pix}}</span>{{/virtual}}</button>
                             {{/haschildren}}
                             {{^haschildren}}
                                 <a class="fw-bold text-truncate" href="{{editurl}}" title="{{title}}">{{title}}</a>
@@ -92,10 +92,7 @@
                         </span>
                     {{/virtual}}
                 </td>
-                <td class="d-none d-xl-table-cell" data-column="url">
-                    {{#haschildren}}{{^virtual}}<button type="button" class="btn btn-link p-0 text-muted text-decoration-none d-inline-flex align-items-center gap-1" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{#pix}}i/folder, core{{/pix}}{{childlabel}}</button>{{/virtual}}{{/haschildren}}
-                    {{^haschildren}}<span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span>{{/haschildren}}
-                </td>
+                <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span></td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
                     {{^virtual}}
                         <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">
