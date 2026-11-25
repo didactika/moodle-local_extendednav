@@ -1,0 +1,39 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// The screens of Extended navigation, drawn with the Didactika design system (https://moodle-design.didactika.org/).
+// styles.css is generated from this file: run node tools/build-styles.mjs /path/to/moodle after a change.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+// Every rule is written once for the pages of the plugin, its dialogs and its settings page, so Sass joins long lines of
+// selectors in styles.css; their length says nothing about how the rules read, so the generated file does not count it.
+/* stylelint-disable max-line-length */
+
+// The dialogs of the plugin: Moodle puts them at the end of the page, outside the screen, so they are reached by the classes
+// Moodle gives the body of the pages of the plugin and of its settings.
+$len-modal: ".path-local-extendednav .modal, .path-admin-local-extendednav .modal, #page-admin-setting-local_extendednav_settings .modal, #page-local-extendednav-manage .modal";
+// The settings page of the plugin, whose tabs Moodle draws.
+$len-settings: "#page-admin-setting-local_extendednav_settings #region-main";
+
+@import 'scss/tabs';
+@import 'scss/bootstrap4';
+@import 'scss/tokens';
+@import 'scss/chrome';
+@import 'scss/feedback';
+@import 'scss/menus';
+@import 'scss/moodle';
+@import 'scss/manage';
+@import 'scss/states';
+@import 'scss/icon_picker';
+@import 'scss/node_form';
+
+.len,
+#{$len-modal} {
+    @include dd-states;
+}
+
+#{$len-settings} {
+    @include dd-tabs;
+    @include dd-states;
+}

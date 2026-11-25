@@ -16,10 +16,10 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_icon;
-use local_extendednav\local\node_text;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\text;
 
 /**
  * The user menu.
@@ -27,7 +27,7 @@ use local_extendednav\local\node_text;
  * Moodle builds the user menu from the customusermenuitems setting, so the plugin
  * rewrites that setting for the current request. Moodle reads only "text|url"
  * from each line, so icons, tooltips, new windows and submenus are applied in the
- * browser by the local_extendednav/usermenu module.
+ * browser by the local_extendednav/menus/usermenu module.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -147,26 +147,57 @@ class usermenu extends base {
      */
     public function build_config_value(array $customnodes): string {
         $natives = $this->get_native_nodes();
+        $holders = self::holders($customnodes);
         $lines = [];
         foreach ($customnodes as $node) {
-            if (!empty($node->parentkey) || !node_access::is_shown($node)) {
+            if (!empty($node->parentkey) || !access::is_shown($node)) {
                 continue;
             }
             $native = $natives[$node->nodekey] ?? null;
 
             // Keep the "identifier,component" form of core items so Moodle translates them itself.
             if (trim((string)$node->title) !== '') {
-                $title = format_string(node_text::resolve($node->title), true, ['escape' => false]);
+                $title = format_string(text::resolve($node->title), true, ['escape' => false]);
             } else {
                 $title = $native ? $native->text : '';
             }
             $url = trim((string)$node->url) !== '' ? trim((string)$node->url) : ($native ? $native->action : '');
+            if ($url === '' && isset($holders[$node->nodekey])) {
+                $url = self::submenu_url($node->nodekey);
+            }
             if ($title === '' || $url === '') {
                 continue;
             }
             $lines[] = str_replace(["\r", "\n", '|'], ' ', $title) . '|' . $url;
         }
         return implode("\n", $lines);
+    }
+
+    /**
+     * Returns the keys of the nodes that hold others: the submenus.
+     *
+     * @param \stdClass[] $customnodes Nodes of this menu.
+     * @return bool[] By node key.
+     */
+    private static function holders(array $customnodes): array {
+        $holders = [];
+        foreach ($customnodes as $node) {
+            if (!empty($node->parentkey) && access::is_shown($node)) {
+                $holders[(string)$node->parentkey] = true;
+            }
+        }
+        return $holders;
+    }
+
+    /**
+     * Returns the URL a submenu without one of its own takes in the user menu of Moodle, which only lists items with a URL: one
+     * of its own, which the browser module finds and turns into the opener of the submenu.
+     *
+     * @param string $nodekey Key of the submenu.
+     * @return string
+     */
+    private static function submenu_url(string $nodekey): string {
+        return '/?extendednavmenu=' . rawurlencode($nodekey);
     }
 
     /**
@@ -181,7 +212,7 @@ class usermenu extends base {
         $roots = [];
         $children = [];
         foreach ($customnodes as $node) {
-            if (!node_access::is_shown($node)) {
+            if (!access::is_shown($node)) {
                 continue;
             }
             if (empty($node->parentkey)) {
@@ -195,19 +226,19 @@ class usermenu extends base {
         foreach ($roots as $nodekey => $node) {
             $haschildren = !empty($children[$nodekey]);
             $icon = trim((string)$node->icon);
-            $tooltip = node_text::resolve($node->tooltip ?? '');
+            $tooltip = text::resolve($node->tooltip ?? '');
             $attributes = [
                 'data-region' => 'local-extendednav-node-fix',
-                'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null),
-                'data-title' => strip_tags(format_string(node_text::get_title($node, $natives[$nodekey] ?? null))),
+                'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null, $haschildren),
+                'data-title' => strip_tags(format_string(text::get_title($node, $natives[$nodekey] ?? null))),
             ];
             // The user menu shows FontAwesome icons only, so Moodle icons are turned into theirs.
-            $iconclasses = node_icon::get_fontawesome_classes($icon);
+            $iconclasses = icon::get_fontawesome_classes($icon);
             if ($iconclasses !== null) {
                 $attributes['data-icon'] = $iconclasses;
             }
             if (!$haschildren) {
-                $attributes += node_display::get_link_attributes($node);
+                $attributes += display::get_link_attributes($node);
             }
             if ($tooltip !== '') {
                 $attributes['data-tooltip'] = strip_tags(format_string($tooltip));
@@ -223,7 +254,7 @@ class usermenu extends base {
                 continue;
             }
             $parent = $parent ?? (object)['nodekey' => $parentkey, 'title' => null, 'url' => null];
-            $parenttitle = strip_tags(format_string(node_text::get_title($parent, $natives[$parentkey] ?? null)));
+            $parenttitle = strip_tags(format_string(text::get_title($parent, $natives[$parentkey] ?? null)));
             if ($parenttitle === '') {
                 continue;
             }
@@ -231,18 +262,18 @@ class usermenu extends base {
             $context = ['panelid' => 'carousel-item-extnav-' . preg_replace('/[^a-zA-Z0-9]/', '', $parentkey),
                 'title' => $parenttitle, 'items' => []];
             foreach ($items as $child) {
-                $title = strip_tags(format_string(node_text::get_title($child, $natives[$child->nodekey] ?? null)));
+                $title = strip_tags(format_string(text::get_title($child, $natives[$child->nodekey] ?? null)));
                 $url = $this->get_absolute_url($child, $natives[$child->nodekey] ?? null);
                 if ($title === '' || $url === '') {
                     continue;
                 }
                 $icon = trim((string)$child->icon);
-                $display = node_display::get_link_attributes($child);
+                $display = display::get_link_attributes($child);
                 $context['items'][] = [
                     'url' => $url,
                     'title' => $title,
-                    'tooltip' => strip_tags(format_string(node_text::resolve($child->tooltip ?? ''))),
-                    'icon' => node_icon::get_fontawesome_classes($icon) ?? false,
+                    'tooltip' => strip_tags(format_string(text::resolve($child->tooltip ?? ''))),
+                    'icon' => icon::get_fontawesome_classes($icon) ?? false,
                     'newwindow' => ($display['data-extnav-display'] ?? '') === 'new',
                     'popup' => ($display['data-extnav-display'] ?? '') === 'popup' ? [
                         'width' => $display['data-extnav-width'],
@@ -257,7 +288,7 @@ class usermenu extends base {
             $html .= \html_writer::tag('template', $output->render_from_template('local_extendednav/usermenu/panel', $context), [
                 'data-region' => 'local-extendednav-submenu',
                 'data-panel-id' => $context['panelid'],
-                'data-trigger-url' => $this->get_absolute_url($parent, $natives[$parentkey] ?? null),
+                'data-trigger-url' => $this->get_absolute_url($parent, $natives[$parentkey] ?? null, true),
                 'data-trigger-title' => $parenttitle,
             ]);
         }
@@ -269,12 +300,16 @@ class usermenu extends base {
      *
      * @param \stdClass $node Node record.
      * @param \stdClass|null $native Core node definition, if any.
+     * @param bool $holder Whether the node holds others, so a submenu without a URL takes one of its own.
      * @return string Absolute URL, or an empty string.
      */
-    private function get_absolute_url(\stdClass $node, ?\stdClass $native): string {
+    private function get_absolute_url(\stdClass $node, ?\stdClass $native, bool $holder = false): string {
         $url = trim((string)($node->url ?? ''));
         if ($url === '' && $native !== null) {
             $url = (string)$native->action;
+        }
+        if ($url === '' && $holder) {
+            $url = self::submenu_url((string)$node->nodekey);
         }
         if ($url === '') {
             return '';

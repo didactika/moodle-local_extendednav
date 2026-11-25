@@ -1,0 +1,111 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/list/nodes_table
+
+    The nodes of a navigation: the handle that moves a node (or every node selected with it), the title with its key, the
+    visibility with a badge for each kind of restriction, the link and the actions of each node. The icon of every title has
+    a slot of one width, empty or not, so the titles start at one line. Each badge says its restriction when the pointer is
+    over it and opens the dialog of every restriction of the node. The actions have a slot each, in one order (visibility,
+    edit, delete): an action a node does not have leaves its slot empty, so the actions of one kind are always in one column.
+    A group of the list, such as General in the site administration, only opens its level.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "rows": [
+            {
+                "id": 3, "nodekey": "grades", "title": "Grades", "url": "/grade/report/?id=2", "icon": "", "parentkey": "",
+                "visibility": 2, "visibilitylabel": "Restricted", "tone": "warning", "child": false,
+                "flags": [{"label": "Roles", "detail": "Roles: teacher"}], "details": ["Roles: teacher"], "hasdetails": true,
+                "visibilitydetail": "Shown only to the roles chosen.",
+                "exception": false, "inherited": false, "candelete": false, "canhide": true, "canshow": true,
+                "isselected": false, "editurl": "#", "canedit": true, "depth": 0, "haschildren": false, "virtual": false, "tree": true, "withicons": false, "scopenote": "",
+                "openlabel": "Open Grades", "editlabel": "Edit Grades", "deletelabel": "Delete Grades",
+                "selectlabel": "Select Grades", "showlabel": "Show Grades", "hidelabel": "Hide Grades", "visible": false,
+                "selectable": true, "canmove": true, "draglabel": "Drag Grades to move it"
+            }
+        ]
+    }
+}}
+<table class="table w-100">
+    <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>
+    <thead>
+        <tr>
+            <th scope="col" class="d-none d-md-table-cell" data-column="handle"><span class="sr-only visually-hidden">{{#str}}move, moodle{{/str}}</span></th>
+            <th scope="col" data-column="select"><input type="checkbox" class="form-check-input" data-region="selectpage" title="{{#str}}selectall, moodle{{/str}}" aria-label="{{#str}}selectall, moodle{{/str}}"></th>
+            <th scope="col" data-column="title">{{#str}}title, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-md-table-cell" data-column="visibility">{{#str}}visibility, local_extendednav{{/str}}</th>
+            <th scope="col" class="d-none d-xl-table-cell" data-column="url">{{#str}}url, local_extendednav{{/str}}</th>
+            <th scope="col" class="text-end text-right text-nowrap" data-column="actions"><span class="sr-only visually-hidden">{{#str}}actions, moodle{{/str}}</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#rows}}
+            <tr {{#isselected}}class="table-active"{{/isselected}} data-key="{{nodekey}}" data-parent="{{parentkey}}" {{#virtual}}data-virtual="1"{{/virtual}}>
+                <td class="d-none d-md-table-cell" data-column="handle">
+                    {{#canmove}}
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-region="handle" data-key="{{nodekey}}" title="{{draglabel}}" aria-label="{{draglabel}}">{{#pix}}i/dragdrop, core{{/pix}}</button>
+                    {{/canmove}}
+                </td>
+                <td data-column="select">
+                    {{#selectable}}<input type="checkbox" class="form-check-input" data-region="selectrow" value="{{id}}" title="{{selectlabel}}" aria-label="{{selectlabel}}" {{#isselected}}checked{{/isselected}}>{{/selectable}}
+                </td>
+                <th scope="row" data-column="title">
+                    <span class="d-flex align-items-center gap-2" data-depth="{{depth}}">
+                        {{#withicons}}<span class="text-muted" data-region="nodeicon">{{#icon}}{{{icon}}}{{/icon}}</span>{{/withicons}}
+                        <span class="d-flex flex-column overflow-hidden">
+                            {{#haschildren}}
+                                <button type="button" class="btn btn-link p-0 fw-bold text-start text-left d-inline-flex align-items-center gap-1 mw-100" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}"><span class="text-truncate">{{title}}</span>{{^virtual}}<span class="text-muted small flex-shrink-0" aria-hidden="true">{{#pix}}i/folder, core{{/pix}}</span>{{/virtual}}</button>
+                            {{/haschildren}}
+                            {{^haschildren}}
+                                <a class="fw-bold text-truncate" href="{{editurl}}" title="{{title}}">{{title}}</a>
+                            {{/haschildren}}
+                            {{^virtual}}
+                                <span class="small text-muted text-truncate">{{#native}}<span class="badge rounded-pill text-bg-light" title="{{#str}}origin_native_help, local_extendednav{{/str}}">{{#str}}origin_native, local_extendednav{{/str}}</span>{{/native}}{{^native}}<span class="badge rounded-pill text-bg-info" title="{{#str}}origin_custom_help, local_extendednav{{/str}}">{{#str}}origin_custom, local_extendednav{{/str}}</span>{{/native}} <code>{{nodekey}}</code>{{scopenote}}</span>
+                                <span class="d-md-none mt-1 text-truncate"><span class="badge rounded-pill text-bg-{{tone}} mw-100 text-truncate align-bottom">{{visibilitylabel}}</span></span>
+                            {{/virtual}}
+                        </span>
+                    </span>
+                </th>
+                <td class="d-none d-md-table-cell" data-column="visibility">
+                    {{^virtual}}
+                        <span class="d-inline-flex flex-wrap align-items-center gap-1">
+                            <button type="button" class="badge rounded-pill text-bg-{{tone}}" data-action="restrictions" data-key="{{nodekey}}" data-toggle="tooltip" data-bs-toggle="tooltip" title="{{visibilitydetail}}">{{visibilitylabel}}</button>
+                            {{#flags}}<button type="button" class="badge rounded-pill text-bg-light" data-action="restrictions" data-key="{{nodekey}}" data-toggle="tooltip" data-bs-toggle="tooltip" title="{{detail}}">{{label}}</button>{{/flags}}
+                        </span>
+                    {{/virtual}}
+                </td>
+                <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span></td>
+                <td class="text-end text-right text-nowrap" data-column="actions">
+                    {{^virtual}}
+                        <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">
+                            {{#canhide}}<button type="button" class="btn btn-link btn-icon btn-sm text-body" data-action="hide" data-key="{{nodekey}}" data-title="{{title}}" title="{{hidelabel}}" aria-label="{{hidelabel}}">{{#pix}}t/show, core{{/pix}}</button>{{/canhide}}
+                            {{^canhide}}{{#canshow}}<button type="button" class="btn btn-link btn-icon btn-sm text-primary" data-action="show" data-key="{{nodekey}}" data-title="{{title}}" title="{{showlabel}}" aria-label="{{showlabel}}">{{#pix}}t/hide, core{{/pix}}</button>{{/canshow}}{{^canshow}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/canshow}}{{/canhide}}
+                            {{#canedit}}<a class="btn btn-link btn-icon btn-sm text-primary" href="{{editurl}}" title="{{editlabel}}" aria-label="{{editlabel}}">{{#pix}}t/edit, core{{/pix}}</a>{{/canedit}}
+                            {{^canedit}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/canedit}}
+                            {{#candelete}}<button type="button" class="btn btn-link btn-icon btn-sm text-danger" data-action="delete" data-key="{{nodekey}}" data-title="{{title}}" title="{{deletelabel}}" aria-label="{{deletelabel}}">{{#pix}}t/delete, core{{/pix}}</button>{{/candelete}}
+                            {{^candelete}}<span class="btn btn-link btn-icon btn-sm invisible" aria-hidden="true"></span>{{/candelete}}
+                        </span>
+                    {{/virtual}}
+                </td>
+            </tr>
+        {{/rows}}
+    </tbody>
+</table>

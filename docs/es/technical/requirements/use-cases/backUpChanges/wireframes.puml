@@ -1,0 +1,10 @@
+@startsalt
+{
+  {+
+  <b>Valores predeterminados de las copias</b>
+  }
+  [X] Incluir los cambios de la navegación
+  <b>Valores predeterminados de las restauraciones</b>
+  [X] Restaurar los cambios de la navegación
+}
+@endsalt

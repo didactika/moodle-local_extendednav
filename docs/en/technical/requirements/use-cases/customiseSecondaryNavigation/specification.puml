@@ -1,0 +1,16 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "customiseSecondaryNavigation" as customiseSecondaryNavigation {
+  [*] --> Listing
+  state "Listing" as Listing : The list shows the nodes of the navigation
+  state "Changing" as Changing : A change is being saved
+  state "Failed" as Failed : The error is shown
+  Listing --> Changing
+  Changing --> Failed
+  Failed --> Listing
+}
+
+@enduml

@@ -11,7 +11,43 @@ MOODLE_XXX_STABLE branch, it uses everything under the "## [<that release>]" hea
 Keep an "## [Unreleased]" section above the latest release and rename it when the next release is cut.
 -->
 
+### Changed
+
+- The badge of a node that an administrator sees only for being one says Only admins.
+- The actions of every row are in fixed places (show or hide, edit, delete), so each action is in one column, and every title starts on the same line.
+- An item that Moodle numbers is known by the path of its address, the same on every page.
+- Whoever manages the navigation of the site changes a course or an activity without being enrolled in it.
+
 ## [Unreleased]
+
+## [2.0.0-m503] - 2026-11-25
+
+### Added
+
+- Each kind of activity has a navigation of its own (forums, assignments, quizzes...), listed under Activities: the kinds the site uses first, the others folded under Other kinds. A task looks through the most recent activities of each kind every night, and Find items does it at once for one kind, so the items a plugin adds to some activities only can be changed before anyone opens one. The changes of the single navigation of the activities go to each kind that has the item when the site is upgraded.
+- Each activity changes its own navigation on its page, Navigation, in its menu; a course changes its own and the one of each kind of activity it has. The changes of an activity travel in its backup and in the backup of its course, with their grades and activities mapped on restore.
+- Every badge of the visibility explains its restriction when the pointer is over it, and opens the dialog Who sees with every restriction of the node.
+- The form of a node follows the design system: its selects open the menu of the system, the icon is chosen and never typed, the notice of a node of Moodle opens its section, and a node outside a course offers no condition on grades or completion.
+- A management page in the design system: the navigations in a column (a select on a narrow screen), a search, a menu of visibilities with their counts, a list as wide as the page and of fixed height, round action buttons, a floating bar for the selected nodes and a menu to choose the scope. Every action changes the list in place, without reloading the page.
+- Nodes are ordered by dragging them by their handle, or with the arrow keys on the handle; the nodes selected among its siblings move with it. The lists have no pages, and the head checkbox selects every row.
+- The bar of the selection offers Show, Hide and Delete only when a selected node allows them, and asks before acting, listing the nodes left as they are. Hiding asks whether to hide from administrators too, which is on by default in the site administration.
+- Each node says whether Moodle manages it or it was added, and a menu Origin filters by it. The visibility shows a badge for each kind of restriction, with the details in a tooltip.
+- An empty secondary navigation finds its nodes from a page of the site, without leaving the management page.
+- The site administration groups the items of the General tab of Moodle under General.
+- Access restrictions of Moodle on every node, as Restrict access of an activity: dates, groups and groupings of a course, profile fields and the conditions of the plugins of the site. Dates make nodes that appear and end on their own, marked Scheduled and Ended on the list.
+- The activity log is a report, Extended navigation activity, in Site administration > Reports.
+- The exceptions of a course are part of its backup and come back with it; the file of the site holds the nodes of the site and the exceptions of its categories.
+- Thousands of exceptions export and import in seconds: the names of their courses and categories are read together, and a node that does not change is not written again.
+- One On and Off button next to the name of each navigation applies its changes or leaves the navigation as Moodle draws it. The settings page of the plugin is gone.
+- Site administrators see every node by default, even one that is hidden or restricted to roles they do not have, and their row says so. An option of each node applies its rules to administrators too.
+- The secondary navigations of Moodle can be ordered, renamed, re-linked, hidden, restricted to roles or languages, placed in the More menu or kept out of it, and extended with nodes of your own: the navigation of a course, of the site home, of an activity and of a category.
+- The whole site administration can be shaped: every category and every page, at any depth, can be renamed, hidden and ordered, and links of your own can be added to a category. The tree is browsed one level at a time, with a breadcrumb, and a search looks in every level.
+- A node can be an exception for a category or a course, and everything inside it: the nearest one to the page wins.
+- Each category and course changes its navigations on its own page, Navigation, in its menu, for whoever manages the navigation of the site or holds the new capability local/extendednav:managecontext there (managers by default). The site administration lists every exception, page by page, in Exceptions of categories and courses.
+- The menu Export offers this navigation or every navigation in one file. Both have one format, which the import reads: the navigations and whether each one is on, the exceptions of categories and courses (`scope`), the nodes of Moodle (`native`), and the fields `placement` and `hideadmins`. A node of Moodle that the site does not have is left out with a warning.
+- The form of a node is in sections (the node, its look, who sees it, where it goes) and asks only what applies to the navigation.
+- The activity log in the design system: the navigations in a column, a search by node key or person, a menu of the actions with their counts, a menu of the date with presets, the newest changes first, and the same list and pager, without reloading the page.
+- The nodes of each navigation are found when a page shows them, once per node, so listing them adds no page build, no query when nothing is customised and no measurable time to a page.
 
 ## [1.0.0-m503] - 2026-10-19
 

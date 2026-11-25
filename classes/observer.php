@@ -16,17 +16,14 @@
 
 namespace local_extendednav;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_repository;
-use local_extendednav\menu\base;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\repository;
 
 /**
- * Event observers and the synchronisation with Moodle's custom menu settings.
- *
- * Items of the custom menu items and user menu items settings are imported as
- * nodes, so they can be managed together with the core nodes. Deleting such a
- * node removes its line from the setting.
+ * Event observers. They stay light: a change of a menu setting of Moodle queues its import (see
+ * \local_extendednav\local\support\menu_config), a deleted role leaves the nodes restricted to it, and a deleted user takes
+ * their own preferences with them.
  *
  * @package    local_extendednav
  * @copyright  2026 Didactika.org
@@ -34,25 +31,25 @@ use local_extendednav\menu\base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observer {
-    /** @var bool Set while the plugin writes a setting itself, to ignore its own changes. */
-    private static bool $issyncing = false;
-
     /**
      * Imports a custom menu setting again when an administrator changes it.
      *
      * @param \core\event\config_log_created $event The event.
      */
     public static function config_log_created(\core\event\config_log_created $event): void {
-        if (self::$issyncing) {
+        if (\local_extendednav\local\support\menu_config::$issyncing) {
             return;
         }
         $plugin = $event->other['plugin'] ?? '';
         if (!empty($plugin) && $plugin !== 'core') {
             return;
         }
-        $menu = menu_manager::get_menu_by_config($event->other['name'] ?? '');
-        if ($menu !== null) {
-            $menu->sync_from_config();
+        // The import runs in a task, once for each setting however many times it is saved meanwhile: the observer stays light.
+        $name = (string)($event->other['name'] ?? '');
+        if (menu_manager::get_menu_by_config($name) !== null) {
+            $task = new \local_extendednav\task\sync_custom_menu();
+            $task->set_custom_data(['name' => $name]);
+            \core\task\manager::queue_adhoc_task($task, true);
         }
     }
 
@@ -75,256 +72,26 @@ class observer {
             ['shortname' => '%' . $DB->sql_like_escape($shortname) . '%']
         );
         foreach ($records as $record) {
-            $roles = node_access::split_list($record->roles);
+            $roles = access::split_list($record->roles);
             if (!in_array($shortname, $roles, true)) {
                 continue;
             }
             $roles = array_values(array_diff($roles, [$shortname]));
-            node_manager::update((object)['id' => $record->id, 'roles' => empty($roles) ? null : implode(',', $roles)]);
+            manager::update((object)['id' => $record->id, 'roles' => empty($roles) ? null : implode(',', $roles)]);
         }
     }
 
     /**
-     * Returns the hash of the current value of a Moodle menu setting.
+     * Forgets how a deleted user arranged their own preferences.
      *
-     * @param string $configname Setting name.
-     * @return string
+     * @param \core\event\user_deleted $event The event.
      */
-    public static function get_config_hash(string $configname): string {
-        return sha1(self::read_config($configname));
-    }
-
-    /**
-     * Imports the lines of a menu's Moodle setting as nodes.
-     *
-     * Lines are matched to existing nodes by key, then by URL, then by title and URL,
-     * so editing a line updates its node instead of creating another one. Nodes whose
-     * line was removed are deleted. Core nodes only store a title or URL that differs
-     * from the core one, so they keep following Moodle.
-     *
-     * @param base $menu The menu.
-     * @param bool $events Whether to trigger node events.
-     */
-    public static function sync_custom_menu(base $menu, bool $events = true): void {
+    public static function user_deleted(\core\event\user_deleted $event): void {
         global $DB;
 
-        $configname = $menu->get_config_name();
-        $prefix = $menu->get_config_prefix();
-        $natives = $menu->get_native_nodes();
-        $text = self::read_config($configname);
-
-        $existing = $DB->get_records('local_extendednav', ['menu' => $menu->get_key()], 'sortorder ASC, id ASC');
-        $matched = [];
-        $seenkeys = [];
-        $depthkeys = [];
-
-        foreach (self::parse_lines($text) as $linenumber => $line) {
-            $rawtext = $line;
-            preg_match('/^(-*)/', $rawtext, $match);
-            $depth = strlen($match[1] ?? '');
-            $item = $menu->parse_config_line(ltrim($rawtext, '-'));
-            if ($item['text'] === '' || strpos($item['text'], '###') === 0) {
-                continue;
-            }
-
-            $nodekey = base::make_key($prefix, $item['text']);
-            if ($nodekey === $prefix) {
-                $nodekey = $prefix . 'item' . $linenumber;
-            }
-            $basekey = $nodekey;
-            for ($count = 1; isset($seenkeys[$nodekey]); $count++) {
-                $nodekey = $basekey . $count;
-            }
-            $seenkeys[$nodekey] = true;
-
-            $parentkey = ($depth > 0 && isset($depthkeys[$depth - 1])) ? $depthkeys[$depth - 1] : null;
-            $depthkeys = array_slice($depthkeys, 0, $depth, true);
-            $depthkeys[$depth] = $nodekey;
-
-            $values = [
-                'title' => $item['text'],
-                'url' => $item['url'] !== '' ? $item['url'] : null,
-                'tooltip' => $item['tooltip'] !== '' ? $item['tooltip'] : null,
-                'langs' => $item['langs'] !== '' ? implode(',', node_access::split_list($item['langs'])) : null,
-                'parentkey' => $parentkey,
-            ];
-            if (isset($natives[$nodekey])) {
-                if ($values['title'] === $natives[$nodekey]->text) {
-                    $values['title'] = null;
-                }
-                if ($values['url'] === $natives[$nodekey]->action) {
-                    $values['url'] = null;
-                }
-            }
-
-            $record = self::find_match($existing, $matched, $nodekey, $prefix, $item);
-            if ($record !== null) {
-                $matched[$record->id] = true;
-                $changes = ['id' => $record->id];
-                foreach ($values as $field => $value) {
-                    if ($record->$field !== $value) {
-                        $changes[$field] = $value;
-                    }
-                }
-                if (count($changes) > 1) {
-                    node_manager::update((object)$changes, $events);
-                }
-            } else {
-                $new = node_manager::prepare(['nodekey' => $nodekey, 'visibility' => 1] + $values, $menu->get_key());
-                $new = node_manager::create($new, $events);
-                $matched[$new->id] = true;
-            }
+        if ($DB->record_exists('local_extendednav', ['contextid' => $event->contextid])) {
+            $DB->delete_records('local_extendednav', ['contextid' => $event->contextid]);
+            repository::purge();
         }
-
-        // Delete the nodes whose line was removed from the setting (never core nodes).
-        $removed = [];
-        foreach ($existing as $record) {
-            if (
-                !isset($matched[$record->id]) && strpos($record->nodekey, $prefix) === 0
-                    && !isset($natives[$record->nodekey])
-            ) {
-                $removed[] = $record;
-            }
-        }
-        node_manager::delete($removed, $events, false);
-
-        set_config('confighash_' . $configname, sha1($text), 'local_extendednav');
-        node_repository::purge();
-    }
-
-    /**
-     * Removes the lines of deleted nodes from a menu's Moodle setting.
-     *
-     * @param base $menu The menu.
-     * @param \stdClass[] $records Deleted records.
-     */
-    public static function remove_from_config(base $menu, array $records): void {
-        global $CFG;
-
-        $configname = $menu->get_config_name();
-        $prefix = $menu->get_config_prefix();
-        $text = self::read_config($configname);
-        if (trim($text) === '' || empty($records)) {
-            return;
-        }
-
-        $deletedkeys = [];
-        foreach ($records as $record) {
-            $deletedkeys[$record->nodekey] = $record;
-        }
-
-        $kept = [];
-        $seenkeys = [];
-        $changed = false;
-        foreach (explode("\n", $text) as $linenumber => $line) {
-            $trimmed = trim($line);
-            $item = $trimmed === '' ? null : $menu->parse_config_line(ltrim($trimmed, '-'));
-            if ($item === null || $item['text'] === '' || strpos($item['text'], '###') === 0) {
-                $kept[] = $line;
-                continue;
-            }
-
-            $nodekey = base::make_key($prefix, $item['text']);
-            if ($nodekey === $prefix) {
-                $nodekey = $prefix . 'item' . $linenumber;
-            }
-            $basekey = $nodekey;
-            for ($count = 1; isset($seenkeys[$nodekey]); $count++) {
-                $nodekey = $basekey . $count;
-            }
-            $seenkeys[$nodekey] = true;
-
-            if (isset($deletedkeys[$nodekey])) {
-                $changed = true;
-            } else {
-                $kept[] = $line;
-            }
-        }
-
-        if ($changed) {
-            $newtext = implode("\n", $kept);
-            self::$issyncing = true;
-            try {
-                set_config($configname, $newtext);
-                $CFG->{$configname} = $newtext;
-                set_config('confighash_' . $configname, sha1($newtext), 'local_extendednav');
-            } finally {
-                self::$issyncing = false;
-            }
-        }
-    }
-
-    /**
-     * Reads a Moodle menu setting with normalised line endings.
-     *
-     * The value is read from the database, because the plugin empties the copy in
-     * $CFG while a page is printed.
-     *
-     * @param string $configname Setting name.
-     * @return string
-     */
-    private static function read_config(string $configname): string {
-        global $DB;
-
-        $value = $DB->get_field('config', 'value', ['name' => $configname]);
-        return str_replace(["\r\n", "\r"], "\n", (string)$value);
-    }
-
-    /**
-     * Returns the non-empty, trimmed lines of a setting, keyed by line number.
-     *
-     * @param string $text Setting value.
-     * @return string[]
-     */
-    private static function parse_lines(string $text): array {
-        $lines = [];
-        foreach (explode("\n", $text) as $number => $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                $lines[$number] = $line;
-            }
-        }
-        return $lines;
-    }
-
-    /**
-     * Finds the node a line corresponds to.
-     *
-     * @param \stdClass[] $existing Nodes of the menu.
-     * @param array $matched Ids already matched to another line.
-     * @param string $nodekey Key built from the line.
-     * @param string $prefix Key prefix of the menu.
-     * @param array $item Parsed line.
-     * @return \stdClass|null
-     */
-    private static function find_match(
-        array $existing,
-        array $matched,
-        string $nodekey,
-        string $prefix,
-        array $item
-    ): ?\stdClass {
-        foreach ($existing as $record) {
-            if (!isset($matched[$record->id]) && $record->nodekey === $nodekey) {
-                return $record;
-            }
-        }
-        if ($item['url'] !== '') {
-            foreach ($existing as $record) {
-                if (
-                    !isset($matched[$record->id]) && strpos($record->nodekey, $prefix) === 0
-                        && $record->url === $item['url']
-                ) {
-                    return $record;
-                }
-            }
-        }
-        foreach ($existing as $record) {
-            $sameurl = $item['url'] === '' ? empty($record->url) : $record->url === $item['url'];
-            if (!isset($matched[$record->id]) && $record->title === $item['text'] && $sameurl) {
-                return $record;
-            }
-        }
-        return null;
     }
 }

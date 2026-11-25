@@ -17,11 +17,11 @@
 namespace local_extendednav\menu;
 
 use local_extendednav\hooks;
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_display;
-use local_extendednav\local\node_icon;
-use local_extendednav\local\node_text;
-use local_extendednav\local\url_helper;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\display;
+use local_extendednav\local\node\icon;
+use local_extendednav\local\node\text;
+use local_extendednav\local\support\url_helper;
 
 /**
  * The primary navigation.
@@ -48,6 +48,15 @@ class primary extends base {
      */
     public function get_name(): string {
         return get_string('primary_nav', 'local_extendednav');
+    }
+
+    /**
+     * Returns the short name of the navigation, as the selects and the column of the navigations list it.
+     *
+     * @return string
+     */
+    public function get_short_name(): string {
+        return get_string('primary_short', 'local_extendednav');
     }
 
     /**
@@ -317,11 +326,15 @@ class primary extends base {
                     $existingnode->action = new \moodle_url($state->url);
                 }
                 $existingnode->text = $decoration . $existingnode->text . $marker;
-            } else if ($state->shown && $state->title !== '' && $state->url !== null && !$this->is_native($nodekey)) {
-                // A Moodle item that Moodle did not add (turned off in its settings) is never added by the plugin.
+            } else if (
+                $state->shown && $state->title !== '' && ($state->url !== null || isset($parents[$nodekey]))
+                && !$this->is_native($nodekey)
+            ) {
+                // A Moodle item that Moodle did not add (turned off in its settings) is never added by the plugin. A submenu has
+                // no URL of its own: it opens the items under it.
                 $existingnode = \navigation_node::create(
                     $decoration . format_string($state->title) . $marker,
-                    new \moodle_url($state->url),
+                    $state->url !== null ? new \moodle_url($state->url) : null,
                     \navigation_node::TYPE_SETTING,
                     null,
                     $nodekey,
@@ -391,10 +404,10 @@ class primary extends base {
 
         if ($needslabels) {
             // Moodle 5.3 prints the text of top-level items as plain text; the module shows the icon and marker again.
-            $PAGE->requires->js_call_amd('local_extendednav/primary_labels', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/primary_labels', 'init');
         }
         if ($needsscript) {
-            $PAGE->requires->js_call_amd('local_extendednav/link_display', 'init');
+            $PAGE->requires->js_call_amd('local_extendednav/menus/link_display', 'init');
         }
     }
 
@@ -449,15 +462,15 @@ class primary extends base {
      */
     private function build_state(\stdClass $cnode): \stdClass {
         $state = new \stdClass();
-        $state->shown = node_access::is_shown($cnode);
-        $state->title = node_text::get_title($cnode);
-        $state->tooltip = node_text::resolve($cnode->tooltip ?? '');
+        $state->shown = access::is_shown($cnode);
+        $state->title = text::get_title($cnode);
+        $state->tooltip = text::resolve($cnode->tooltip ?? '');
         $state->url = trim((string)($cnode->url ?? '')) === '' ? null : trim((string)$cnode->url);
         $state->icon = trim((string)($cnode->icon ?? ''));
         $state->parentkey = trim((string)($cnode->parentkey ?? '')) === '' ? null : trim((string)$cnode->parentkey);
-        $state->linkattributes = node_display::get_link_attributes($cnode);
+        $state->linkattributes = display::get_link_attributes($cnode);
 
-        if (node_access::is_protected($cnode)) {
+        if (access::is_protected($cnode)) {
             $state->parentkey = null;
         }
         if ($state->parentkey === 'siteadminnode') {
@@ -473,7 +486,7 @@ class primary extends base {
      * @return string HTML.
      */
     private function render_icon(string $icon): string {
-        $html = node_icon::render($icon);
+        $html = icon::render($icon);
         return $html === '' ? '' : $html . ' ';
     }
 }

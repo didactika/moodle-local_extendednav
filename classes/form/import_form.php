@@ -52,6 +52,24 @@ class import_form extends \moodleform {
         $mform->setDefault('conflict_action', 'skip');
         $mform->addHelpButton('conflict_action', 'conflict_handling', 'local_extendednav');
 
+        // From the site, the nodes of the file can go to some categories and courses instead of where the file says.
+        if (!empty($this->_customdata['sitewide'])) {
+            $mform->addElement('header', 'targetsheader', get_string('import_targets', 'local_extendednav'));
+            $mform->setExpanded('targetsheader', false);
+            $mform->addElement('static', 'targetsinfo', '', get_string('import_targets_desc', 'local_extendednav'));
+            $mform->addElement(
+                'autocomplete',
+                'targetcategories',
+                get_string('categories'),
+                \core_course_category::make_categories_list(),
+                ['multiple' => true]
+            );
+            $mform->addElement('course', 'targetcourses', get_string('courses'), [
+                'multiple' => true,
+                'includefrontpage' => false,
+            ]);
+        }
+
         $this->add_action_buttons(true, get_string('import', 'local_extendednav'));
     }
 }

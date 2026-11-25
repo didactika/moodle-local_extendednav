@@ -1,0 +1,35 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+left to right direction
+
+package "Moodle" {
+  [Hooks API]
+  [Navigation and Boost theme]
+  [Web services (AJAX)]
+  [Events and log]
+  [Capabilities]
+  [Settings (custommenuitems)]
+}
+package "local_extendednav" {
+  [Management pages]
+  [Hooks]
+  [Menus]
+  [Access guard]
+  [Node services]
+}
+database "Database" as db
+
+[Hooks API] --> [Hooks]
+[Hooks] --> [Menus]
+[Hooks] --> [Access guard]
+[Menus] --> [Navigation and Boost theme]
+[Management pages] --> [Node services]
+[Management pages] --> [Web services (AJAX)]
+[Management pages] --> [Capabilities]
+[Node services] --> [Events and log]
+[Node services] --> db
+[Menus] --> db
+[Menus] --> [Settings (custommenuitems)]
+
+@enduml

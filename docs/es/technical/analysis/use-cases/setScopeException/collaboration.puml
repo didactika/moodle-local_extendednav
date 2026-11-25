@@ -1,0 +1,22 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Página de gestión" as c0 <<boundary>>
+class "Servicio de ámbitos" as c1 <<control>>
+class "Repositorio de nodos" as c2 <<control>>
+class "Gestor de nodos" as c3 <<control>>
+class "Ámbito" as c4 <<entity>>
+class "Nodo" as c5 <<entity>>
+
+user --> c0 : 1: busca una categoría, un curso o una actividad
+c0 --> c1
+c1 --> c2
+c2 --> c3
+c3 --> c4
+c4 --> c5
+
+@enduml

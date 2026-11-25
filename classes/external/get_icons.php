@@ -21,7 +21,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\icon_catalogue;
+use local_extendednav\local\support\icon_catalogue;
 
 /**
  * Lists the icons of the icon picker. The list is the same for everyone, so the browser loads it once and searches it.

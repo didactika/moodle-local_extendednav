@@ -1,0 +1,14 @@
+@startsalt
+{
+  {+
+  <b>Forum navigation</b> | (On) | [+ Add node] | [Find items] | [Import] | [Export v]
+  }
+  {#
+  . | <b>Title</b> | <b>Visibility</b> | <b>URL</b> | .
+  [] | Settings | Visible to everyone | /course/modedit.php | [edit]
+  [] | Subscriptions | Visible to everyone | /mod/forum/subscribers.php | [edit]
+  [] | Reports | Visible to everyone | /mod/forum/report/summary/ | [edit]
+  }
+  "10 activities reviewed: 2 new items."
+}
+@endsalt

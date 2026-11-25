@@ -1,0 +1,35 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Management page" as manage <<boundary>>
+class "Item form" as form <<boundary>>
+class "Import page" as import <<boundary>>
+class "Restricted page" as restricted <<boundary>>
+class "Node manager" as manager <<control>>
+class "Node validator" as validator <<control>>
+class "Node importer" as importer <<control>>
+class "Hooks" as hooks <<control>>
+class "Menu" as menu <<control>>
+class "Node access" as access <<control>>
+class "Access guard" as guard <<control>>
+class "Node" as node <<entity>>
+
+manage --> form
+form --> validator
+form --> manager
+import --> importer
+importer --> validator
+manager --> node
+importer --> node
+hooks --> menu
+hooks --> guard
+menu --> access
+guard --> access
+guard --> restricted
+menu --> node
+guard --> node
+
+@enduml

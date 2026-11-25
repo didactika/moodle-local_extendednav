@@ -1,0 +1,20 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+skinparam responseMessageBelowArrow true
+
+actor "Administrador" as p0
+participant "manage.js" as p1
+participant "get_scopes / change_nodes" as p2
+participant "manager" as p3
+database "local_extendednav" as p4
+
+p0 -> p1 : actúa sobre la lista
+p1 -> p2 : función de servicio web
+p2 -> p3 : aplica las reglas
+p3 -> p4 : lee y escribe las filas
+p3 --> p2 : hecho
+p2 --> p1 : filas y cuentas
+p1 --> p0 : la lista dibujada de nuevo
+
+@enduml

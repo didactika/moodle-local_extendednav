@@ -1,0 +1,175 @@
+{
+  "name": "tour_node_name,local_extendednav",
+  "description": "tour_node_description,local_extendednav",
+  "pathmatch": "/local/extendednav/edit.php%",
+  "enabled": "1",
+  "sortorder": "0",
+  "endtourlabel": "",
+  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"showtourwhen\":1,\"filtervalues\":{\"accessdate\":{\"filter_accessdate\":\"tool_usertours_accountcreation\",\"filter_accessdate_range\":0,\"filter_accessdate_enabled\":\"0\"},\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\"form.mform [data-region=\\\"nodeformdata\\\"]\"]}}",
+  "displaystepnumbers": true,
+  "version": "2024100700",
+  "steps": [
+    {
+      "title": "tour_node_step1_title,local_extendednav",
+      "content": "tour_node_step1_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "0"
+    },
+    {
+      "title": "tour_node_step2_title,local_extendednav",
+      "content": "tour_node_step2_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_treetype",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "1"
+    },
+    {
+      "title": "tour_node_step3_title,local_extendednav",
+      "content": "tour_node_step3_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_nodekey",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "2"
+    },
+    {
+      "title": "tour_node_step4_title,local_extendednav",
+      "content": "tour_node_step4_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_title",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "3"
+    },
+    {
+      "title": "tour_node_step5_title,local_extendednav",
+      "content": "tour_node_step5_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_url",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "4"
+    },
+    {
+      "title": "tour_node_step6_title,local_extendednav",
+      "content": "tour_node_step6_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_iconpicker",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "5"
+    },
+    {
+      "title": "tour_node_step7_title,local_extendednav",
+      "content": "tour_node_step7_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_tooltip",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "6"
+    },
+    {
+      "title": "tour_node_step8_title,local_extendednav",
+      "content": "tour_node_step8_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_display",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "7"
+    },
+    {
+      "title": "tour_node_step9_title,local_extendednav",
+      "content": "tour_node_step9_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_visibility",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "8"
+    },
+    {
+      "title": "tour_node_step10_title,local_extendednav",
+      "content": "tour_node_step10_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_roles",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "9"
+    },
+    {
+      "title": "tour_node_step11_title,local_extendednav",
+      "content": "tour_node_step11_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_langs",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "10"
+    },
+    {
+      "title": "tour_node_step12_title,local_extendednav",
+      "content": "tour_node_step12_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_availabilityconditionsjson",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "11"
+    },
+    {
+      "title": "tour_node_step13_title,local_extendednav",
+      "content": "tour_node_step13_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_hideadmins",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "12"
+    },
+    {
+      "title": "tour_node_step14_title,local_extendednav",
+      "content": "tour_node_step14_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_blockaccess",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "13"
+    },
+    {
+      "title": "tour_node_step15_title,local_extendednav",
+      "content": "tour_node_step15_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_parentkey",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "14"
+    },
+    {
+      "title": "tour_node_step16_title,local_extendednav",
+      "content": "tour_node_step16_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_categoryparent",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "15"
+    },
+    {
+      "title": "tour_node_step17_title,local_extendednav",
+      "content": "tour_node_step17_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_placement",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "16"
+    },
+    {
+      "title": "tour_node_step18_title,local_extendednav",
+      "content": "tour_node_step18_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#id_submitbutton",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "17"
+    }
+  ]
+}

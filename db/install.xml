@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/extendednav/db" VERSION="20261014" COMMENT="XMLDB file for Moodle local/extendednav"
+<XMLDB PATH="local/extendednav/db" VERSION="20261125" COMMENT="XMLDB file for Moodle local/extendednav"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_extendednav" COMMENT="Navigation nodes added to, or overriding, the primary navigation and the user menu">
+    <TABLE NAME="local_extendednav" COMMENT="Navigation nodes added to, or overriding, the navigations of Moodle: primary, user menu, course, activity, category and site administration">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="menu" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="primary" SEQUENCE="false" COMMENT="Menu the node belongs to (primary or usermenu)"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Context the node applies to: 0 for the whole site, or a category or a course, and everything inside it, as an exception"/>
         <FIELD NAME="nodekey" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Unique key of the node within its menu. Core nodes use their core key"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Display text. Empty on a core node means the core string is used"/>
         <FIELD NAME="tooltip" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Title attribute of the link"/>
@@ -21,6 +22,9 @@
         <FIELD NAME="display" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="How the link opens: 0 = current window, 1 = new window, 2 = pop-up"/>
         <FIELD NAME="popupwidth" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Width of the pop-up window in pixels, when display is 2"/>
         <FIELD NAME="popupheight" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Height of the pop-up window in pixels, when display is 2"/>
+        <FIELD NAME="placement" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Where a secondary navigation node goes: 0 = where Moodle puts it, 1 = always in the More menu, 2 = never in the More menu"/>
+        <FIELD NAME="hideadmins" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 to hide the node from site administrators too. By default an administrator sees every node"/>
+        <FIELD NAME="availability" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Conditions of the node as Moodle's Restrict access writes them (JSON), or null when it has none"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -29,7 +33,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="menu_nodekey" UNIQUE="true" FIELDS="menu, nodekey"/>
+        <INDEX NAME="menu_nodekey_context" UNIQUE="true" FIELDS="menu, nodekey, contextid"/>
+        <INDEX NAME="menu_context" UNIQUE="false" FIELDS="menu, contextid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

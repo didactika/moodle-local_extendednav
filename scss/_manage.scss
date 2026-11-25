@@ -1,0 +1,239 @@
+// This file is part of Moodle - https://moodle.org/
+// Moodle is free software under the GNU General Public License, version 3 or later.
+
+// The management page: the navigations to the left, a select on a narrow screen, and the list to the right.
+// @copyright 2026 Didactika.org
+// @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+.len [data-region="layout"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+
+    @media (min-width: 992px) {
+        align-items: start;
+
+        &:not([data-compact]) {
+            grid-template-columns: 15rem minmax(0, 1fr);
+        }
+    }
+
+    // A page of few navigations chooses them with a select, never as wide as the page.
+    &[data-compact] [data-region="originselect"] {
+        max-width: 20rem;
+    }
+
+    & > [data-region="origin"] {
+        min-width: 0;
+    }
+
+    // The column of the navigations: a card with flush lists, the icon of each navigation tinted as its text, and the one open
+    // tinted with a line of the primary colour on its side, drawn as a shadow so the text never moves.
+    & [data-region="origins"] .list-group-item {
+        padding: 0.5rem 1rem;
+        border-color: var(--dd-hairline);
+        color: var(--dd-ink);
+
+        & .icon {
+            margin-right: 0;
+            color: var(--dd-muted);
+        }
+
+        &.active {
+            border-color: var(--dd-hairline);
+            background-color: var(--dd-primary-soft);
+            box-shadow: inset 3px 0 0 var(--dd-primary);
+            color: var(--dd-primary-ink);
+            font-weight: 600;
+
+            & .icon {
+                color: currentColor;
+            }
+        }
+    }
+
+    & [data-region="origins"] > .card {
+        overflow: hidden;
+    }
+}
+
+// The menu of the exports opens under its button, held by its right edge so it never leaves the page, and its texts wrap.
+.len [data-menu="export"] > .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 1060;
+    width: 20rem;
+    max-width: calc(100vw - 2rem);
+    margin-top: 2px;
+
+    & .dropdown-item {
+        display: block;
+        white-space: normal;
+    }
+}
+
+// The menu that chooses the scope opens under its button, over the list, and keeps its width.
+.len [data-menu="scope"] {
+    position: relative;
+
+    & > .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1060;
+        min-width: 18rem;
+        max-height: 20rem;
+        margin-top: 2px;
+        overflow: auto;
+    }
+}
+
+// The table takes the whole width of the list. The handle and the box to select a row are narrow, the actions take what their
+// buttons need, and the title, the visibility and the link share the rest.
+.len [data-region="tablewrap"] {
+    & table {
+        width: 100%;
+    }
+
+    & :is(th, td)[data-column="handle"],
+    & :is(th, td)[data-column="select"] {
+        width: 2.75rem;
+        padding-right: 0;
+    }
+
+    // The title takes what the other columns leave, at least 12rem, and a long one ends with an ellipsis.
+    & thead th[data-column="title"] {
+        min-width: 12rem;
+    }
+
+    & tbody th[data-column="title"] {
+        max-width: 0;
+    }
+
+    // On a narrow screen the handle is hidden (a touch screen does not drag) and the title gives up its width, so the actions
+    // of the row stay on the screen.
+    @media (max-width: 767.98px) {
+        &.table-responsive .table thead th[data-column="title"] {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+        }
+
+        &.table-responsive .table tbody th[data-column="title"] {
+            max-width: 0;
+        }
+    }
+
+    // A submenu item, or a node deep in the tree found by a search, starts further in.
+    @for $depth from 1 through 5 {
+        & [data-depth="#{$depth}"] {
+            padding-left: #{$depth * 1.25}rem;
+        }
+    }
+
+    & td[data-column="actions"] {
+        width: 1%;
+    }
+
+    // The link takes a share of the row and ends with an ellipsis, so a long one never pushes the actions out of the box.
+    & th[data-column="url"] {
+        width: 25%;
+    }
+
+    & td[data-column="url"] {
+        max-width: 0;
+    }
+
+    // The icon of a title has a slot of one width in every row, empty or not, so every title starts at one line.
+    & [data-region="nodeicon"] {
+        display: inline-flex;
+        flex: 0 0 1.25rem;
+        justify-content: center;
+
+        & .icon {
+            margin: 0;
+        }
+    }
+
+    // A badge of the visibility is a button: it says its restriction under the pointer and opens the dialog of all of them.
+    & button.badge {
+        border: 0;
+        cursor: pointer;
+        transition: box-shadow var(--dd-ease);
+
+        &:hover {
+            box-shadow: 0 0 0 2px var(--dd-hairline);
+        }
+
+        &:focus:not(:focus-visible) {
+            outline: 0;
+            box-shadow: none;
+        }
+
+        &:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 3px var(--dd-ring);
+        }
+    }
+
+    // The handle moves a row: it is grabbed, and the row it is dropped on shows where it goes.
+    & [data-region="handle"] {
+        cursor: grab;
+        touch-action: none;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    & tr[data-drop="before"] > * {
+        box-shadow: inset 0 2px 0 var(--dd-primary);
+    }
+
+    & tr[data-drop="after"] > * {
+        box-shadow: inset 0 -2px 0 var(--dd-primary);
+    }
+}
+
+// The selects of the navigations, drawn as the menus of the toolbar of a list: a pill as tall as the search, as wide as what it
+// says. The select of the kinds of activity is tinted while the navigation shown is one of them.
+.len :is([data-region="origins"], [data-region="originbar"]) select:is(.form-select, .custom-select) {
+    width: auto;
+    min-width: 10rem;
+    max-width: 12rem;
+    min-height: var(--dd-h);
+    padding-left: 1rem;
+    padding-right: 2.5rem;
+    border-color: var(--dd-line);
+    border-radius: 999px;
+    background-color: var(--dd-surface);
+    color: var(--dd-ink);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color var(--dd-ease), box-shadow var(--dd-ease);
+
+    &:hover {
+        border-color: var(--dd-line-hover);
+    }
+
+    &:focus,
+    &[aria-expanded="true"] {
+        border-color: var(--dd-primary);
+        outline: 0;
+        box-shadow: 0 0 0 3px var(--dd-ring);
+    }
+
+    &.border-primary {
+        background-color: var(--dd-primary-soft);
+        color: var(--dd-primary-ink);
+        font-weight: 600;
+    }
+}
+
+// The fields a change touched, under the node of a row of the activity log: a link at the size of the text beside it.
+.len [data-region="tablewrap"] .btn[data-action="changes"] {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}

@@ -6,6 +6,7 @@ Feature: Edit navigation nodes
 
   Background:
     Given I log in as "admin"
+    And I change window size to "large"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
 
   @javascript
@@ -26,12 +27,14 @@ Feature: Edit navigation nodes
     And I should not see "Block URL access"
 
   @javascript
-  Scenario: The form explains that languages have no effect on hidden nodes
+  Scenario: A node that nobody sees asks for no language and no restriction
     When I follow "Add node"
-    And I set the field "Languages" to "English"
-    Then I should not see "This item is hidden from everyone"
+    Then I should see "Languages"
+    And I should see "Access restrictions"
     And I set the field "Visibility" to "Not visible"
-    And I should see "This item is hidden from everyone"
+    And I should not see "Languages"
+    And I should not see "Access restrictions"
+    And I should see "Hide from administrators too"
 
   @javascript
   Scenario: The pop-up size is only asked for pop-ups
@@ -61,21 +64,29 @@ Feature: Edit navigation nodes
     And I click on "FontAwesome" "button" in the "Choose an icon" "dialogue"
     And I set the field "Search icons" to "home"
     And I click on "[data-value='fa-house']" "css_element" in the "Choose an icon" "dialogue"
-    Then the field "Icon" matches value "fa-house"
-    And I click on "Choose icon" "button"
+    Then the "value" attribute of "input[name='icon']" "css_element" should contain "fa-house"
+    And I should see "fa-house" in the "[data-region='iconopen']" "css_element"
+    And I click on "[data-region='iconopen']" "css_element"
     And I click on "Moodle icons" "button" in the "Choose an icon" "dialogue"
     And I set the field "Search icons" to "i/home"
     And I click on "[data-value='core:i/home']" "css_element" in the "Choose an icon" "dialogue"
-    And the field "Icon" matches value "core:i/home"
-    And I click on "Clear" "button"
-    And the field "Icon" matches value ""
+    And the "value" attribute of "input[name='icon']" "css_element" should contain "core:i/home"
+    And I click on "[data-region='iconopen']" "css_element"
+    And I set the field "Search icons" to "fa-hippo"
+    And I click on "[data-value='fa-hippo']" "css_element" in the "Choose an icon" "dialogue"
+    And the "value" attribute of "input[name='icon']" "css_element" should contain "fa-hippo"
+    And I click on "Remove the icon" "button"
+    And I should see "Choose icon" in the "[data-region='iconopen']" "css_element"
+    And I should not see "Remove the icon"
 
+  @javascript
   Scenario: Site administration cannot be hidden
     When I click on "Edit" "link" in the "siteadminnode" "table_row"
     And I set the field "Visibility" to "Not visible"
     And I press "Save changes"
     Then I should see "Site administration cannot be hidden, restricted, blocked or limited to some languages."
 
+  @javascript
   Scenario: Every fallback page cannot be blocked for everyone
     Given the following "local_extendednav > nodes" exist:
       | nodekey | visibility | blockaccess |
@@ -105,23 +116,34 @@ Feature: Edit navigation nodes
     And I press "Save changes"
     Then I should see "This kind of URL is not allowed."
 
+  @javascript
   Scenario: Custom nodes can be deleted and core nodes cannot
     Given the following "local_extendednav > nodes" exist:
       | nodekey | title | url       |
       | help    | Help  | /help.php |
     And I reload the page
-    Then "Delete" "link" should exist in the "help" "table_row"
-    And "Delete" "link" should not exist in the "myhome" "table_row"
-    And I click on "Delete" "link" in the "help" "table_row"
-    And I should see "1 node(s) deleted."
-    And I should not see "help" in the "local-extendednav-manage" "table"
+    Then "Delete" "button" should exist in the "help" "table_row"
+    And "Delete" "button" should not exist in the "myhome" "table_row"
+    And I click on "Delete" "button" in the "help" "table_row"
+    And I click on "Delete" "button" in the "Delete Help?" "dialogue"
+    And I should see "1 changed"
+    And I should not see "help" in the "[data-region='tablewrap']" "css_element"
 
+  @javascript
   Scenario: Moodle items that Moodle no longer adds can be deleted
     Given the following config values are set as admin:
       | enabledashboard | 0 |
     And I reload the page
-    Then I should see "Currently unavailable" in the "myhome" "table_row"
-    And "Delete" "link" should not exist in the "siteadminnode" "table_row"
-    And I click on "Delete" "link" in the "myhome" "table_row"
-    And I should see "1 node(s) deleted."
-    And I should not see "myhome" in the "local-extendednav-manage" "table"
+    Then I should see "Unavailable" in the "myhome" "table_row"
+    And "Delete" "button" should not exist in the "siteadminnode" "table_row"
+    And I click on "Delete" "button" in the "myhome" "table_row"
+    And I click on "Delete" "button" in the "Delete myhome?" "dialogue"
+    And I should see "1 changed"
+    And I should not see "myhome" in the "[data-region='tablewrap']" "css_element"
+
+  @javascript
+  Scenario: A node of the site does not offer the conditions that need the activities of a course
+    When I follow "Add node"
+    And I click on "Add restriction..." "button"
+    Then "Date" "button" should exist in the "Add restriction..." "dialogue"
+    And "Grade" "button" should not exist in the "Add restriction..." "dialogue"

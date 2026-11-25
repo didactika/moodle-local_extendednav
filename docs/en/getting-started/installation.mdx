@@ -1,0 +1,27 @@
+---
+title: Installation
+summary: Requirements, and how to install the plugin from a release or from Git.
+order: 10
+---
+
+**Requirements:** Moodle 5.3, with the PHP version your Moodle release requires, and a theme based on Boost. Moodle 4.5 to 5.2 have a line of their own with the same features.
+
+| Moodle | Branch | Releases |
+|---|---|---|
+| 4.5 to 5.2 | `MOODLE_400_STABLE` | `X.Y.Z-m405` |
+| 5.3 | `main` | `X.Y.Z-m503` |
+
+<Tabs>
+  <TabItem label="From a release">
+    Download the latest release ZIP, go to **Site administration > Plugins > Install plugins**, upload the file and follow the prompts.
+  </TabItem>
+  <TabItem label="From Git">
+```bash
+cd /path/to/moodle
+git clone -b main https://github.com/didactika/moodle-local_extendednav.git public/local/extendednav
+php admin/cli/upgrade.php
+```
+  </TabItem>
+</Tabs>
+
+The installation creates one row for each of the items of Moodle and imports the items already defined in **Custom menu items** and **User menu items**. The next step is to [change a first item](page:getting-started/quick-start).

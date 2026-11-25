@@ -1,0 +1,11 @@
+@startsalt
+{
+  {* Navegación del curso, para un curso }
+  ==
+  {
+    Navegaciones | Se aplica a: ^Pedagogía digital 101^
+    "Buscar nodos" | ^Visibilidad^
+    Calificaciones | Excepción | No visible | [ Volver ]
+  }
+}
+@endsalt

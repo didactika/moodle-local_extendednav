@@ -1,0 +1,20 @@
+@startuml
+title UC-008 Find the items of the navigation of each kind of activity
+start
+:The task starts at night, or an administrator selects Find items;
+repeat :Take a kind of activity that is turned on;
+  if (The site has activities of the kind?) then (yes)
+    repeat :Take one of the most recent activities;
+      :Build its secondary navigation as its page would;
+      if (Built?) then (yes)
+        :Key each item (its key, or the path of its address);
+      else (no)
+        :Give no items;
+      endif
+    repeat while (More activities and time left?) is (yes)
+    :Record the items new to the navigation of the kind;
+  else (no)
+  endif
+repeat while (More kinds?) is (yes)
+stop
+@enduml

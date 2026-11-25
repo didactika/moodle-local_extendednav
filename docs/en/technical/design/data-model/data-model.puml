@@ -1,0 +1,31 @@
+@startuml
+!theme plain
+hide circle
+skinparam linetype polyline
+
+entity local_extendednav {
+  * id : int
+  --
+  nodekey : char
+  menu : char
+  contextid : int
+  parentkey : char
+  title : text
+  tooltip : text
+  url : text
+  icon : char
+  visibility : int
+  roles : text
+  blockaccess : bool
+  langs : text
+  display : int
+  popupwidth : int
+  popupheight : int
+  placement : int
+  hideadmins : bool
+  sortorder : int
+  timecreated : int
+  timemodified : int
+}
+
+@enduml

@@ -1,0 +1,53 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/list/empty
+
+    The empty state of a list: what is missing and what to do. After a search or a filter it offers to clear them; the first
+    time it says how the first rows appear.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "filtered": false,
+        "icon": "i/users",
+        "title": "No delegations yet",
+        "text": "Create delegations to let people open other accounts for a period.",
+        "sampleurl": ""
+    }
+}}
+<div class="d-flex flex-column align-items-center gap-2 px-4 py-5 text-center">
+    {{#filtered}}
+        <span class="icon-box">{{#pix}}a/search, core{{/pix}}</span>
+        <p class="fw-bold mb-0">{{#str}}empty_search_title, local_extendednav{{/str}}</p>
+        <p class="text-muted mb-0">{{#str}}empty_search_text, local_extendednav{{/str}}</p>
+        <button type="button" class="btn btn-outline-secondary" data-action="clearfilters">{{#str}}clear_filters, local_extendednav{{/str}}</button>
+    {{/filtered}}
+    {{^filtered}}
+        <span class="icon-box">{{#pix}}{{icon}}{{^icon}}i/users{{/icon}}, core{{/pix}}</span>
+        <p class="fw-bold mb-0">{{title}}</p>
+        <p class="text-muted mb-0">{{text}}</p>
+        {{#sampleurl}}
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                <button type="button" class="btn btn-primary" data-action="loadsample" data-url="{{sampleurl}}">{{#pix}}i/reload, core{{/pix}} {{#str}}find_nodes, local_extendednav{{/str}}</button>
+                <a class="btn btn-outline-secondary" href="{{sampleurl}}" target="_blank" rel="noopener">{{#pix}}i/externallink, core{{/pix}} {{#str}}open_sample_page, local_extendednav{{/str}}</a>
+            </div>
+        {{/sampleurl}}
+    {{/filtered}}
+</div>

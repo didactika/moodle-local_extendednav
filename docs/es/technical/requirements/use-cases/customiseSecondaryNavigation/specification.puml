@@ -1,0 +1,16 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "customiseSecondaryNavigation" as customiseSecondaryNavigation {
+  [*] --> Listado
+  state "Listado" as Listado : La lista muestra los nodos de la navegación
+  state "Cambiando" as Cambiando : Se está guardando un cambio
+  state "Fallido" as Fallido : Se muestra el error
+  Listado --> Cambiando
+  Cambiando --> Fallido
+  Fallido --> Listado
+}
+
+@enduml
