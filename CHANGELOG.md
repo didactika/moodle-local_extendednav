@@ -20,6 +20,8 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+## [2.0.0-m405] - 2026-11-25
+
 ### Added
 
 - Each kind of activity has a navigation of its own (forums, assignments, quizzes...), listed under Activities: the kinds the site uses first, the others folded under Other kinds. A task looks through the most recent activities of each kind every night, and Find items does it at once for one kind, so the items a plugin adds to some activities only can be changed before anyone opens one. The changes of the single navigation of the activities go to each kind that has the item when the site is upgraded.
