@@ -26,6 +26,7 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ### Fixed
 
+- Hiding a submenu, a section or an external link no longer offers Block the URL too, and the form of such a node no longer shows Block URL access: they have no address of the site to block. The rows of the list say whether a node can block its address (blockable).
 - Upgrading from the web from a version without the context of a node no longer stops with Field "contextid" does not exist: while the upgrade of the plugin is pending, its files newer than its database, the plugin changes nothing and reads none of its tables, so the page of the upgrade and the rest of the site show the navigation of Moodle until the upgrade ends.
 
 ## [2.0.0-m405] - 2026-11-25
