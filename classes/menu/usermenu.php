@@ -147,6 +147,7 @@ class usermenu extends base {
      */
     public function build_config_value(array $customnodes): string {
         $natives = $this->get_native_nodes();
+        $holders = self::holders($customnodes);
         $lines = [];
         foreach ($customnodes as $node) {
             if (!empty($node->parentkey) || !access::is_shown($node)) {
@@ -161,12 +162,42 @@ class usermenu extends base {
                 $title = $native ? $native->text : '';
             }
             $url = trim((string)$node->url) !== '' ? trim((string)$node->url) : ($native ? $native->action : '');
+            if ($url === '' && isset($holders[$node->nodekey])) {
+                $url = self::submenu_url($node->nodekey);
+            }
             if ($title === '' || $url === '') {
                 continue;
             }
             $lines[] = str_replace(["\r", "\n", '|'], ' ', $title) . '|' . $url;
         }
         return implode("\n", $lines);
+    }
+
+    /**
+     * Returns the keys of the nodes that hold others: the submenus.
+     *
+     * @param \stdClass[] $customnodes Nodes of this menu.
+     * @return bool[] By node key.
+     */
+    private static function holders(array $customnodes): array {
+        $holders = [];
+        foreach ($customnodes as $node) {
+            if (!empty($node->parentkey) && access::is_shown($node)) {
+                $holders[(string)$node->parentkey] = true;
+            }
+        }
+        return $holders;
+    }
+
+    /**
+     * Returns the URL a submenu without one of its own takes in the user menu of Moodle, which only lists items with a URL: one
+     * of its own, which the browser module finds and turns into the opener of the submenu.
+     *
+     * @param string $nodekey Key of the submenu.
+     * @return string
+     */
+    private static function submenu_url(string $nodekey): string {
+        return '/?extendednavmenu=' . rawurlencode($nodekey);
     }
 
     /**
@@ -198,7 +229,7 @@ class usermenu extends base {
             $tooltip = text::resolve($node->tooltip ?? '');
             $attributes = [
                 'data-region' => 'local-extendednav-node-fix',
-                'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null),
+                'data-url' => $this->get_absolute_url($node, $natives[$nodekey] ?? null, $haschildren),
                 'data-title' => strip_tags(format_string(text::get_title($node, $natives[$nodekey] ?? null))),
             ];
             // The user menu shows FontAwesome icons only, so Moodle icons are turned into theirs.
@@ -257,7 +288,7 @@ class usermenu extends base {
             $html .= \html_writer::tag('template', $output->render_from_template('local_extendednav/usermenu/panel', $context), [
                 'data-region' => 'local-extendednav-submenu',
                 'data-panel-id' => $context['panelid'],
-                'data-trigger-url' => $this->get_absolute_url($parent, $natives[$parentkey] ?? null),
+                'data-trigger-url' => $this->get_absolute_url($parent, $natives[$parentkey] ?? null, true),
                 'data-trigger-title' => $parenttitle,
             ]);
         }
@@ -271,10 +302,13 @@ class usermenu extends base {
      * @param \stdClass|null $native Core node definition, if any.
      * @return string Absolute URL, or an empty string.
      */
-    private function get_absolute_url(\stdClass $node, ?\stdClass $native): string {
+    private function get_absolute_url(\stdClass $node, ?\stdClass $native, bool $holder = false): string {
         $url = trim((string)($node->url ?? ''));
         if ($url === '' && $native !== null) {
             $url = (string)$native->action;
+        }
+        if ($url === '' && $holder) {
+            $url = self::submenu_url((string)$node->nodekey);
         }
         if ($url === '') {
             return '';
