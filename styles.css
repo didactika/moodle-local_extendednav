@@ -2429,8 +2429,9 @@
     align-items: center;
     gap: 0.25rem;
     min-width: 0;
-    height: 5.75rem;
+    height: 6.75rem;
     padding: 0.65rem 0.35rem 0.35rem;
+    overflow: hidden;
     border-color: transparent;
     background-color: transparent;
     line-height: 1.2;
@@ -2451,6 +2452,13 @@
     border-color: var(--dd-primary);
     background-color: var(--dd-primary-soft);
     color: var(--dd-primary-ink);
+}
+
+.path-local-extendednav .modal .btn[data-region=iconcell] > *,
+.path-admin-local-extendednav .modal .btn[data-region=iconcell] > *,
+#page-admin-setting-local_extendednav_settings .modal .btn[data-region=iconcell] > *,
+#page-local-extendednav-manage .modal .btn[data-region=iconcell] > * {
+    flex-shrink: 0;
 }
 
 .path-local-extendednav .modal [data-region=iconglyph],
@@ -2479,9 +2487,10 @@
 #page-admin-setting-local_extendednav_settings .modal [data-region=iconlabel],
 #page-local-extendednav-manage .modal [data-region=iconlabel] {
     display: -webkit-box;
-    max-width: 100%;
+    width: 100%;
     overflow: hidden;
     overflow-wrap: anywhere;
+    word-break: break-word;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
