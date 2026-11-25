@@ -229,7 +229,8 @@ class nodes {
             'details' => [], 'flags' => [], 'id' => 0, 'nodekey' => admintree::GENERAL, 'title' => $title, 'native' => true,
             'url' => '', 'icon' => '', 'visibility' => access::VISIBILITY_ALL, 'visibilitylabel' => '',
             'visibilitydetail' => '', 'tone' => 'secondary',
-            'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
+            'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'blockable' => false,
+            'unavailable' => false,
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
             'exception' => false, 'inherited' => false, 'scopenote' => '', 'candelete' => false, 'canhide' => false,
             'canshow' => false,
@@ -425,6 +426,8 @@ class nodes {
             'parentkey' => (string)($node->parentkey ?? ''),
             'child' => !empty($node->parentkey),
             'blocked' => !empty($node->blockaccess) && $visibility !== access::VISIBILITY_ALL,
+            // Only a node with an address of the site can block it: a submenu, a section or an external link has none.
+            'blockable' => !empty(\local_extendednav\local\navigation\access_guard::get_node_paths($node)),
             // A node of Moodle that Moodle does not add right now, for example because it is turned off.
             'unavailable' => $menu instanceof \local_extendednav\menu\primary && $native !== null
                 && !$menu->is_shown_by_moodle($node->nodekey),

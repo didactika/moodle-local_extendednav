@@ -159,6 +159,7 @@ abstract class node_service extends external_api {
             'parentkey' => $text('Key of the parent node.'),
             'child' => $flag('Whether the node is a submenu item.'),
             'blocked' => $flag('Whether its address is blocked to who does not see it.'),
+            'blockable' => $flag('Whether it has an address of the site that hiding it can block.'),
             'unavailable' => $flag('Whether Moodle does not add the node now.'),
             'unknownroles' => $text('Roles of the node that no longer exist.'),
             'adminonly' => $flag('Whether the current user sees it only for being an administrator.'),

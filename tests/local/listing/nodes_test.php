@@ -63,6 +63,28 @@ final class nodes_test extends \advanced_testcase {
     }
 
     /**
+     * Only a node with an address of the site can block it: a submenu and an external link cannot.
+     */
+    public function test_which_nodes_can_block_their_address(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        // From Moodle 5.3 the Home item is only added when this setting is on; earlier versions ignore it.
+        set_config('enablemyhome', 1);
+        $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
+        $generator->create_node(['nodekey' => 'library', 'title' => 'Library', 'url' => '/library.php']);
+        $generator->create_node(['nodekey' => 'resources', 'title' => 'Resources', 'url' => '']);
+        $generator->create_node(['nodekey' => 'outside', 'title' => 'Outside', 'url' => 'https://example.com/']);
+
+        $rows = array_column(nodes::get('primary', 0)['rows'], 'blockable', 'nodekey');
+
+        $this->assertTrue($rows['library']);
+        $this->assertFalse($rows['resources'], 'A submenu has no address to block.');
+        $this->assertFalse($rows['outside'], 'An external link blocks no page of the site.');
+        $this->assertArrayHasKey('myhome', $rows);
+        $this->assertTrue($rows['myhome'], 'A node of Moodle blocks the address Moodle gives it.');
+    }
+
+    /**
      * The list is filtered by the search and by the visibility, and counts every visibility.
      */
     public function test_the_list_filters_and_counts(): void {

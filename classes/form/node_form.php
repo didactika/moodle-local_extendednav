@@ -236,12 +236,21 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', access::VISIBILITY_ROLES);
 
-        // The pages of the administration are never blocked: Moodle checks their capabilities.
-        if (!$istree) {
+        // The pages of the administration are never blocked: Moodle checks their capabilities. Only a node with an address of the
+        // site can block it: a submenu or a section has none, and neither has an item of the preferences whose address is not
+        // typed here and that Moodle draws without one.
+        $fixedurl = $isprefs && ($isnative || self::is_section($menu, $current));
+        $blockable = !$fixedurl
+            || ($current !== null && !empty(access_guard::get_node_paths((object)((array)$current + ['menu' => $menukey]))));
+        if (!$istree && $blockable) {
             $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
             $mform->setDefault('blockaccess', 1);
             $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
             $mform->hideIf('blockaccess', 'visibility', 'eq', access::VISIBILITY_ALL);
+            if ($mform->elementExists('treetype')) {
+                // A submenu or a section keeps no address.
+                $mform->hideIf('blockaccess', 'treetype', 'neq', 'page');
+            }
         }
 
         $mform->addElement(
