@@ -28,6 +28,7 @@ use local_extendednav\local\node\manager;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\observer
+ * @covers     \local_extendednav\local\support\menu_config
  */
 final class observer_test extends \advanced_testcase {
     /**

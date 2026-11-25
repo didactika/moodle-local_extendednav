@@ -77,9 +77,12 @@ class node_form extends \moodleform {
         // The node: what it is called and where it leads.
         $mform->addElement('header', 'nodeheader', get_string('form_section_node', 'local_extendednav'));
         $mform->setExpanded('nodeheader', true);
-        // The notice of a node of Moodle opens the section, so it is read before any field; the script shows it.
+        // The notice of a node of Moodle opens the section, so it is read before any field; the script shows it. It speaks of
+        // the address only where it can be changed: not in a page of the site administration nor in the preferences.
+        $urlless = $istreepage || ($menu instanceof \local_extendednav\menu\preferences && $isnative)
+            || in_array('url', $this->_customdata['locked'] ?? [], true);
         $mform->addElement('html', \html_writer::div(
-            get_string('coreoverridealert', 'local_extendednav'),
+            get_string($urlless ? 'coreoverridealert_title' : 'coreoverridealert', 'local_extendednav'),
             'alert alert-info',
             ['id' => 'core_node_alert', 'hidden' => 'hidden']
         ));
@@ -144,8 +147,9 @@ class node_form extends \moodleform {
         $mform->setType('title', PARAM_TEXT);
         $mform->addHelpButton('title', 'title', 'local_extendednav');
 
-        if ($isprefs && self::is_section($menu, $current)) {
-            // A section of the page Preferences is no link: it holds options, and has no address.
+        if ($isprefs && ($isnative || self::is_section($menu, $current))) {
+            // A section of the page Preferences is no link: it holds options, and has no address. An item of Moodle keeps the
+            // address Moodle gives it.
             $mform->addElement('hidden', 'url', '');
             $mform->setType('url', PARAM_TEXT);
         } else if ($istreepage) {
@@ -176,15 +180,18 @@ class node_form extends \moodleform {
         if (!$istree && !$isprefs) {
             $mform->addElement('header', 'lookheader', get_string('form_section_look', 'local_extendednav'));
             $mform->setExpanded('lookheader', true);
-            // The icon is chosen from a list, never typed: the value goes in a hidden field and the picker shows it.
-            $mform->addElement('hidden', 'icon');
-            $mform->setType('icon', PARAM_TEXT);
-            $mform->addElement('static', 'iconpicker', get_string('icon', 'local_extendednav'), \html_writer::div('', '', [
-                'data-region' => 'iconfield',
-                'data-native' => $isnative ? '1' : '0',
-            ]));
-            $mform->addHelpButton('iconpicker', 'icon', 'local_extendednav');
-            $PAGE->requires->js_call_amd('local_extendednav/form/icon_picker', 'init', ['icon']);
+            // The icon is chosen from a list, never typed: the value goes in a hidden field and the picker shows it. Only the
+            // primary navigation and the user menu draw icons; the secondary navigations of Moodle have none.
+            if (!$issecondary) {
+                $mform->addElement('hidden', 'icon');
+                $mform->setType('icon', PARAM_TEXT);
+                $mform->addElement('static', 'iconpicker', get_string('icon', 'local_extendednav'), \html_writer::div('', '', [
+                    'data-region' => 'iconfield',
+                    'data-native' => $isnative ? '1' : '0',
+                ]));
+                $mform->addHelpButton('iconpicker', 'icon', 'local_extendednav');
+                $PAGE->requires->js_call_amd('local_extendednav/form/icon_picker', 'init', ['icon']);
+            }
 
             $mform->addElement('text', 'tooltip', get_string('tooltip', 'local_extendednav'), ['size' => 40, 'maxlength' => 255]);
             $mform->setType('tooltip', PARAM_TEXT);

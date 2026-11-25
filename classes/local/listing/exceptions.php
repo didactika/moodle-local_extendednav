@@ -75,7 +75,7 @@ final class exceptions {
 
         $perpage = min(max($perpage, 1), self::MAX_PAGE_SIZE);
         $records = $DB->get_records_sql(
-            "SELECT n.contextid, ctx.contextlevel, ctx.instanceid, COUNT(1) AS total
+            "SELECT n.contextid, ctx.contextlevel, ctx.instanceid, ctx.path, COUNT(1) AS total
                FROM $from
               WHERE $where
            GROUP BY n.contextid, ctx.contextlevel, ctx.instanceid, ctx.path
@@ -103,6 +103,30 @@ final class exceptions {
             $counted->close();
         }
 
+        // The contexts of the page and the ones around them, their courses and their categories, read at once for the page.
+        $ids = [];
+        foreach ($records as $record) {
+            $ids[] = (int)$record->contextid;
+            $path = array_filter(explode('/', (string)$record->path));
+            array_push($ids, ...array_map('intval', $path));
+        }
+        $ids = array_values(array_unique($ids));
+        $courseids = [];
+        $categoryids = [];
+        if ($ids) {
+            \context_helper::preload_contexts_by_id($ids);
+            foreach ($ids as $id) {
+                $context = \context::instance_by_id($id, IGNORE_MISSING);
+                if ($context instanceof \context_course) {
+                    $courseids[] = (int)$context->instanceid;
+                } else if ($context instanceof \context_coursecat) {
+                    $categoryids[] = (int)$context->instanceid;
+                }
+            }
+        }
+        $courses = $courseids ? $DB->get_records_list('course', 'id', $courseids, '', 'id, fullname') : [];
+        $categories = $categoryids ? \core_course_category::get_many($categoryids) : [];
+
         $rows = [];
         foreach ($records as $record) {
             $scope = context_scope::from_id((int)$record->contextid);
@@ -123,7 +147,7 @@ final class exceptions {
             $rows[] = [
                 'contextid' => (int)$record->contextid,
                 'name' => $scope->name(),
-                'path' => self::path_of($scope->context()),
+                'path' => self::path_of($scope->context(), $courses, $categories),
                 'kind' => $scope->kind(),
                 'icon' => $scope->is_activity() ? 'monologo' : ($scope->is_course() ? 'i/course' : 'i/withsubcat'),
                 'component' => $scope->is_activity() ? 'mod_' . $scope->cm()->modname : 'core',
@@ -161,18 +185,17 @@ final class exceptions {
      * The categories around a context, from the top, and the course of an activity, for the line under its name.
      *
      * @param \context $context A category, a course or an activity.
+     * @param \stdClass[] $courses The courses of the page, by id.
+     * @param \core_course_category[] $categories The categories of the page, by id.
      * @return string
      */
-    private static function path_of(\context $context): string {
+    private static function path_of(\context $context, array $courses, array $categories): string {
         $names = [];
         foreach ($context->get_parent_contexts() as $parent) {
-            if ($parent->contextlevel === CONTEXT_COURSE) {
-                $names[] = format_string(get_course($parent->instanceid)->fullname, true, ['context' => $parent]);
-            } else if ($parent->contextlevel === CONTEXT_COURSECAT) {
-                $category = \core_course_category::get($parent->instanceid, IGNORE_MISSING, true);
-                if ($category) {
-                    array_unshift($names, $category->get_formatted_name());
-                }
+            if ($parent->contextlevel === CONTEXT_COURSE && isset($courses[$parent->instanceid])) {
+                $names[] = format_string($courses[$parent->instanceid]->fullname, true, ['context' => $parent]);
+            } else if ($parent->contextlevel === CONTEXT_COURSECAT && isset($categories[$parent->instanceid])) {
+                array_unshift($names, $categories[$parent->instanceid]->get_formatted_name());
             }
         }
         return implode(' / ', $names);

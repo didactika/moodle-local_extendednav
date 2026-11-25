@@ -82,7 +82,8 @@ class activity extends secondary {
 
         if (self::$types === null) {
             $types = [];
-            foreach ($DB->get_fieldset_select('modules', 'name', 'visible = 1') as $modname) {
+            $modnames = $DB->get_fieldset_select('modules', 'name', 'visible = 1');
+            foreach ($modnames as $modname) {
                 if (\core_component::get_component_directory('mod_' . $modname) !== null) {
                     $types[$modname] = get_string('modulename', 'mod_' . $modname);
                 }

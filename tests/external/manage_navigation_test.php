@@ -88,7 +88,7 @@ final class manage_navigation_test extends \advanced_testcase {
         $this->assertSame(0, (int)repository::get_exceptions('preferences', $contextid)[$saved['id']]->visibility);
 
         $this->expectException(\invalid_parameter_exception::class);
-        manage_navigation::save_node('preferences', $contextid, 'forumpreferences', ['title' => 'Mine']);
+        manage_navigation::save_node('preferences', $contextid, 'forumpreferences', ['url' => '/elsewhere.php']);
     }
 
     /**

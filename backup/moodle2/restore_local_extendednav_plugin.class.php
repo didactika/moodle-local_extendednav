@@ -22,8 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_local_extendednav_plugin extends restore_local_plugin {
-    /** @var int[] Nodes restored, whose conditions on grades and completion wait for the activities to be restored. */
+    /** @var \stdClass[] Nodes read from the backup, saved together once their conditions point to what was restored. */
     private array $restored = [];
+
+    /** @var array Keys the restored contexts already set, as "context|menu|nodekey", read once for each context. */
+    private array $existing = [];
 
     /**
      * Reads the nodes of the course from its backup.
@@ -73,14 +76,22 @@ class restore_local_extendednav_plugin extends restore_local_plugin {
         unset($data->id);
         $data->contextid = $contextid;
         $data->availability = $this->restore_conditions($data->availability ?? null);
+        // What the context already sets, when the backup goes into an existing course, read once for the context.
+        if (!isset($this->existing[$contextid])) {
+            $this->existing[$contextid] = [];
+            $rows = $DB->get_recordset('local_extendednav', ['contextid' => $contextid], '', 'id, menu, nodekey');
+            foreach ($rows as $row) {
+                $this->existing[$contextid][$row->menu . '|' . $row->nodekey] = true;
+            }
+            $rows->close();
+        }
         foreach ($this->menus_for($data) as $menu) {
-            $data->menu = $menu;
-            $same = ['menu' => $menu, 'nodekey' => $data->nodekey, 'contextid' => $contextid];
-            if (!$DB->record_exists('local_extendednav', $same)) {
-                $this->restored[] = (int)$DB->insert_record('local_extendednav', $data);
+            $key = $menu . '|' . $data->nodekey;
+            if (!isset($this->existing[$contextid][$key])) {
+                $this->existing[$contextid][$key] = true;
+                $this->restored[] = (object)(['menu' => $menu] + (array)$data);
             }
         }
-        \local_extendednav\local\node\repository::purge();
     }
 
     /**
@@ -142,9 +153,8 @@ class restore_local_extendednav_plugin extends restore_local_plugin {
     private function map_activity_conditions(): void {
         global $DB;
 
-        foreach ($this->restored as $id) {
-            $availability = $DB->get_field('local_extendednav', 'availability', ['id' => $id]);
-            $tree = $availability ? json_decode($availability) : null;
+        foreach ($this->restored as $record) {
+            $tree = !empty($record->availability) ? json_decode($record->availability) : null;
             if (!$tree) {
                 continue;
             }
@@ -165,7 +175,11 @@ class restore_local_extendednav_plugin extends restore_local_plugin {
                 }
             };
             $walk($tree);
-            $DB->set_field('local_extendednav', 'availability', json_encode($tree), ['id' => $id]);
+            $record->availability = json_encode($tree);
+        }
+        // Every node of the backup, saved at once.
+        if ($this->restored) {
+            $DB->insert_records('local_extendednav', $this->restored);
         }
         $this->restored = [];
         \local_extendednav\local\node\repository::purge();

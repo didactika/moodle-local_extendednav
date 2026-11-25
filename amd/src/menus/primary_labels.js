@@ -85,15 +85,14 @@ const copyElement = (element) => {
 /**
  * Turns the text into nodes: the plugin's elements, and everything else as text.
  *
- * The text is parsed in a template, where nothing runs or loads.
+ * The text is parsed as a document of its own, where nothing runs or loads.
  *
  * @param {String} text Text that holds the plugin's markup.
  * @returns {Node[]}
  */
 const buildNodes = (text) => {
-    const template = document.createElement('template');
-    template.innerHTML = text;
-    return Array.from(template.content.childNodes).map((node) => {
+    const parsed = new DOMParser().parseFromString(`<body>${text}</body>`, 'text/html');
+    return Array.from(parsed.body.childNodes).map((node) => {
         if (node.nodeType === Node.ELEMENT_NODE && ALLOWED[node.tagName] && isPluginElement(node)) {
             return copyElement(node);
         }

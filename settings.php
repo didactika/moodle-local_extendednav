@@ -77,6 +77,38 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
         new moodle_url('/local/extendednav/activity.php'),
         'local/extendednav:manage'
     ));
+    // How long the activity log keeps its entries. Saving either setting turns the task that cleans it on or off.
+    $logpage = new admin_settingpage(
+        'local_extendednav_logsettings',
+        get_string('logretention_page', 'local_extendednav'),
+        'moodle/site:config'
+    );
+    if ($ADMIN->fulltree) {
+        $enabled = new admin_setting_configcheckbox(
+            'local_extendednav/' . \local_extendednav\task\clean_activity_log::ENABLED,
+            get_string('logretention_enabled', 'local_extendednav'),
+            get_string('logretention_enabled_desc', 'local_extendednav'),
+            0
+        );
+        $enabled->set_updatedcallback([\local_extendednav\task\clean_activity_log::class, 'sync']);
+        $logpage->add($enabled);
+        $retention = new admin_setting_configduration(
+            'local_extendednav/' . \local_extendednav\task\clean_activity_log::RETENTION,
+            get_string('logretention', 'local_extendednav'),
+            get_string('logretention_desc', 'local_extendednav'),
+            52 * WEEKSECS,
+            WEEKSECS
+        );
+        $retention->set_updatedcallback([\local_extendednav\task\clean_activity_log::class, 'sync']);
+        $logpage->add($retention);
+        if (method_exists($logpage, 'hide_if')) {
+            $logpage->hide_if(
+                'local_extendednav/' . \local_extendednav\task\clean_activity_log::RETENTION,
+                'local_extendednav/' . \local_extendednav\task\clean_activity_log::ENABLED
+            );
+        }
+    }
+    $ADMIN->add('local_extendednav_reports', $logpage);
 }
 
 // The site administration as the plugin shapes it: names, hidden pages and the order of each category. Moodle is building the
@@ -85,5 +117,5 @@ if ($hassiteconfig || has_capability('local/extendednav:manage', context_system:
 try {
     \local_extendednav\menu\admintree::apply($ADMIN);
 } catch (\dml_exception $e) {
-    debugging('Extended navigation could not shape the site administration: ' . $e->getMessage(), DEBUG_DEVELOPER);
+    debugging(get_string('err_admintree_apply', 'local_extendednav', $e->getMessage()), DEBUG_DEVELOPER);
 }

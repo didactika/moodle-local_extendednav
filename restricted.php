@@ -27,9 +27,14 @@
 
 require_once(__DIR__ . '/../../config.php');
 
+// The page tells the user who is logged in that no page is open to them, and offers them to log out: it shows nothing of the
+// site and changes nothing, so it is theirs alone, in their own context, and needs no capability. A guest is sent to log in.
 require_login(null, false);
-
-$PAGE->set_context(context_system::instance());
+if (isguestuser()) {
+    redirect(get_login_url());
+}
+$context = context_user::instance((int)$USER->id);
+$PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/extendednav/restricted.php'));
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('restricted_title', 'local_extendednav'));

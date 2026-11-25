@@ -140,7 +140,7 @@ const updatePreview = async(tile, info, value, native) => {
         const html = await Templates.renderPix(name, component === 'core' ? 'moodle' : component, '');
         // Ignore the answer if the field changed in the meantime.
         if (tile.dataset.value === value) {
-            tile.innerHTML = html;
+            await Templates.replaceNodeContents(tile, html, '');
             // Moodle shows "b/" icons 64 pixels big; the menus show them at the size of the others.
             tile.querySelectorAll('.iconsize-big').forEach((icon) => icon.classList.remove('iconsize-big'));
         }

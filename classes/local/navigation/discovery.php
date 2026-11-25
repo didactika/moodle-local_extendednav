@@ -119,7 +119,10 @@ final class discovery {
             $view->initialise();
             return secondary::describe(secondary::children_of($view));
         } catch (\Throwable $e) {
-            debugging('The navigation of the activity ' . $cmid . ' could not be built: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            debugging(
+                get_string('err_discovery_activity', 'local_extendednav', (object)['cmid' => $cmid, 'error' => $e->getMessage()]),
+                DEBUG_DEVELOPER
+            );
             return [];
         } finally {
             $PAGE = $saved;

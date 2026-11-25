@@ -82,6 +82,19 @@ class split_activity_navigation extends \core\task\adhoc_task {
 
         $menu = new activity($modname);
         $natives = $menu->get_native_nodes();
+        // The rows the kind has already, read once, by context and key.
+        $existing = [];
+        $rows = $DB->get_recordset(
+            'local_extendednav',
+            ['menu' => $menu->get_key()],
+            '',
+            'id, nodekey, contextid, timecreated, timemodified'
+        );
+        foreach ($rows as $row) {
+            $existing[(int)$row->contextid . '|' . $row->nodekey] = $row;
+        }
+        $rows->close();
+        $new = [];
         foreach ($legacy as $row) {
             // An item of Moodle the kind does not have, or a change made for an activity of another kind, stays out.
             if (isset($legacynatives[$row->nodekey]) && !isset($natives[$row->nodekey])) {
@@ -94,16 +107,18 @@ class split_activity_navigation extends \core\task\adhoc_task {
             foreach (self::FIELDS as $field) {
                 $record->$field = $row->$field ?? null;
             }
-            $existing = $DB->get_record('local_extendednav', [
-                'menu' => $record->menu, 'nodekey' => $record->nodekey, 'contextid' => $record->contextid,
-            ]);
-            if (!$existing) {
-                $DB->insert_record('local_extendednav', $record);
-            } else if (empty($existing->timemodified) || (int)$existing->timemodified <= (int)$existing->timecreated) {
+            $current = $existing[(int)$record->contextid . '|' . $record->nodekey] ?? null;
+            if (!$current) {
+                $new[] = $record;
+            } else if (empty($current->timemodified) || (int)$current->timemodified <= (int)$current->timecreated) {
                 // The row of an item that a page or the search found, never changed: it takes the old change.
-                $record->id = $existing->id;
+                $record->id = $current->id;
                 $DB->update_record('local_extendednav', $record);
             }
+        }
+        // The new rows of the kind, saved at once.
+        if ($new) {
+            $DB->insert_records('local_extendednav', $new);
         }
     }
 

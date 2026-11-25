@@ -104,10 +104,9 @@ class provider implements
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
 
-        foreach ($contextlist->get_contexts() as $context) {
-            if (!$context instanceof \context_user || (int)$context->instanceid !== (int)$contextlist->get_user()->id) {
-                continue;
-            }
+        // The plugin keeps data of a user in that user's own context only: one context, one query.
+        $context = \context_user::instance((int)$contextlist->get_user()->id, IGNORE_MISSING);
+        if ($context && in_array((int)$context->id, array_map('intval', $contextlist->get_contextids()), true)) {
             $rows = $DB->get_records(
                 'local_extendednav',
                 ['contextid' => $context->id],

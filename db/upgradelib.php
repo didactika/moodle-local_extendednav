@@ -34,12 +34,29 @@
 function local_extendednav_upgrade_numbered_keys(array $menus): void {
     global $DB;
 
+    // The rows of the navigations, read in one query; what changes is worked out here and written in a few queries.
+    $all = [];
+    if ($menus) {
+        $records = $DB->get_recordset_list('local_extendednav', 'menu', $menus, '', 'id, menu, nodekey, parentkey, contextid');
+        foreach ($records as $record) {
+            $all[$record->menu][$record->id] = $record;
+        }
+        $records->close();
+    }
     foreach ($menus as $menu) {
         $stored = json_decode((string)get_config('local_extendednav', 'nativenodes_' . $menu), true);
         if (!is_array($stored)) {
             continue;
         }
+        $rows = $all[$menu] ?? [];
+        $bykey = [];
+        foreach ($rows as $row) {
+            $bykey[(string)$row->nodekey][(int)$row->contextid] = $row;
+        }
         $changed = false;
+        $delete = [];
+        $rename = [];
+        $parents = [];
         foreach ($stored as $key => $item) {
             if (!ctype_digit((string)$key)) {
                 continue;
@@ -48,20 +65,31 @@ function local_extendednav_upgrade_numbered_keys(array $menus): void {
             unset($stored[$key]);
             $changed = true;
             if ($newkey === null || isset($stored[$newkey])) {
-                $DB->delete_records('local_extendednav', ['menu' => $menu, 'nodekey' => (string)$key]);
+                foreach ($bykey[(string)$key] ?? [] as $row) {
+                    $delete[] = (int)$row->id;
+                }
                 continue;
             }
             $stored[$newkey] = $item;
-            foreach ($DB->get_records('local_extendednav', ['menu' => $menu, 'nodekey' => (string)$key]) as $row) {
-                $taken = ['menu' => $menu, 'nodekey' => $newkey, 'contextid' => $row->contextid];
-                if ($DB->record_exists('local_extendednav', $taken)) {
-                    $DB->delete_records('local_extendednav', ['id' => $row->id]);
+            foreach ($bykey[(string)$key] ?? [] as $contextid => $row) {
+                if (isset($bykey[$newkey][$contextid])) {
+                    $delete[] = (int)$row->id;
                 } else {
-                    $DB->set_field('local_extendednav', 'nodekey', $newkey, ['id' => $row->id]);
+                    $rename[(int)$row->id] = $newkey;
+                    $bykey[$newkey][$contextid] = $row;
                 }
             }
-            $DB->set_field('local_extendednav', 'parentkey', $newkey, ['menu' => $menu, 'parentkey' => (string)$key]);
+            foreach ($rows as $row) {
+                if ((string)$row->parentkey === (string)$key) {
+                    $parents[(int)$row->id] = $newkey;
+                }
+            }
         }
+        foreach (array_chunk($delete, 500) as $chunk) {
+            $DB->delete_records_list('local_extendednav', 'id', $chunk);
+        }
+        \local_extendednav\local\node\manager::set_field_by_id('nodekey', $rename);
+        \local_extendednav\local\node\manager::set_field_by_id('parentkey', $parents);
         if ($changed) {
             set_config('nativenodes_' . $menu, json_encode($stored), 'local_extendednav');
         }
