@@ -449,7 +449,7 @@ class node_form extends \moodleform {
         if ($current !== null && menu_manager::get_menu($menukey)->is_native($current->nodekey)) {
             $data['nodekey'] = $current->nodekey;
         }
-        $data['availability'] = self::conditions_of($data['availabilityconditionsjson'] ?? '');
+        $data['availability'] = $this->availability_of($data['availabilityconditionsjson'] ?? null);
         $data = (array)self::tree_values((object)$data);
         $record = manager::prepare($data, $menukey);
 
@@ -569,7 +569,7 @@ class node_form extends \moodleform {
     public function get_data() {
         $data = parent::get_data();
         if ($data !== null) {
-            $data->availability = self::conditions_of($data->availabilityconditionsjson ?? '');
+            $data->availability = $this->availability_of($data->availabilityconditionsjson ?? null);
             $data = self::tree_values($data);
         }
         return $data;
@@ -634,6 +634,21 @@ class node_form extends \moodleform {
             $data->parentkey = $type === 'tab' ? '' : (string)($data->categoryparent ?? '');
         }
         return $data;
+    }
+
+    /**
+     * The access restrictions to save: the ones the editor wrote, or, when the form has no editor, the ones the node has. The
+     * editor is left out while Moodle's restricted access is turned off, or for whoever may not change the restrictions in a
+     * category, a course or an activity; saving the node must not erase them then.
+     *
+     * @param string|null $json What the editor wrote, or null when the form has no editor.
+     * @return string The access restrictions, or empty.
+     */
+    private function availability_of(?string $json): string {
+        if (!$this->_form->elementExists('availabilityconditionsjson')) {
+            return (string)($this->_customdata['node']->availability ?? '');
+        }
+        return self::conditions_of((string)$json);
     }
 
     /**

@@ -34,7 +34,7 @@ The vertical position of an entity expresses its importance to the project objec
 | --- | --- | --- | --- | --- |
 | Node | 1 | An item of a navigation (a menu, a secondary navigation, the page Preferences or the site administration), added by the plugin or an item of Moodle that the plugin changes. | `nodekey`, `menu`, `title`, `url`, `visibility`, `blockaccess` | The rest are in the [data model](../design/data-model/data-model.svg). |
 | Menu | 2 | One of the navigations: the primary navigation, the user menu, the page Preferences, the secondary navigation of the site home, of a course and of a category, the navigation of each kind of activity, and the site administration. | `primary`, `usermenu`, `frontpage`, `course`, `category`, `mod_<module>`, `admin` | It is a class of the plugin, not a table. |
-| Visibility | 2 | Who sees a node: everyone, the users with some roles, or nobody. | `visibility` | |
+| Visibility | 2 | Who sees a node: everyone, with no limits; the users it is restricted to, by roles, by conditions or by both; or nobody. | `visibility` | |
 | Role | 3 | A role that may see a restricted node. | role shortname | It is Moodle's `role`. |
 | Condition | 3 | An access restriction of Moodle on a node: a date, a group, a grouping, a profile field or a condition of a plugin. | `availability` | It is Moodle's availability tree, kept as JSON in the node. |
 | Language | 3 | A language to which a node is limited. | language code | It is a list of codes in the node. |
@@ -62,7 +62,7 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. | Node, Scope | `repository::get_scoped_nodes` |
 | RN-014 | Deleting a node of the site deletes its exceptions. | Node, Scope | `manager::delete` |
-| RN-015 | A node is shown only when its visibility, its roles and its access restrictions (Moodle's Restrict access) all let the user see it; a node of a course is checked in that course. | Node, Condition | `availability::allows` |
+| RN-015 | A node visible to everyone is shown to everyone. A restricted node needs roles, access restrictions (Moodle's Restrict access) or both, and is shown only when the ones it has all let the user see it; a node of a course is checked in that course. The roles and restrictions a node visible to everyone keeps from before are not used. | Node, Role, Condition | `access::is_allowed_by_rules`, `availability::allows`, `validator::validate` |
 | RN-016 | The dates of the restrictions make a node scheduled before its start and ended after its end; it appears and disappears on its own. | Node, Condition | `availability::period` |
 | RN-017 | The exceptions of a course travel in the backup of the course; the file of the site holds the nodes of the site and the exceptions of its categories. | Node, Scope | `backup_local_extendednav_plugin`, `exporter::export_file` |
 | RN-018 | A category, a course or an activity changes its navigations on its own page, by whoever manages the navigation of the site or holds local/extendednav:managecontext in that context; the site administration only lists them. | Node, Scope | `context_scope::require_manage`, `node_service::require_scope` |
@@ -77,6 +77,7 @@ The vertical position of an entity expresses its importance to the project objec
 | RN-027 | Only the entries of the plugin older than the time kept are deleted, never the entries of another component. | ActivityRecord | `clean_activity_log::clean` |
 | RN-028 | The clean-up task is on only while the clean-up is on and has a time; saving either setting turns it on or off. | ActivityRecord | `clean_activity_log::sync` |
 | RN-029 | The log is read by time, a day at a time and in batches, through the index on the time. | ActivityRecord | `clean_activity_log::clean` |
+| RN-030 | While Moodle's restricted access is turned off, the access restrictions of a node let everyone through, as those of an activity do: a node restricted only by them is shown to everyone and its URL is not blocked, and one with roles too is restricted by its roles alone. Saving a node meanwhile keeps its restrictions, which apply again when restricted access is turned on. | Node, Condition | `availability::allows`, `node_form::availability_of` |
 | RN-030 | Whether the changes of a course go in a backup and come back with a restore is decided by two defaults of Moodle. | Node, Scope | `settings.php` |
 | RN-031 | Restoring into an existing course keeps what the course already sets. | Node, Scope | `restore_local_extendednav_plugin` |
 | RN-032 | A web service applies the same rules and the same capabilities as the page that does the same. | Node | `node_service::require_scope` |

@@ -31,3 +31,13 @@ A node with a start date appears on its own when the date comes, and a node with
 > Administrators see every node by default, also the ones that are scheduled or have ended, marked **Only admins**. See [Administrators see every node](page:concepts/administrators-see-everything).
 
 The restrictions hide the node from the navigation; they do not block the page it links to. To block the page too, use **Block URL access** with a hidden or restricted node.
+
+## When restricted access is turned off
+
+The access restrictions are Moodle's, so they follow **Enable restricted access** in **Site administration > General > Advanced features**, as the ones of an activity do. While it is turned off:
+
+- A node restricted only by access restrictions is shown to everyone, and its URL is not blocked even with **Block URL access**.
+- A node restricted by roles and access restrictions is restricted by its roles alone.
+- The form does not show **Access restrictions**, and saving a node keeps the ones it has. They apply again as soon as restricted access is turned back on.
+
+To keep a node hidden or its URL blocked while restricted access is off, restrict it by roles or make it **Not visible**.

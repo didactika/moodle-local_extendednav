@@ -31,3 +31,13 @@ Un nodo con fecha de inicio aparece por sí solo cuando llega la fecha, y un nod
 > Los administradores ven todos los nodos de forma predeterminada, también los programados o finalizados, marcados como **Solo administradores**. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
 
 Las restricciones ocultan el nodo de la navegación; no bloquean la página a la que enlaza. Para bloquear también la página, use **Bloquear el acceso por URL** con un nodo oculto o restringido.
+
+## Cuando la restricción de acceso está desactivada
+
+Las restricciones de acceso son las de Moodle, así que siguen el ajuste **Habilitar acceso restringido** de **Administración del sitio > General > Características avanzadas**, igual que las de una actividad. Mientras está desactivado:
+
+- Un nodo restringido solo por restricciones de acceso se muestra a todos, y su URL no se bloquea aunque tenga **Bloquear el acceso por URL**.
+- Un nodo restringido por roles y restricciones de acceso queda restringido solo por sus roles.
+- El formulario no muestra **Restricciones de acceso**, y guardar un nodo conserva las que tiene. Vuelven a aplicarse en cuanto se activa de nuevo la restricción de acceso.
+
+Para mantener un nodo oculto o su URL bloqueada mientras la restricción de acceso está desactivada, restrínjalo por roles o márquelo como **No visible**.
