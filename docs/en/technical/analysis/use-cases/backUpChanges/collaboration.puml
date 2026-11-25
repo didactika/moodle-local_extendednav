@@ -1,0 +1,11 @@
+@startuml
+title UC-011 Back up and restore — collaboration
+boundary BackupDefaults
+control BackupPlugin
+control RestorePlugin
+entity Node
+BackupDefaults --> BackupPlugin : 1: include or not
+BackupPlugin --> Node : 2: read the nodes of the context
+BackupDefaults --> RestorePlugin : 3: restore or not
+RestorePlugin --> Node : 4: save the nodes of the context restored
+@enduml

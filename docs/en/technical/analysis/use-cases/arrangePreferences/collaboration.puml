@@ -1,0 +1,13 @@
+@startuml
+title UC-009 Arrange the Preferences page — collaboration
+boundary PreferencesPage
+boundary NavigationPage
+control PreferencesInjector
+control ContextScope
+entity Node
+PreferencesPage --> NavigationPage : 1: Arrange my preferences
+NavigationPage --> ContextScope : 2: what may the person do
+NavigationPage --> Node : 3: save the change in the context of the user
+PreferencesPage --> PreferencesInjector : 4: build the settings
+PreferencesInjector --> Node : 5: read the site and the user
+@enduml

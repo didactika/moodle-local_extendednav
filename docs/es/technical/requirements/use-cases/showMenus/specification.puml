@@ -1,0 +1,22 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "showMenus" as showMenus {
+  state " " as Request
+  state " " as Building
+  state " " as Shown
+
+  [*] --> Request : A logged-in user opens a page
+  Request --> Building : System finds the plugin on
+  Request --> [*] : The plugin is off or the user is a guest
+  Building --> Shown : System adds the items the user may see, in their language
+  Shown --> [*] : The user sees the primary navigation and the user menu
+
+  note on link
+    System: filters each item by role and language
+  end note
+}
+
+@enduml

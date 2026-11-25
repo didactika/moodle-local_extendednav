@@ -1,0 +1,10 @@
+@startsalt
+{
+  {+
+  <b>Activity log settings</b>
+  }
+  [X] Clean up the activity log
+  Keep the entries for | "52" | ^weeks^
+  [Save changes]
+}
+@endsalt

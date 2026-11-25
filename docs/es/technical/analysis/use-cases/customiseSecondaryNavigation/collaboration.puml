@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Página de gestión" as c0 <<boundary>>
+class "Servicio de lectura de nodos" as c1 <<control>>
+class "Servicio de cambio de nodos" as c2 <<control>>
+class "Lista de nodos" as c3 <<control>>
+class "Gestor de nodos" as c4 <<control>>
+class "Navegación secundaria" as c5 <<control>>
+class "Nodo" as c6 <<entity>>
+
+user --> c0 : 1: elige una navegación
+c0 --> c1
+c1 --> c2
+c2 --> c3
+c3 --> c4
+c4 --> c5
+c5 --> c6
+
+@enduml

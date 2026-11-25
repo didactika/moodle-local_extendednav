@@ -1,0 +1,14 @@
+@startsalt
+{
+  {+
+  <b>Preferences page</b> | [Import] | [Export]
+  }
+  {#
+  . | <b>Title</b> | <b>Visibility</b> | .
+  [] | User account | Visible to everyone | [hide] [edit]
+  [] | Roles | Visible to everyone | [hide] [edit]
+  [] | Blogs | Not visible | [show] [edit]
+  [] | Miscellaneous | Visible to everyone | [hide] [edit]
+  }
+}
+@endsalt

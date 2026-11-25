@@ -1,0 +1,9 @@
+@startuml
+title UC-010 Clean up the activity log — collaboration
+boundary LogSettings
+control CleanTask
+entity StandardLog
+LogSettings --> CleanTask : 1: turn on or off
+CleanTask --> StandardLog : 2: read the ids by time
+CleanTask --> StandardLog : 3: delete by id
+@enduml

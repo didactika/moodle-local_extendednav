@@ -1,0 +1,14 @@
+@startsalt
+{
+  {+
+  <b>Página de preferencias</b> | [Importar] | [Exportar]
+  }
+  {#
+  . | <b>Título</b> | <b>Visibilidad</b> | .
+  [] | Cuenta de usuario | Visible para todos | [ocultar] [editar]
+  [] | Roles | Visible para todos | [ocultar] [editar]
+  [] | Blogs | No visible | [mostrar] [editar]
+  [] | Miscelánea | Visible para todos | [ocultar] [editar]
+  }
+}
+@endsalt

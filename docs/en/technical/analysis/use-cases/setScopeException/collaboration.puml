@@ -1,0 +1,22 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Management page" as c0 <<boundary>>
+class "Get scopes service" as c1 <<control>>
+class "Node repository" as c2 <<control>>
+class "Node manager" as c3 <<control>>
+class "Scope" as c4 <<entity>>
+class "Node" as c5 <<entity>>
+
+user --> c0 : 1: searches a category, a course or an activity
+c0 --> c1
+c1 --> c2
+c2 --> c3
+c3 --> c4
+c4 --> c5
+
+@enduml

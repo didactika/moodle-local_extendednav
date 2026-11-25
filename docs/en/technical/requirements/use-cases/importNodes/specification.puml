@@ -1,0 +1,24 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "importNodes" as importNodes {
+  state " " as Choosing
+  state " " as Checking
+  state " " as Done
+
+  [*] --> Choosing : Administrator chooses Export or Import
+  Choosing --> Done : Administrator exports and System writes a YAML file
+  Choosing --> Checking : Administrator uploads a file and chooses what to do with existing items
+  Checking --> Choosing : System lists the invalid items and imports nothing
+  Checking --> Done : System creates, updates or skips each item
+  Done --> [*] : System shows the counts
+
+  note on link
+    Administrator: uploads a file
+    System: checks the whole file before saving
+  end note
+}
+
+@enduml

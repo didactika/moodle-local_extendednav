@@ -1,0 +1,20 @@
+@startuml
+title UC-008 Buscar los elementos — secuencia
+participant "discover_nodes" as task
+participant "discovery" as discovery
+participant "moodle_page" as page
+participant "views\\secondary" as view
+participant "activity" as menu
+task -> discovery : all()
+loop cada tipo de actividad
+  discovery -> discovery : kind(modname)
+  loop actividades más recientes, mientras quede tiempo
+    discovery -> page : set_cm(cm), set_url(view.php)
+    discovery -> view : initialise()
+    view --> discovery : nodos
+    discovery -> discovery : children_of() y describe()
+  end
+  discovery -> menu : record_seen(elementos)
+  menu -> menu : sync_native_nodes()
+end
+@enduml

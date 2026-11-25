@@ -1,0 +1,20 @@
+@startuml
+!theme plain
+hide empty members
+skinparam linetype polyline
+top to bottom direction
+
+class "Administrator" as user <<actor>>
+class "Management page" as screen <<boundary>>
+class "Item form" as form <<boundary>>
+class "Node validator" as validator <<control>>
+class "Node manager" as manager <<control>>
+class "Node" as node <<entity>>
+
+user --> screen : 1: adds, edits or deletes
+screen --> form : 2: the fields of the item
+form --> validator : 3: validate(node, others)
+form --> manager : 4: create / update / delete
+manager --> node : 5: insert, update or delete, with its event
+
+@enduml
