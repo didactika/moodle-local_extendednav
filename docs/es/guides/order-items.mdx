@@ -1,0 +1,20 @@
+---
+title: Ordenar los elementos
+summary: Arrastre un elemento por su asa hasta su nuevo lugar, o muévalo con las teclas de flecha.
+order: 40
+---
+
+Arrastre un elemento por el asa del principio de su fila y suéltelo donde debe ir. Una línea encima o debajo de una fila indica dónde quedará. El orden se guarda en cuanto lo suelta, y la lista se dibuja de nuevo sin recargar la página.
+
+<Screenshot src="asset:manage-primary.webp" alt="La página de gestión, con un asa al principio de cada fila" caption="Cada fila tiene su asa." url="/local/extendednav/manage.php" />
+
+Con el teclado, lleve el foco al asa de un elemento y pulse la **flecha arriba** o la **flecha abajo**: el elemento se mueve un lugar.
+
+- Un elemento se mueve entre sus hermanos: los elementos con su mismo padre, o las categorías y páginas de su categoría en la administración del sitio.
+- Seleccione varios nodos y arrastre uno de ellos: los nodos seleccionados entre sus hermanos se mueven juntos, en el orden que tienen.
+- Mover un padre mueve consigo a sus elementos de submenú.
+- Las asas no se muestran mientras hay una búsqueda o un filtro aplicado, porque la lista muestra entonces solo una parte de la navegación. Use el botón que borra los filtros para volver a ordenar.
+- En una pantalla estrecha, como la de un teléfono, las asas no se muestran: ordene la navegación desde una pantalla más ancha.
+- En una categoría o un curso, ordenar un elemento le da el orden de su propia navegación. Consulte [Cambiar una navegación para una categoría o un curso](page:guides/exceptions).
+
+El orden de la lista es el orden de la navegación, y un archivo exportado lo conserva: cada elemento tiene su posición en el campo `order`.

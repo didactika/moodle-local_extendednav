@@ -16,8 +16,8 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_access;
-use local_extendednav\local\node_repository;
+use local_extendednav\local\node\access;
+use local_extendednav\local\node\repository;
 use local_extendednav\menu_manager;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\menu\usermenu::class)]
@@ -37,7 +37,7 @@ final class usermenu_test extends \advanced_testcase {
      */
     public function test_build_config_value(): void {
         $this->resetAfterTest();
-        node_access::reset_caches();
+        access::reset_caches();
         $this->setUser($this->getDataGenerator()->create_user());
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'umenu_privatefilesmoo', 'visibility' => 0]);
@@ -49,7 +49,7 @@ final class usermenu_test extends \advanced_testcase {
             'url' => '/catalogue.php', 'parentkey' => 'library']);
 
         force_current_language('en');
-        $value = menu_manager::get_menu('usermenu')->build_config_value(node_repository::get_menu_nodes('usermenu'));
+        $value = menu_manager::get_menu('usermenu')->build_config_value(repository::get_menu_nodes('usermenu'));
         $lines = explode("\n", $value);
 
         $this->assertContains('profile,moodle|/user/profile.php', $lines, 'Core items keep their language string.');
@@ -88,7 +88,7 @@ final class usermenu_test extends \advanced_testcase {
         global $PAGE;
 
         $this->resetAfterTest();
-        node_access::reset_caches();
+        access::reset_caches();
         $this->setUser($this->getDataGenerator()->create_user());
         $generator = $this->getDataGenerator()->get_plugin_generator('local_extendednav');
         $generator->create_node(['menu' => 'usermenu', 'nodekey' => 'library', 'title' => 'Library', 'url' => '/library.php',
@@ -101,7 +101,7 @@ final class usermenu_test extends \advanced_testcase {
             'display' => 2, 'popupwidth' => 800, 'popupheight' => 600, 'icon' => 'core:i/home']);
 
         $html = menu_manager::get_menu('usermenu')->build_browser_templates(
-            node_repository::get_menu_nodes('usermenu'),
+            repository::get_menu_nodes('usermenu'),
             $PAGE->get_renderer('core')
         );
 

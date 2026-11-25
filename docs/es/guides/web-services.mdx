@@ -1,0 +1,48 @@
+---
+title: Gestionar las navegaciones desde fuera de Moodle
+summary: Lea, cambie, exporte e importe las navegaciones mediante servicios web, desde otro sistema.
+order: 70
+---
+
+Todo lo que hace la página de gestión se hace con servicios web, de modo que otro sistema también puede hacerlo. Las funciones están reunidas en el servicio externo **Navegación ampliada**.
+
+## Activar el servicio
+
+1. Vaya a **Administración del sitio > Servidor > Servicios web > Servicios externos** y habilite **Navegación ampliada**. El servicio es solo para usuarios autorizados.
+2. Añada el usuario que lo llamará y cree un token para ese usuario.
+3. Conceda al usuario las capacidades que necesitan las funciones. El usuario necesita las mismas capacidades que la página que hace lo mismo: `local/extendednav:manage` para las navegaciones del sitio y las capacidades del contexto para una categoría, un curso, una actividad o un usuario. Consulte [Ajustes y capacidades](page:reference/settings-and-capabilities).
+
+## Las funciones
+
+| Función | Qué hace |
+|---|---|
+| `local_extendednav_get_navigations` | Enumera las navegaciones: clave, nombre, si cada una está activada, si sus nodos son carpetas y si los contextos la cambian |
+| `local_extendednav_get_nodes` | Enumera los nodos de una navegación, para el sitio o para un contexto, con la búsqueda y los filtros de la lista |
+| `local_extendednav_save_node` | Añade un nodo o cambia uno, con las comprobaciones del formulario. Los campos no enviados conservan su valor |
+| `local_extendednav_set_visibility` | Muestra u oculta nodos; al ocultar también puede ocultarlos a los administradores y bloquear sus URL |
+| `local_extendednav_reorder_nodes`, `local_extendednav_move_node`, `local_extendednav_place_node` | Ordenan nodos y eligen dónde van |
+| `local_extendednav_delete_nodes` | Elimina los nodos añadidos o vuelve a lo que fija el sitio |
+| `local_extendednav_set_enabled` | Activa o desactiva una navegación |
+| `local_extendednav_get_exceptions`, `local_extendednav_get_activity` | Enumeran los contextos que cambian una navegación y el registro de actividad |
+| `local_extendednav_discover_nodes` | Busca los elementos de la navegación de un tipo de actividad |
+| `local_extendednav_export_navigations` | Escribe las navegaciones y los contextos elegidos como un archivo YAML y devuelve su texto |
+| `local_extendednav_import_navigations` | Lee un archivo YAML; comprueba primero todo el archivo y omite, con un aviso, las categorías, los cursos, las actividades y los usuarios que el sitio no tiene |
+| `local_extendednav_search_export` | Encuentra navegaciones, tipos de actividad, usuarios, cursos y categorías para exportar, de diez en diez |
+| `local_extendednav_get_icons` | Enumera los iconos que se pueden elegir |
+
+Una llamada que el usuario no puede hacer lanza una excepción por la capacidad; un nodo no válido lanza una que nombra los campos, y no se guarda nada. Un campo que bloquean las capacidades de un contexto no se puede enviar.
+
+## Ejemplo
+
+Para ocultar una opción de la página Preferencias de un usuario, llame a `local_extendednav_save_node` con la navegación `preferences`, el contexto del usuario, la clave de la opción y el campo que se cambia:
+
+```json
+{
+  "menu": "preferences",
+  "contextid": 5,
+  "nodekey": "forumpreferences",
+  "fields": {"visibility": 0}
+}
+```
+
+La respuesta contiene el identificador de la fila, si se creó y los avisos.

@@ -16,9 +16,8 @@
 
 namespace local_extendednav\menu;
 
-use local_extendednav\local\node_manager;
-use local_extendednav\local\node_text;
-use local_extendednav\observer;
+use local_extendednav\local\node\manager;
+use local_extendednav\local\node\text;
 
 /**
  * Base class of a menu the plugin manages.
@@ -42,6 +41,15 @@ abstract class base {
      * @return string
      */
     abstract public function get_name(): string;
+
+    /**
+     * Returns the short name of the navigation, as a select that lists several of them in groups says it.
+     *
+     * @return string
+     */
+    public function get_short_name(): string {
+        return $this->get_name();
+    }
 
     /**
      * Returns the core nodes of this menu.
@@ -138,7 +146,7 @@ abstract class base {
         $placeholders = [];
         foreach ($this->get_native_nodes() as $key => $native) {
             $placeholders[$key] = [
-                'title' => strip_tags(node_text::resolve($native->text)),
+                'title' => strip_tags(text::resolve($native->text)),
                 'url' => (string)$native->action,
             ];
         }
@@ -156,13 +164,13 @@ abstract class base {
     public function sync_native_nodes(bool $events = true): void {
         global $DB;
 
-        $existing = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key()], '', 'nodekey, id');
+        $existing = $DB->get_records_menu('local_extendednav', ['menu' => $this->get_key(), 'contextid' => 0], '', 'nodekey, id');
         foreach ($this->get_native_nodes() as $key => $native) {
             if (isset($existing[$key])) {
                 continue;
             }
-            $record = node_manager::prepare(['nodekey' => $key, 'visibility' => 1], $this->get_key());
-            node_manager::create($record, $events);
+            $record = manager::prepare(['nodekey' => $key, 'visibility' => 1], $this->get_key());
+            manager::create($record, $events);
         }
     }
 
@@ -173,7 +181,7 @@ abstract class base {
      */
     public function sync_from_config(bool $events = true): void {
         if ($this->get_config_name() !== null) {
-            observer::sync_custom_menu($this, $events);
+            \local_extendednav\local\support\menu_config::sync_custom_menu($this, $events);
         }
     }
 
@@ -187,7 +195,7 @@ abstract class base {
         $this->sync_native_nodes();
         $configname = $this->get_config_name();
         if (
-            $configname !== null && observer::get_config_hash($configname)
+            $configname !== null && \local_extendednav\local\support\menu_config::get_config_hash($configname)
                 !== get_config('local_extendednav', 'confighash_' . $configname)
         ) {
             $this->sync_from_config();
@@ -201,7 +209,7 @@ abstract class base {
      */
     public function remove_nodes_from_config(array $records): void {
         if ($this->get_config_name() !== null && !empty($records)) {
-            observer::remove_from_config($this, $records);
+            \local_extendednav\local\support\menu_config::remove_from_config($this, $records);
         }
     }
 }

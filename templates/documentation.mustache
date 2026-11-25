@@ -20,14 +20,12 @@
     Reference of the YAML import and export format.
 
     Context variables required for this template:
-    * backurl - URL of the import page
     * downloadurl - URL that downloads the example file
     * fields - List of fields, each with name, required and description
     * example - Content of the example file
 
     Example context (json):
     {
-        "backurl": "https://example.com/local/extendednav/import.php",
         "downloadurl": "https://example.com/local/extendednav/documentation.php?example=1",
         "fields": [
             {"name": "nodekey", "required": true, "description": "Unique key of the node."},
@@ -36,9 +34,6 @@
         "example": "nodes:\n  - nodekey: help"
     }
 }}
-<div class="mb-3">
-    <a href="{{backurl}}" class="btn btn-outline-secondary">{{#pix}} t/left, core {{/pix}}{{#str}} back, core {{/str}}</a>
-</div>
 <p>{{#str}} doc_intro, local_extendednav {{/str}}</p>
 <p class="text-muted">{{#str}} doc_example_tip, local_extendednav {{/str}}</p>
 <p><a href="{{downloadurl}}" class="btn btn-outline-secondary">{{#pix}} t/download, core {{/pix}}{{#str}} download_example, local_extendednav {{/str}}</a></p>

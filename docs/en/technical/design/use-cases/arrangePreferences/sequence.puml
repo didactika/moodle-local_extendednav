@@ -1,0 +1,18 @@
+@startuml
+title UC-009 Arrange the Preferences page — sequence
+actor User as user
+participant "context.php" as page
+participant "context_scope" as scope
+participant "manager" as manager
+participant "preferences_injector" as injector
+user -> page : open the list
+page -> scope : from_id(context of the user), require_view()
+user -> page : hide an option
+page -> scope : require_scope(changevisibility)
+page -> manager : set_visibility(menu preferences, context)
+manager --> page : exception saved
+user -> injector : open Preferences
+injector -> injector : read() the sections of Moodle
+injector -> injector : apply() the site and the user
+injector --> user : the page arranged
+@enduml

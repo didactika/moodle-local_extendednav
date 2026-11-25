@@ -1,0 +1,58 @@
+{
+  "name": "tour_personal_name,local_extendednav",
+  "description": "tour_personal_description,local_extendednav",
+  "pathmatch": "/local/extendednav/context.php%",
+  "enabled": "1",
+  "sortorder": "0",
+  "endtourlabel": "",
+  "configdata": "{\"placement\":\"bottom\",\"orphan\":\"0\",\"backdrop\":\"1\",\"reflex\":\"0\",\"showtourwhen\":1,\"filtervalues\":{\"accessdate\":{\"filter_accessdate\":\"tool_usertours_accountcreation\",\"filter_accessdate_range\":0,\"filter_accessdate_enabled\":\"0\"},\"category\":[],\"course\":[],\"courseformat\":[],\"role\":[],\"theme\":[],\"cssselector\":[\".len[data-region=\\\"manage\\\"][data-scope=\\\"user\\\"]\"]}}",
+  "displaystepnumbers": true,
+  "version": "2024100700",
+  "steps": [
+    {
+      "title": "tour_personal_step1_title,local_extendednav",
+      "content": "tour_personal_step1_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "2",
+      "targetvalue": "",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "0"
+    },
+    {
+      "title": "tour_personal_step2_title,local_extendednav",
+      "content": "tour_personal_step2_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-action=\"openlevel\"]",
+      "configdata": "{\"placement\":\"right\"}",
+      "sortorder": "1"
+    },
+    {
+      "title": "tour_personal_step3_title,local_extendednav",
+      "content": "tour_personal_step3_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-action=\"hide\"]",
+      "configdata": "{\"placement\":\"left\"}",
+      "sortorder": "2"
+    },
+    {
+      "title": "tour_personal_step4_title,local_extendednav",
+      "content": "tour_personal_step4_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-region=\"handle\"]",
+      "configdata": "{\"placement\":\"right\"}",
+      "sortorder": "3"
+    },
+    {
+      "title": "tour_personal_step5_title,local_extendednav",
+      "content": "tour_personal_step5_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": ".len [data-region=\"tablewrap\"] tbody tr [data-action=\"restrictions\"]",
+      "configdata": "{\"placement\":\"bottom\"}",
+      "sortorder": "4"
+    }
+  ]
+}

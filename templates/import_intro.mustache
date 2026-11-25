@@ -20,18 +20,13 @@
     Introduction of the import page.
 
     Context variables required for this template:
-    * backurl - URL of the management page
     * docurl - URL of the YAML documentation page
 
     Example context (json):
     {
-        "backurl": "https://example.com/local/extendednav/manage.php?menu=primary",
         "docurl": "https://example.com/local/extendednav/documentation.php"
     }
 }}
-<div class="mb-3">
-    <a href="{{backurl}}" class="btn btn-outline-secondary">{{#pix}} t/left, core {{/pix}}{{#str}} back_to_nodes, local_extendednav {{/str}}</a>
-</div>
 <div class="alert alert-info">
     <h3 class="h5">{{#str}} import_instructions_title, local_extendednav {{/str}}</h3>
     <p>{{#str}} import_instructions_desc, local_extendednav {{/str}}</p>

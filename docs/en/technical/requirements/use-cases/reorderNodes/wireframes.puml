@@ -1,0 +1,12 @@
+@startsalt
+{
+  {* Primary navigation | User menu }
+  ==
+  {#
+    Order | Title | Node key
+    (::) | Training | training
+    (::) | Guides | guides
+    (::) | -> Guide for students | guide_students
+  }
+}
+@endsalt

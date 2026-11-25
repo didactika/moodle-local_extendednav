@@ -1,0 +1,16 @@
+@startuml
+!theme plain
+skinparam linetype polyline
+hide empty description
+
+state "setScopeException" as setScopeException {
+  [*] --> Site
+  state "Site" as Site : The list shows the navigation of the site
+  state "Scope" as Scope : The list shows what the scope sees
+  state "Changing" as Changing : An exception is being saved
+  Site --> Scope
+  Scope --> Changing
+  Changing --> Site
+}
+
+@enduml

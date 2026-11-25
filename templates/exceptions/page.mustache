@@ -1,0 +1,88 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/exceptions/page
+
+    The overview of the categories, courses and activities that change a navigation: a search, a menu of the kinds with the number of
+    each, and the list, page by page, each row with the navigations it changes and the way to its page. The rows are loaded by
+    local_extendednav/exceptions.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "id": "len-exceptions"
+    }
+}}
+<div class="len" data-region="exceptions">
+    <p class="text-muted">{{#str}}exceptions_overview_desc, local_extendednav{{/str}}</p>
+    <section id="{{id}}" data-region="list" aria-label="{{#str}}exceptions_overview, local_extendednav{{/str}}">
+        <div class="card">
+            <div class="d-flex align-items-center justify-content-between gap-3 px-3 py-2 border-bottom" data-region="filters">
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                    <form class="position-relative d-flex align-items-center" role="search" data-region="searchform" aria-label="{{#str}}exceptions_search, local_extendednav{{/str}}">
+                        {{#pix}}a/search, core{{/pix}}
+                        <label class="sr-only visually-hidden" for="{{id}}-search">{{#str}}exceptions_search, local_extendednav{{/str}}</label>
+                        <input class="form-control" type="search" id="{{id}}-search" data-region="search" placeholder="{{#str}}exceptions_search, local_extendednav{{/str}}" autocomplete="off">
+                    </form>
+                    <div class="d-flex align-items-center gap-2" data-region="filter-menus">
+                        <span class="dropdown d-inline-flex" data-menu="kind" data-filter="kind">
+                            <button type="button" class="custom-select form-select" data-menu-toggle aria-haspopup="true" aria-expanded="false"
+                                aria-label="{{#str}}exceptions_kind, local_extendednav{{/str}}"><span data-region="menu-label" data-label="{{#str}}exceptions_kind, local_extendednav{{/str}}">{{#str}}exceptions_kind, local_extendednav{{/str}}</span></button>
+                            <button type="button" class="btn btn-link p-0" data-menu-clear hidden title="{{#str}}clear, moodle{{/str}}: {{#str}}exceptions_kind, local_extendednav{{/str}}"
+                                aria-label="{{#str}}clear, moodle{{/str}}: {{#str}}exceptions_kind, local_extendednav{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                            <span class="dropdown-menu show" role="group" aria-label="{{#str}}exceptions_kind, local_extendednav{{/str}}" hidden>
+                                <label class="dropdown-item" for="{{id}}-kind-category">
+                                    <input type="checkbox" class="form-check-input" id="{{id}}-kind-category" data-option="category">
+                                    <span>{{#str}}categories{{/str}}</span>
+                                    <span class="badge text-bg-secondary ms-auto ml-auto" data-count="category"></span>
+                                </label>
+                                <label class="dropdown-item" for="{{id}}-kind-course">
+                                    <input type="checkbox" class="form-check-input" id="{{id}}-kind-course" data-option="course">
+                                    <span>{{#str}}courses{{/str}}</span>
+                                    <span class="badge text-bg-secondary ms-auto ml-auto" data-count="course"></span>
+                                </label>
+                                <label class="dropdown-item" for="{{id}}-kind-activity">
+                                    <input type="checkbox" class="form-check-input" id="{{id}}-kind-activity" data-option="activity">
+                                    <span>{{#str}}activities{{/str}}</span>
+                                    <span class="badge text-bg-secondary ms-auto ml-auto" data-count="activity"></span>
+                                </label>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    <button type="button" class="btn btn-link btn-icon" data-action="clearfilters" disabled
+                        title="{{#str}}clear_filters, local_extendednav{{/str}}" aria-label="{{#str}}clear_filters, local_extendednav{{/str}}">{{#pix}}i/reload, core{{/pix}}</button>
+                </div>
+            </div>
+            <div class="table-responsive" data-region="tablewrap" aria-busy="true">
+                <table class="table">
+                    <caption class="sr-only visually-hidden">{{#str}}exceptions_overview, local_extendednav{{/str}}</caption>
+                    <tbody>
+                        <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                        <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div data-region="empty" hidden></div>
+            <div data-region="error" hidden></div>
+            {{> local_extendednav/list/pager }}
+        </div>
+    </section>
+</div>

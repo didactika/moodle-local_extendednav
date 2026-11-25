@@ -1,0 +1,23 @@
+---
+title: Los elementos de Moodle
+summary: Cómo trata el plugin los elementos que Moodle añade por sí mismo.
+order: 30
+---
+
+La página de gestión lista los elementos que Moodle añade a cada menú junto con los que usted añade. Los elementos de Moodle son los que Moodle mismo coloca en la navegación principal, incluidas las pestañas que añaden otros plugins, y los **Elementos del menú de usuario** predeterminados.
+
+## Cambiar un elemento de Moodle
+
+Cambie solo lo necesario. Los campos vacíos conservan los valores de Moodle, y el formulario los muestra como texto de ejemplo, de modo que el elemento sigue traducido en todos los idiomas del sitio. Use la clave del elemento de Moodle (por ejemplo `myhome`) al importar un archivo que lo cambie.
+
+## Elementos de menú personalizados
+
+Los elementos de **Elementos de menú personalizados** y de **Elementos del menú de usuario** de Moodle se importan en la instalación, con sus ayudas emergentes y códigos de idioma, y se mantienen sincronizados.
+
+## Elementos que Moodle deja de añadir
+
+Los nuevos elementos de la navegación principal se encuentran cada vez que se abre la página de gestión. Un elemento que Moodle deja de añadir se marca como **No disponible actualmente** y el plugin tampoco lo añade. Ocurre, por ejemplo, cuando se desactiva en **Administración del sitio > Apariencia > Navegación**, cuando el tema lo elimina o cuando procedía de un plugin que se desinstaló. Puede eliminarlo, y vuelve como un elemento nuevo si Moodle lo añade de nuevo.
+
+## Iconos
+
+El icono de un elemento se elige en un selector con búsqueda de los iconos de Moodle, incluidos los de sus plugins, y de los iconos FontAwesome que Moodle incluye. El menú de usuario solo muestra iconos FontAwesome: un icono de Moodle se muestra como su icono FontAwesome, de modo que un icono que no tiene uno, como una imagen, no se muestra.

@@ -1,0 +1,15 @@
+@startuml
+title UC-010 Depurar el registro de actividad — secuencia
+participant "settings" as settings
+participant "clean_activity_log" as task
+database "logstore_standard_log" as log
+settings -> task : sync()
+task -> task : activar o desactivar la tarea programada
+...una vez al día...
+task -> log : MIN(timecreated), la primera vez
+loop cada día hasta el tiempo conservado, mientras quede tiempo
+  task -> log : ids del plugin con timecreated en el día (1000)
+  task -> log : eliminar por id
+  task -> task : set_config(logretention_done)
+end
+@enduml

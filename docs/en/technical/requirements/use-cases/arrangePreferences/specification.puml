@@ -1,0 +1,17 @@
+@startuml
+title UC-009 Arrange the Preferences page
+start
+:The user selects Arrange my preferences;
+:The Navigation page opens in the context of the user, with the sections as folders;
+repeat :The user opens a section;
+  if (What does the user do?) then (hide or show)
+    :The change is saved as an exception of the user;
+  elseif (order or move) then
+    :The order or the section is saved;
+  else (rename)
+    :The title is saved;
+  endif
+repeat while (Anything else?) is (yes)
+:Preferences shows the arrangement of the user;
+stop
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+title UC-011 Respaldar y restaurar — colaboración
+boundary BackupDefaults
+control BackupPlugin
+control RestorePlugin
+entity Node
+BackupDefaults --> BackupPlugin : 1: incluir o no
+BackupPlugin --> Node : 2: leer los nodos del contexto
+BackupDefaults --> RestorePlugin : 3: restaurar o no
+RestorePlugin --> Node : 4: guardar los nodos del contexto restaurado
+@enduml

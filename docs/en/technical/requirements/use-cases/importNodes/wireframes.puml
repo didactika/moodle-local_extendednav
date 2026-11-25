@@ -1,0 +1,9 @@
+@startsalt
+{
+  Import nodes
+  ==
+  YAML file | [ Choose a file... ]
+  Existing nodes | ^Keep them^
+  [ Import ] | [ Cancel ]
+}
+@endsalt

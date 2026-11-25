@@ -1,0 +1,43 @@
+---
+title: Añadir o cambiar elementos
+summary: Cree un elemento, o cambie uno de Moodle, en la navegación principal o en el menú de usuario, como enlace o como submenú.
+order: 30
+---
+
+Vaya a **Administración del sitio > Apariencia > Navegación ampliada > Gestionar la navegación**. La columna de la izquierda elige la navegación; **Principal** y **Menú de usuario** enumeran los elementos de cada menú, con una búsqueda por título, clave o URL y menús que reducen la lista. Para las navegaciones de un curso, una actividad, una categoría y la administración, consulte [Cambiar las otras navegaciones](page:guides/other-navigations).
+
+<Screenshot src="asset:manage-usermenu.webp" alt="La lista del menú de usuario, con los elementos de Moodle y los elementos añadidos por el plugin" caption="La lista del menú de usuario." url="/local/extendednav/manage.php?menu=usermenu" />
+
+Necesita la capacidad `local/extendednav:manage`, o ser administrador del sitio.
+
+## Añadir o cambiar un elemento
+
+Seleccione **Añadir nodo**, o el icono de edición de un elemento. El formulario está en secciones, en el orden en que suele decidirse un elemento. Un campo obligatorio está marcado, y un valor no válido se explica bajo su campo al guardar. La primera vez que lo abre, un recorrido guiado explica cada campo; omite los que usted no puede cambiar.
+
+| Sección | Campos |
+|---|---|
+| **Nodo** | El **Tipo** de un elemento nuevo: **Enlace**, que lleva a una URL, o **Submenú**, que no tiene URL y contiene enlaces. Después la **Clave del nodo** (letras, números, guiones bajos y guiones) y su **Título**. En un elemento de Moodle, un aviso al principio de la sección lo indica: cambie solo lo necesario, ya que los campos vacíos conservan los valores de Moodle, que el título muestra en gris como texto de ejemplo en el idioma de la página |
+| **Enlace** | La **URL**: una ruta del sitio, como `/course/view.php?id=2`, o una URL completa de otro sitio. Un submenú no tiene ninguna |
+| **Aspecto y apertura** | Un **Texto de ayuda**, un **Icono** y cómo se abre con **Visualización**: **Ventana actual**, **Ventana nueva** o **Ventana emergente**, con su anchura y su altura. El icono solo está en la navegación principal y en el menú de usuario: **Elegir icono** abre una lista con búsqueda de iconos de Moodle y FontAwesome |
+| **Quién lo ve** | **Visibilidad** (todos, restringido a algunos **Roles**, o nadie), **Idiomas**, **Restricciones de acceso** con las mismas condiciones que una actividad, **Ocultar también a los administradores** y **Bloquear la URL**. Un nodo **No visible** no pide idiomas ni restricciones, ya que nadie lo ve |
+| **Dónde va** | El **Padre**, para mostrar el elemento en un submenú. Solo se ofrece un submenú; si el menú no tiene ninguno, el campo no se muestra. Un submenú queda en el nivel superior. La sección no aparece cuando no tiene nada que elegir |
+
+<Screenshot src="asset:node-form.webp" alt="El formulario de un elemento, con el Tipo elegido" caption="El formulario de un elemento." url="/local/extendednav/edit.php" />
+
+## Submenús
+
+Un submenú no tiene URL propia: agrupa enlaces, que se abren desde él. En la navegación principal es un menú con sus elementos debajo; en el menú de usuario abre un panel con sus elementos. Un submenú aparece en las listas como una carpeta: una pequeña carpeta tras su nombre lo marca y su nombre lo abre, para añadir enlaces dentro. Establezca el **Padre** de un enlace en un submenú para moverlo dentro, o edite un submenú para cambiar su título.
+
+## Eliminar un elemento
+
+Seleccione el icono de eliminar de un elemento. Un elemento de Moodle que se elimina vuelve como un elemento nuevo si Moodle lo añade de nuevo. Consulte [Los elementos de Moodle](page:concepts/moodles-own-items).
+
+## Qué rechaza el formulario
+
+El formulario rechaza los cambios que dejarían a todos los usuarios sin una página de destino, y la Administración del sitio nunca puede ocultarse ni anidarse. Un enlace necesita su URL; un enlace dentro de un submenú también.
+
+## Comprobar el resultado
+
+La navegación principal y el menú de usuario muestran el cambio al instante. Un elemento limitado a idiomas aparece solo a los usuarios de esos idiomas.
+
+<Screenshot src="asset:user-menu.webp" alt="El menú de usuario con un elemento añadido por el plugin" caption="El menú de usuario con el elemento Soporte." url="/my/" />

@@ -1,0 +1,70 @@
+---
+title: Cambiar una navegación para una categoría, un curso o una actividad
+summary: Dé a una categoría, un curso o una actividad su propio orden, sus nombres y sus nodos, mientras el resto del sitio conserva la navegación del sitio.
+order: 46
+---
+
+La navegación de un curso, de cada tipo de actividad y de una categoría se puede cambiar para todo el sitio y, como excepción, para una **categoría**, un **curso** o una **actividad**. Todo lo que hay dentro de una categoría la sigue, un curso puede cambiar lo que fija su categoría y una actividad puede cambiar lo que fija su curso.
+
+## Abrir la navegación de una categoría, un curso o una actividad
+
+En un curso, abra el menú del curso (**Más**) y seleccione **Navegación**. En una actividad, abra el menú de la actividad y seleccione **Navegación**. En una categoría, abra el menú de la categoría y seleccione **Navegación**. La página enumera las navegaciones que el contexto puede cambiar, en un selector sobre la lista:
+
+| Contexto | Navegaciones que cambia |
+|---|---|
+| Actividad | Su propia navegación, solo para esa actividad |
+| Curso | La navegación del curso y la navegación de cada tipo de actividad que tiene el curso (todos sus foros, todas sus tareas) |
+| Categoría | La navegación de la categoría, la de los cursos que contiene y la de cada tipo de actividad |
+
+<Screenshot src="asset:context-activity.webp" alt="La página Navegación de un foro, con un elemento oculto solo para ese foro" caption="La navegación de una actividad, cambiada desde la actividad." url="/local/extendednav/context.php" />
+
+<Screenshot src="asset:context-course.webp" alt="La página Navegación de un curso, con la navegación del curso y un nodo cambiado solo para el curso" caption="La navegación de un curso, cambiada desde el curso." url="/local/extendednav/context.php" />
+
+## Quién puede hacerlo
+
+Quien gestiona la navegación del sitio puede cambiar la navegación de cualquier categoría, curso y actividad, sin estar matriculado en el curso. En una categoría, un curso o una actividad, lo que una persona puede hacer depende de las capacidades que tenga allí; los profesores con permiso de edición y los gestores las tienen todas por defecto.
+
+| Capacidad | Permite |
+|---|---|
+| **Ver la navegación de una categoría, un curso o una actividad** | Abrir la página **Navegación** y leerla |
+| **Gestionar la navegación de una categoría, un curso o una actividad** | Cambiar esa navegación; cada tipo de cambio necesita además su propia capacidad |
+| **Mostrar y ocultar los nodos de una categoría, un curso o una actividad** | Mostrar y ocultar nodos |
+| **Ordenar los nodos de una categoría, un curso o una actividad** | Arrastrar nodos, elegir su padre y dónde van |
+| **Renombrar los nodos de una categoría, un curso o una actividad** | Cambiar títulos y textos de ayuda |
+| **Cambiar los iconos de los nodos de una categoría, un curso o una actividad, y cómo se abren** | Cambiar iconos y cómo se abren |
+| **Cambiar las URL de los nodos de una categoría, un curso o una actividad** | Cambiar adónde lleva un nodo |
+| **Restringir los nodos de una categoría, un curso o una actividad** | Roles, idiomas, restricciones de acceso, administradores y bloqueo |
+| **Añadir nodos a una categoría, un curso o una actividad** | Añadir nodos propios |
+| **Eliminar los nodos de una categoría, un curso o una actividad** | Eliminar los nodos añadidos y volver a lo que fija el sitio |
+
+Los campos y los botones de un cambio que la persona no puede hacer no se muestran. Conceda una capacidad a otros roles, como los profesores sin permiso de edición, en un curso o en una categoría con los permisos de Moodle. Consulte [Ajustes y capacidades](page:reference/settings-and-capabilities).
+
+## Ver todas las excepciones
+
+En **Administración del sitio > Apariencia > Navegación ampliada > Excepciones**, la lista muestra cada categoría, curso y actividad que cambia una navegación, con el número de nodos que cambia en cada una. Una actividad muestra su curso y sus categorías bajo su nombre. Busque por el nombre de una categoría o de un curso (una actividad se encuentra por su curso), reduzca la lista a categorías, cursos o actividades y seleccione una para abrir su página. Las preferencias que organiza cada usuario son suyas y no se enumeran aquí.
+
+<Screenshot src="asset:exceptions-overview.webp" alt="La lista de las categorías, los cursos y las actividades que cambian una navegación" caption="Todas las excepciones del sitio, en una lista." url="/local/extendednav/exceptions.php" />
+
+## Hacer una excepción
+
+La lista muestra lo que muestran las páginas de la categoría, el curso o la actividad: los nodos del sitio y los que hereda. Cambie un nodo como lo haría para el sitio: ocúltelo, muévalo o edítelo. El primer cambio de un nodo da a la categoría, al curso o a la actividad una fila propia, que empieza como copia del nodo al que sustituye. La fila muestra **Excepción**; un nodo que procede de una categoría superior muestra **Heredado**.
+
+- Gana el ámbito más cercano: la actividad sobre su curso, el curso sobre su categoría y la categoría sobre el sitio.
+- Cuando una categoría o un curso cambia el orden de cualquier nodo, fija el orden de toda su navegación.
+- Un nodo añadido para un curso existe solo allí.
+
+## Volver al sitio
+
+El botón al final de la fila de una excepción (**Volver**) elimina los cambios de la categoría, el curso o la actividad para ese nodo, y su navegación vuelve a seguir al sitio. Eliminar un nodo del sitio elimina también sus excepciones.
+
+## Copias de seguridad y restauraciones
+
+Las excepciones de un **curso** y de sus **actividades** forman parte del curso: van en la copia de seguridad del curso, o de la actividad, y vuelven al restaurarla, también como curso nuevo o en otro curso. Los grupos, las agrupaciones, las fechas, los elementos de calificación y las actividades de sus condiciones se emparejan con los restaurados. Un nodo que el curso o la actividad ya cambia se conserva tal como está. Una copia hecha con una versión anterior a la 2.0, que tenía una sola navegación para todas las actividades, da cada nodo a los tipos de actividad que lo tienen.
+
+El sitio decide si van en una copia de seguridad y si vuelven con una restauración. En **Administración del sitio > Cursos > Copias de seguridad**, **Configuración general de copias de seguridad** tiene **Incluir los cambios de navegación** y **Configuración general de restauración** tiene **Restaurar los cambios de navegación**; ambas están activadas por defecto.
+
+<Screenshot src="asset:backup-defaults.webp" alt="La configuración general de copias de seguridad, con la opción Incluir los cambios de navegación" caption="Si los cambios de un curso van en sus copias de seguridad." url="/admin/settings.php?section=backupgeneralsettings" />
+
+## Exportar e importar
+
+Las excepciones de una **categoría** pertenecen al sitio, ya que Moodle no hace copias de seguridad de las categorías: **Exportar > Esta navegación** y **Exportar > Todas las navegaciones** las incluyen, cada una con su categoría (`scope`). Al importar, la categoría se busca por su nombre completo, con sus padres; una que no existe en el sitio se omite con un aviso. Consulte [Importar y exportar](page:guides/import-and-export) y [El formato YAML](page:reference/yaml-format).

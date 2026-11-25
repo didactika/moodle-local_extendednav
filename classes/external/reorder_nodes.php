@@ -21,7 +21,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_extendednav\local\node_manager;
+use local_extendednav\local\node\manager;
 use local_extendednav\menu_manager;
 
 /**
@@ -65,7 +65,7 @@ class reorder_nodes extends external_api {
         if (menu_manager::get_menu($params['menu']) === null) {
             throw new \invalid_parameter_exception('Unknown menu');
         }
-        node_manager::reorder($params['menu'], $params['ids']);
+        manager::reorder($params['menu'], $params['ids']);
         return ['success' => true];
     }
 

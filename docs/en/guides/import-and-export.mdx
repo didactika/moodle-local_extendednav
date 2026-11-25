@@ -1,0 +1,50 @@
+---
+title: Import and export
+summary: Copy navigations from one site to another with a YAML file, choosing what the file holds.
+order: 50
+---
+
+## Export
+
+On the management page, open **Export** and choose:
+
+- **This navigation**, for a file with every node of the navigation chosen, including the exceptions of categories.
+- **Every navigation**, for one file with every navigation and whether each one is on.
+- **Choose what to export**, to choose what the file holds.
+
+<Screenshot src="asset:manage-export-menu.webp" alt="The Export menu open, with the options This navigation, Every navigation and Choose what to export" caption="The three kinds of export." url="/local/extendednav/manage.php" />
+
+All the files have the same format: every node says which navigation it belongs to. In the site administration, only the categories and pages that were changed are written, and the ones of a category that was ordered by hand.
+
+### Choose what to export
+
+The form has three parts:
+
+| Part | What it offers |
+|---|---|
+| **Navigations** | The **navigations of the site** and the **kinds of activity** to write, and whether to **include the changes of the whole site** |
+| **Preferences of users** | The users whose arrangement of their own Preferences page goes in the file |
+| **Courses and categories** | The courses and categories whose changes go in the file. The changes of a course and of its activities already travel in the backups of Moodle: choose them here only to move them in a file |
+
+Each of these is a select with a search. It shows the first ten results when you open it, and finds ten at a time as you type, so a site with thousands of users, courses or categories stays quick. Choose at least one navigation and where its changes come from: the whole site, some users, courses or categories.
+
+<Screenshot src="asset:export-choose.webp" alt="The form that chooses what to export, with the selects of navigations, users, courses and categories" caption="Choose what the file holds." url="/local/extendednav/export.php?choose=1" />
+
+On the page of a category, a course or an activity, **Export** writes the changes of that context only.
+
+## Import
+
+On the other site, select **Import** and upload the file (`.yaml` or `.yml`). The same page imports a file of one navigation or of every navigation. In **Existing nodes**, choose whether the nodes that already exist are kept or replaced.
+
+<Screenshot src="asset:import.webp" alt="The import page, with the field for the YAML file and the choice for the existing nodes" caption="The import page." url="/local/extendednav/import.php" />
+
+| Case | What happens |
+|---|---|
+| A node is not valid | The page lists each problem with its reason, and nothing is imported |
+| A node of Moodle that this site does not have, such as a page of a plugin that is not installed | It is left out with a warning, and the rest of the file is imported |
+| A node of a category, a course, an activity or a user that does not exist on this site | It is left out with a warning, and the rest of the file is imported |
+| A node of a category, a course, an activity or a user | It is imported for the one with the same name: the full name of a category, the short name of a course, the course and the number of an activity, the username of a user |
+| A file of every navigation | Each navigation is turned on or off as the file says |
+| A language that is not installed | A warning is shown, and the node is imported |
+
+Each node keeps its position, so a whole navigation is imported in the same order. **See the YAML format** on the import page describes every field and offers an example file. The same description is in [The YAML format](page:reference/yaml-format). From outside Moodle, the same export and import are web services: see [Manage the navigations from outside Moodle](page:guides/web-services).

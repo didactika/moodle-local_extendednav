@@ -1,0 +1,30 @@
+---
+title: Instalación
+summary: Requisitos y cómo instalar el plugin desde una versión publicada o desde Git.
+order: 10
+---
+
+**Requisitos:** Moodle 4.5 a 5.2, con la versión de PHP que requiera su versión de Moodle, y un tema basado en Boost. Moodle 5.3 tiene una línea propia con las mismas funciones.
+
+| Moodle | Rama | Versiones |
+|---|---|---|
+| 4.5 a 5.2 | `MOODLE_400_STABLE` | `X.Y.Z-m405` |
+| 5.3 | `main` | `X.Y.Z-m503` |
+
+<Tabs>
+  <TabItem label="Desde una versión publicada">
+    Descargue el ZIP de la última versión, vaya a **Administración del sitio > Extensiones > Instalar plugins**, suba el archivo y siga las indicaciones.
+  </TabItem>
+  <TabItem label="Desde Git">
+```bash
+cd /path/to/moodle
+# Moodle 4.5 y 5.0
+git clone -b MOODLE_400_STABLE https://github.com/didactika/moodle-local_extendednav.git local/extendednav
+# Moodle 5.1 y 5.2
+git clone -b MOODLE_400_STABLE https://github.com/didactika/moodle-local_extendednav.git public/local/extendednav
+php admin/cli/upgrade.php
+```
+  </TabItem>
+</Tabs>
+
+La instalación crea una fila para cada elemento de Moodle e importa los elementos ya definidos en **Elementos de menú personalizados** y **Elementos del menú de usuario**. El siguiente paso es [cambiar un primer elemento](page:getting-started/quick-start).

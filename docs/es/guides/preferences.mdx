@@ -1,0 +1,43 @@
+---
+title: Organizar la página de preferencias
+summary: Ordene, renombre, oculte y amplíe las secciones y las opciones de la página Preferencias, para todo el sitio y para cada usuario.
+order: 48
+---
+
+La página **Preferencias** de Moodle (las opciones de una persona: su cuenta, los foros, el calendario, las insignias, las notificaciones…) se compone de **secciones**, cada una con sus **opciones**. El plugin las enumera como carpetas, igual que la administración del sitio, de modo que el sitio puede organizarlas para todos y cada persona puede organizar las suyas.
+
+## Organizarla para todo el sitio
+
+Vaya a **Administración del sitio > Apariencia > Navegación ampliada > Gestionar la navegación** y elija **Preferencias**. La lista muestra las secciones (**Cuenta de usuario**, **Blogs**, **Insignias**, **Roles**, **Varios**…); el nombre de una sección la abre y enumera sus opciones. Las secciones y las opciones se registran cuando una persona abre Preferencias, como en las demás navegaciones.
+
+<Screenshot src="asset:manage-preferences.webp" alt="La página de gestión con la navegación Preferencias elegida y sus secciones en lista" caption="Las secciones de la página Preferencias, como carpetas." url="/local/extendednav/manage.php?menu=preferences" />
+
+| Acción | Cómo |
+|---|---|
+| Ocultar una sección o una opción | El botón de ojo de su fila |
+| Renombrarla | Edítela y rellene **Título**. El título muestra, en gris, el nombre que le da Moodle en su idioma |
+| Ordenarla | Arrástrela por su asa |
+| Mover una opción a otra sección | Edítela y elija la **Sección** |
+| Añadir una sección propia | **Añadir nodo** con el **Tipo** **Sección** y un título. Añada las opciones dentro |
+| Añadir un enlace propio | **Añadir nodo** con el **Tipo** **Enlace**, un título, una URL y la **Sección** en la que va |
+
+Los elementos que no están en ninguna sección, que Moodle muestra al final, forman una sección, **Varios**, que se puede ordenar, renombrar y ocultar como cualquier otra. Una sección sin ninguna opción que mostrar no se muestra. Una sección no es un enlace: no tiene URL, y una opción de Moodle conserva la URL que le da Moodle.
+
+## Organizar la propia página
+
+Cada persona puede organizar su propia página si tiene la capacidad **Organizar y ocultar las opciones de la propia página de preferencias** (`local/extendednav:personalise`), que todos los usuarios tienen por defecto. Abra **Preferencias**: en la sección **Navegación ampliada**, seleccione **Organizar mis preferencias**. La página es la misma lista, en su propia cuenta.
+
+<Screenshot src="asset:preferences-section.webp" alt="La página Preferencias con la sección Navegación ampliada y la opción Organizar mis preferencias" caption="El acceso a su propia lista." url="/user/preferences.php" />
+
+<Screenshot src="asset:personal-preferences.webp" alt="La lista de las secciones de la página Preferencias de un usuario, con sus botones de ojo" caption="Su propia lista: lo que cambie se aplica solo a su cuenta." url="/local/extendednav/context.php" />
+
+Puede ocultar una opción con su botón de ojo, mostrarla de nuevo, arrastrarla para cambiar su lugar, renombrarla, moverla a otra sección (edítela y elija la **Sección**) y, con el botón al final de su fila, volver a lo que fija el sitio. Lo que no cambie sigue al sitio, y lo que el sitio oculta permanece oculto. No puede cambiar adónde lleva una opción, y el acceso a la organización de la página nunca se oculta. La primera vez que abre la página, un recorrido guiado la explica.
+
+Un administrador organiza la página de otro usuario desde ese usuario: abra las **Preferencias** del usuario y, en la sección **Navegación ampliada**, seleccione **Organizar las preferencias de** ese usuario. No existe una lista de todos los usuarios.
+
+## Qué se conserva
+
+Lo que una persona organiza se conserva en su propia cuenta, como cambios de su propio contexto, y se elimina con la cuenta. La API de privacidad de Moodle lo exporta junto con el resto de los datos de la persona. El plugin no conserva nada más sobre una persona.
+
+> [!NOTE]
+> La página de perfil la construye Moodle y conserva sus cuadros: el plugin no la cambia.

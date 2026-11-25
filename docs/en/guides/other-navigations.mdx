@@ -1,0 +1,73 @@
+---
+title: Change the other navigations
+summary: Order, rename, hide and extend the navigation of the site home, of a course, of each kind of activity and of a category.
+order: 45
+---
+
+Besides the primary navigation and the user menu, the plugin changes the navigations that Moodle draws under the header of a page: the one of the **site home**, of a **course**, of each **kind of activity** (forums, assignments, quizzes and the rest) and of a **category**. The site administration and the page Preferences have a page of their own: see [Shape the site administration](page:guides/site-administration) and [Arrange the Preferences page](page:guides/preferences).
+
+<Screenshot src="asset:manage-course.webp" alt="The management page with the course navigation chosen and its nodes listed" caption="The management page: the navigations to the left and the nodes of the one chosen to the right." url="/local/extendednav/manage.php?menu=course" />
+
+## Choose the navigation
+
+On the management page, the column to the left lists the navigations in one list: **Primary**, **User menu**, **Preferences**, **Site home**, **Course**, **Category**, **Activities** and **Site administration**. On a narrow screen the column is a select with a search, above the name of the page, with the same entries; it also lists the kinds of activity. The name of the navigation and its actions are above the list, and the column starts at the height of the list.
+
+**Activities** opens the list of the kinds of activity, because the kinds are many and each has its own navigation: a forum has **Subscriptions**, an assignment has **Submissions**, and a plugin can add an item to one kind only. The list shows each kind with its icon, how many activities of the kind the site has and in how many courses, what the site changes in its navigation (the items hidden, restricted, renamed and added), how many categories, courses and activities change it on their own and when it was last changed. The kinds the site uses come first. Search by name; select a kind to open its navigation. A change made in the navigation of the forums applies to every forum, and to no other kind.
+
+<Screenshot src="asset:manage-kinds.webp" alt="The list of the kinds of activity, with their use and what the site changes in each" caption="The kinds of activity: choose one to change its navigation." url="/local/extendednav/manage.php?menu=activities" />
+
+<Screenshot src="asset:manage-activity.webp" alt="The management page with the navigation of the forums chosen under Activities" caption="The navigation of one kind of activity." url="/local/extendednav/manage.php?menu=mod_forum" />
+
+## Turn a navigation on or off
+
+The button next to the name of the navigation says whether its changes are applied. Press **On** to turn them off: Moodle then draws that navigation as it does without the plugin, and the other navigations keep their changes. Press **Off** to apply them again. Nothing is lost while a navigation is off.
+
+## See what Moodle shows
+
+Moodle has no list of the nodes of these navigations: they depend on the page, on who looks and on the plugins that add theirs. The plugin records each node the first time a page shows it, so the list fills as people use the site. A node of Moodle appears in the list with the link and the title Moodle gives it, and it can be changed from then on.
+
+Each kind of activity is also looked through once a day: the scheduled task **Find the items of the navigation of each kind of activity** builds the navigation of the most recent activities of every kind, as an administrator, and lists every item it finds. An item that a plugin adds only to some activities (a report for the assignments that use it, for example) appears as soon as one activity of the site has it. On the list of a kind of activity, **Find items** does the same at once for that kind, and says how many activities it reviewed and how many items it added.
+
+While the list of a navigation is empty, select **Find the nodes**: the plugin opens a page of the site that shows that navigation (a course, an activity, a category or the site home), without leaving the management page, and lists what it finds. **Open a page that shows it** opens the same page in a new tab.
+
+## What you can do with a node
+
+| Action | How |
+|---|---|
+| Hide or show it | The eye button of its row, or **Hide** and **Show** in the bar that appears when you select nodes. Hiding asks whether to hide the nodes from administrators too and whether to block their URLs, for whoever may restrict them |
+| Order it | Drag it by its handle; the nodes selected with it go too. See [Order the items](page:guides/order-items) |
+| Rename it or change its URL | Edit it and fill **Title** or **URL**. An empty field keeps what Moodle gives |
+| Restrict it | Edit it and choose the roles or the languages that see it |
+| Decide where it goes | Edit it and choose **Where it goes**: where Moodle puts it, always in the **More** menu, or in the bar, out of the menu |
+| Add a node of your own | **Add node**. The title and the URL are required |
+
+The secondary navigations have no submenus and draw no icons, so their nodes have neither a parent nor an icon, and the list keeps no room for one.
+
+## The list
+
+The list shows every node of the navigation, with no pages, so the whole navigation can be ordered. In the primary navigation, the user menu, the Preferences and the site administration the nodes are folders: a node that holds others has a small folder after its name, and its name opens it. The path above the list shows where you are and takes you back. A search or a filter looks in every level at once, so folders and items are found wherever they are.
+
+Search by title, key or URL. Three menus narrow the list, and each says how many nodes each option has:
+
+- **Visibility**: the nodes visible to everyone, restricted or hidden.
+- **Origin**: the nodes of Moodle (or of another plugin), marked **Moodle**, and the nodes added on this page, marked **Added**.
+- **Restriction**: the nodes with a kind of restriction, the same ones the badges say: roles, languages, a blocked URL, hidden from administrators too, conditions, scheduled, ended, a placement of their own, or always shown. Several kinds can be chosen; a node with any of them is listed.
+
+The column **Visibility** shows the visibility of each node and, beside it, a badge for each kind of restriction: **Roles**, **Languages**, **URL blocked**, **Admins too**, **Only admins**. Place the pointer over a badge to read its restriction in a sentence. Select a badge to open **Who sees**, which lists every restriction of the node, one row for each badge, with the button **Edit node**. The button at the end of the row of filters clears the search and the filters. A text that is cut with an ellipsis shows its whole text when the pointer is over it.
+
+<Screenshot src="asset:restrictions-dialog.webp" alt="The dialog Who sees, with a row for each badge of the visibility of a node" caption="Select a badge to read every restriction of the node." url="/local/extendednav/manage.php?menu=primary" />
+
+The buttons of each row are always in the same place: show or hide first, then edit, then delete. A row without one of them leaves its place empty, so each action is in one column and the titles start on the same line.
+
+The bar of the selection offers only what the nodes selected allow: **Show** when one of them is not visible to everyone, **Hide** when one of them is visible, and **Delete** when one of them was added. The question before **Hide** has two switches, **Hide from administrators too** and **Block the URL too**; the question lists the nodes it leaves as they are.
+
+<Screenshot src="asset:hide-dialog.webp" alt="The question before hiding a node, with the switches to hide it from administrators and to block its URL" caption="Hiding a node can also block its URL, in one step." url="/local/extendednav/manage.php?menu=course" />
+
+<Screenshot src="asset:manage-selection.webp" alt="Two nodes selected, with the bar of actions over the list" caption="Select nodes to show, hide or delete them together." url="/local/extendednav/manage.php?menu=course" />
+
+> [!NOTE]
+> Nothing reloads the page: a change is saved when you press its button and the list is drawn again at once.
+
+## A guided tour
+
+The first time you open the **Navigation** page of a course or an activity, a guided tour explains the list, the order, the eye button, the badges and how to add a node. It is shown once. An administrator manages it in **Site administration > Appearance > User tours**.

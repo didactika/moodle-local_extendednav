@@ -1,0 +1,23 @@
+---
+title: The items of Moodle
+summary: How the plugin treats the items that Moodle adds by itself.
+order: 30
+---
+
+The management page lists the items that Moodle adds to each menu together with the items you add. The items of Moodle are the ones Moodle itself puts in the primary navigation, including the tabs that other plugins add, and the default **User menu items**.
+
+## Changing an item of Moodle
+
+Change only what you need. The empty fields keep the values of Moodle, and the form shows them as placeholders, so the item stays translated in every language of the site. Use the key of the item of Moodle (for example `myhome`) when you import a file that changes it.
+
+## Custom menu items
+
+The items of **Custom menu items** and **User menu items** of Moodle are imported at the installation, with their tooltips and language codes, and kept in sync.
+
+## Items that Moodle stops adding
+
+New items of the primary navigation are found whenever the management page is opened. An item that Moodle stops adding is marked **Currently unavailable** and is not added by the plugin either. This happens, for example, when it is turned off in **Site administration > Appearance > Navigation**, when the theme removes it or when it came from a plugin that was uninstalled. You can delete it, and it comes back as a new item if Moodle adds it again.
+
+## Icons
+
+The icon of an item is chosen from a searchable picker of the icons of Moodle, including those of its plugins, and of the FontAwesome icons that Moodle ships. The user menu only shows FontAwesome icons: an icon of Moodle is shown as its FontAwesome icon, so an icon without one, such as an image, is not shown.

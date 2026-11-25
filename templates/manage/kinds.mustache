@@ -1,0 +1,97 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage/kinds
+
+    The kinds of activity of the site, each with its own navigation: a search, and a list with the icon and the name of each
+    kind, how much the site uses it, what the site changes in its navigation, how many courses, categories or activities
+    change it on their own and when it was last changed. The kinds the site uses come first. A kind opens its navigation.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "name": "Activities", "description": "Order, rename, hide and extend the navigations of Moodle.", "origins": [], "originoptions": [],
+        "rows": [{"key": "mod_forum", "name": "Forum", "component": "mod_forum", "url": "#", "activities": 12,
+            "usage": "12 activities in 4 courses", "itemslabel": "10 items", "changes": [{"label": "2 hidden"}], "exceptions": 3,
+            "lastchange": "24/11/26", "off": false}]
+    }
+}}
+<div class="len" data-region="kinds">
+    {{#description}}<p class="text-muted mb-0">{{description}}</p>{{/description}}
+    {{> local_extendednav/manage/origins_bar }}
+    <div class="d-grid gap-3" data-region="head">
+        <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+        <p class="small text-muted mb-0">{{#str}}kinds_desc, local_extendednav{{/str}}</p>
+    </div>
+    <div data-region="layout">
+        {{> local_extendednav/manage/origins }}
+        <div class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
+            <div class="card">
+                <div class="d-flex align-items-center gap-2 px-3 py-2 border-bottom" data-region="filters">
+                    <form class="position-relative d-flex align-items-center" role="search" aria-label="{{#str}}kinds_search, local_extendednav{{/str}}">
+                        {{#pix}}a/search, core{{/pix}}
+                        <label class="sr-only visually-hidden" for="len-kinds-search">{{#str}}kinds_search, local_extendednav{{/str}}</label>
+                        <input class="form-control" type="search" id="len-kinds-search" data-region="kindsearch" placeholder="{{#str}}kinds_search, local_extendednav{{/str}}" autocomplete="off">
+                    </form>
+                </div>
+                <div class="table-responsive" data-region="tablewrap">
+                    <table class="table">
+                        <caption class="sr-only visually-hidden">{{#str}}kinds_caption, local_extendednav{{/str}}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{#str}}kinds_kind, local_extendednav{{/str}}</th>
+                                <th scope="col" class="d-none d-md-table-cell">{{#str}}kinds_changes, local_extendednav{{/str}}</th>
+                                <th scope="col" class="text-end text-right d-none d-md-table-cell">{{#str}}kinds_exceptions, local_extendednav{{/str}}</th>
+                                <th scope="col" class="text-end text-right d-none d-lg-table-cell">{{#str}}kinds_lastchange, local_extendednav{{/str}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#rows}}
+                                <tr data-region="kind" data-name="{{name}}">
+                                    <th scope="row">
+                                        <span class="d-flex align-items-center gap-2">
+                                            <span class="text-muted" data-region="nodeicon">{{#pix}}monologo, {{component}}{{/pix}}</span>
+                                            <span class="d-flex flex-column overflow-hidden">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <a class="fw-bold text-truncate" href="{{url}}" title="{{name}}">{{name}}</a>
+                                                    {{#off}}<span class="badge rounded-pill text-bg-secondary">{{#str}}navigation_off, local_extendednav{{/str}}</span>{{/off}}
+                                                </span>
+                                                <span class="small text-muted fw-normal text-truncate" title="{{usage}}">{{usage}}</span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <td class="d-none d-md-table-cell">
+                                        <span class="d-inline-flex flex-wrap align-items-center gap-1">
+                                            <span class="small text-muted me-1 mr-1">{{itemslabel}}</span>
+                                            {{#changes}}<span class="badge rounded-pill text-bg-light">{{label}}</span>{{/changes}}
+
+                                        </span>
+                                    </td>
+                                    <td class="text-end text-right d-none d-md-table-cell">{{#exceptions}}{{exceptions}}{{/exceptions}}{{^exceptions}}<span class="text-muted">—</span>{{/exceptions}}</td>
+                                    <td class="text-end text-right text-nowrap d-none d-lg-table-cell">{{#lastchange}}{{lastchange}}{{/lastchange}}{{^lastchange}}<span class="text-muted">—</span>{{/lastchange}}</td>
+                                </tr>
+                            {{/rows}}
+                        </tbody>
+                    </table>
+                    <div class="text-center text-muted py-5" data-region="kindsempty" hidden>{{#str}}noresults, local_extendednav{{/str}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

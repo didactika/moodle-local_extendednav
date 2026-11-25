@@ -1,0 +1,40 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/dialog/restrictions
+
+    Body of the dialog that explains who sees a node: one row for each badge of its visibility, the badge on the left and
+    the restriction in a sentence on the right, and the link to change them.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "items": [
+            {"label": "Restricted", "tone": "warning", "detail": "Shown only to the roles chosen."},
+            {"label": "Roles", "tone": "light", "detail": "Roles: editingteacher, teacher"}
+        ],
+        "editurl": "#"
+    }
+}}
+<dl class="row mb-0" data-region="restrictions">
+    {{#items}}
+        <dt class="col-sm-4 px-0 py-2 mb-0 border-bottom"><span class="badge rounded-pill text-bg-{{tone}}">{{label}}</span></dt>
+        <dd class="col-sm-8 px-0 py-2 mb-0 border-bottom">{{detail}}</dd>
+    {{/items}}
+</dl>

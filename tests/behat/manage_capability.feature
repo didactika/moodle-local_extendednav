@@ -27,4 +27,4 @@ Feature: Let other roles manage the navigation
     And I should not see "Apply the navigation nodes and URL blocking"
     And I click on "Manage navigation" "link" in the "region-main" "region"
     And I should see "Primary navigation"
-    And I should see "myhome" in the "local-extendednav-manage" "table"
+    And I should see "Primary" in the "[data-region='origins']" "css_element"

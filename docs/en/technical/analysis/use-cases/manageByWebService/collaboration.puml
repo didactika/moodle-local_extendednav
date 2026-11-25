@@ -1,0 +1,10 @@
+@startuml
+title UC-012 Manage the navigations from outside Moodle — collaboration
+boundary ExternalClient
+control Services
+control NodeRules
+entity Node
+ExternalClient --> Services : 1: call with a token
+Services --> NodeRules : 2: validate
+Services --> Node : 3: read and save
+@enduml

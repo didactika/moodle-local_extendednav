@@ -17,6 +17,7 @@ Feature: Change the primary navigation
       | student1 | C1     | student        |
       | teacher1 | C1     | editingteacher |
 
+  @javascript
   Scenario: An administrator adds a custom item from the management page
     Given I log in as "admin"
     And I navigate to "Appearance > Extended navigation > Manage navigation" in site administration
@@ -27,7 +28,7 @@ Feature: Change the primary navigation
       | URL      | /my/courses.php |
     And I press "Save changes"
     Then I should see "Node saved."
-    And I should see "help" in the "local-extendednav-manage" "table"
+    And I should see "help" in the "[data-region='tablewrap']" "css_element"
     And I log out
     And I log in as "student1"
     And I should see "Help centre" in the ".primary-navigation" "css_element"
@@ -96,11 +97,11 @@ Feature: Change the primary navigation
     When I log in as "student1"
     Then "Library" "link" should exist in the ".primary-navigation .dropdown-menu" "css_element"
 
-  Scenario: Nothing changes while the plugin is disabled
+  Scenario: Nothing changes while the primary navigation is turned off
     Given the following "local_extendednav > nodes" exist:
       | nodekey   | visibility |
       | mycourses | 0          |
     And the following config values are set as admin:
-      | enable_plugin | 0 | local_extendednav |
+      | enabled_primary | 0 | local_extendednav |
     When I log in as "student1"
     Then I should see "My courses" in the ".primary-navigation" "css_element"

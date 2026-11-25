@@ -1,0 +1,78 @@
+---
+title: Settings and capabilities
+summary: How each navigation is turned on or off, the settings of the activity log, the capabilities of the plugin, the tours, the web services and what it stores.
+order: 40
+---
+
+## Turn a navigation on or off
+
+Everything about the navigations is on the management page, at **Site administration > Appearance > Extended navigation > Manage navigation**. The button next to the name of each navigation applies its changes or not. It shows **On**, in green, while the changes are applied: press it to turn them off. It then shows **Off**, in grey, and the column of the navigations marks that navigation as **Off**: press the button to apply the changes again. While a navigation is off, Moodle draws it as it does without the plugin, and its nodes and their order are kept. The other navigations keep their changes.
+
+| Navigation | When it is off |
+|---|---|
+| Primary navigation | Moodle shows its primary navigation, and no URL is blocked |
+| User menu | Moodle shows its user menu |
+| Preferences | Moodle shows its Preferences page, and each user still arranges their own |
+| Site home, course, activity, category | Moodle shows its own navigation on those pages |
+| Site administration | Moodle shows its own tree of categories and pages |
+
+Whether a node is also hidden from administrators is decided in the form of each node. See [Administrators see every node](page:concepts/administrators-see-everything).
+
+## Settings
+
+| Where | Setting | What it does |
+|---|---|---|
+| **Site administration > Reports > Extended navigation > Activity log settings** | **Clean up the activity log** (off by default) | A scheduled task deletes every day the entries of the activity log older than the time below. The task is turned on and off with this setting |
+| Same page | **Keep the entries for** | How long an entry is kept, in days, weeks or any other unit, with no upper limit |
+| **Site administration > Courses > Backups > General backup defaults** | **Include the navigation changes** (on by default) | Whether the backup of a course or an activity holds the changes of its navigation |
+| **Site administration > Courses > Backups > General restore defaults** | **Restore the navigation changes** (on by default) | Whether restoring a course or an activity brings those changes back |
+
+<Screenshot src="asset:log-settings.webp" alt="The settings of the activity log, with the switch to clean it up and the time to keep the entries" caption="How long the activity log keeps its entries." url="/admin/settings.php?section=local_extendednav_logsettings" />
+
+## Capabilities
+
+| Capability | Default roles | Allows the user to |
+|---|---|---|
+| `local/extendednav:manage` | None | Manage the items, import, export and see the activity log, in the system context |
+| `local/extendednav:viewcontext` | Editing teacher, manager | View the navigation of a category, a course or an activity |
+| `local/extendednav:managecontext` | Editing teacher, manager | Manage the navigation of a category, a course or an activity; each kind of change also needs its own capability |
+| `local/extendednav:changevisibility` | Editing teacher, manager | Show and hide the nodes of a category, a course or an activity |
+| `local/extendednav:changeorder` | Editing teacher, manager | Order the nodes, choose their parent and where they go |
+| `local/extendednav:changetitles` | Editing teacher, manager | Rename the nodes and change their tooltips |
+| `local/extendednav:changeicons` | Editing teacher, manager | Change the icons of the nodes and how they open |
+| `local/extendednav:changelinks` | Editing teacher, manager | Change the URLs of the nodes |
+| `local/extendednav:changeconditions` | Editing teacher, manager | Restrict the nodes: roles, languages, access restrictions, administrators and blocking |
+| `local/extendednav:addnodes` | Editing teacher, manager | Add nodes of their own |
+| `local/extendednav:deletenodes` | Editing teacher, manager | Delete the nodes added, or take the navigation back to what the site sets |
+| `local/extendednav:personalise` | Authenticated user | Arrange and hide the options of one’s own Preferences page |
+
+The users who hold `local/extendednav:manage` find the management page in the same place as the administrators.
+
+> [!WARNING]
+> Whoever holds `local/extendednav:manage` decides the menu of every user and which pages are blocked. Give it only to people you would trust with the navigation of the site.
+
+## Scheduled tasks
+
+| Task | When | What it does |
+|---|---|---|
+| **Find the items of the navigation of each kind of activity** | Once a day, at night | Builds, as an administrator, the navigation of the most recent activities of each kind and lists the items Moodle and its plugins add to them, so they can be changed before anyone opens such an activity. It sends nothing to the browser and changes nothing on the activities |
+| **Clean up the activity log of the navigation** | Once a day, only while the clean-up is on | Deletes the old entries of the activity log, a day of the log at a time and in batches, and goes on from where it stopped |
+| **Import a menu setting of Moodle into the navigation** | On demand | Imports again the custom menu items or the user menu items after an administrator changes that setting of Moodle |
+
+Their schedule is set in **Site administration > Server > Tasks > Scheduled tasks**.
+
+## Guided tours
+
+The plugin adds guided tours: the **Navigation** page of a course or an activity, the Preferences page of a user, the page where a user arranges their preferences and the form of a node. They are added when the plugin is installed or upgraded, are shown once, and skip the steps whose element a person does not have. They are managed like any other tour in **Site administration > Appearance > User tours**.
+
+## Web services
+
+The functions of the plugin are gathered in the external service **Extended navigation**. See [Manage the navigations from outside Moodle](page:guides/web-services).
+
+## Privacy
+
+The only personal data the plugin keeps is how a user arranged their own Preferences page. The plugin implements the Privacy API: the arrangement is listed, exported and deleted with the user.
+
+## Backup
+
+The nodes of the site and the exceptions of the categories are configuration of the site: use the YAML export to copy them. The exceptions of a course and of its activities are part of the backup of the course, and of the backup of each activity.

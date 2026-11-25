@@ -1,0 +1,146 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/manage/page
+
+    The page of the navigations: the navigations to the left (a select on a narrow screen), and to the right the name, the actions
+    and the list of the nodes of the navigation chosen. For the whole site (sitewide) it has the On and Off button, the import, the
+    export and the way to the exceptions; for a category or a course it says what the changes reach.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "config": "{}",
+        "name": "Course navigation",
+        "origins": [
+            {"label": "Course", "items": [{"key": "course", "name": "Course navigation", "url": "#", "active": true}]}
+        ],
+        "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}],
+        "enabled": true,
+        "sitewide": true,
+        "hasscopes": true,
+        "exceptionsurl": "#",
+        "scopename": "",
+        "addurl": "#",
+        "importurl": "#",
+        "exporturl": "#",
+        "exporteverythingurl": "#",
+        "exportchooseurl": "#",
+        "canadd": true,
+        "candiscover": false,
+        "searchlabel": "Search nodes",
+        "id": "len-nodes"
+    }
+}}
+<div class="len" data-region="manage" data-scope="{{scope}}" data-config="{{config}}">
+    {{#sitewide}}<p class="text-muted mb-0">{{#str}}manage_nodes_desc, local_extendednav{{/str}}</p>{{/sitewide}}
+    {{^sitewide}}<p class="text-muted mb-0">{{#description}}{{description}}{{/description}}{{^description}}{{#str}}context_desc, local_extendednav, {{scopename}}{{/str}}{{/description}}</p>{{/sitewide}}
+
+    {{^single}}{{> local_extendednav/manage/origins_bar }}{{/single}}
+    <div class="d-grid gap-3" data-region="head">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <h2 class="h4 fw-bold mb-0">{{name}}</h2>
+                {{#sitewide}}
+                    <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
+                        <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
+                        <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/uncheckedcircle, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
+                    </button>
+                {{/sitewide}}
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2" data-region="actions">
+                {{#canadd}}
+                    <a class="btn btn-primary" href="{{addurl}}" data-action="addnode">{{#pix}}t/add, core{{/pix}} {{#str}}add_node, local_extendednav{{/str}}</a>
+                {{/canadd}}
+                {{#candiscover}}
+                    <button type="button" class="btn btn-outline-secondary" data-action="discover" title="{{#str}}discover_help, local_extendednav{{/str}}" aria-label="{{#str}}discover, local_extendednav{{/str}}">{{#pix}}i/search, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}discover, local_extendednav{{/str}}</span></button>
+                {{/candiscover}}
+                {{#sitewide}}
+                <a class="btn btn-outline-secondary" href="{{importurl}}" title="{{#str}}import, local_extendednav{{/str}}" aria-label="{{#str}}import, local_extendednav{{/str}}">{{#pix}}i/import, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}import, local_extendednav{{/str}}</span></a>
+                <span class="dropdown d-inline-flex position-relative" data-menu="export">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-menu-toggle aria-haspopup="true" aria-expanded="false" title="{{#str}}export, local_extendednav{{/str}}" aria-label="{{#str}}export, local_extendednav{{/str}}">{{#pix}}t/download, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}export, local_extendednav{{/str}}</span></button>
+                    <span class="dropdown-menu dropdown-menu-end dropdown-menu-right show" hidden>
+                        <a class="dropdown-item" href="{{exporturl}}">
+                            <span class="d-block fw-bold">{{#str}}export_this, local_extendednav{{/str}}</span>
+                            <span class="d-block small text-muted">{{name}}</span>
+                        </a>
+                        <span class="dropdown-divider d-block" role="separator"></span>
+                        <a class="dropdown-item" href="{{exporteverythingurl}}">
+                            <span class="d-block fw-bold">{{#str}}export_everything, local_extendednav{{/str}}</span>
+                            <span class="d-block small text-muted">{{#str}}export_everything_help, local_extendednav{{/str}}</span>
+                        </a>
+                        <span class="dropdown-divider d-block" role="separator"></span>
+                        <a class="dropdown-item" href="{{exportchooseurl}}">
+                            <span class="d-block fw-bold">{{#str}}export_choose, local_extendednav{{/str}}</span>
+                            <span class="d-block small text-muted">{{#str}}export_choose_help, local_extendednav{{/str}}</span>
+                        </a>
+                    </span>
+                </span>
+                {{/sitewide}}
+                {{^sitewide}}
+                    {{#importurl}}<a class="btn btn-outline-secondary" href="{{importurl}}" title="{{#str}}import, local_extendednav{{/str}}" aria-label="{{#str}}import, local_extendednav{{/str}}">{{#pix}}i/import, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}import, local_extendednav{{/str}}</span></a>{{/importurl}}
+                    {{#exporturl}}<a class="btn btn-outline-secondary" href="{{exporturl}}" title="{{#str}}export, local_extendednav{{/str}}" aria-label="{{#str}}export, local_extendednav{{/str}}">{{#pix}}t/download, core{{/pix}} <span class="d-none d-xl-inline">{{#str}}export, local_extendednav{{/str}}</span></a>{{/exporturl}}
+                {{/sitewide}}
+            </div>
+        </div>
+
+        {{#sitewide}}{{#hasscopes}}
+            <p class="small text-muted mb-0" data-region="scope">{{#str}}exceptions_where, local_extendednav{{/str}} <a href="{{exceptionsurl}}">{{#str}}exceptions_overview, local_extendednav{{/str}}</a></p>
+        {{/hasscopes}}{{/sitewide}}
+    </div>
+
+    <div data-region="layout" {{#compact}}data-compact="1"{{/compact}}>
+        {{^single}}{{> local_extendednav/manage/origins }}{{/single}}
+
+        <div class="d-grid gap-3" data-region="origin" aria-label="{{name}}">
+            <section id="{{id}}" data-region="list" data-config="{{config}}" aria-label="{{searchlabel}}">
+                <div class="card">
+                    {{> local_extendednav/list/toolbar }}
+                    <nav class="px-3 py-2 border-bottom" data-region="path" aria-label="{{#str}}tree_path, local_extendednav{{/str}}" hidden>
+                        <ol class="breadcrumb mb-0"></ol>
+                    </nav>
+                    <div class="table-responsive" data-region="tablewrap" aria-busy="true">
+                        <table class="table">
+                            <caption class="sr-only visually-hidden">{{#str}}list_caption_nodes, local_extendednav{{/str}}</caption>
+                            <tbody>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                                <tr aria-hidden="true"><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td><td><span class="placeholder"></span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div data-region="empty" hidden></div>
+                    <div data-region="error" hidden></div>
+                    <div class="px-3 py-2 border-top small text-muted" data-region="foot" role="status"><span data-region="count"></span></div>
+                </div>
+                <div class="card" data-region="floatbar" hidden role="region" aria-label="{{#str}}selection, local_extendednav{{/str}}">
+                    <div class="d-flex flex-wrap align-items-center gap-3 px-3 py-2">
+                        <span class="fw-bold" role="status" data-region="selectedcount"></span>
+                                                <div class="d-flex flex-wrap gap-2 ms-auto ml-auto">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-action="bulkshow" hidden>{{#pix}}t/hide, core{{/pix}} {{#str}}show_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-action="bulkhide" hidden>{{#pix}}t/show, core{{/pix}} {{#str}}hide_selected, local_extendednav{{/str}}</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-action="bulkdelete" hidden>{{#pix}}t/delete, core{{/pix}} <span data-region="deletelabel"></span></button>
+                        </div>
+                        <button type="button" class="btn btn-link btn-icon btn-sm" data-action="clearselection" title="{{#str}}clear, moodle{{/str}}" aria-label="{{#str}}clear, moodle{{/str}}">{{#pix}}e/cancel, core{{/pix}}</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

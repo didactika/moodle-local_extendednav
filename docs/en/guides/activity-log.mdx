@@ -1,0 +1,28 @@
+---
+title: Activity log
+summary: See who created, changed or deleted each node of a navigation, when, and what each change did.
+order: 60
+---
+
+Go to **Site administration > Reports > Extended navigation > Activity log**. The column to the left chooses the navigation, as on the management page.
+
+<Screenshot src="asset:activity.webp" alt="The activity log of the primary navigation, with the time, the node, the action, the person and the IP address of each change" caption="The activity log: one row per change, the newest first." url="/local/extendednav/activity.php" />
+
+Each row shows when the change was made, the node (a link to its form while it exists) with the fields the change touched under it, the action (**Created**, **Updated** or **Deleted**), who made it and from which IP address. Select the fields to open **Changes of**, which lists each field with its value before and after: the title, the link, the visibility in words, the roles, the conditions and the rest. Select the column **Time** to put the oldest changes first.
+
+<Screenshot src="asset:activity-changes.webp" alt="The dialog Changes of a node, with the title, the visibility and the roles before and after" caption="What a change did, field by field." url="/local/extendednav/activity.php" />
+
+| Filter | What it does |
+|---|---|
+| Search | Finds a node by its key, or a person by their name |
+| **Action** | Shows only the changes of the actions chosen, with the number of each |
+| **Date** | Today, the last 7 days, this month, the last 30 days, or two days of your own |
+
+The button at the end of the row of filters clears them. On a narrow screen the menus are grouped in one menu, **Filters**. Nothing reloads the page.
+
+The changes are recorded as events in the standard log of the site, which the activity log reads, so they follow the retention settings of the log. If the standard log is disabled, the page says so.
+
+## Keep the log short
+
+On a site with many changes the log grows. In **Site administration > Reports > Extended navigation > Activity log settings**, turn on **Clean up the activity log** and set **Keep the entries for**, in days, weeks or any other unit, with no upper limit. A scheduled task then deletes every day the entries of the plugin older than that time, and nothing else of the log of Moodle. The task turns itself on and off with the setting; it is off while the clean-up is. See [Settings and capabilities](page:reference/settings-and-capabilities).
+

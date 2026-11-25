@@ -16,7 +16,7 @@
 
 namespace local_extendednav;
 
-use local_extendednav\local\node_manager;
+use local_extendednav\local\node\manager;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\local_extendednav\observer::class)]
 /**
@@ -28,6 +28,7 @@ use local_extendednav\local\node_manager;
  * @author     Eduardo Estrada <eduardodavidestrada1@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_extendednav\observer
+ * @covers     \local_extendednav\local\support\menu_config
  */
 final class observer_test extends \advanced_testcase {
     /**
@@ -109,7 +110,7 @@ final class observer_test extends \advanced_testcase {
         set_config('custommenuitems', "Help|/help.php\nNews|/news.php");
         menu_manager::get_menu('primary')->sync_from_config();
 
-        node_manager::delete([$this->get_node('primary', 'cmenu_help')]);
+        manager::delete([$this->get_node('primary', 'cmenu_help')]);
         $this->assertSame('News|/news.php', get_config('core', 'custommenuitems'));
     }
 

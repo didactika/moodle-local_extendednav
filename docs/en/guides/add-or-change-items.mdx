@@ -1,0 +1,43 @@
+---
+title: Add or change items
+summary: Create an item, or change one of Moodle, in the primary navigation or in the user menu, as a link or as a submenu.
+order: 30
+---
+
+Go to **Site administration > Appearance > Extended navigation > Manage navigation**. The column to the left chooses the navigation; **Primary** and **User menu** list the items of each menu, with a search by title, key or URL and menus that narrow the list. For the navigations of a course, an activity, a category and the administration, see [Change the other navigations](page:guides/other-navigations).
+
+<Screenshot src="asset:manage-usermenu.webp" alt="The list of the user menu, with the items of Moodle and the items added by the plugin" caption="The list of the user menu." url="/local/extendednav/manage.php?menu=usermenu" />
+
+You need the capability `local/extendednav:manage`, or to be a site administrator.
+
+## Add or change an item
+
+Select **Add node**, or the edit icon of an item. The form is in sections, in the order in which an item is usually decided. A field that is required is marked, and a value that is not valid is explained under its field when you save. The first time you open it, a guided tour explains each field; it skips the ones you may not change.
+
+| Section | Fields |
+|---|---|
+| **Node** | The **Type** of a new item: **Link**, which leads to a URL, or **Submenu**, which has no URL and holds links. Then the **Node key** (letters, numbers, underscores and hyphens) and its **Title**. For an item of Moodle, a notice at the top of the section says so: change only what you need, as the empty fields keep the values of Moodle, which the title shows in grey as a placeholder in the language of the page |
+| **Link** | The **URL**: a path of the site, such as `/course/view.php?id=2`, or a whole URL of another site. A submenu has none |
+| **Look and opening** | A **Tooltip**, an **Icon** and how it opens with **Display**: **Current window**, **New window** or **Pop-up**, with its width and height. The icon is in the primary navigation and the user menu only: **Choose icon** opens a searchable list of icons of Moodle and FontAwesome |
+| **Who sees it** | **Visibility** (everyone, restricted to some **Roles**, or nobody), **Languages**, **Access restrictions** with the same conditions as an activity, **Hide from administrators too** and **Block the URL**. A node that is **Not visible** asks for no language and no restriction, as nobody sees it |
+| **Where it goes** | The **Parent**, to show the item in a submenu. Only a submenu is offered; with no submenu in the menu, the field is not shown. A submenu stays at the top. The section does not appear when it has nothing to choose |
+
+<Screenshot src="asset:node-form.webp" alt="The form of an item, with the Type chosen" caption="The form of an item." url="/local/extendednav/edit.php" />
+
+## Submenus
+
+A submenu has no URL of its own: it groups links, which open from it. In the primary navigation it is a menu with its items below; in the user menu it opens a panel with its items. A submenu appears in the lists as a folder: a small folder after its name marks it and its name opens it, to add links inside. Set a link's **Parent** to a submenu to move it in, or edit a submenu to change its title.
+
+## Delete an item
+
+Select the delete icon of an item. An item of Moodle that is deleted comes back as a new item if Moodle adds it again. See [The items of Moodle](page:concepts/moodles-own-items).
+
+## What the form refuses
+
+The form refuses the changes that would leave every user without a landing page, and Site administration can never be hidden or nested. A link needs its URL; a link inside a submenu needs it too.
+
+## Check the result
+
+The primary navigation and the user menu show the change at once. An item that is limited to languages appears only to the users of those languages.
+
+<Screenshot src="asset:user-menu.webp" alt="The user menu with an item added by the plugin" caption="The user menu with the item Support." url="/my/" />
