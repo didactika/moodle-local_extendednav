@@ -34,7 +34,6 @@ Feature: Arrange one's own preferences
     And I follow "Arrange my preferences"
     And I click on "Open User account" "button"
     And I click on "Show Forum preferences" "button"
-    And I click on "Show" "button" in the "Show Forum preferences?" "dialogue"
     And I wait until the page is ready
     And I visit "/user/preferences.php"
     And I should see "Forum preferences"
