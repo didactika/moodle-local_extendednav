@@ -1,0 +1,93 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_extendednav/status/page
+
+    The state of every navigation: on top the switch of the whole plugin, and below it each navigation with its own switch, in
+    groups, the kinds of activity the site does not use folded. While the plugin is off the switches of the navigations are grey
+    and cannot be changed, but keep the state each navigation goes back to. The switches are wired by local_extendednav/status.
+
+    @copyright  2026 Didactika.org
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Example context (json):
+    {
+        "pluginenabled": true,
+        "upgradepending": false,
+        "groups": [
+            {"id": "site", "label": "Site", "countlabel": "1 of 1 on", "rows": [
+                {"key": "primary", "name": "Primary", "description": "Primary navigation", "url": "#", "icon": "i/menu",
+                    "component": "core", "enabled": true}
+            ]}
+        ]
+    }
+}}
+<div class="len d-grid gap-3" data-region="status" data-pluginenabled="{{#pluginenabled}}1{{/pluginenabled}}{{^pluginenabled}}0{{/pluginenabled}}">
+    <p class="text-muted mb-0">{{#str}}status_desc, local_extendednav{{/str}}</p>
+
+    {{#upgradepending}}
+        <div class="alert alert-warning mb-0" role="status">{{#str}}status_upgrade_pending, local_extendednav{{/str}}</div>
+    {{/upgradepending}}
+
+    <div class="card">
+        <div class="card-body d-flex align-items-start justify-content-between gap-3">
+            <div>
+                <label class="h5 fw-bold mb-1 d-block" for="len-status-plugin">{{#str}}status_plugin, local_extendednav{{/str}}</label>
+                <p class="small text-muted mb-0" id="len-status-plugin-desc">{{#str}}status_plugin_desc, local_extendednav{{/str}}</p>
+            </div>
+            <div class="form-check form-switch custom-control custom-switch flex-shrink-0">
+                <input type="checkbox" class="form-check-input custom-control-input" role="switch" id="len-status-plugin"
+                    data-action="toggleplugin" aria-describedby="len-status-plugin-desc" {{#pluginenabled}}checked{{/pluginenabled}}>
+                <label class="form-check-label custom-control-label" for="len-status-plugin">
+                    <span class="sr-only visually-hidden">{{#str}}status_plugin, local_extendednav{{/str}}</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary mb-0" role="status" data-region="pluginoff" {{#pluginenabled}}hidden{{/pluginenabled}}>
+        {{#str}}status_plugin_off, local_extendednav{{/str}}
+    </div>
+
+    <div class="d-grid gap-3" data-region="navigations" {{^pluginenabled}}aria-disabled="true"{{/pluginenabled}}>
+        {{#groups}}
+            <section class="card" data-group="{{id}}" aria-labelledby="len-status-group-{{id}}">
+                <details {{^folded}}open{{/folded}}>
+                    <summary class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h3 class="h6 fw-bold mb-0" id="len-status-group-{{id}}">{{label}}</h3>
+                        <span class="badge rounded-pill text-bg-light border" data-region="groupcount">{{countlabel}}</span>
+                    </summary>
+                    <ul class="list-group list-group-flush">
+                        {{#rows}}
+                            <li class="list-group-item d-flex align-items-center gap-3" data-key="{{key}}">
+                                {{#pix}}{{icon}}, {{component}}{{/pix}}
+                                <a class="flex-grow-1 text-truncate" href="{{url}}" title="{{#str}}status_manage, local_extendednav, {{description}}{{/str}}">{{name}}</a>
+                                <div class="form-check form-switch custom-control custom-switch mb-0">
+                                    <input type="checkbox" class="form-check-input custom-control-input" role="switch" id="len-status-{{key}}"
+                                        data-action="togglenavigation" data-key="{{key}}" {{#enabled}}checked{{/enabled}} {{^pluginenabled}}disabled{{/pluginenabled}}>
+                                    <label class="form-check-label custom-control-label" for="len-status-{{key}}">
+                                        <span class="sr-only visually-hidden">{{#str}}status_switch, local_extendednav, {{description}}{{/str}}</span>
+                                    </label>
+                                </div>
+                            </li>
+                        {{/rows}}
+                    </ul>
+                </details>
+            </section>
+        {{/groups}}
+    </div>
+</div>

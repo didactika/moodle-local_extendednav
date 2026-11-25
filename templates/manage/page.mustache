@@ -33,6 +33,8 @@
         ],
         "originoptions": [{"name": "Course navigation", "url": "#", "selected": true}],
         "enabled": true,
+        "pluginoff": false,
+        "statusurl": "#",
         "sitewide": true,
         "hasscopes": true,
         "exceptionsurl": "#",
@@ -58,7 +60,7 @@
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <h2 class="h4 fw-bold mb-0">{{name}}</h2>
                 {{#sitewide}}
-                    <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}">
+                    <button type="button" class="btn btn-sm rounded-pill {{#enabled}}btn-outline-success{{/enabled}}{{^enabled}}btn-outline-secondary{{/enabled}}" data-action="toggleenabled" aria-pressed="{{#enabled}}true{{/enabled}}{{^enabled}}false{{/enabled}}" {{#pluginoff}}disabled{{/pluginoff}}>
                         <span data-state="on" {{^enabled}}hidden{{/enabled}}>{{#pix}}i/checkedcircle, core{{/pix}} {{#str}}navigation_on, local_extendednav{{/str}}</span>
                         <span data-state="off" {{#enabled}}hidden{{/enabled}}>{{#pix}}i/uncheckedcircle, core{{/pix}} {{#str}}navigation_off, local_extendednav{{/str}}</span>
                     </button>
@@ -99,6 +101,12 @@
                 {{/sitewide}}
             </div>
         </div>
+
+        {{#sitewide}}{{#pluginoff}}
+            <div class="alert alert-secondary mb-0" role="status" data-region="pluginoff">
+                {{#str}}manage_plugin_off, local_extendednav{{/str}} <a href="{{statusurl}}">{{#str}}status_page, local_extendednav{{/str}}</a>
+            </div>
+        {{/pluginoff}}{{/sitewide}}
 
         {{#sitewide}}{{#hasscopes}}
             <p class="small text-muted mb-0" data-region="scope">{{#str}}exceptions_where, local_extendednav{{/str}} <a href="{{exceptionsurl}}">{{#str}}exceptions_overview, local_extendednav{{/str}}</a></p>

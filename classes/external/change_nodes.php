@@ -297,4 +297,39 @@ final class change_nodes extends node_service {
     public static function set_enabled_returns(): external_single_structure {
         return self::count_returns();
     }
+
+    /**
+     * Describes set_plugin_enabled().
+     *
+     * @return external_function_parameters
+     */
+    public static function set_plugin_enabled_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'value' => new external_value(PARAM_BOOL, 'On or off.'),
+        ]);
+    }
+
+    /**
+     * Turns the whole plugin on or off: off, every navigation is drawn as Moodle draws it and no page is blocked. Each
+     * navigation keeps its own state, which applies again when the plugin is turned on.
+     *
+     * @param bool $value On or off.
+     * @return array 1 when it is on, 0 when it is off.
+     */
+    public static function set_plugin_enabled(bool $value): array {
+        $params = self::validate_parameters(self::set_plugin_enabled_parameters(), compact('value'));
+        self::require_manage();
+        set_config('enable_plugin', $params['value'] ? 1 : 0, 'local_extendednav');
+        repository::purge();
+        return ['count' => $params['value'] ? 1 : 0];
+    }
+
+    /**
+     * Describes set_plugin_enabled()'s result.
+     *
+     * @return external_single_structure
+     */
+    public static function set_plugin_enabled_returns(): external_single_structure {
+        return self::count_returns();
+    }
 }

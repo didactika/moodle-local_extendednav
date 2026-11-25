@@ -67,7 +67,7 @@ final class manage_navigation extends node_service {
                 'scopes' => nodes::supports_scopes($key),
             ];
         }
-        return ['navigations' => $navigations];
+        return ['pluginenabled' => (bool)get_config('local_extendednav', 'enable_plugin'), 'navigations' => $navigations];
     }
 
     /**
@@ -77,6 +77,7 @@ final class manage_navigation extends node_service {
      */
     public static function get_navigations_returns(): external_single_structure {
         return new external_single_structure([
+            'pluginenabled' => new external_value(PARAM_BOOL, 'Whether the plugin is on; off, no navigation is changed.'),
             'navigations' => new external_multiple_structure(new external_single_structure([
                 'key' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
                 'name' => new external_value(PARAM_TEXT, 'Name.'),

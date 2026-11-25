@@ -20,6 +20,10 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+### Added
+
+- The page Navigation status, under Appearance > Extended navigation, lists every navigation with its own switch, in groups, and the switch of the whole plugin on top. Off, the plugin changes no navigation and blocks no page, and the switches of the navigations stay grey and locked with the state each goes back to; turning it off asks first. The management page says when the plugin is off. The web service local_extendednav_set_plugin_enabled turns the plugin on or off, and local_extendednav_get_navigations says whether it is on.
+
 ### Fixed
 
 - Upgrading from the web from a version without the context of a node no longer stops with Field "contextid" does not exist: while the upgrade of the plugin is pending, its files newer than its database, the plugin changes nothing and reads none of its tables, so the page of the upgrade and the rest of the site show the navigation of Moodle until the upgrade ends.

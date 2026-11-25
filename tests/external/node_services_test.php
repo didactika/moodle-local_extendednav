@@ -295,4 +295,28 @@ final class node_services_test extends \advanced_testcase {
         $this->expectException(\required_capability_exception::class);
         change_nodes::set_enabled('course', false);
     }
+
+    /**
+     * The switch of the whole plugin turns every navigation off at once, and each comes back as it was.
+     */
+    public function test_set_plugin_enabled(): void {
+        $this->prepare();
+        change_nodes::set_enabled('course', false);
+
+        change_nodes::set_plugin_enabled(false);
+
+        $this->assertFalse(menu_manager::is_on());
+        $this->assertFalse(menu_manager::is_enabled('mod_forum'));
+        $this->assertTrue(menu_manager::is_turned_on('mod_forum'), 'Each navigation keeps its own state.');
+
+        change_nodes::set_plugin_enabled(true);
+
+        $this->assertTrue(menu_manager::is_on());
+        $this->assertTrue(menu_manager::is_enabled('mod_forum'));
+        $this->assertFalse(menu_manager::is_enabled('course'), 'A navigation turned off stays off.');
+
+        $this->setUser($this->getDataGenerator()->create_user());
+        $this->expectException(\required_capability_exception::class);
+        change_nodes::set_plugin_enabled(false);
+    }
 }

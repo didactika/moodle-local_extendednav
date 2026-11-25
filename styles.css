@@ -2,7 +2,8 @@
 /* Moodle 4.0 and later cores disagree on decimal formatting; use the current leading-zero style. */
 /* stylelint-disable number-leading-zero */
 
-/* stylelint-disable max-line-length *//* stylelint-disable declaration-no-important */
+/* stylelint-disable max-line-length */
+/* stylelint-disable declaration-no-important */
 
 .len .gap-1,
 .path-local-extendednav .modal .gap-1,
@@ -2379,6 +2380,32 @@
 .len [data-region=tablewrap] .btn[data-action=changes] {
     font-size: 0.8125rem;
     line-height: 1.4;
+}
+
+.len[data-region=status] [data-region=navigations] {
+    transition: opacity var(--dd-ease);
+}
+
+.len[data-region=status] [data-region=navigations][aria-disabled=true] {
+    opacity: 0.55;
+}
+
+.len[data-region=status] summary.card-header {
+    cursor: pointer;
+    list-style: none;
+}
+
+.len[data-region=status] summary.card-header::-webkit-details-marker {
+    display: none;
+}
+
+.len[data-region=status] details:not([open]) > summary.card-header {
+    border-bottom: 0;
+}
+
+.len[data-region=status] .list-group-item .icon {
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .path-local-extendednav .modal [data-region=iconpicker] > [data-region=grid],
