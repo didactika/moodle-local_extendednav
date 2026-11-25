@@ -59,6 +59,8 @@ A category, a course or an activity sometimes needs another order, other names o
 | --- | --- | --- | --- | --- |
 | A1 | 2 | The navigation has no exceptions (primary, user menu, administration). | The page offers no scope. | Step 1 |
 | A2 | 1 | The search finds nothing. | The menu says that no category or course matches. | Step 1 |
+| A3 | 1 | The scope is a user. | Only the Preferences page can change, from the Preferences of that user; no list offers every user. | Step 1 |
+| A4 | 3 | The person lacks the capability of that kind of change. | The fields of that change are not in the form and the action is not offered. | Step 3 |
 
 ## Business rules
 
@@ -67,6 +69,7 @@ A category, a course or an activity sometimes needs another order, other names o
 | RN-012 | The nearest scope to a page wins for each node: the course, then the categories around it, then the site. |
 | RN-013 | When a scope changes the order of any node, it sets the order of its whole navigation. |
 | RN-014 | Deleting a node of the site deletes its exceptions. |
+| RN-036 | In a category, a course or an activity each kind of change has its own capability; a user holds only the ones to arrange their own page. |
 
 ## Specification
 

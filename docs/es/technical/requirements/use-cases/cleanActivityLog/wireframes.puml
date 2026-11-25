@@ -1,0 +1,10 @@
+@startsalt
+{
+  {+
+  <b>Ajustes del registro de actividad</b>
+  }
+  [X] Depurar el registro de actividad
+  Conservar las entradas durante | "52" | ^semanas^
+  [Guardar cambios]
+}
+@endsalt

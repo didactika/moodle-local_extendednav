@@ -60,6 +60,8 @@ Las navegaciones que Moodle dibuja bajo la cabecera de una página dependen de l
 | A1 | 1 | La navegación aún no tiene nodos. | La lista explica que los nodos de Moodle aparecen cuando una página los muestra, y ofrece añadir un nodo. | Paso 1 |
 | A2 | 2 | La navegación es la administración del sitio. | La lista muestra un nivel del árbol; el primer nivel agrupa bajo General los elementos de la pestaña General de Moodle. | Paso 2 |
 | A3 | 2 | El servidor rechaza el cambio. | Muestra el error y deja la lista como estaba. | Paso 1 |
+| A4 | 1 | La navegación es la navegación principal, el menú de usuario o la página de preferencias. | La lista muestra un nivel de las carpetas; una carpeta se marca con una pequeña carpeta tras su nombre y se abre con su nombre. | Paso 1 |
+| A5 | 1 | La entrada elegida es Actividades. | La lista muestra los tipos de actividad, con su uso y lo que el sitio cambia; un tipo abre su navegación. | Paso 1 |
 
 ## Reglas de negocio
 
@@ -68,6 +70,8 @@ Las navegaciones que Moodle dibuja bajo la cabecera de una página dependen de l
 | RN-009 | Un nodo de una navegación secundaria se encuentra cuando una página lo muestra, una sola vez, y desde entonces tiene una fila que se puede cambiar. |
 | RN-010 | En la administración del sitio cada categoría y cada página, a cualquier profundidad, se puede renombrar, ocultar y ordenar; un enlace del plugin va en una categoría; sus nodos también se ocultan a los administradores de forma predeterminada. |
 | RN-011 | Un administrador del sitio ve todos los nodos, salvo que el plugin o el nodo se lo oculten también a los administradores. |
+| RN-034 | Un nodo sin URL agrupa otros: un submenú, una sección, una categoría o una pestaña; solo un grupo se ofrece como padre de otro nodo. |
+| RN-035 | Una búsqueda o un filtro de la lista mira en todos los niveles de las carpetas. |
 
 ## Especificación
 

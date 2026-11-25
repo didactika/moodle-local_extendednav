@@ -23,7 +23,12 @@ sourceOfTruth: code
 | Backup and restore | classes | `backup/moodle2/backup_local_extendednav_plugin.class.php`, `backup/moodle2/restore_local_extendednav_plugin.class.php` | yes |
 | Change from the single navigation of the activities | files | `db/upgradelib.php`, `classes/task/split_activity_navigation.php` | yes |
 | Management pages | files | `manage.php`, `edit.php`, `import.php`, `export.php`, `activity.php` | yes |
-| Web services | files | `classes/external/reorder_nodes.php`, `classes/external/get_icons.php` | yes |
+| Web services | files | `classes/external/manage_navigation.php`, `classes/external/change_nodes.php`, `classes/external/get_nodes.php`, `classes/external/reorder_nodes.php`, `classes/external/search_export.php`, `db/services.php` | yes |
 | Events | classes | `classes/event/` | yes |
 | Capabilities of the plugin | file | `db/access.php` | yes |
-| Privacy | class | `classes/privacy/provider.php` | yes |
+| Privacy | class | `classes/privacy/provider.php` (the changes of each user to their Preferences page) | yes |
+| Preferences page | classes | `classes/menu/preferences.php`, `classes/local/navigation/preferences_injector.php`, `lib.php` | yes |
+| Activity log clean-up | files | `classes/task/clean_activity_log.php`, `db/tasks.php`, `settings.php` | yes |
+| Export form and its search | files | `classes/form/export_form.php`, `classes/external/search_export.php`, `amd/src/form/export_search.js` | yes |
+| Menu settings of Moodle | classes | `classes/local/support/menu_config.php`, `classes/task/sync_custom_menu.php`, `classes/observer.php` | yes |
+| Guided tours | files | `tours/`, `lib.php` (`local_extendednav_import_tours`), `classes/task/import_tours.php` | yes |

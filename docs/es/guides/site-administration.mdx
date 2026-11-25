@@ -1,35 +1,40 @@
 ---
 title: Dar forma a la administración del sitio
-summary: Renombre, oculte y ordene cada categoría y cada página de la administración del sitio, a cualquier profundidad, y añada enlaces propios.
+summary: Renombre, oculte y ordene cada categoría y cada página de la administración del sitio, a cualquier profundidad, y añada pestañas, categorías y páginas propias.
 order: 47
 ---
 
-La administración del sitio es un árbol: categorías como **Usuarios** o **Extensiones** contienen páginas y otras categorías. El plugin lee ese árbol en cada página de administración, así que cada categoría y cada página se pueden cambiar, por profunda que esté.
+La administración del sitio es un árbol: categorías como **Usuarios** o **Extensiones** contienen páginas y otras categorías. El plugin lee ese árbol en cada página de administración, de modo que cada categoría y cada página se puede cambiar, por profunda que sea.
 
-<Screenshot src="asset:manage-admin-top.webp" alt="La administración del sitio en la página de gestión, con sus categorías de primer nivel" caption="El primer nivel de la administración del sitio." url="/local/extendednav/manage.php?menu=admin" />
+<Screenshot src="asset:manage-admin-top.webp" alt="La administración del sitio en la página de gestión, con sus categorías del nivel superior" caption="El nivel superior de la administración del sitio." url="/local/extendednav/manage.php?menu=admin" />
 
 ## Recorrer el árbol
 
-Elija **Administración del sitio** en la columna de la página de gestión. La lista muestra un nivel del árbol. El primer nivel tiene las categorías que Moodle muestra como pestañas (**Usuarios**, **Cursos**, **Extensiones**…) y, primero, **General**, que contiene los demás elementos del primer nivel, como hace la pestaña General de Moodle. Seleccione el nombre de una categoría para abrirla. Las migas de pan sobre la lista indican dónde está; seleccione un nivel para volver a él. Una búsqueda busca en todos los niveles a la vez.
+Elija **Administración del sitio** en la columna de la página de gestión. La lista muestra un nivel del árbol. El nivel superior contiene las categorías que Moodle muestra como pestañas (**Usuarios**, **Cursos**, **Extensiones**…) y, en primer lugar, **General**, que contiene los demás elementos del nivel superior, como la pestaña General de Moodle. Una categoría tiene una pequeña carpeta tras su nombre; seleccione su nombre para abrirla. La ruta sobre la lista indica dónde se encuentra, desde **Administración del sitio**; seleccione un nivel para volver a él. Una búsqueda mira en todos los niveles a la vez.
 
-<Screenshot src="asset:manage-admin-level.webp" alt="La categoría Usuarios abierta, con sus categorías y las migas de pan sobre la lista" caption="Una categoría abierta, con el camino de vuelta en las migas de pan." url="/local/extendednav/manage.php?menu=admin&parent=users" />
+<Screenshot src="asset:manage-admin-level.webp" alt="La categoría Usuarios abierta, con sus categorías y la ruta sobre la lista" caption="Una categoría abierta, con el camino de vuelta en la ruta." url="/local/extendednav/manage.php?menu=admin&parent=users" />
 
 ## Qué se puede hacer
 
 | Acción | Cómo |
 |---|---|
-| Renombrar una categoría o una página | Edítela y rellene **Título**. El nuevo nombre se muestra en la administración, en las migas de pan y en la búsqueda |
-| Ocultarla | El botón del ojo de su fila, o restríjala a algunos roles o idiomas en su formulario |
+| Renombrar una categoría o una página | Edítela y rellene **Título**. El nuevo nombre se muestra en la administración, en la ruta de navegación y en la búsqueda |
+| Ocultarla | El botón de ojo de su fila, o restrinja su visibilidad a algunos roles o idiomas en su formulario |
 | Ordenarla | Arrástrela por su asa entre las demás de su categoría |
-| Añadir una página propia | **Añadir nodo** con el **Tipo** **Página**, un título, la URL y el **Padre**, la categoría en la que va. **Añadir nodo** empieza en la categoría abierta, y **Padre** tiene búsqueda |
-| Añadir una categoría propia | **Añadir nodo** con el **Tipo** **Categoría** y un título: no tiene URL. Contiene páginas y otras categorías, y Moodle enumera lo que contiene en una página propia. En el nivel superior aparece en **General**, y pasa a ser una pestaña propia cuando contiene otra categoría |
+| Añadir una página propia | **Añadir nodo** con el **Tipo** **Página**, un título, una URL y el **Padre**: una pestaña, una categoría o **General**, donde Moodle muestra las páginas del nivel superior |
+| Añadir una categoría propia | **Añadir nodo** con el **Tipo** **Categoría**, un título y el **Padre**, la pestaña o la categoría en la que va. No tiene URL |
+| Añadir una pestaña propia | **Añadir nodo** con el **Tipo** **Pestaña** y un título. No tiene padre ni URL, y va en la parte superior |
 
-La dirección de una página de Moodle no cambia, y sus ajustes siguen donde están: renombrar u ocultar una página cambia cómo aparece en la lista, nunca lo que hace. Moodle sigue comprobando las capacidades de cada página.
+El **Padre** depende del **Tipo**: una pestaña no tiene ninguno, una categoría va en una pestaña o en otra categoría, y una página va en una pestaña, una categoría o **General**. Después de guardar una pestaña o una categoría, la lista se abre dentro de ella, para añadir sus páginas. Moodle muestra una pestaña o una categoría solo cuando contiene una página, de modo que mientras está vacía la lista la marca **Vacía, no se muestra**; sigue enumerada en la parte superior, para poder abrirla más tarde y añadir sus páginas.
 
-## Páginas que oculta Moodle
+Una pestaña que contiene páginas y ninguna categoría las muestra en una sección propia, con el nombre de la pestaña, de modo que es una pestaña como las de Moodle. Moodle coloca las pestañas en la fila según el orden de la lista y envía las que no caben a **Más**: arrastre una pestaña hacia arriba para tenerla en la fila.
 
-Algunas páginas las oculta el propio Moodle, como las que abre tras una actualización. Aparecen con **Oculto por Moodle** bajo su visibilidad, y el plugin no las muestra.
+La URL de una página de Moodle no se puede cambiar y sus ajustes permanecen donde están: renombrar u ocultar una página cambia cómo se enumera, nunca lo que hace. Moodle sigue comprobando las capacidades de cada página.
+
+## Páginas que Moodle oculta
+
+Moodle oculta algunas páginas por sí mismo, como las que abre después de una actualización. Se enumeran con **Oculta por Moodle** bajo su visibilidad, y el plugin no las muestra.
 
 ## Administradores
 
-En la administración del sitio, **Ocultar también a los administradores** está activado de forma predeterminada: una categoría o una página que se oculta también se oculta a los administradores. La pregunta que aparece al ocultar nodos permite desactivarlo, y también el formulario de cada nodo. El camino a esta página de gestión nunca se oculta. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
+En la administración del sitio, **Ocultar también a los administradores** está activado por defecto: una categoría o una página que usted oculta se oculta también a los administradores. La pregunta que se hace al ocultar nodos permite desactivarlo, y también el formulario de cada nodo. El acceso a esta página de gestión nunca se oculta. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).

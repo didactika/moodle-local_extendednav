@@ -4,7 +4,7 @@ summary: Shape the primary navigation and the user menu, and keep users on the p
 order: 1
 ---
 
-Extended navigation (`local_extendednav`) is a Moodle local plugin that lets administrators manage the two menus every user sees: the primary navigation at the top of the page and the user menu under the picture of the user. Add items, rename, re-link, reorder, nest or hide the items of Moodle, show items only to some roles or languages, and stop users from opening the pages of the items they cannot see.
+Extended navigation (`local_extendednav`) is a Moodle local plugin that lets administrators manage the navigations every user sees: the primary navigation at the top of the page, the user menu under the picture of the user, the navigations of courses and activities, the site administration and the page Preferences. Add items, rename, re-link, reorder, nest or hide the items of Moodle, show items only to some roles or languages, and stop users from opening the pages of the items they cannot see.
 
 <Screenshot src="asset:manage-primary.webp" alt="The page that manages the primary navigation, with one row per item, its visibility, icon, node key and URL" caption="The management page: every item of the primary navigation, with its visibility and actions." url="/local/extendednav/manage.php" />
 
@@ -19,8 +19,8 @@ Extended navigation (`local_extendednav`) is a Moodle local plugin that lets adm
 Pick the route that matches what you want to do. Each one lists the pages to read, in order, with what each is for.
 
 <div class="d-paths">
-<Path title="I administer the site" icon="admin-panel-settings-rounded" time="20 min" goal="Install the plugin, add the first items and decide who sees each one." pages={['getting-started/installation', 'getting-started/quick-start', 'guides/add-or-change-items', 'guides/order-items']} />
-<Path title="I move a navigation between sites" icon="sync-alt-rounded" time="10 min" goal="Export the items of one site, import them in another and review who changed what." pages={['guides/import-and-export', 'reference/yaml-format', 'guides/activity-log']} />
+<Path title="I administer the site" icon="admin-panel-settings-rounded" time="20 min" goal="Install the plugin, add the first items and decide who sees each one." pages={['getting-started/installation', 'getting-started/quick-start', 'guides/add-or-change-items', 'guides/order-items', 'guides/preferences']} />
+<Path title="I move a navigation between sites" icon="sync-alt-rounded" time="10 min" goal="Export the items of one site, import them in another and review who changed what." pages={['guides/import-and-export', 'reference/yaml-format', 'guides/web-services', 'guides/activity-log']} />
 <Path title="I build on it or review it" icon="code-rounded" time="45 min" goal="Understand how an item is shown and how a URL is blocked, and how the plugin is built." pages={['concepts/how-an-item-is-shown', 'concepts/how-blocking-works', 'technical/index', 'reference/settings-and-capabilities']} />
 </div>
 
@@ -42,7 +42,9 @@ The menus of Moodle are the same for everyone and only partly configurable. Exte
 
 <FeatureGrid>
   <Feature icon="menu-rounded" title="Every navigation">The primary navigation, the user menu, the navigations of the site home, of a course, of an activity and of a category, and the whole site administration.</Feature>
-  <Feature icon="account-tree-rounded" title="Submenus">One level of submenus in both menus. A parent moves with its submenu items.</Feature>
+  <Feature icon="account-tree-rounded" title="Submenus and folders">Submenus in both menus, tabs and categories in the site administration, and sections in Preferences, as folders of the same list.</Feature>
+  <Feature icon="manage-accounts-rounded" title="Preferences of each user">Each person arranges their own Preferences page, and the site arranges it for everyone.</Feature>
+  <Feature icon="api-rounded" title="Web services">Everything the management page does, from another system, with its own service.</Feature>
   <Feature icon="drag-indicator-rounded" title="Drag and drop">Drag a node by its handle, or move it with the arrow keys.</Feature>
   <Feature icon="tune-rounded" title="Options of each item">Title, tooltip, URL, icon, and how the link opens: in the current window, in a new window or in a pop-up.</Feature>
   <Feature icon="verified-user-rounded" title="Safety checks">The form refuses the changes that would leave every user without a landing page.</Feature>

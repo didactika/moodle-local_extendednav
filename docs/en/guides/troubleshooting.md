@@ -14,3 +14,7 @@ order: 70
 | The icons of the user menu are missing | The user menu only shows FontAwesome icons; an icon of Moodle without a FontAwesome icon, such as an image, is not shown |
 | The FontAwesome tabs of the icon picker are empty | The plugin reads the FontAwesome list from where this line of Moodle keeps it; type the class in the field instead |
 | An import is refused | The page lists each invalid item and why. Nothing is saved until the whole file is valid |
+| A tab of the site administration does not show | Moodle shows a tab only once it holds a page. Open it in the list and add its pages; a tab that holds pages only shows them in a section of its own. Drag the tab up if it is in **More** |
+| A submenu does not appear in the primary navigation | It needs at least one link visible to the user inside it |
+| A user does not find **Arrange my preferences** | The user lacks `local/extendednav:personalise`, or the Preferences navigation is turned off |
+| The activity log is not cleaned | The clean-up is off, or it keeps no time; the task runs once a day and, on a large log, goes on in the next runs |

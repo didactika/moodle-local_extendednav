@@ -32,7 +32,7 @@ extends:
 
 ## Contexto
 
-Ocultar un elemento de un menú no impide que un usuario escriba su dirección. Con el bloqueo activado, el plugin lo impide en cada página y envía al usuario adonde puede estar.
+Ocultar un elemento de un menú no impide que un usuario escriba su URL. Con el bloqueo activado, el plugin lo impide en cada página y envía al usuario adonde puede estar.
 
 ## Precondiciones
 

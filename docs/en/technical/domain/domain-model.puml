@@ -26,6 +26,8 @@ package "Level 3 - Detail" <<level3>> {
   class Role
   class Language
   class Submenu
+  class Folder
+  class Scope
 }
 
 package "Level 4 - Support" <<level4>> {
@@ -39,6 +41,8 @@ Node "0..*" o-down- "0..*" Role : is shown to
 Node "0..*" o-down- "0..*" Language : is limited to
 Node "1" o-down- "0..*" Submenu : opens
 Node "1" -down- "0..*" ActivityRecord : leaves
+Node "0..*" -down- "0..1" Scope : applies to
+Folder "1" o-down- "0..*" Node : groups
 ImportFile ..> Node : creates
 
 @enduml

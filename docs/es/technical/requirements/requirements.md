@@ -25,16 +25,27 @@ sourceOfTruth: code
 | RF-012 | Cada tipo de actividad tiene su propia navegación, cuyos elementos se encuentran en las actividades del sitio, también los que un plugin añade solo a algunas actividades. | Debe | `classes/menu/activity.php`, `classes/local/navigation/discovery.php` | UC-006, UC-008 |
 | RF-013 | Una actividad cambia su propia navegación desde su página, y los cambios de un curso y de sus actividades viajan en sus copias de seguridad. | Debería | `classes/local/navigation/context_scope.php`, `backup/moodle2/` | UC-007 |
 | RF-014 | Un nodo de la administración del sitio sin enlace es una categoría del plugin, que contiene enlaces y otras categorías; en el nivel superior es una pestaña cuando contiene una categoría. | Debería | `classes/menu/admintree.php` | UC-006 |
+| RF-015 | Un usuario organiza su propia página de preferencias, y el sitio la organiza para todos, como carpetas de secciones y opciones. | Should | `classes/local/navigation/preferences_injector.php` | UC-009 |
+| RF-016 | Las entradas del registro de actividad se pueden conservar durante un tiempo que el sitio establece, y una tarea que sigue ese ajuste elimina las más antiguas. | Could | `classes/task/clean_activity_log.php` | UC-010 |
+| RF-017 | Los valores predeterminados de las copias de seguridad y de las restauraciones deciden si se incluyen los cambios de un curso y de sus actividades. | Should | `settings.php`, `backup/moodle2/` | UC-011 |
+| RF-018 | Todo lo que hace la página de gestión se puede hacer mediante servicios web, reunidos en un solo servicio. | Should | `classes/external/`, `db/services.php` | UC-012 |
+| RF-019 | En una categoría, un curso o una actividad, ver la navegación y cada tipo de cambio tienen su propia capacidad. | Should | `db/access.php`, `classes/local/navigation/context_scope.php` | UC-007 |
+| RF-020 | Lo que contiene un archivo se elige entre navegaciones, tipos de actividad, usuarios, cursos y categorías, que se buscan de diez en diez; una importación omite, con un aviso, lo que el sitio no tiene. | Should | `classes/form/export_form.php`, `classes/external/search_export.php`, `classes/local/io/importer.php` | UC-003, UC-012 |
+| RF-021 | Un nodo sin URL agrupa otros, como un submenú, una sección, una categoría o una pestaña, y las listas lo muestran como una carpeta. | Should | `classes/local/listing/nodes.php`, `classes/form/node_form.php` | UC-001, UC-006 |
+| RF-022 | Recorridos guiados explican la página Navegación de un curso o una actividad, la página donde un usuario organiza sus preferencias y el formulario de un nodo; se importan al instalar o actualizar el plugin y se gestionan en la página de recorridos de Moodle. | Could | `tours/`, `lib.php` | UC-001, UC-009 |
+| RF-023 | Ocultar elementos puede bloquear también sus URL, para quien pueda restringirlos. | Should | `classes/local/node/manager.php` | UC-005 |
 
 ## No funcionales
 
 | ID | Atributo de calidad | Requisito | Medida | Prioridad |
 | --- | --- | --- | --- | --- |
-| RNF-001 | Seguridad | Gestionar elementos necesita su propia capacidad, que ningún rol tiene de forma predeterminada. | `local/extendednav:manage` sin arquetipo | Debe |
+| RNF-001 | Seguridad | Gestionar la navegación del sitio necesita su propia capacidad, que ningún rol tiene de forma predeterminada; en una categoría, un curso o una actividad, los docentes con permiso de edición y los gestores tienen las capacidades del contexto, y todos los usuarios tienen la que organiza su propia página de preferencias. | `local/extendednav:manage` sin arquetipo; `db/access.php` | Must |
 | RNF-002 | Disponibilidad | El plugin nunca deja a todos los usuarios sin una página de destino. | `validator::validate` | Debe |
-| RNF-003 | Privacidad | El plugin no almacena datos personales. | `classes/privacy/provider.php` (proveedor nulo) | Debe |
+| RNF-003 | Privacidad | El único dato personal que el plugin conserva es cómo un usuario organizó su propia página de preferencias, que se exporta y se elimina con la API de privacidad y con el usuario. | `classes/privacy/provider.php`, `classes/observer.php` | Must |
 | RNF-004 | Integridad | Una importación no cambia nada si algún elemento no es válido. | `importer::import` | Debe |
 | RNF-005 | Rendimiento | Una página que no tiene nada personalizado en su navegación solo lee la caché del plugin. Las páginas de los usuarios nunca construyen otra página: registran lo que muestran, y los elementos de los tipos de actividad los busca una tarea por la noche o a petición. | `injector::apply`, `secondary::record_seen`, `discovery::kind` | Debe |
+| RNF-006 | Rendimiento | Ninguna consulta se ejecuta dentro de un bucle en un camino que crece con los datos: restaurar, exportar, importar, actualizar y las listas leen en bloque, y el registro de actividad se depura por tiempo, por lotes, a través de su índice. | `tests/performance_test.php` (miles de nodos), `classes/task/clean_activity_log.php` | Must |
+| RNF-007 | Seguridad | La página para un usuario sin ninguna página adonde ir es de ese usuario y no necesita capacidad; un invitado es enviado a iniciar sesión. | `restricted.php` | Should |
 
 ## Reglas de negocio
 

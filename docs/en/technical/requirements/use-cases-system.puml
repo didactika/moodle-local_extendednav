@@ -14,10 +14,16 @@ rectangle "local_extendednav" {
   package "Navigation" {
     usecase "Find the items of the navigation of each kind of activity" as UC_discoverActivityItems
   }
+  package "Maintenance" {
+    usecase "Clean up the activity log" as UC_cleanActivityLog
+    usecase "Back up and restore the changes of a course" as UC_backUpChanges
+  }
 }
 
 A_System --> UC_showMenus
 A_System --> UC_blockUrl
 A_System --> UC_discoverActivityItems
+A_System --> UC_cleanActivityLog
+A_System --> UC_backUpChanges
 
 @enduml

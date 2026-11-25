@@ -1,0 +1,10 @@
+@startsalt
+{
+  {+
+  <b>General backup defaults</b>
+  }
+  [X] Include the navigation changes
+  <b>General restore defaults</b>
+  [X] Restore the navigation changes
+}
+@endsalt

@@ -26,7 +26,7 @@ sourceOfTruth: code
 ## Decisiones
 
 - Moodle y sus plugins leen la página en construcción desde la variable global `$PAGE`, de modo que la página de la actividad ocupa su lugar mientras se construye la navegación y lo devuelve después, también cuando la construcción falla.
-- La clave de un elemento que Moodle numera es la ruta de su dirección (`secondary::key_of`), la misma que usan las páginas, de modo que el elemento encontrado y el elemento mostrado son uno.
+- La clave de un elemento que Moodle numera es la ruta de su URL (`secondary::key_of`), la misma que usan las páginas, de modo que el elemento encontrado y el elemento mostrado son uno.
 - Primero se revisan las actividades más recientes: un plugin que añade un elemento a algunas actividades suele configurarse en las nuevas.
 
 ## Secuencia

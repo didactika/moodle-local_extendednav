@@ -26,6 +26,10 @@ sourceOfTruth: model
 | UC-006 | [Personalizar una navegación secundaria](./use-cases/customiseSecondaryNavigation/README.md) | Administrador | Navegación | RF-007 | [ficha](../analysis/use-cases/customiseSecondaryNavigation/README.md) | [ficha](../design/use-cases/customiseSecondaryNavigation/README.md) | [ficha](../implementation/use-cases/customiseSecondaryNavigation/README.md) |
 | UC-007 | [Cambiar una navegación para una categoría, un curso o una actividad](./use-cases/setScopeException/README.md) | Administrador | Navegación | RF-008 | [ficha](../analysis/use-cases/setScopeException/README.md) | [ficha](../design/use-cases/setScopeException/README.md) | [ficha](../implementation/use-cases/setScopeException/README.md) |
 | UC-008 | [Buscar los elementos de la navegación de cada tipo de actividad](./use-cases/discoverActivityItems/README.md) | Sistema | Navegación | RF-012 | [ficha](../analysis/use-cases/discoverActivityItems/README.md) | [ficha](../design/use-cases/discoverActivityItems/README.md) | [ficha](../implementation/use-cases/discoverActivityItems/README.md) |
+| UC-009 | [Organizar la página de preferencias](./use-cases/arrangePreferences/README.md) | User | Navegación | RF-015 | [ficha](../analysis/use-cases/arrangePreferences/README.md) | [ficha](../design/use-cases/arrangePreferences/README.md) | [ficha](../implementation/use-cases/arrangePreferences/README.md) |
+| UC-010 | [Depurar el registro de actividad](./use-cases/cleanActivityLog/README.md) | Sistema | Maintenance | RF-016 | [ficha](../analysis/use-cases/cleanActivityLog/README.md) | [ficha](../design/use-cases/cleanActivityLog/README.md) | [ficha](../implementation/use-cases/cleanActivityLog/README.md) |
+| UC-011 | [Respaldar y restaurar los cambios de un curso](./use-cases/backUpChanges/README.md) | Sistema | Maintenance | RF-017 | [ficha](../analysis/use-cases/backUpChanges/README.md) | [ficha](../design/use-cases/backUpChanges/README.md) | [ficha](../implementation/use-cases/backUpChanges/README.md) |
+| UC-012 | [Gestionar las navegaciones desde fuera de Moodle](./use-cases/manageByWebService/README.md) | Integration | Navegación | RF-018 | [ficha](../analysis/use-cases/manageByWebService/README.md) | [ficha](../design/use-cases/manageByWebService/README.md) | [ficha](../implementation/use-cases/manageByWebService/README.md) |
 
 ### Diagrama de casos de uso
 
@@ -37,8 +41,16 @@ sourceOfTruth: model
 
 ![Administrador](./use-cases-administrator.svg)
 
+#### Integration
+
+![Integration](./use-cases-integration.svg)
+
 #### Sistema
 
 ![Sistema](./use-cases-system.svg)
+
+#### User
+
+![User](./use-cases-user.svg)
 
 <!-- rup-flow:use-cases:end -->

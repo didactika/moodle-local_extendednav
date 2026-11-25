@@ -59,6 +59,11 @@ An administrator adds items to a menu, changes the items of Moodle or removes it
 | A1 | 2 | The key is repeated or not valid, or the URL or the title is missing. | Shows the error under the field; nothing is saved. | Step 1 |
 | A2 | 2 | The change would leave every user without a landing page. | Refuses it. | Step 1 |
 | A3 | 2 | The item is Site administration and is hidden or nested. | Refuses it. | Step 1 |
+| A4 | 1 | The item is of the primary navigation or of the user menu. | **Type** offers Link or Submenu. A submenu has no URL and holds links; only a submenu is offered as the parent of a link, and with none the parent is not shown. | Step 2 |
+| A5 | 1 | The item is of the site administration. | **Type** offers Tab, Category or Page, and the parent offered depends on the type; a tab that holds pages only shows them in a section of its own, and while it holds nothing it is listed with a note. | Step 2 |
+| A6 | 1 | The item is a section or an option of the Preferences page. | **Type** offers Link or Section; an option goes in any section. | Step 2 |
+| A7 | 1 | The navigation is a secondary navigation. | The form has no icon: those navigations draw none. | Step 2 |
+| A8 | 4 | The item is hidden. | The dialog also offers to hide it from administrators and to block its URL, for whoever may restrict it. | Step 4 |
 
 ## Business rules
 
@@ -67,6 +72,8 @@ An administrator adds items to a menu, changes the items of Moodle or removes it
 | RN-002 | A node key is unique within its menu. |
 | RN-003 | A change that would leave every user without a landing page is refused. |
 | RN-008 | An item of Moodle with empty fields keeps the values of Moodle. |
+| RN-034 | A node without a URL groups others: a submenu, a section, a category or a tab; only a group is offered as the parent of another node. |
+| RN-035 | A search or a filter of the list looks in every level of the folders. |
 
 ## Specification
 

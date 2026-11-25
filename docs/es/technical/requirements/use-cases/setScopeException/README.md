@@ -59,6 +59,8 @@ A veces una categoría, un curso o una actividad necesitan otro orden, otros nom
 | --- | --- | --- | --- | --- |
 | A1 | 2 | La navegación no tiene excepciones (principal, menú de usuario, administración). | La página no ofrece ámbito. | Paso 1 |
 | A2 | 1 | La búsqueda no encuentra nada. | El menú indica que ninguna categoría ni curso coincide. | Paso 1 |
+| A3 | 1 | El ámbito es un usuario. | Solo puede cambiar la página de preferencias, desde las preferencias de ese usuario; ninguna lista ofrece a todos los usuarios. | Paso 1 |
+| A4 | 3 | La persona no tiene la capacidad de ese tipo de cambio. | Los campos de ese cambio no están en el formulario y la acción no se ofrece. | Paso 3 |
 
 ## Reglas de negocio
 
@@ -67,6 +69,7 @@ A veces una categoría, un curso o una actividad necesitan otro orden, otros nom
 | RN-012 | Para cada nodo gana el ámbito más cercano a la página: el curso, luego las categorías que lo rodean y luego el sitio. |
 | RN-013 | Cuando un ámbito cambia el orden de un nodo, fija el orden de toda su navegación. |
 | RN-014 | Eliminar un nodo del sitio elimina sus excepciones. |
+| RN-036 | En una categoría, un curso o una actividad cada tipo de cambio tiene su propia capacidad; un usuario tiene solo las de organizar su propia página. |
 
 ## Especificación
 

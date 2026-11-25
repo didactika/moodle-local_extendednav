@@ -1,0 +1,14 @@
+@startuml
+title UC-010 Depurar el registro de actividad
+start
+:Un administrador activa la depuración y establece el tiempo;
+:La tarea se activa;
+:Una vez al día la tarea se inicia;
+:Leer hasta dónde está depurado el registro;
+repeat :Tomar un día del registro;
+  :Leer los identificadores de las entradas del plugin, mil cada vez;
+  :Eliminarlas por sus identificadores;
+  :Anotar hasta dónde llegó;
+repeat while (¿Más antiguo que el tiempo conservado y queda tiempo?) is (sí)
+stop
+@enduml

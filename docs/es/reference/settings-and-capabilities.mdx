@@ -1,44 +1,78 @@
 ---
 title: Ajustes y capacidades
-summary: Cómo se activa o desactiva cada navegación, la capacidad del plugin y lo que almacena.
+summary: Cómo se activa o desactiva cada navegación, los ajustes del registro de actividad, las capacidades del plugin, los recorridos, los servicios web y lo que almacena.
 order: 40
 ---
 
 ## Activar o desactivar una navegación
 
-El plugin no tiene página de ajustes: todo está en la página de gestión, en **Administración del sitio > Apariencia > Navegación ampliada > Gestionar la navegación**.
-
-El botón junto al nombre de cada navegación aplica o no sus cambios. Muestra **Activada**, en verde, mientras los cambios se aplican: púlselo para desactivarlos. Entonces muestra **Desactivada**, en gris, y la columna de las navegaciones marca esa navegación como **Desactivada**: pulse el botón para volver a aplicar los cambios. Mientras una navegación está desactivada, Moodle la dibuja como lo hace sin el plugin, y sus nodos y su orden se conservan. Las demás navegaciones conservan sus cambios.
+Todo lo relativo a las navegaciones está en la página de gestión, en **Administración del sitio > Apariencia > Navegación ampliada > Gestionar la navegación**. El botón junto al nombre de cada navegación aplica o no sus cambios. Muestra **Activada**, en verde, mientras se aplican los cambios: púlselo para desactivarlos. Entonces muestra **Desactivada**, en gris, y la columna de las navegaciones marca esa navegación como **Desactivada**: pulse el botón para aplicar de nuevo los cambios. Mientras una navegación está desactivada, Moodle la dibuja como lo hace sin el plugin, y sus nodos y su orden se conservan. Las demás navegaciones conservan sus cambios.
 
 | Navegación | Cuando está desactivada |
 |---|---|
-| Navegación principal | Moodle muestra su navegación principal, y no se bloquea ninguna dirección |
+| Navegación principal | Moodle muestra su navegación principal y no se bloquea ninguna URL |
 | Menú de usuario | Moodle muestra su menú de usuario |
-| Página principal, curso, actividad, categoría | Moodle muestra su propia navegación en esas páginas |
+| Preferencias | Moodle muestra su página Preferencias, y cada usuario sigue organizando la suya |
+| Página principal del sitio, curso, actividad, categoría | Moodle muestra su propia navegación en esas páginas |
 | Administración del sitio | Moodle muestra su propio árbol de categorías y páginas |
 
-Si un nodo también se oculta a los administradores se decide en el formulario de cada nodo. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
+Si un nodo se oculta también a los administradores se decide en el formulario de cada nodo. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
+
+## Ajustes
+
+| Dónde | Ajuste | Qué hace |
+|---|---|---|
+| **Administración del sitio > Informes > Navegación ampliada > Ajustes del registro de actividad** | **Limpiar el registro de actividad** (desactivado por defecto) | Una tarea programada elimina cada día las entradas del registro de actividad más antiguas que el tiempo indicado debajo. La tarea se activa y se desactiva con este ajuste |
+| Misma página | **Conservar las entradas durante** | Cuánto tiempo se conserva una entrada, en días, semanas o cualquier otra unidad, sin límite superior |
+| **Administración del sitio > Cursos > Copias de seguridad > Configuración general de copias de seguridad** | **Incluir los cambios de navegación** (activado por defecto) | Si la copia de seguridad de un curso o de una actividad contiene los cambios de su navegación |
+| **Administración del sitio > Cursos > Copias de seguridad > Configuración general de restauración** | **Restaurar los cambios de navegación** (activado por defecto) | Si al restaurar un curso o una actividad se recuperan esos cambios |
+
+<Screenshot src="asset:log-settings.webp" alt="Los ajustes del registro de actividad, con el interruptor para limpiarlo y el tiempo de conservación de las entradas" caption="Cuánto tiempo conserva el registro de actividad sus entradas." url="/admin/settings.php?section=local_extendednav_logsettings" />
 
 ## Capacidades
 
-| Capacidad | Roles predeterminados | Permite al usuario |
+| Capacidad | Roles por defecto | Permite al usuario |
 |---|---|---|
 | `local/extendednav:manage` | Ninguno | Gestionar los elementos, importar, exportar y ver el registro de actividad, en el contexto del sistema |
-| `local/extendednav:managecontext` | Gestor | Cambiar las navegaciones de una categoría, un curso o una actividad, y de todo lo que contiene, desde su página **Navegación** |
+| `local/extendednav:viewcontext` | Profesor con permiso de edición, gestor | Ver la navegación de una categoría, un curso o una actividad |
+| `local/extendednav:managecontext` | Profesor con permiso de edición, gestor | Gestionar la navegación de una categoría, un curso o una actividad; cada tipo de cambio necesita además su propia capacidad |
+| `local/extendednav:changevisibility` | Profesor con permiso de edición, gestor | Mostrar y ocultar los nodos de una categoría, un curso o una actividad |
+| `local/extendednav:changeorder` | Profesor con permiso de edición, gestor | Ordenar los nodos, elegir su padre y dónde van |
+| `local/extendednav:changetitles` | Profesor con permiso de edición, gestor | Renombrar los nodos y cambiar sus textos de ayuda |
+| `local/extendednav:changeicons` | Profesor con permiso de edición, gestor | Cambiar los iconos de los nodos y cómo se abren |
+| `local/extendednav:changelinks` | Profesor con permiso de edición, gestor | Cambiar las URL de los nodos |
+| `local/extendednav:changeconditions` | Profesor con permiso de edición, gestor | Restringir los nodos: roles, idiomas, restricciones de acceso, administradores y bloqueo |
+| `local/extendednav:addnodes` | Profesor con permiso de edición, gestor | Añadir nodos propios |
+| `local/extendednav:deletenodes` | Profesor con permiso de edición, gestor | Eliminar los nodos añadidos, o devolver la navegación a lo que fija el sitio |
+| `local/extendednav:personalise` | Usuario autenticado | Organizar y ocultar las opciones de la propia página de preferencias |
 
-Los usuarios que tienen esta capacidad encuentran la página de gestión en el mismo lugar que los administradores.
+Los usuarios que tienen `local/extendednav:manage` encuentran la página de gestión en el mismo lugar que los administradores.
 
 > [!WARNING]
-> Quien tenga `local/extendednav:manage` decide el menú de cada usuario y qué páginas se bloquean. Concédala solo a personas en quienes confiaría para la navegación del sitio.
+> Quien tiene `local/extendednav:manage` decide el menú de todos los usuarios y qué páginas están bloqueadas. Concédala solo a personas en las que confiaría la navegación del sitio.
 
-## Tarea programada
+## Tareas programadas
 
-**Buscar los elementos de la navegación de cada tipo de actividad** se ejecuta una vez al día, por la noche. Construye, como administrador, la navegación de las actividades más recientes de cada tipo y enumera los elementos que Moodle y sus plugins les añaden, para que se puedan cambiar antes de que alguien abra una de esas actividades. No envía nada al navegador ni cambia nada en las actividades. Su programación se ajusta en **Administración del sitio > Servidor > Tareas > Tareas programadas**.
+| Tarea | Cuándo | Qué hace |
+|---|---|---|
+| **Buscar los elementos de la navegación de cada tipo de actividad** | Una vez al día, por la noche | Construye, como administrador, la navegación de las actividades más recientes de cada tipo y enumera los elementos que Moodle y sus plugins añaden, para poder cambiarlos antes de que alguien abra una actividad así. No envía nada al navegador y no cambia nada en las actividades |
+| **Limpiar el registro de actividad de la navegación** | Una vez al día, solo mientras la limpieza está activada | Elimina las entradas antiguas del registro de actividad, un día del registro cada vez y por lotes, y continúa donde se detuvo |
+| **Importar un ajuste de menú de Moodle a la navegación** | Bajo demanda | Importa de nuevo los elementos del menú personalizado o del menú de usuario después de que un administrador cambie ese ajuste de Moodle |
+
+Su horario se establece en **Administración del sitio > Servidor > Tareas > Tareas programadas**.
+
+## Recorridos guiados
+
+El plugin añade recorridos guiados: la página **Navegación** de un curso o una actividad, la página Preferencias de un usuario, la página donde un usuario organiza sus preferencias y el formulario de un nodo. Se añaden al instalar o actualizar el plugin, se muestran una sola vez y omiten los pasos cuyo elemento la persona no tiene. Se gestionan como cualquier otro recorrido en **Administración del sitio > Apariencia > Recorridos de usuario**.
+
+## Servicios web
+
+Las funciones del plugin están reunidas en el servicio externo **Navegación ampliada**. Consulte [Gestionar las navegaciones desde fuera de Moodle](page:guides/web-services).
 
 ## Privacidad
 
-El plugin almacena elementos de navegación, no datos personales, e implementa la API de privacidad como proveedor nulo.
+Los únicos datos personales que conserva el plugin son la forma en que un usuario organizó su propia página Preferencias. El plugin implementa la API de privacidad: la organización se enumera, se exporta y se elimina con el usuario.
 
 ## Copia de seguridad
 
-Los nodos del sitio y las excepciones de las categorías son configuración del sitio: use la exportación YAML para copiarlos. Las excepciones de un curso y de sus actividades forman parte de la copia de seguridad del curso, y de la copia de seguridad de cada actividad.
+Los nodos del sitio y las excepciones de las categorías son configuración del sitio: utilice la exportación YAML para copiarlos. Las excepciones de un curso y de sus actividades forman parte de la copia de seguridad del curso y de la de cada actividad.

@@ -22,11 +22,26 @@ In a course, open the menu of the course (**More**) and select **Navigation**. I
 
 ## Who can do it
 
-Whoever manages the navigation of the site can change the navigation of every category, course and activity, without being enrolled in the course. Whoever has the capability **Manage the navigation of a category, a course or an activity** (`local/extendednav:managecontext`) in a category, a course or an activity can change that one and everything inside it. Managers have it by default; give it to other roles, such as teachers, in a course or a category with the permissions of Moodle.
+Whoever manages the navigation of the site can change the navigation of every category, course and activity, without being enrolled in the course. In a category, a course or an activity, what a person may do depends on the capabilities they hold there; editing teachers and managers hold them all by default.
+
+| Capability | Allows |
+|---|---|
+| **View the navigation of a category, a course or an activity** | Open the page **Navigation** and read it |
+| **Manage the navigation of a category, a course or an activity** | Change that navigation; each kind of change also needs its own capability |
+| **Show and hide the nodes of a category, a course or an activity** | Show and hide nodes |
+| **Order the nodes of a category, a course or an activity** | Drag nodes, choose their parent and where they go |
+| **Rename the nodes of a category, a course or an activity** | Change titles and tooltips |
+| **Change the icons of the nodes of a category, a course or an activity, and how they open** | Change icons and how they open |
+| **Change the URLs of the nodes of a category, a course or an activity** | Change where a node leads |
+| **Restrict the nodes of a category, a course or an activity** | Roles, languages, access restrictions, administrators and blocking |
+| **Add nodes to a category, a course or an activity** | Add nodes of their own |
+| **Delete the nodes of a category, a course or an activity** | Delete the nodes added and go back to what the site sets |
+
+The fields and buttons of a change that the person may not make are not shown. Give a capability to other roles, such as non-editing teachers, in a course or a category with the permissions of Moodle. See [Settings and capabilities](page:reference/settings-and-capabilities).
 
 ## See every exception
 
-In **Site administration > Appearance > Extended navigation > Exceptions**, the list shows every category, course and activity that changes a navigation, with the number of nodes it changes in each one. An activity shows its course and categories under its name. Search by the name of a category or a course (an activity is found by its course), narrow the list to categories, courses or activities, and select one to open its page.
+In **Site administration > Appearance > Extended navigation > Exceptions**, the list shows every category, course and activity that changes a navigation, with the number of nodes it changes in each one. An activity shows its course and categories under its name. Search by the name of a category or a course (an activity is found by its course), narrow the list to categories, courses or activities, and select one to open its page. The Preferences that each user arranges are theirs and are not listed here.
 
 <Screenshot src="asset:exceptions-overview.webp" alt="The list of the categories, courses and activities that change a navigation" caption="Every exception of the site, in one list." url="/local/extendednav/exceptions.php" />
 
@@ -42,8 +57,14 @@ The list shows what the pages of the category, the course or the activity show: 
 
 The button at the end of the row of an exception (**Go back**) removes the changes of the category, the course or the activity for that node, and its navigation follows the site again. Deleting a node of the site removes its exceptions too.
 
-## Export and import
+## Backups and restores
 
 The exceptions of a **course** and of its **activities** are part of the course: they go in the backup of the course, or of the activity, and come back when it is restored, also as a new course or into another one. The groups, the groupings, the dates, the grade items and the activities of their conditions are matched to the ones restored. A node that the course or the activity already changes is kept as it is. A backup made with a version before 2.0, which had a single navigation for every activity, gives each node to the kinds of activity that have it.
 
-The exceptions of a **category** belong to the site, as Moodle does not back up categories: **Export > This navigation** and **Export > Every navigation** include them, each with its category (`scope`). On import, the category is looked up by its full name, with its parents. See [The YAML format](page:reference/yaml-format).
+The site decides whether they go in a backup and come back with a restore. In **Site administration > Courses > Backups**, **General backup defaults** has **Include the navigation changes** and **General restore defaults** has **Restore the navigation changes**; both are on by default.
+
+<Screenshot src="asset:backup-defaults.webp" alt="The general backup defaults, with the option Include the navigation changes" caption="Whether the changes of a course go in its backups." url="/admin/settings.php?section=backupgeneralsettings" />
+
+## Export and import
+
+The exceptions of a **category** belong to the site, as Moodle does not back up categories: **Export > This navigation** and **Export > Every navigation** include them, each with its category (`scope`). On import, the category is looked up by its full name, with its parents; one that does not exist on the site is left out with a warning. See [Import and export](page:guides/import-and-export) and [The YAML format](page:reference/yaml-format).

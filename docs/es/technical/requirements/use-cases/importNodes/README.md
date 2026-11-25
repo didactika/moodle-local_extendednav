@@ -58,12 +58,16 @@ Una navegación cuesta trabajo construirla. Un administrador exporta sus element
 | --- | --- | --- | --- | --- |
 | A1 | 2 | Un elemento no es válido. | Lista cada elemento no válido con el motivo y no importa nada. | Paso 2 |
 | A2 | 2 | El archivo no tiene una lista `nodes`. | Rechaza el archivo. | Paso 2 |
+| A3 | 1 | El administrador elige **Elegir qué exportar**. | El formulario ofrece las navegaciones del sitio, los tipos de actividad, los usuarios, los cursos y las categorías en selectores que muestran diez resultados y buscan de diez en diez, y si se incluyen los cambios de todo el sitio. | Paso 1 |
+| A4 | 1 | La exportación se hace desde la página de una categoría, un curso o una actividad. | El archivo contiene los cambios de ese contexto únicamente. | Paso 1 |
+| A5 | 2 | El archivo nombra una categoría, un curso, una actividad o un usuario que no existe. | Ese nodo se omite con un aviso y el resto se importa. | Paso 4 |
 
 ## Reglas de negocio
 
 | ID | Regla |
 | --- | --- |
 | RN-006 | Todo el archivo se comprueba antes de guardar nada. |
+| RN-033 | Una importación omite, con un aviso, lo que nombra una categoría, un curso, una actividad o un usuario que el sitio no tiene. |
 
 ## Especificación
 

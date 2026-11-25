@@ -1,6 +1,6 @@
 ---
 title: Importar y exportar
-summary: Copie una navegación, o todas, de un sitio a otro con un archivo YAML.
+summary: Copie navegaciones de un sitio a otro con un archivo YAML, eligiendo lo que contiene el archivo.
 order: 50
 ---
 
@@ -8,25 +8,43 @@ order: 50
 
 En la página de gestión, abra **Exportar** y elija:
 
-- **Esta navegación**, para un archivo con todos los nodos de la navegación elegida, incluidas las excepciones de categorías y cursos.
+- **Esta navegación**, para un archivo con todos los nodos de la navegación elegida, incluidas las excepciones de las categorías.
 - **Todas las navegaciones**, para un único archivo con todas las navegaciones y si cada una está activada.
+- **Elegir qué exportar**, para elegir lo que contiene el archivo.
 
-<Screenshot src="asset:manage-export-menu.webp" alt="El menú Exportar abierto, con las opciones Esta navegación y Todas las navegaciones" caption="Los dos tipos de exportación." url="/local/extendednav/manage.php" />
+<Screenshot src="asset:manage-export-menu.webp" alt="El menú Exportar abierto, con las opciones Esta navegación, Todas las navegaciones y Elegir qué exportar" caption="Los tres tipos de exportación." url="/local/extendednav/manage.php" />
 
-Ambos archivos tienen el mismo formato: cada nodo indica a qué navegación pertenece. En la administración del sitio solo se escriben las categorías y páginas que se han cambiado, y las de una categoría que se ha ordenado a mano.
+Todos los archivos tienen el mismo formato: cada nodo indica a qué navegación pertenece. En la administración del sitio solo se escriben las categorías y las páginas que se cambiaron, y las de una categoría que se ordenó a mano.
+
+### Elegir qué exportar
+
+El formulario tiene tres partes:
+
+| Parte | Qué ofrece |
+|---|---|
+| **Navegaciones** | Las **navegaciones del sitio** y los **tipos de actividad** que se escriben, y si se **incluyen los cambios de todo el sitio** |
+| **Preferencias de los usuarios** | Los usuarios cuya organización de su propia página Preferencias va en el archivo |
+| **Cursos y categorías** | Los cursos y las categorías cuyos cambios van en el archivo. Los cambios de un curso y de sus actividades ya viajan en las copias de seguridad de Moodle: elíjalos aquí solo para moverlos en un archivo |
+
+Cada una es un selector con búsqueda. Muestra los diez primeros resultados al abrirlo y encuentra diez cada vez mientras escribe, de modo que un sitio con miles de usuarios, cursos o categorías sigue siendo ágil. Elija al menos una navegación y de dónde proceden sus cambios: todo el sitio, algunos usuarios, cursos o categorías.
+
+<Screenshot src="asset:export-choose.webp" alt="El formulario para elegir qué exportar, con los selectores de navegaciones, usuarios, cursos y categorías" caption="Elija lo que contiene el archivo." url="/local/extendednav/export.php?choose=1" />
+
+En la página de una categoría, un curso o una actividad, **Exportar** escribe solo los cambios de ese contexto.
 
 ## Importar
 
-En el otro sitio, seleccione **Importar** y suba el archivo (`.yaml` o `.yml`). La misma página importa un archivo de una navegación o de todas. En **Nodos existentes**, elija si los nodos que ya existen se conservan o se reemplazan.
+En el otro sitio, seleccione **Importar** y suba el archivo (`.yaml` o `.yml`). La misma página importa un archivo de una navegación o de todas las navegaciones. En **Nodos existentes**, elija si los nodos que ya existen se conservan o se sustituyen.
 
-<Screenshot src="asset:import.webp" alt="La página de importación, con el campo del archivo YAML y la elección para los nodos existentes" caption="La página de importación." url="/local/extendednav/import.php" />
+<Screenshot src="asset:import.webp" alt="La página de importación, con el campo del archivo YAML y la opción para los nodos existentes" caption="La página de importación." url="/local/extendednav/import.php" />
 
 | Caso | Qué ocurre |
 |---|---|
-| Un nodo no es válido | La página enumera cada problema con su motivo, y no se importa nada |
-| Un nodo de Moodle que este sitio no tiene, como una página de un plugin que no está instalado | Se omite con un aviso, y el resto del archivo se importa |
-| Un nodo de una categoría o un curso | Se importa para la categoría o el curso con el mismo nombre corto o nombre completo. Si no existe, el archivo no se importa |
-| Un archivo de todas las navegaciones | Cada navegación se activa o desactiva como indica el archivo |
-| Un idioma que no está instalado | Se muestra un aviso, y el nodo se importa |
+| Un nodo no es válido | La página enumera cada problema con su motivo y no se importa nada |
+| Un nodo de Moodle que este sitio no tiene, como una página de un plugin que no está instalado | Se omite con un aviso y se importa el resto del archivo |
+| Un nodo de una categoría, un curso, una actividad o un usuario que no existe en este sitio | Se omite con un aviso y se importa el resto del archivo |
+| Un nodo de una categoría, un curso, una actividad o un usuario | Se importa para el que tiene el mismo nombre: el nombre completo de una categoría, el nombre corto de un curso, el curso y el número de una actividad, el nombre de usuario de un usuario |
+| Un archivo de todas las navegaciones | Cada navegación se activa o se desactiva como dice el archivo |
+| Un idioma que no está instalado | Se muestra un aviso y el nodo se importa |
 
-Cada nodo conserva su posición, así que una navegación completa se importa en el mismo orden. **Ver el formato YAML** en la página de importación describe cada campo y ofrece un archivo de ejemplo. La misma descripción está en [El formato YAML](page:reference/yaml-format).
+Cada nodo conserva su posición, de modo que una navegación completa se importa en el mismo orden. **Ver el formato YAML**, en la página de importación, describe cada campo y ofrece un archivo de ejemplo. La misma descripción está en [El formato YAML](page:reference/yaml-format). Desde fuera de Moodle, la misma exportación y la misma importación son servicios web: consulte [Gestionar las navegaciones desde fuera de Moodle](page:guides/web-services).

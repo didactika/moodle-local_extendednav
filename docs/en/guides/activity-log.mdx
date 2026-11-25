@@ -21,3 +21,8 @@ Each row shows when the change was made, the node (a link to its form while it e
 The button at the end of the row of filters clears them. On a narrow screen the menus are grouped in one menu, **Filters**. Nothing reloads the page.
 
 The changes are recorded as events in the standard log of the site, which the activity log reads, so they follow the retention settings of the log. If the standard log is disabled, the page says so.
+
+## Keep the log short
+
+On a site with many changes the log grows. In **Site administration > Reports > Extended navigation > Activity log settings**, turn on **Clean up the activity log** and set **Keep the entries for**, in days, weeks or any other unit, with no upper limit. A scheduled task then deletes every day the entries of the plugin older than that time, and nothing else of the log of Moodle. The task turns itself on and off with the setting; it is off while the clean-up is. See [Settings and capabilities](page:reference/settings-and-capabilities).
+

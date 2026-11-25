@@ -1,0 +1,43 @@
+---
+title: Arrange the Preferences page
+summary: Order, rename, hide and extend the sections and options of the page Preferences, for the whole site and for each user.
+order: 48
+---
+
+The page **Preferences** of Moodle (the options of a person: their account, forums, calendar, badges, notifications…) is made of **sections**, each with its **options**. The plugin lists them as folders, as it does with the site administration, so the site can arrange them for everyone and each person can arrange their own.
+
+## Arrange it for the whole site
+
+Go to **Site administration > Appearance > Extended navigation > Manage navigation** and choose **Preferences**. The list shows the sections (**User account**, **Blogs**, **Badges**, **Roles**, **Miscellaneous**…); the name of a section opens it and lists its options. The sections and options are found when a person opens Preferences, as with the other navigations.
+
+<Screenshot src="asset:manage-preferences.webp" alt="The management page with the Preferences navigation chosen and its sections listed" caption="The sections of the Preferences page, as folders." url="/local/extendednav/manage.php?menu=preferences" />
+
+| Action | How |
+|---|---|
+| Hide a section or an option | The eye button of its row |
+| Rename it | Edit it and fill **Title**. The title shows, in grey, the name Moodle gives it in your language |
+| Order it | Drag it by its handle |
+| Move an option to another section | Edit it and choose the **Section** |
+| Add a section of your own | **Add node** with the **Type** **Section** and a title. Add the options inside it |
+| Add a link of your own | **Add node** with the **Type** **Link**, a title, a URL and the **Section** it goes in |
+
+The items that are in no section, which Moodle shows last, are one section, **Miscellaneous**, that you can order, rename and hide like any other. A section with no option to show is not shown. A section is no link: it has no URL, and an option of Moodle keeps the URL Moodle gives it.
+
+## Arrange your own page
+
+Every person can arrange their own page, if they hold the capability **Arrange and hide the options of one’s own Preferences page** (`local/extendednav:personalise`), which every user has by default. Open **Preferences**: in the section **Extended navigation**, select **Arrange my preferences**. The page is the same list, in your own account.
+
+<Screenshot src="asset:preferences-section.webp" alt="The page Preferences with the section Extended navigation and the option Arrange my preferences" caption="The way into your own list." url="/user/preferences.php" />
+
+<Screenshot src="asset:personal-preferences.webp" alt="The list of the sections of the Preferences page of a user, with their eye buttons" caption="Your own list: what you change applies to your account only." url="/local/extendednav/context.php" />
+
+You can hide an option with its eye button, show it again, drag it to change its place, rename it, move it to another section (edit it and choose the **Section**) and, with the button at the end of its row, go back to what the site sets. Whatever you do not change follows the site, and what the site hides stays hidden. You cannot change where an option leads, and the way to arrange the page is never hidden. The first time you open the page, a guided tour explains it.
+
+An administrator arranges the page of another user from that user: open the **Preferences** of the user, and in the section **Extended navigation** select **Arrange the preferences of** that user. There is no list of every user.
+
+## What is kept
+
+What a person arranges is kept in their own account, as changes of their own context, and is deleted with the account. The Privacy API of Moodle exports it with the rest of the data of the person. The plugin keeps nothing else about a person.
+
+> [!NOTE]
+> The profile page is built by Moodle and keeps its boxes: the plugin does not change it.

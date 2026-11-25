@@ -21,3 +21,7 @@ Cada fila muestra cuándo se hizo el cambio, el nodo (un enlace a su formulario 
 El botón del final de la fila de filtros los borra. En una pantalla estrecha, los menús se agrupan en un único menú, **Filtros**. Nada recarga la página.
 
 Los cambios se registran como eventos en el registro estándar del sitio, que el registro de actividad lee, así que siguen la configuración de conservación del registro. Si el registro estándar está desactivado, la página lo indica.
+
+## Mantener el registro breve
+
+En un sitio con muchos cambios el registro crece. En **Administración del sitio > Informes > Navegación ampliada > Ajustes del registro de actividad**, active **Limpiar el registro de actividad** y establezca **Conservar las entradas durante**, en días, semanas u otra unidad, sin límite superior. Una tarea programada elimina entonces cada día las entradas del plugin más antiguas que ese tiempo, y nada más del registro de Moodle. La tarea se activa y se desactiva con el ajuste. Consulte [Ajustes y capacidades](page:reference/settings-and-capabilities).

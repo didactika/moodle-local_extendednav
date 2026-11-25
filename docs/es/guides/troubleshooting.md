@@ -14,3 +14,7 @@ order: 70
 | Faltan los iconos del menú de usuario | El menú de usuario solo muestra iconos FontAwesome; un icono de Moodle sin icono FontAwesome, como una imagen, no se muestra |
 | Las pestañas de FontAwesome del selector de iconos están vacías | El plugin lee la lista de FontAwesome donde la guarda esta línea de Moodle; escriba la clase en el campo |
 | Se rechaza una importación | La página lista cada elemento no válido y el motivo. No se guarda nada hasta que todo el archivo es válido |
+| Una pestaña de la administración del sitio no se muestra | Moodle muestra una pestaña solo cuando contiene una página. Ábrala en la lista y añada sus páginas; una pestaña que solo contiene páginas las muestra en una sección propia. Arrastre la pestaña hacia arriba si está en **Más** |
+| Un submenú no aparece en la navegación principal | Necesita al menos un enlace visible para el usuario en su interior |
+| Un usuario no encuentra **Organizar mis preferencias** | Al usuario le falta `local/extendednav:personalise`, o la navegación Preferencias está desactivada |
+| El registro de actividad no se depura | La depuración está desactivada o no tiene un tiempo de conservación; la tarea se ejecuta una vez al día y, en un registro grande, continúa en las siguientes ejecuciones |

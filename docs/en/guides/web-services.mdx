@@ -1,0 +1,48 @@
+---
+title: Manage the navigations from outside Moodle
+summary: Read, change, export and import the navigations through web services, from another system.
+order: 70
+---
+
+Everything the management page does is done with web services, so another system can do it too. The functions are gathered in the external service **Extended navigation**.
+
+## Turn the service on
+
+1. Go to **Site administration > Server > Web services > External services** and enable **Extended navigation**. The service is for authorised users only.
+2. Add the user that will call it, and create a token for that user.
+3. Give the user the capabilities the functions need. The user needs the same capabilities as the page that does the same: `local/extendednav:manage` for the navigations of the site, and the capabilities of the context for a category, a course, an activity or a user. See [Settings and capabilities](page:reference/settings-and-capabilities).
+
+## The functions
+
+| Function | What it does |
+|---|---|
+| `local_extendednav_get_navigations` | Lists the navigations: key, name, whether each is on, whether its nodes are folders and whether contexts change it |
+| `local_extendednav_get_nodes` | Lists the nodes of a navigation, for the site or for a context, with the search and the filters of the list |
+| `local_extendednav_save_node` | Adds a node or changes one, with the checks of the form. The fields not sent keep their value |
+| `local_extendednav_set_visibility` | Shows or hides nodes; hiding can also hide them from administrators and block their URLs |
+| `local_extendednav_reorder_nodes`, `local_extendednav_move_node`, `local_extendednav_place_node` | Order nodes and choose where they go |
+| `local_extendednav_delete_nodes` | Deletes the nodes added, or goes back to what the site sets |
+| `local_extendednav_set_enabled` | Turns a navigation on or off |
+| `local_extendednav_get_exceptions`, `local_extendednav_get_activity` | List the contexts that change a navigation and the activity log |
+| `local_extendednav_discover_nodes` | Looks for the items of the navigation of a kind of activity |
+| `local_extendednav_export_navigations` | Writes the navigations and contexts chosen as a YAML file and returns its text |
+| `local_extendednav_import_navigations` | Reads a YAML file; it checks the whole file first and leaves out, with a warning, the categories, courses, activities and users the site does not have |
+| `local_extendednav_search_export` | Finds navigations, kinds of activity, users, courses and categories to export, ten at a time |
+| `local_extendednav_get_icons` | Lists the icons that can be chosen |
+
+A call that the user may not make raises an exception for the capability; a node that is not valid raises one that names the fields, and nothing is saved. A field that the capabilities of a context lock cannot be sent.
+
+## Example
+
+To hide an option of the Preferences page of a user, call `local_extendednav_save_node` with the navigation `preferences`, the context of the user, the key of the option and the field to change:
+
+```json
+{
+  "menu": "preferences",
+  "contextid": 5,
+  "nodekey": "forumpreferences",
+  "fields": {"visibility": 0}
+}
+```
+
+The answer carries the identifier of the row, whether it was created and the warnings.

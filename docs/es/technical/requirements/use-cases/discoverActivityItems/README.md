@@ -41,7 +41,7 @@ Moodle no tiene una lista de los elementos de la navegación de una actividad: d
 
 ## Postcondiciones
 
-- Éxito: cada elemento encontrado en una actividad del tipo está en la lista de su navegación, con su texto y su dirección, y tiene una fila que se puede cambiar.
+- Éxito: cada elemento encontrado en una actividad del tipo está en la lista de su navegación, con su texto y su URL, y tiene una fila que se puede cambiar.
 - Fallo: una actividad cuya navegación no se puede construir no aporta elementos; las demás se siguen revisando.
 
 ## Flujo principal
@@ -52,7 +52,7 @@ Moodle no tiene una lista de los elementos de la navegación de una actividad: d
 | 2 | | Toma cada tipo de actividad activado. |
 | 3 | | Toma las actividades más recientes del tipo, hasta 50. |
 | 4 | | Construye la navegación secundaria de cada actividad, con la página de la actividad como página en construcción. |
-| 5 | | Da a cada elemento su clave: la que le da Moodle o, para un elemento que Moodle numera, la ruta de su dirección. |
+| 5 | | Da a cada elemento su clave: la que le da Moodle o, para un elemento que Moodle numera, la ruta de su URL. |
 | 6 | | Registra los elementos nuevos en la navegación del tipo y da una fila a cada uno. |
 
 ## Flujos alternativos
@@ -70,7 +70,7 @@ Moodle no tiene una lista de los elementos de la navegación de una actividad: d
 | --- | --- |
 | RN-019 | Cada tipo de actividad tiene su propia navegación. |
 | RN-020 | Un elemento se enumera en cuanto una actividad de su tipo lo muestra. |
-| RN-021 | Un elemento que Moodle numera se conoce por la ruta de su dirección. |
+| RN-021 | Un elemento que Moodle numera se conoce por la ruta de su URL. |
 
 ## Especificación
 
