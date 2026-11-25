@@ -179,6 +179,8 @@ class nodes {
             $group = $istree && !$menu->is_native($node->nodekey) && trim((string)($node->url ?? '')) === '';
             $row['haschildren'] = $istree && (isset($parents[$node->nodekey]) || $group);
             $row['tree'] = $istree;
+            // Only the primary navigation and the user menu draw icons: the others keep no room for one.
+            $row['withicons'] = in_array($menukey, ['primary', 'usermenu'], true);
             // A folder says how many items it holds, so it is clear that it opens.
             $count = (int)($parents[$node->nodekey] ?? 0);
             $row['childlabel'] = !$row['haschildren'] ? '' : ($count === 0 ? get_string('folder_empty', 'local_extendednav')
@@ -233,9 +235,11 @@ class nodes {
             'visibilitydetail' => '', 'tone' => 'secondary',
             'roles' => '', 'langs' => '', 'parentkey' => '', 'child' => false, 'blocked' => false, 'unavailable' => false,
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
-            'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
+            'exception' => false, 'inherited' => false, 'scopenote' => '', 'candelete' => false, 'canhide' => false,
+            'canshow' => false,
             'canedit' => false,
             'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true, 'tree' => true,
+            'withicons' => false,
             'childlabel' => '',
         ];
     }
@@ -442,6 +446,11 @@ class nodes {
             ),
             'exception' => $isexception && !$inherited,
             'inherited' => $inherited,
+            // Whether the scope changes the node or inherits it, said after its key; written here, as the list is drawn again
+            // in the browser, where two strings side by side in a template are not resolved.
+            'scopenote' => $isexception && !$inherited
+                ? get_string('separator', 'local_extendednav') . get_string('exception', 'local_extendednav')
+                : ($inherited ? get_string('separator', 'local_extendednav') . get_string('inherited', 'local_extendednav') : ''),
             'candelete' => $contextid !== 0 ? $isexception && !$inherited : $menu->can_delete($node->nodekey),
             'canhide' => !$protected && $visibility !== access::VISIBILITY_HIDDEN,
             'canshow' => !$protected && $visibility !== access::VISIBILITY_ALL,

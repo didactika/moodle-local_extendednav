@@ -41,6 +41,9 @@ class admintree extends base {
     /** @var string Key of the group General of the list, which holds the items of the top level that are not tabs. */
     public const GENERAL = 'admingeneral';
 
+    /** @var string End of the name of the section that holds the pages of a tab of the plugin with no category of its own. */
+    public const SECTION_SUFFIX = '_pages';
+
     /** @var array|null The nodes of the tree, found once per request. */
     private static ?array $tree = null;
 
@@ -330,11 +333,27 @@ class admintree extends base {
     private static function add_parts($root, array $rows, array &$parts): void {
         $pending = array_filter($rows, static fn(\stdClass $row, string $key): bool => !isset($parts[self::name_of($key)])
             && trim((string)($row->title ?? '')) !== '', ARRAY_FILTER_USE_BOTH);
+        // Moodle makes a tab of a category at the top only when it holds another category; one that holds pages alone is drawn
+        // inside General. The pages of a tab of the plugin that holds no category go in a section of the tab, with its name, so
+        // it is a tab as Moodle's are.
+        $holdscategory = [];
+        $holdspage = [];
+        foreach ($pending as $row) {
+            $parentkey = (string)($row->parentkey ?? '');
+            if ($parentkey !== '') {
+                if (trim((string)($row->url ?? '')) === '') {
+                    $holdscategory[$parentkey] = true;
+                } else {
+                    $holdspage[$parentkey] = true;
+                }
+            }
+        }
+        $sections = [];
         do {
             $added = 0;
             foreach ($pending as $key => $row) {
                 $parentkey = (string)($row->parentkey ?? '');
-                $parent = $parentkey === '' ? $root : ($parts[self::name_of($parentkey)] ?? null);
+                $parent = $sections[$parentkey] ?? ($parentkey === '' ? $root : ($parts[self::name_of($parentkey)] ?? null));
                 if (!$parent instanceof \admin_category) {
                     continue;
                 }
@@ -348,6 +367,12 @@ class admintree extends base {
                 }
                 $root->add($parent->name, $part);
                 $parts[$name] = $part;
+                $pagesonly = isset($holdspage[$key]) && !isset($holdscategory[$key]);
+                if ($parentkey === '' && $part instanceof \admin_category && $pagesonly) {
+                    $sections[$key] = new \admin_category($name . self::SECTION_SUFFIX, $title);
+                    $root->add($name, $sections[$key]);
+                    self::$added[] = self::key_of($name . self::SECTION_SUFFIX);
+                }
                 self::$added[] = $key;
                 unset($pending[$key]);
                 $added++;

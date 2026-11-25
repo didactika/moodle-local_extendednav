@@ -300,6 +300,7 @@ class usermenu extends base {
      *
      * @param \stdClass $node Node record.
      * @param \stdClass|null $native Core node definition, if any.
+     * @param bool $holder Whether the node holds others, so a submenu without a URL takes one of its own.
      * @return string Absolute URL, or an empty string.
      */
     private function get_absolute_url(\stdClass $node, ?\stdClass $native, bool $holder = false): string {
