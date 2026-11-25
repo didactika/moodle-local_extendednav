@@ -577,6 +577,7 @@
     block-size: var(--dd-table-h);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scroll-padding-block-start: 3rem;
 }
 
 .len .table-responsive[data-region=tablewrap] thead th {
