@@ -326,11 +326,15 @@ class primary extends base {
                     $existingnode->action = new \moodle_url($state->url);
                 }
                 $existingnode->text = $decoration . $existingnode->text . $marker;
-            } else if ($state->shown && $state->title !== '' && $state->url !== null && !$this->is_native($nodekey)) {
-                // A Moodle item that Moodle did not add (turned off in its settings) is never added by the plugin.
+            } else if (
+                $state->shown && $state->title !== '' && ($state->url !== null || isset($parents[$nodekey]))
+                && !$this->is_native($nodekey)
+            ) {
+                // A Moodle item that Moodle did not add (turned off in its settings) is never added by the plugin. A submenu has
+                // no URL of its own: it opens the items under it.
                 $existingnode = \navigation_node::create(
                     $decoration . format_string($state->title) . $marker,
-                    new \moodle_url($state->url),
+                    $state->url !== null ? new \moodle_url($state->url) : null,
                     \navigation_node::TYPE_SETTING,
                     null,
                     $nodekey,
