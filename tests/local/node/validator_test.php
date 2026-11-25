@@ -166,12 +166,12 @@ final class validator_test extends \advanced_testcase {
     }
 
     /**
-     * Restricted nodes need roles; unknown roles and languages are warnings.
+     * Restricted nodes need roles or access restrictions; unknown roles and languages are warnings.
      */
     public function test_roles_and_languages(): void {
         $this->resetAfterTest();
         $errors = $this->run_validation(['nodekey' => 'x', 'title' => 'X', 'url' => '/a.php', 'visibility' => 2])['errors'];
-        $this->assertSame(get_string('required'), $errors['roles']);
+        $this->assertSame(get_string('err_restricted_empty', 'local_extendednav'), $errors['roles']);
 
         $result = $this->run_validation(['nodekey' => 'x', 'title' => 'X', 'url' => '/a.php', 'visibility' => 2,
             'roles' => 'editingteacher,ghost', 'langs' => 'en,xx']);

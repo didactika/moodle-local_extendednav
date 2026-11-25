@@ -30,6 +30,7 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ### Fixed
 
+- A list that opens a level, or changes its page, its search, its filters or its order, starts at its first row: kept scrolled as it was, its first rows stayed under the header that is always in view, which hid their buttons.
 - In Choose icon, a long name, such as e/cleanup_messy_code, no longer runs past the edges of its cell or over the name of its component: every cell has room for two lines of name and its component, and a longer name ends with an ellipsis.
 - Saving a node while Moodle's restricted access is turned off, or in a category, a course or an activity where the access restrictions cannot be changed, no longer erases the access restrictions it has: the form keeps them when it does not show their editor.
 - Hiding a submenu, a section or an external link no longer offers Block the URL too, and the form of such a node no longer shows Block URL access: they have no address of the site to block. The rows of the list say whether a node can block its address (blockable).
