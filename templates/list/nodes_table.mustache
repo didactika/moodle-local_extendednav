@@ -78,7 +78,7 @@
                                 <a class="fw-bold text-truncate" href="{{editurl}}" title="{{title}}">{{title}}</a>
                             {{/haschildren}}
                             {{^virtual}}
-                                <span class="small text-muted text-truncate">{{#native}}<span class="badge rounded-pill text-bg-light" title="{{#str}}origin_native_help, local_extendednav{{/str}}">{{#str}}origin_native, local_extendednav{{/str}}</span>{{/native}}{{^native}}<span class="badge rounded-pill text-bg-info" title="{{#str}}origin_custom_help, local_extendednav{{/str}}">{{#str}}origin_custom, local_extendednav{{/str}}</span>{{/native}} <code>{{nodekey}}</code>{{#haschildren}} <button type="button" class="badge rounded-pill text-bg-primary border-0" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{childlabel}}</button>{{/haschildren}}{{scopenote}}</span>
+                                <span class="small text-muted text-truncate">{{#native}}<span class="badge rounded-pill text-bg-light" title="{{#str}}origin_native_help, local_extendednav{{/str}}">{{#str}}origin_native, local_extendednav{{/str}}</span>{{/native}}{{^native}}<span class="badge rounded-pill text-bg-info" title="{{#str}}origin_custom_help, local_extendednav{{/str}}">{{#str}}origin_custom, local_extendednav{{/str}}</span>{{/native}} <code>{{nodekey}}</code>{{scopenote}}</span>
                                 <span class="d-md-none mt-1 text-truncate"><span class="badge rounded-pill text-bg-{{tone}} mw-100 text-truncate align-bottom">{{visibilitylabel}}</span></span>
                             {{/virtual}}
                         </span>
@@ -92,7 +92,10 @@
                         </span>
                     {{/virtual}}
                 </td>
-                <td class="d-none d-xl-table-cell" data-column="url"><span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span></td>
+                <td class="d-none d-xl-table-cell" data-column="url">
+                    {{#haschildren}}{{^virtual}}<button type="button" class="btn btn-link p-0 text-muted text-decoration-none d-inline-flex align-items-center gap-1" data-action="openlevel" data-key="{{nodekey}}" title="{{openlabel}}">{{#pix}}i/folder, core{{/pix}}{{childlabel}}</button>{{/virtual}}{{/haschildren}}
+                    {{^haschildren}}<span class="text-truncate d-block" {{#url}}title="{{url}}"{{/url}}>{{url}}</span>{{/haschildren}}
+                </td>
                 <td class="text-end text-right text-nowrap" data-column="actions">
                     {{^virtual}}
                         <span class="d-inline-flex align-items-center gap-1" data-region="rowactions">
