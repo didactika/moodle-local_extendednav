@@ -145,11 +145,13 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         $DB->delete_records('user_preferences', ['name' => 'local_extendednav_preferences']);
         if ($DB->get_manager()->table_exists('tool_usertours_tours')) {
             // The tours change: the one of the Navigation page leaves the preferences of each user to a tour of their own.
-            foreach (['mypreferences', 'context', 'preferences'] as $name) {
-                $tour = $DB->get_record('tool_usertours_tours', ['name' => 'tour_' . $name . '_name,local_extendednav']);
-                if ($tour) {
-                    \tool_usertours\tour::instance((int)$tour->id)->remove();
-                }
+            $names = array_map(
+                static fn(string $name): string => 'tour_' . $name . '_name,local_extendednav',
+                ['mypreferences', 'context', 'preferences']
+            );
+            $tours = $DB->get_records_list('tool_usertours_tours', 'name', $names, '', 'id');
+            foreach ($tours as $tour) {
+                \tool_usertours\tour::instance((int)$tour->id)->remove();
             }
         }
         require_once($CFG->dirroot . '/local/extendednav/lib.php');
@@ -165,6 +167,36 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         local_extendednav_import_tours();
 
         upgrade_plugin_savepoint(true, 2026112605, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112606) {
+        // The task that cleans the activity log comes off, as its setting does, until the setting is turned on.
+        \local_extendednav\task\clean_activity_log::sync();
+
+        upgrade_plugin_savepoint(true, 2026112606, 'local', 'extendednav');
+    }
+
+    if ($oldversion < 2026112607) {
+        // A node of the site at the top of the primary navigation or the user menu that holds others is a submenu, which has no
+        // URL of its own: the URL it kept from before is cleared, in one query.
+        $parents = $DB->get_fieldset_sql(
+            "SELECT DISTINCT parentkey
+               FROM {local_extendednav}
+              WHERE menu IN ('primary', 'usermenu') AND parentkey IS NOT NULL AND parentkey <> ''"
+        );
+        if ($parents) {
+            [$insql, $params] = $DB->get_in_or_equal($parents, SQL_PARAMS_NAMED);
+            $DB->set_field_select(
+                'local_extendednav',
+                'url',
+                null,
+                "menu IN ('primary', 'usermenu') AND (parentkey IS NULL OR parentkey = '') AND nodekey $insql",
+                $params
+            );
+        }
+        \local_extendednav\local\node\repository::purge();
+
+        upgrade_plugin_savepoint(true, 2026112607, 'local', 'extendednav');
     }
 
     return true;

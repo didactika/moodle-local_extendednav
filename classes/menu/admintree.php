@@ -191,11 +191,12 @@ class admintree extends base {
         $now = time();
         $new = [];
         $sortorder = (int)$DB->get_field_sql('SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = ?', [self::KEY]) + 1;
+        $moved = [];
         foreach ($natives as $key => $native) {
             if (isset($bykey[$key])) {
                 // A plugin can move its page to another category; the row follows it.
                 if ((string)$bykey[$key]->parentkey !== $native->parentkey && $this->is_native_parent($bykey[$key])) {
-                    $DB->set_field('local_extendednav', 'parentkey', $native->parentkey ?: null, ['id' => $bykey[$key]->id]);
+                    $moved[(int)$bykey[$key]->id] = $native->parentkey ?: null;
                 }
                 continue;
             }
@@ -205,6 +206,7 @@ class admintree extends base {
                 'hideadmins' => 1, 'sortorder' => $sortorder++, 'timecreated' => $now, 'timemodified' => $now,
             ];
         }
+        \local_extendednav\local\node\manager::set_field_by_id('parentkey', $moved);
         if (!empty($new)) {
             $DB->insert_records('local_extendednav', $new);
         }

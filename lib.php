@@ -131,14 +131,22 @@ function local_extendednav_import_tours(): int {
         \core\task\manager::queue_adhoc_task(new \local_extendednav\task\import_tours(), true);
         return 0;
     }
-    $imported = 0;
+    $tours = [];
     foreach (glob(__DIR__ . '/tours/*.json') as $file) {
         $json = file_get_contents($file);
         $tour = json_decode($json);
-        if (!is_object($tour) || empty($tour->name) || empty($tour->steps)) {
-            continue;
+        if (is_object($tour) && !empty($tour->name) && !empty($tour->steps)) {
+            $tours[$tour->name] = $json;
         }
-        if ($DB->record_exists('tool_usertours_tours', ['name' => $tour->name])) {
+    }
+    if (!$tours) {
+        return 0;
+    }
+    // The tours already there, in one query.
+    $present = $DB->get_records_list('tool_usertours_tours', 'name', array_keys($tours), '', 'name');
+    $imported = 0;
+    foreach ($tours as $name => $json) {
+        if (isset($present[$name])) {
             continue;
         }
         \tool_usertours\manager::import_tour_from_json($json);

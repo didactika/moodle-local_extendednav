@@ -55,7 +55,7 @@
                         {{#editurl}}<a class="text-truncate" href="{{editurl}}"><code>{{nodekey}}</code></a>{{/editurl}}
                         {{^editurl}}<code class="text-truncate" title="{{nodekey}}">{{nodekey}}</code>{{/editurl}}
                         {{#changedfields}}<button type="button" class="btn btn-link p-0 small text-start text-left text-truncate" data-action="changes" data-id="{{id}}" title="{{changeslabel}}">{{changedfields}}</button>{{/changedfields}}
-                        <span class="d-flex d-md-none align-items-center gap-2 small text-muted text-truncate"><span class="badge rounded-pill text-bg-{{tone}}">{{actionlabel}}</span> {{user}}</span>
+                        <span class="d-flex d-md-none align-items-center gap-2 small text-muted text-truncate"><span class="badge rounded-pill text-bg-{{tone}}">{{actionlabel}}</span><span class="text-truncate">{{user}}</span></span>
                     </span>
                 </th>
                 <td class="d-none d-md-table-cell"><span class="badge rounded-pill text-bg-{{tone}}">{{actionlabel}}</span></td>

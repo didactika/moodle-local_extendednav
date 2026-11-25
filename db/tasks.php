@@ -34,4 +34,15 @@ $tasks = [
         'month' => '*',
         'dayofweek' => '*',
     ],
+    [
+        // Off until the clean-up of the activity log is turned on in its settings, which turn it on and off.
+        'classname' => \local_extendednav\task\clean_activity_log::class,
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => 'R',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 1,
+    ],
 ];

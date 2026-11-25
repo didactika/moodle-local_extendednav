@@ -160,11 +160,28 @@ class manager {
         }
         $unchanged = [];
 
+        // The next place of each navigation and scope, for the nodes that are new and have none, read in one query.
+        $next = [];
+        $menus = array_unique(array_map(static fn(\stdClass $record): string => (string)$record->menu, $records));
+        if ($menus) {
+            [$insql, $params] = $DB->get_in_or_equal(array_values($menus));
+            $maxima = $DB->get_recordset_sql(
+                "SELECT menu, contextid, MAX(sortorder) AS maxorder
+                   FROM {local_extendednav}
+                  WHERE menu $insql
+               GROUP BY menu, contextid",
+                $params
+            );
+            foreach ($maxima as $maximum) {
+                $next[$maximum->menu . '@' . (int)$maximum->contextid] = (int)$maximum->maxorder + 1;
+            }
+            $maxima->close();
+        }
+
         $transaction = $DB->start_delegated_transaction();
         $now = time();
         $saved = [];
-        // The next place of each navigation and scope, read once for the nodes that are new and have none.
-        $next = [];
+        $new = [];
         foreach ($records as $key => $record) {
             $record = clone $record;
             if (!empty($record->id)) {
@@ -183,20 +200,45 @@ class manager {
             unset($record->id);
             if (!isset($record->sortorder)) {
                 $group = $record->menu . '@' . (int)($record->contextid ?? 0);
-                if (!isset($next[$group])) {
-                    $max = $DB->get_field_sql(
-                        'SELECT MAX(sortorder) FROM {local_extendednav} WHERE menu = :menu AND contextid = :contextid',
-                        ['menu' => $record->menu, 'contextid' => (int)($record->contextid ?? 0)]
-                    );
-                    $next[$group] = $max === null || $max === false ? 0 : (int)$max + 1;
-                }
+                $next[$group] = $next[$group] ?? 0;
                 $record->sortorder = $next[$group]++;
             }
             $record->timecreated = $now;
-            $record->id = (int)$DB->insert_record('local_extendednav', $record);
-            $saved[$key] = $record;
+            $new[$key] = $record;
+        }
+        // The new nodes, saved at once, and their ids read back by navigation, scope and key, which are unique.
+        if ($new) {
+            $DB->insert_records('local_extendednav', array_values($new));
+            $wanted = [];
+            foreach ($new as $key => $record) {
+                $wanted[$record->menu][(int)($record->contextid ?? 0) . '|' . $record->nodekey] = $key;
+            }
+            foreach ($wanted as $menu => $keys) {
+                $nodekeys = array_unique(array_map(static fn($id): string => explode('|', (string)$id, 2)[1], array_keys($keys)));
+                foreach (array_chunk(array_values($nodekeys), 500) as $chunk) {
+                    [$insql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED);
+                    $params['menu'] = $menu;
+                    $rows = $DB->get_recordset_select(
+                        'local_extendednav',
+                        "menu = :menu AND nodekey $insql",
+                        $params,
+                        '',
+                        'id, contextid, nodekey'
+                    );
+                    foreach ($rows as $row) {
+                        $key = $keys[(int)$row->contextid . '|' . $row->nodekey] ?? null;
+                        if ($key !== null) {
+                            $new[$key]->id = (int)$row->id;
+                            $saved[$key] = $new[$key];
+                        }
+                    }
+                    $rows->close();
+                }
+            }
         }
         $transaction->allow_commit();
+        // The records saved in the order they came.
+        $saved = array_replace(array_intersect_key(array_flip(array_keys($records)), $saved), $saved);
         repository::purge();
 
         foreach ($records as $key => $record) {
@@ -303,15 +345,17 @@ class manager {
         }
 
         $DB->delete_records_list('local_extendednav', 'id', array_keys($todelete));
-        // The exceptions of a node that is deleted go with it.
+        // The exceptions of a node that is deleted go with it: one query for each navigation.
+        $sitekeys = [];
         foreach ($todelete as $record) {
             if ((int)($record->contextid ?? 0) === 0) {
-                $DB->delete_records_select(
-                    'local_extendednav',
-                    'menu = :menu AND nodekey = :nodekey AND contextid <> 0',
-                    ['menu' => $record->menu, 'nodekey' => $record->nodekey]
-                );
+                $sitekeys[$record->menu][] = (string)$record->nodekey;
             }
+        }
+        foreach ($sitekeys as $menu => $nodekeys) {
+            [$insql, $params] = $DB->get_in_or_equal(array_values(array_unique($nodekeys)), SQL_PARAMS_NAMED);
+            $params['menu'] = $menu;
+            $DB->delete_records_select('local_extendednav', "menu = :menu AND contextid <> 0 AND nodekey $insql", $params);
         }
 
         // The children of a deleted parent become top-level nodes, where the parent was.
@@ -389,14 +433,44 @@ class manager {
             }
         }
 
-        $transaction = $DB->start_delegated_transaction();
+        $changes = [];
         foreach ($ordered as $sortorder => $id) {
             if ((int)$current[$id]->sortorder !== $sortorder) {
-                $DB->set_field('local_extendednav', 'sortorder', $sortorder, ['id' => $id]);
+                $changes[$id] = $sortorder;
             }
         }
-        $transaction->allow_commit();
+        self::set_field_by_id('sortorder', $changes);
         repository::purge();
+    }
+
+    /**
+     * Gives each row its own value of one field, in one query for every few hundred rows instead of one query per row.
+     *
+     * @param string $field The field: nodekey, parentkey or sortorder.
+     * @param array $values The value of each row, by row id; null leaves the field empty.
+     */
+    public static function set_field_by_id(string $field, array $values): void {
+        global $DB;
+
+        if (!in_array($field, ['nodekey', 'parentkey', 'sortorder'], true) || !$values) {
+            return;
+        }
+        $transaction = $DB->start_delegated_transaction();
+        foreach (array_chunk($values, 500, true) as $chunk) {
+            $cases = [];
+            $params = [];
+            foreach ($chunk as $id => $value) {
+                $cases[] = 'WHEN ? THEN ?';
+                $params[] = (int)$id;
+                $params[] = $value;
+            }
+            [$insql, $inparams] = $DB->get_in_or_equal(array_map('intval', array_keys($chunk)));
+            $DB->execute(
+                "UPDATE {local_extendednav} SET $field = CASE id " . implode(' ', $cases) . " ELSE $field END WHERE id $insql",
+                array_merge($params, $inparams)
+            );
+        }
+        $transaction->allow_commit();
     }
 
     /**

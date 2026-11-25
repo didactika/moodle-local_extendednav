@@ -61,6 +61,42 @@ final class exporter {
 
         $nodes = [];
         $navigations = [];
+        // The rows of every navigation of the file, in one query, kept by navigation.
+        $bymenu = [];
+        $known = [];
+        foreach ($menukeys as $key) {
+            $menu = menu_manager::get_menu((string)$key);
+            if ($menu !== null) {
+                // Moodle's own items get their rows before the rows are read.
+                $menu->ensure_synced();
+                $known[] = (string)$key;
+            }
+        }
+        if ($known && ($contextids === null || $contextids)) {
+            [$menusql, $params] = $DB->get_in_or_equal($known, SQL_PARAMS_NAMED, 'menu');
+            if ($contextids !== null) {
+                [$contextsql, $contextparams] = $DB->get_in_or_equal(array_map('intval', $contextids), SQL_PARAMS_NAMED, 'ctx');
+                $records = $DB->get_recordset_sql(
+                    "SELECT n.* FROM {local_extendednav} n
+                      WHERE n.menu $menusql AND n.contextid $contextsql
+                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC",
+                    $params + $contextparams
+                );
+            } else {
+                $records = $DB->get_recordset_sql(
+                    "SELECT n.*
+                       FROM {local_extendednav} n
+                  LEFT JOIN {context} ctx ON ctx.id = n.contextid
+                      WHERE n.menu $menusql AND (n.contextid = 0 OR ctx.contextlevel = :category)
+                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC",
+                    $params + ['category' => CONTEXT_COURSECAT]
+                );
+            }
+            foreach ($records as $record) {
+                $bymenu[$record->menu][$record->id] = $record;
+            }
+            $records->close();
+        }
         foreach ($menukeys as $menukey) {
             $menu = menu_manager::get_menu($menukey);
             if ($menu === null) {
@@ -69,29 +105,9 @@ final class exporter {
             $menu->ensure_synced();
             // The file of the site holds what belongs to the site: its nodes and the exceptions of its categories, which Moodle
             // does not back up. The exceptions of a course travel with the course, in its backup.
-            if ($contextids !== null) {
-                if (!$contextids) {
-                    continue;
-                }
-                [$insql, $params] = $DB->get_in_or_equal(array_map('intval', $contextids), SQL_PARAMS_NAMED);
-                $rows = $DB->get_records_sql(
-                    "SELECT n.* FROM {local_extendednav} n
-                      WHERE n.menu = :menu AND n.contextid $insql
-                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC",
-                    ['menu' => $menukey] + $params
-                );
-                if (!$rows) {
-                    continue;
-                }
-            } else {
-                $rows = $DB->get_records_sql(
-                    'SELECT n.*
-                       FROM {local_extendednav} n
-                  LEFT JOIN {context} ctx ON ctx.id = n.contextid
-                      WHERE n.menu = :menu AND (n.contextid = 0 OR ctx.contextlevel = :category)
-                   ORDER BY n.contextid ASC, n.sortorder ASC, n.id ASC',
-                    ['menu' => $menukey, 'category' => CONTEXT_COURSECAT]
-                );
+            $rows = $bymenu[$menukey] ?? [];
+            if ($contextids !== null && !$rows) {
+                continue;
             }
             if ($menukey === \local_extendednav\menu\admintree::KEY) {
                 $ordered = \local_extendednav\menu\admintree::get_ordered_parents();

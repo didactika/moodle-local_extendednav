@@ -162,7 +162,7 @@ class nodes {
         $parents = [];
         foreach ($all as $node) {
             if ((string)($node->parentkey ?? '') !== '') {
-                $parents[(string)$node->parentkey] = true;
+                $parents[(string)$node->parentkey] = ($parents[(string)$node->parentkey] ?? 0) + 1;
             }
         }
         // In a category, a course or an activity, each action takes the capability of its kind of change.
@@ -178,6 +178,11 @@ class nodes {
             // which opens even while it holds nothing, to add what goes in it.
             $group = $istree && !$menu->is_native($node->nodekey) && trim((string)($node->url ?? '')) === '';
             $row['haschildren'] = $istree && (isset($parents[$node->nodekey]) || $group);
+            $row['tree'] = $istree;
+            // A folder says how many items it holds, so it is clear that it opens.
+            $count = (int)($parents[$node->nodekey] ?? 0);
+            $row['childlabel'] = !$row['haschildren'] ? '' : ($count === 0 ? get_string('folder_empty', 'local_extendednav')
+                : get_string($count === 1 ? 'folder_one' : 'folder_items', 'local_extendednav', $count));
             // Moodle shows a tab or a category of the administration only once it holds a page, and says nothing of an empty one.
             if ($group && !isset($parents[$node->nodekey]) && $menu instanceof admintree) {
                 $row['flags'][] = [
@@ -230,7 +235,8 @@ class nodes {
             'unknownroles' => '', 'adminonly' => false, 'hideadmins' => false, 'placement' => 0, 'placementlabel' => '',
             'exception' => false, 'inherited' => false, 'candelete' => false, 'canhide' => false, 'canshow' => false,
             'canedit' => false,
-            'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true,
+            'first' => true, 'last' => true, 'haschildren' => true, 'depth' => 0, 'virtual' => true, 'tree' => true,
+            'childlabel' => '',
         ];
     }
 
@@ -409,7 +415,8 @@ class nodes {
             'title' => text::get_title($node, $native) ?: (string)$node->nodekey,
             'native' => $native !== null,
             'url' => $url,
-            'icon' => icon::render((string)($node->icon ?? '')),
+            // The secondary navigations of Moodle draw no icons, so none is shown for them.
+            'icon' => $menu instanceof \local_extendednav\menu\secondary ? '' : icon::render((string)($node->icon ?? '')),
             'visibility' => $visibility,
             'visibilitylabel' => get_string($visibilitystring, 'local_extendednav'),
             'visibilitydetail' => $visibilitydetail,

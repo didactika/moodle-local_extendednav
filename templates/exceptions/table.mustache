@@ -57,7 +57,7 @@
                 </th>
                 <td class="d-none d-md-table-cell">
                     <span class="d-inline-flex flex-wrap gap-1">
-                        {{#navigations}}<a class="badge rounded-pill text-bg-light text-decoration-none" href="{{url}}">{{name}} · {{count}}</a>{{/navigations}}
+                        {{#navigations}}<a class="badge rounded-pill text-bg-light text-decoration-none" href="{{url}}">{{name}}{{#str}}separator, local_extendednav{{/str}}{{count}}</a>{{/navigations}}
                     </span>
                 </td>
                 <td class="text-end text-right text-nowrap" data-column="actions">

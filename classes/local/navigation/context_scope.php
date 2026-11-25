@@ -44,8 +44,8 @@ final class context_scope {
         'changeconditions' => ['roles', 'langs', 'blockaccess', 'hideadmins', 'availability'],
     ];
 
-    /** @var string[] What a user may change in their own preferences: show and hide, order, and go back to the site. */
-    public const PERSONAL = ['changevisibility', 'changeorder', 'deletenodes'];
+    /** @var string[] What a user may change in their own preferences: show and hide, order, rename, and go back to the site. */
+    public const PERSONAL = ['changevisibility', 'changeorder', 'changetitles', 'deletenodes'];
 
     /** @var \context The category, the course, the activity or the user. */
     private \context $context;

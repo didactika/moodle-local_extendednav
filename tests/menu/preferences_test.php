@@ -224,9 +224,9 @@ final class preferences_test extends \advanced_testcase {
         $this->assertTrue($scope->can_manage());
         $this->assertTrue($scope->can('changevisibility'));
         $this->assertTrue($scope->can('changeorder'));
-        $this->assertFalse($scope->can('changetitles'), 'A user does not rename.');
+        $this->assertTrue($scope->can('changetitles'), 'A user renames their own items.');
         $this->assertFalse($scope->can('addnodes'), 'A user does not add links.');
-        $this->assertContains('title', $scope->locked_fields());
+        $this->assertContains('url', $scope->locked_fields(), 'A user does not change where an item leads.');
 
         $theirs = context_scope::from_id(\context_user::instance($other->id)->id);
         $this->assertFalse($theirs->can_manage(), 'A user does not arrange the page of another.');
