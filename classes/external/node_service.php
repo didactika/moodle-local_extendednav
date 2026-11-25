@@ -150,7 +150,7 @@ abstract class node_service extends external_api {
             'native' => $flag('Whether Moodle has the node.'),
             'url' => $text('Link of the node.'),
             'icon' => $text('Icon, drawn.'),
-            'visibility' => new external_value(PARAM_INT, '0 hidden, 1 everyone, 2 roles.'),
+            'visibility' => new external_value(PARAM_INT, '0 hidden, 1 everyone, 2 restricted.'),
             'visibilitylabel' => $text('Visibility, in words.'),
             'visibilitydetail' => $text('Who sees the node, in a sentence.'),
             'tone' => new external_value(PARAM_ALPHA, 'Colour of the visibility.'),

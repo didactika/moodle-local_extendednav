@@ -350,10 +350,6 @@ class nodes {
             access::VISIBILITY_HIDDEN => ['vis_hidden', 'danger'],
         ];
         [$visibilitystring, $tone] = $visibilitykeys[$visibility] ?? $visibilitykeys[access::VISIBILITY_HIDDEN];
-        // A node for everyone that has conditions is shown only to whoever meets them.
-        if ($visibility === access::VISIBILITY_ALL && trim((string)($node->availability ?? '')) !== '') {
-            [$visibilitystring, $tone] = ['vis_conditional', 'warning'];
-        }
 
         $protected = access::is_protected($node);
         // What narrows the visibility: a short flag for each kind of restriction, shown beside the visibility, and a whole line
@@ -388,17 +384,14 @@ class nodes {
         if (!empty($native->moodlehidden)) {
             $restrict('hidden_by_moodle', get_string('hidden_by_moodle_detail', 'local_extendednav'));
         }
-        // The conditions of Moodle's Restrict access, in its words; a node with dates says whether it is still to come or over.
-        $conditions = availability::describe($node);
-        // The badge of the visibility says who sees the node; a node for everyone with conditions says them there.
+        // The conditions of Moodle's Restrict access, in its words, for a restricted node: one visible to everyone keeps them from
+        // before, unused. A node with dates says whether it is still to come or over.
+        $conditions = $visibility === access::VISIBILITY_ROLES ? availability::describe($node) : '';
         $visibilitydetail = get_string($visibilitystring . '_detail', 'local_extendednav');
-        if ($conditions !== '' && $visibility === access::VISIBILITY_ALL) {
-            $visibilitydetail .= ' ' . $conditions;
-            $details[] = $conditions;
-        } else if ($conditions !== '') {
+        if ($conditions !== '') {
             $restrict('flag_conditions', $conditions);
         }
-        $period = availability::period($node);
+        $period = $visibility === access::VISIBILITY_ROLES ? availability::period($node) : null;
         if ($period && $period['state'] === 'scheduled') {
             $restrict('flag_scheduled', get_string('period_scheduled', 'local_extendednav', userdate($period['from'])));
         } else if ($period && $period['state'] === 'ended') {
@@ -493,7 +486,7 @@ class nodes {
         if (!empty($node->hideadmins) && $visibility !== access::VISIBILITY_ALL) {
             $kinds[] = 'hideadmins';
         }
-        if (trim((string)($node->availability ?? '')) !== '') {
+        if ($visibility === access::VISIBILITY_ROLES && access::has_conditions($node)) {
             $kinds[] = 'conditions';
             $period = availability::period($node);
             if ($period && in_array($period['state'], ['scheduled', 'ended'], true)) {

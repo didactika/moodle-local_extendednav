@@ -118,20 +118,20 @@
       "sortorder": "11"
     },
     {
-      "title": "tour_node_step13_title,local_extendednav",
-      "content": "tour_node_step13_content,local_extendednav",
-      "contentformat": "1",
-      "targettype": "0",
-      "targetvalue": "#fitem_id_hideadmins",
-      "configdata": "{\"placement\":\"top\"}",
-      "sortorder": "12"
-    },
-    {
       "title": "tour_node_step14_title,local_extendednav",
       "content": "tour_node_step14_content,local_extendednav",
       "contentformat": "1",
       "targettype": "0",
       "targetvalue": "#fitem_id_blockaccess",
+      "configdata": "{\"placement\":\"top\"}",
+      "sortorder": "12"
+    },
+    {
+      "title": "tour_node_step13_title,local_extendednav",
+      "content": "tour_node_step13_content,local_extendednav",
+      "contentformat": "1",
+      "targettype": "0",
+      "targetvalue": "#fitem_id_hideadmins",
       "configdata": "{\"placement\":\"top\"}",
       "sortorder": "13"
     },

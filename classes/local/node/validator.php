@@ -121,8 +121,8 @@ class validator {
             }
         }
         if (!isset($errors['roles']) && $visibility === access::VISIBILITY_ROLES) {
-            if (empty($roles)) {
-                $errors['roles'] = get_string('required');
+            if (empty($roles) && !access::has_conditions($node)) {
+                $errors['roles'] = get_string('err_restricted_empty', 'local_extendednav');
             } else {
                 foreach (self::get_unknown_roles($roles) as $unknown) {
                     $warnings[] = get_string('warn_unknown_role', 'local_extendednav', $unknown);
