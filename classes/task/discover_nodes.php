@@ -40,7 +40,7 @@ class discover_nodes extends \core\task\scheduled_task {
      * Looks at the activities of every kind.
      */
     public function execute(): void {
-        if (!get_config('local_extendednav', 'enable_plugin')) {
+        if (!\local_extendednav\menu_manager::is_on()) {
             return;
         }
         \core\cron::setup_user(get_admin());

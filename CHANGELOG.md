@@ -20,6 +20,10 @@ Keep an "## [Unreleased]" section above the latest release and rename it when th
 
 ## [Unreleased]
 
+### Fixed
+
+- Upgrading from the web from a version without the context of a node no longer stops with Field "contextid" does not exist: while the upgrade of the plugin is pending, its files newer than its database, the plugin changes nothing and reads none of its tables, so the page of the upgrade and the rest of the site show the navigation of Moodle until the upgrade ends.
+
 ## [2.0.0-m405] - 2026-11-25
 
 ### Added

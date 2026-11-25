@@ -43,6 +43,36 @@ class menu_manager {
         'category' => 'i/withsubcat', 'admin' => 'i/settings',
     ];
 
+    /** @var int|null Version of the plugin files, read once per request. */
+    private static ?int $diskversion = null;
+
+    /**
+     * Whether the plugin changes anything in this request: it is on, and its database is the one its files expect.
+     *
+     * While an upgrade of the plugin is pending the files are new and the tables old, so nothing of the plugin may read
+     * them, not even on the page of the upgrade itself: Moodle shows the site as it is without the plugin until then.
+     *
+     * @return bool
+     */
+    public static function is_on(): bool {
+        return !during_initial_install() && !self::upgrade_pending()
+            && (bool)get_config('local_extendednav', 'enable_plugin');
+    }
+
+    /**
+     * Whether the plugin files are newer than its database: the upgrade has not run yet, or has not finished.
+     *
+     * @return bool
+     */
+    public static function upgrade_pending(): bool {
+        if (self::$diskversion === null) {
+            $plugin = new \stdClass();
+            require(__DIR__ . '/../version.php');
+            self::$diskversion = (int)$plugin->version;
+        }
+        return (int)get_config('local_extendednav', 'version') !== self::$diskversion;
+    }
+
     /**
      * Returns every navigation of the site: the primary navigation, the user menu, the secondary navigations of the site home,
      * a course and a category, one for each kind of activity that is turned on, and the site administration.
@@ -73,7 +103,7 @@ class menu_manager {
      * @return bool
      */
     public static function is_enabled(string $key): bool {
-        return (bool)get_config('local_extendednav', 'enable_plugin')
+        return self::is_on()
             && get_config('local_extendednav', 'enabled_' . $key) !== '0';
     }
 
