@@ -63,6 +63,7 @@ Feature: Shape the site administration
     And I press "Save changes"
     And I visit "/admin/category.php?category=didactika"
     And I should see "Didactika tools"
+    And I follow "Category: Didactika tools"
     And I should see "Handbook"
 
   @javascript
