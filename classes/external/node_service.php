@@ -140,7 +140,6 @@ abstract class node_service extends external_api {
         return new external_single_structure([
             'details' => new external_multiple_structure(new external_value(PARAM_RAW, 'What narrows the visibility.')),
             'haschildren' => $flag('Whether the node is a folder: a category, a tab, a section or a submenu.'),
-            'childlabel' => $text('How many items the folder holds, as the list says it.'),
             'tree' => $flag('Whether the navigation is listed as folders.'),
             'scopenote' => $text('Whether the scope changes the node or inherits it, as the list says it.'),
             'withicons' => $flag('Whether the navigation draws icons, so the list keeps room for them.'),
