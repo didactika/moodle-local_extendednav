@@ -1,9 +1,0 @@
-@startuml
-title UC-010 Depurar el registro de actividad — colaboración
-boundary LogSettings
-control CleanTask
-entity StandardLog
-LogSettings --> CleanTask : 1: activar o desactivar
-CleanTask --> StandardLog : 2: leer los identificadores por tiempo
-CleanTask --> StandardLog : 3: eliminar por identificador
-@enduml
