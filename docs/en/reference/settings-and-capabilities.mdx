@@ -18,6 +18,18 @@ Everything about the navigations is on the management page, at **Site administra
 
 Whether a node is also hidden from administrators is decided in the form of each node. See [Administrators see every node](page:concepts/administrators-see-everything).
 
+## Every navigation in one page
+
+**Site administration > Appearance > Extended navigation > Navigation status** lists every navigation with its own switch, in groups: **Site**, **Secondary navigations**, **Activities** (the kinds of activity the site does not use come folded under **Not used on the site**) and **Site administration**. The header of each group says how many of its navigations are on. A switch here is the same as the button next to the name of the navigation on the management page, and each change is saved at once. The name of a navigation opens its management page.
+
+The switch on top, **Extended navigation**, turns the whole plugin on or off:
+
+- Off, Moodle draws every navigation as it does without the plugin, **and the URLs that the nodes block can be opened again**. Because of that, turning it off asks first.
+- The switches of the navigations stay where they were, grey and locked, and the management page says that the plugin is off. When the plugin is turned on again, each navigation goes back to its own state.
+- Nodes, exceptions and preferences are kept.
+
+The page needs `local/extendednav:manage`, as the management page does. While an upgrade of the plugin is pending, the plugin changes nothing and the page says so: the files are newer than the database until the upgrade ends.
+
 ## Settings
 
 | Where | Setting | What it does |

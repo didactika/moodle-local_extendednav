@@ -75,4 +75,34 @@ final class menu_manager_test extends \advanced_testcase {
         );
         $this->assertSame('profile,moodle|/user/profile.php', $CFG->customusermenuitems);
     }
+
+    /**
+     * The page of the state lists every navigation once, in groups, with its own switch and the one of the plugin.
+     */
+    public function test_status_context(): void {
+        $this->resetAfterTest();
+        set_config('enable_plugin', 0, 'local_extendednav');
+        set_config('enabled_course', 0, 'local_extendednav');
+
+        $context = menu_manager::get_status_context();
+
+        $this->assertFalse($context['pluginenabled']);
+        $this->assertFalse($context['upgradepending']);
+        $rows = [];
+        $listed = 0;
+        foreach ($context['groups'] as $group) {
+            $this->assertNotEmpty($group['rows']);
+            $this->assertNotEmpty($group['countlabel']);
+            foreach ($group['rows'] as $row) {
+                $rows[$row['key']] = $row;
+                $listed++;
+            }
+        }
+        $this->assertEqualsCanonicalizing(array_keys(menu_manager::get_menus()), array_keys($rows));
+        $this->assertSame(count($rows), $listed, 'No navigation is listed twice.');
+        $this->assertFalse($rows['course']['enabled']);
+        $this->assertTrue($rows['primary']['enabled'], 'Each navigation shows its own state while the plugin is off.');
+        $this->assertSame(['site', 'secondary'], array_slice(array_column($context['groups'], 'id'), 0, 2));
+        $this->assertSame('admin', array_column($context['groups'], 'id')[count($context['groups']) - 1]);
+    }
 }

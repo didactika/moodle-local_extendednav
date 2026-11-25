@@ -43,6 +43,7 @@ final class manage_navigation_test extends \advanced_testcase {
         $this->assertTrue($keys['admin']['tree']);
         $this->assertArrayNotHasKey('profile', $keys);
         $this->assertTrue($keys['course']['scopes']);
+        $this->assertTrue(manage_navigation::get_navigations()['pluginenabled']);
 
         $this->setUser($this->getDataGenerator()->create_user());
         $this->expectException(\required_capability_exception::class);

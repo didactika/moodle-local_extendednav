@@ -103,8 +103,71 @@ class menu_manager {
      * @return bool
      */
     public static function is_enabled(string $key): bool {
-        return self::is_on()
-            && get_config('local_extendednav', 'enabled_' . $key) !== '0';
+        return self::is_on() && self::is_turned_on($key);
+    }
+
+    /**
+     * Whether one navigation is turned on by itself, whatever the switch of the whole plugin says.
+     *
+     * @param string $key Navigation key.
+     * @return bool
+     */
+    public static function is_turned_on(string $key): bool {
+        return get_config('local_extendednav', 'enabled_' . $key) !== '0';
+    }
+
+    /**
+     * Returns what the page of the state shows: the switch of the whole plugin, and every navigation with its own switch, in
+     * groups as the column of the navigations orders them; the kinds of activity the site does not use come last, folded.
+     *
+     * @return array Context of the template local_extendednav/status/page.
+     */
+    public static function get_status_context(): array {
+        $row = static function (string $key): ?array {
+            $menu = self::get_menu($key);
+            if ($menu === null) {
+                return null;
+            }
+            $activity = $menu instanceof \local_extendednav\menu\activity;
+            return [
+                'key' => $key,
+                'name' => $menu->get_short_name(),
+                'description' => $menu->get_name(),
+                'url' => (new \moodle_url('/local/extendednav/manage.php', ['menu' => $key]))->out(false),
+                'icon' => $activity ? 'monologo' : (self::ICONS[$key] ?? 'i/navigationitem'),
+                'component' => $activity ? 'mod_' . $menu->get_modname() : 'core',
+                'enabled' => self::is_turned_on($key),
+            ];
+        };
+        $rows = static fn(array $keys): array => array_values(array_filter(array_map($row, $keys)));
+
+        $activities = self::get_activity_keys();
+        $groups = [
+            ['id' => 'site', 'label' => get_string('status_group_site', 'local_extendednav'),
+                'rows' => $rows(['primary', 'usermenu', \local_extendednav\menu\preferences::KEY])],
+            ['id' => 'secondary', 'label' => get_string('status_group_secondary', 'local_extendednav'),
+                'rows' => $rows(['frontpage', 'course', 'category'])],
+            ['id' => 'activities', 'label' => get_string('origin_group_activity', 'local_extendednav'),
+                'rows' => $rows($activities['used'])],
+            ['id' => 'unused', 'label' => get_string('kinds_unused', 'local_extendednav'),
+                'rows' => $rows($activities['others']), 'folded' => true],
+            ['id' => 'admin', 'label' => get_string('administrationsite'),
+                'rows' => $rows([\local_extendednav\menu\admintree::KEY])],
+        ];
+        $groups = array_values(array_filter($groups, static fn(array $group): bool => !empty($group['rows'])));
+        foreach ($groups as &$group) {
+            $group['countlabel'] = get_string('status_group_count', 'local_extendednav', (object)[
+                'on' => count(array_filter($group['rows'], static fn(array $entry): bool => $entry['enabled'])),
+                'count' => count($group['rows']),
+            ]);
+        }
+        unset($group);
+
+        return [
+            'pluginenabled' => (bool)get_config('local_extendednav', 'enable_plugin'),
+            'upgradepending' => self::upgrade_pending(),
+            'groups' => $groups,
+        ];
     }
 
     /**

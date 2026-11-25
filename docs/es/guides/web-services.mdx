@@ -16,13 +16,14 @@ Todo lo que hace la página de gestión se hace con servicios web, de modo que o
 
 | Función | Qué hace |
 |---|---|
-| `local_extendednav_get_navigations` | Enumera las navegaciones: clave, nombre, si cada una está activada, si sus nodos son carpetas y si los contextos la cambian |
+| `local_extendednav_get_navigations` | Dice si el plugin está activado y enumera las navegaciones: clave, nombre, si cada una está activada, si sus nodos son carpetas y si los contextos la cambian |
 | `local_extendednav_get_nodes` | Enumera los nodos de una navegación, para el sitio o para un contexto, con la búsqueda y los filtros de la lista |
 | `local_extendednav_save_node` | Añade un nodo o cambia uno, con las comprobaciones del formulario. Los campos no enviados conservan su valor |
 | `local_extendednav_set_visibility` | Muestra u oculta nodos; al ocultar también puede ocultarlos a los administradores y bloquear sus URL |
 | `local_extendednav_reorder_nodes`, `local_extendednav_move_node`, `local_extendednav_place_node` | Ordenan nodos y eligen dónde van |
 | `local_extendednav_delete_nodes` | Elimina los nodos añadidos o vuelve a lo que fija el sitio |
 | `local_extendednav_set_enabled` | Activa o desactiva una navegación |
+| `local_extendednav_set_plugin_enabled` | Activa o desactiva todo el plugin; cada navegación conserva su propio estado |
 | `local_extendednav_get_exceptions`, `local_extendednav_get_activity` | Enumeran los contextos que cambian una navegación y el registro de actividad |
 | `local_extendednav_discover_nodes` | Busca los elementos de la navegación de un tipo de actividad |
 | `local_extendednav_export_navigations` | Escribe las navegaciones y los contextos elegidos como un archivo YAML y devuelve su texto |
