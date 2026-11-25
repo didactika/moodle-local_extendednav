@@ -242,6 +242,13 @@ export default class List {
         const focus = document.activeElement?.closest('[data-focuskey]')?.dataset.focuskey;
         const {html, js} = await Templates.renderForPromise(this.options.template, context);
         Templates.replaceNodeContents(this.region('tablewrap'), html, js);
+        // Another view of the list (a level, a page, a search, a filter or an order) starts at its first row: kept scrolled, its
+        // first rows would be under the header, which stays in view. The same view drawn again after an action stays put.
+        const view = JSON.stringify(this.state);
+        if (this.view !== undefined && this.view !== view) {
+            this.region('tablewrap').scrollTop = 0;
+        }
+        this.view = view;
         if (focus) {
             this.root.querySelector(`[data-focuskey="${focus}"]`)?.focus();
         }
