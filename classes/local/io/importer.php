@@ -19,6 +19,7 @@ namespace local_extendednav\local\io;
 use local_extendednav\menu_manager;
 use local_extendednav\local\listing\nodes;
 use local_extendednav\local\navigation\access_guard;
+use local_extendednav\local\node\access;
 use local_extendednav\local\node\manager;
 use local_extendednav\local\node\repository;
 use local_extendednav\local\node\validator;
@@ -129,6 +130,7 @@ class importer {
             }
 
             $values = array_intersect_key($item, array_flip(manager::EDITABLE_FIELDS));
+            $values = self::restricted_by_conditions($values);
             $record = manager::prepare($values, $menukey);
             $label = $menukey . '/' . $record->nodekey;
             $order = $item['order'] ?? '';
@@ -282,6 +284,23 @@ class importer {
     }
 
     /**
+     * Reads a node of a file written by an earlier version, where a node visible to everyone could have access restrictions:
+     * such a node is restricted now, so it keeps being shown only to whoever meets them.
+     *
+     * @param array $values The fields of the node in the file.
+     * @return array The fields to save.
+     */
+    private static function restricted_by_conditions(array $values): array {
+        if (
+            (int)($values['visibility'] ?? access::VISIBILITY_ALL) === access::VISIBILITY_ALL
+            && trim((string)($values['availability'] ?? '')) !== ''
+        ) {
+            $values['visibility'] = access::VISIBILITY_ROLES;
+        }
+        return $values;
+    }
+
+    /**
      * Checks the nodes of a file that apply to a category or a course, and builds the records to save.
      *
      * @param array $items The nodes of the file that name a scope, keyed by their place in the file.
@@ -312,6 +331,7 @@ class importer {
                 continue;
             }
             $values = array_intersect_key($item, array_flip(manager::EDITABLE_FIELDS));
+            $values = self::restricted_by_conditions($values);
             $record = manager::prepare($values, $menukey);
             $record->contextid = $contextid;
             $label = $menukey . '@' . $item['scope'] . '/' . $record->nodekey;

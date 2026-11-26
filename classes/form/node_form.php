@@ -236,14 +236,6 @@ class node_form extends \moodleform {
         $mform->addHelpButton('roles', 'roles', 'local_extendednav');
         $mform->hideIf('roles', 'visibility', 'neq', access::VISIBILITY_ROLES);
 
-        // The pages of the administration are never blocked: Moodle checks their capabilities.
-        if (!$istree) {
-            $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
-            $mform->setDefault('blockaccess', 1);
-            $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
-            $mform->hideIf('blockaccess', 'visibility', 'eq', access::VISIBILITY_ALL);
-        }
-
         $mform->addElement(
             'autocomplete',
             'langs',
@@ -256,7 +248,7 @@ class node_form extends \moodleform {
         );
         $mform->setType('langs', PARAM_ALPHANUMEXT);
         $mform->addHelpButton('langs', 'langs', 'local_extendednav');
-        // A node nobody sees has no language or condition to meet: those fields are hidden while it is not visible.
+        // A node nobody sees has no language to show in: the field is hidden while it is not visible.
         $mform->hideIf('langs', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
 
         // Moodle's Restrict access, as for an activity: dates, groups, groupings, profile fields and the conditions the site
@@ -270,7 +262,9 @@ class node_form extends \moodleform {
                 ['class' => 'd-none']
             );
             $mform->addHelpButton('availabilityconditionsjson', 'conditions', 'local_extendednav');
-            $mform->hideIf('availabilityconditionsjson', 'visibility', 'eq', access::VISIBILITY_HIDDEN);
+            // Access restrictions are one of the two ways to restrict a node, with the roles: a node visible to everyone has none,
+            // and one nobody sees has nobody to restrict.
+            $mform->hideIf('availabilityconditionsjson', 'visibility', 'neq', access::VISIBILITY_ROLES);
             $mform->addElement('html', $OUTPUT->container(
                 $OUTPUT->render_from_template('core/loading', []),
                 'd-flex justify-content-center py-3',
@@ -284,10 +278,29 @@ class node_form extends \moodleform {
             }
         }
 
+        // The pages of the administration are never blocked: Moodle checks their capabilities. Only a node with an address of the
+        // site can block it: a submenu or a section has none, and neither has an item of the preferences whose address is not
+        // typed here and that Moodle draws without one.
+        $fixedurl = $isprefs && ($isnative || self::is_section($menu, $current));
+        $blockable = !$fixedurl
+            || ($current !== null && !empty(access_guard::get_node_paths((object)((array)$current + ['menu' => $menukey]))));
+        if (!$istree && $blockable) {
+            $mform->addElement('advcheckbox', 'blockaccess', get_string('blockaccess', 'local_extendednav'));
+            $mform->setDefault('blockaccess', 1);
+            $mform->addHelpButton('blockaccess', 'blockaccess', 'local_extendednav');
+            $mform->hideIf('blockaccess', 'visibility', 'eq', access::VISIBILITY_ALL);
+            if ($mform->elementExists('treetype')) {
+                // A submenu or a section keeps no address.
+                $mform->hideIf('blockaccess', 'treetype', 'neq', 'page');
+            }
+        }
+
         $mform->addElement('advcheckbox', 'hideadmins', get_string('hideadmins', 'local_extendednav'));
         $mform->addHelpButton('hideadmins', 'hideadmins', 'local_extendednav');
-        // A node of the site administration is hidden from administrators too, unless they choose otherwise.
+        // A node of the site administration is hidden from administrators too, unless they choose otherwise. A node visible to
+        // everyone has no rule to apply to them.
         $mform->setDefault('hideadmins', $istree ? 1 : 0);
+        $mform->hideIf('hideadmins', 'visibility', 'eq', access::VISIBILITY_ALL);
 
         // Where it goes.
         $mform->addElement('header', 'placeheader', get_string('form_section_place', 'local_extendednav'));
@@ -436,7 +449,7 @@ class node_form extends \moodleform {
         if ($current !== null && menu_manager::get_menu($menukey)->is_native($current->nodekey)) {
             $data['nodekey'] = $current->nodekey;
         }
-        $data['availability'] = self::conditions_of($data['availabilityconditionsjson'] ?? '');
+        $data['availability'] = $this->availability_of($data['availabilityconditionsjson'] ?? null);
         $data = (array)self::tree_values((object)$data);
         $record = manager::prepare($data, $menukey);
 
@@ -556,7 +569,7 @@ class node_form extends \moodleform {
     public function get_data() {
         $data = parent::get_data();
         if ($data !== null) {
-            $data->availability = self::conditions_of($data->availabilityconditionsjson ?? '');
+            $data->availability = $this->availability_of($data->availabilityconditionsjson ?? null);
             $data = self::tree_values($data);
         }
         return $data;
@@ -621,6 +634,21 @@ class node_form extends \moodleform {
             $data->parentkey = $type === 'tab' ? '' : (string)($data->categoryparent ?? '');
         }
         return $data;
+    }
+
+    /**
+     * The access restrictions to save: the ones the editor wrote, or, when the form has no editor, the ones the node has. The
+     * editor is left out while Moodle's restricted access is turned off, or for whoever may not change the restrictions in a
+     * category, a course or an activity; saving the node must not erase them then.
+     *
+     * @param string|null $json What the editor wrote, or null when the form has no editor.
+     * @return string The access restrictions, or empty.
+     */
+    private function availability_of(?string $json): string {
+        if (!$this->_form->elementExists('availabilityconditionsjson')) {
+            return (string)($this->_customdata['node']->availability ?? '');
+        }
+        return self::conditions_of((string)$json);
     }
 
     /**

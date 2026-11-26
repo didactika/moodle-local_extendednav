@@ -165,14 +165,20 @@ export const init = () => {
         }
     };
 
+    // Only an address of the site can be blocked: none for a node with no address (a submenu, or a link not written yet), and
+    // none for an external link. A node of Moodle with its address left empty keeps the one of Moodle.
     const updateBlockAccess = () => {
         if (blockaccessItem && url) {
-            blockaccessItem.classList.toggle(HIDDEN_CLASS, isExternal(url.value, wwwroot));
+            const key = (nodekey ? nodekey.value : currentKey).trim();
+            const core = Object.prototype.hasOwnProperty.call(placeholders, key) ? placeholders[key] : null;
+            const address = url.value.trim() || (core ? core.url : '');
+            blockaccessItem.classList.toggle(HIDDEN_CLASS, address === '' || isExternal(address, wwwroot));
         }
     };
 
     ['input', 'change'].forEach((type) => {
         nodekey?.addEventListener(type, updateKey);
+        nodekey?.addEventListener(type, updateBlockAccess);
         url?.addEventListener(type, updateBlockAccess);
     });
 

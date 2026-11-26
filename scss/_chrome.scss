@@ -171,6 +171,9 @@
             block-size: var(--dd-table-h);
             overflow-y: auto;
             overscroll-behavior: contain;
+            // A row brought into view at the top of the box (by the keyboard, by a link or by a browser driven by a test) stops
+            // below the header, which stays over the rows: the header has one line, a little under 3rem.
+            scroll-padding-block-start: 3rem;
 
             // A sticky cell leaves a collapsed border behind when the rows scroll: its line is a shadow, which goes with it.
             & thead th {

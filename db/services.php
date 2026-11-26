@@ -112,6 +112,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'local/extendednav:manage',
     ],
+    'local_extendednav_set_plugin_enabled' => [
+        'classname' => \local_extendednav\external\change_nodes::class,
+        'methodname' => 'set_plugin_enabled',
+        'description' => 'Turns the whole plugin on or off; each navigation keeps its own state.',
+        'type' => 'write',
+        'ajax' => true,
+        'capabilities' => 'local/extendednav:manage',
+    ],
     'local_extendednav_get_navigations' => [
         'classname' => \local_extendednav\external\manage_navigation::class,
         'methodname' => 'get_navigations',

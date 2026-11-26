@@ -102,7 +102,10 @@ echo $OUTPUT->render_from_template('local_extendednav/manage/page', [
     'name' => $menu->get_name(),
     'origins' => $origins,
     'originoptions' => $originoptions,
-    'enabled' => get_config('local_extendednav', 'enabled_' . $menukey) !== '0',
+    'enabled' => menu_manager::is_turned_on($menukey),
+    // While the whole plugin is off its switch, on the page of the state, rules every navigation.
+    'pluginoff' => !get_config('local_extendednav', 'enable_plugin'),
+    'statusurl' => (new moodle_url('/local/extendednav/status.php'))->out(false),
     'sitewide' => true,
     'hasscopes' => $hasscopes,
     'exceptionsurl' => (new moodle_url('/local/extendednav/exceptions.php', ['menu' => $menukey]))->out(false),

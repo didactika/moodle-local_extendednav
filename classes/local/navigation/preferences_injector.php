@@ -111,7 +111,7 @@ final class preferences_injector {
      * @param \stdClass $user The user whose preferences they are.
      */
     public static function apply(\navigation_node $settings, \stdClass $user): void {
-        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin') || isguestuser($user)) {
+        if (!\local_extendednav\menu_manager::is_on() || isguestuser($user)) {
             return;
         }
         $groups = self::read($settings);

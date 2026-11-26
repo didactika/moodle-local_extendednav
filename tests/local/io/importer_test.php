@@ -86,6 +86,30 @@ final class importer_test extends \advanced_testcase {
     }
 
     /**
+     * A node visible to everyone with access restrictions, as an earlier version wrote it, comes in restricted; a node visible
+     * to everyone goes out without the access restrictions it keeps from before.
+     */
+    public function test_access_restrictions_only_go_with_a_restricted_node(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $conditions = json_encode(['op' => '&', 'c' => [['type' => 'date', 'd' => '>=', 't' => 1000]], 'showc' => [true]]);
+
+        $result = (new importer('primary', true))->import([
+            ['nodekey' => 'dated', 'title' => 'Dated', 'url' => '/dated.php', 'visibility' => 1, 'availability' => $conditions],
+        ]);
+
+        $this->assertSame([], $result['errors']);
+        $dated = $DB->get_record('local_extendednav', ['menu' => 'primary', 'nodekey' => 'dated']);
+        $this->assertSame(2, (int)$dated->visibility);
+        $this->assertSame($conditions, $dated->availability);
+        $this->assertSame($conditions, exporter::export_node($dated)['availability']);
+
+        $dated->visibility = 1;
+        $this->assertSame('', exporter::export_node($dated)['availability']);
+    }
+
+    /**
      * Imported nodes go to the position of their order field; the others keep their order.
      */
     public function test_import_order(): void {
