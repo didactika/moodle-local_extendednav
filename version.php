@@ -28,6 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2026112614;
 $plugin->requires  = 2024100700; // Moodle 4.5.
 $plugin->component = 'local_extendednav';
-$plugin->release   = '2.0.0-m405';
+$plugin->release   = '2.1.0-m405';
 $plugin->supported = [405, 502];
 $plugin->maturity  = MATURITY_STABLE;
