@@ -256,7 +256,7 @@ class access_guard {
         ) {
             return false;
         }
-        if (!get_config('local_extendednav', 'enable_plugin')) {
+        if (!\local_extendednav\menu_manager::is_on()) {
             return false;
         }
         return isloggedin() && !isguestuser() && !is_siteadmin();

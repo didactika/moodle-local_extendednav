@@ -43,7 +43,7 @@ class injector {
     public static function apply(): void {
         global $PAGE;
 
-        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin') || !$PAGE->has_secondary_navigation()) {
+        if (!\local_extendednav\menu_manager::is_on() || !$PAGE->has_secondary_navigation()) {
             return;
         }
         $origin = self::get_origin($PAGE->context, (int)$PAGE->course->id, $PAGE->cm ? (string)$PAGE->cm->modname : null);

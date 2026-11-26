@@ -237,3 +237,33 @@
     font-size: 0.8125rem;
     line-height: 1.4;
 }
+
+// The page of the state of the navigations: while the plugin is off the navigations are grey and their switches cannot be
+// pressed, though each keeps its state; the groups open and fold from their header, which shows how many are on.
+.len[data-region="status"] {
+    & [data-region="navigations"] {
+        transition: opacity var(--dd-ease);
+
+        &[aria-disabled="true"] {
+            opacity: 0.55;
+        }
+    }
+
+    & summary.card-header {
+        cursor: pointer;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+    }
+
+    & details:not([open]) > summary.card-header {
+        border-bottom: 0;
+    }
+
+    & .list-group-item .icon {
+        margin: 0;
+        flex-shrink: 0;
+    }
+}

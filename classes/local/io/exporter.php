@@ -205,6 +205,11 @@ final class exporter {
         $node->scope = scope::describe((int)($node->contextid ?? 0));
         $menu = menu_manager::get_menu((string)$node->menu);
         $node->native = $menu !== null && $menu->is_native((string)$node->nodekey) ? 1 : 0;
+        // Access restrictions apply only to a restricted node: one visible to everyone keeps them from before, unused, and a file
+        // with them would make it restricted again when imported.
+        if ((int)$node->visibility !== access::VISIBILITY_ROLES) {
+            $node->availability = null;
+        }
         $data = [];
         foreach (self::EXPORT_FIELDS as $field) {
             $value = $node->$field ?? null;

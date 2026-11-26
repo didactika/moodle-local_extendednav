@@ -25,7 +25,7 @@ The same format holds one navigation or every navigation. An exported file also 
 | `tooltip` | Text shown when hovering over the link |
 | `url` | Destination: a path of this site (for example `/course/view.php?id=2`) or a full address |
 | `icon` | FontAwesome class (for example `fa-book`) or icon of Moodle (for example `i/home`). `none` removes the icon |
-| `visibility` | `1` visible to everyone, `2` restricted to the roles listed, `0` not visible |
+| `visibility` | `1` visible to everyone, `2` restricted by the roles listed, the access restrictions or both, `0` not visible |
 | `roles` | Role shortnames separated by commas (for example `editingteacher,teacher`). Used when `visibility` is `2` |
 | `blockaccess` | `1` to block the URL for the users who cannot see the item, `0` otherwise. Only used when `visibility` is `0` or `2` |
 | `langs` | Language codes separated by commas (for example `es,pt_br`). The item is only shown for these languages. Empty means every language |
@@ -33,7 +33,7 @@ The same format holds one navigation or every navigation. An exported file also 
 | `display` | How the link opens: `0` current window, `1` new window, `2` pop-up |
 | `popupwidth`, `popupheight` | Width and height of the pop-up in pixels, from 100 to 9999. Used when `display` is `2` |
 | `scope` | What the node is an exception for: `category:Parent / Name`, `course:shortname`, `activity:course shortname/ID number` (or `activity:course shortname/#number of the activity`) or `user:username`. Empty means the whole site. The exceptions of a course travel in the backup of the course; a file may still name one. A category, course, activity or user the site does not have is left out with a warning |
-| `availability` | Access restrictions of Moodle, in JSON, as Restrict access of an activity saves them. See [Show a node to some people or for a time](page:guides/conditions) |
+| `availability` | Access restrictions of Moodle, in JSON, as Restrict access of an activity saves them. Used when `visibility` is `2`; a file of an earlier version with `visibility: 1` and access restrictions is imported as `2`. See [Show a node to some people or for a time](page:guides/conditions) |
 | `placement` | Where a node of a secondary navigation goes: `0` where Moodle puts it, `1` always in the More menu, `2` never in the More menu |
 | `hideadmins` | `1` to hide the node from site administrators too |
 

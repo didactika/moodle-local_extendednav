@@ -4,14 +4,14 @@ summary: Visibility, roles and languages, and who sees each item of a menu.
 order: 10
 ---
 
-Every item has a visibility, and it can also be limited to some languages.
+Every item has a visibility, and it can also be limited to some languages. Only a restricted or hidden item can block its URL and apply its rules to administrators too; the form offers **Block URL access** and **Hide from administrators too** together, at the end of **Who sees it**.
 
 ## Visibility
 
 | Visibility | In the menu | With **Block URL access** |
 |---|---|---|
-| Visible to everyone | Shown to every logged-in user | Not available |
-| Restricted | Shown to the users who have one of the allowed roles, in any context | Users without those roles cannot open its URL |
+| Visible to everyone | Shown to every logged-in user, with no limits | Not available |
+| Restricted | Shown to the users it is restricted to: the ones who have one of the allowed roles, in any context, the ones who meet its [access restrictions](page:guides/conditions), or the ones who do both when it has both. It needs at least one of them | Whoever does not see it cannot open its URL |
 | Not visible | Hidden from everyone | Nobody can open its URL |
 
 <Screenshot src="asset:node-form.webp" alt="The form of an item, with its visibility, allowed roles and the option to block the URL" caption="An item restricted to two roles, with its URL blocked for everybody else." url="/local/extendednav/edit.php" />

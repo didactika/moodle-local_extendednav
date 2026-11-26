@@ -27,14 +27,37 @@ Feature: Edit navigation nodes
     And I should not see "Block URL access"
 
   @javascript
-  Scenario: A node that nobody sees asks for no language and no restriction
+  Scenario: Each visibility asks only for what applies to it
     When I follow "Add node"
+    And I set the field "URL" to "/mod/page/view.php?id=2"
     Then I should see "Languages"
+    And I should not see "Allowed roles"
+    And I should not see "Access restrictions"
+    And I should not see "Block URL access"
+    And I should not see "Hide from administrators too"
+    And I set the field "Visibility" to "Restricted"
+    And I should see "Allowed roles"
+    And I should see "Languages"
     And I should see "Access restrictions"
+    And I should see "Block URL access"
+    And I should see "Hide from administrators too"
     And I set the field "Visibility" to "Not visible"
+    And I should not see "Allowed roles"
     And I should not see "Languages"
     And I should not see "Access restrictions"
+    And I should see "Block URL access"
     And I should see "Hide from administrators too"
+
+  @javascript
+  Scenario: A restricted node needs roles or access restrictions
+    When I follow "Add node"
+    And I set the following fields to these values:
+      | Node key   | library      |
+      | Title      | Library      |
+      | URL        | /library.php |
+      | Visibility | Restricted   |
+    And I press "Save changes"
+    Then I should see "Choose roles or add access restrictions"
 
   @javascript
   Scenario: The pop-up size is only asked for pop-ups
@@ -144,6 +167,7 @@ Feature: Edit navigation nodes
   @javascript
   Scenario: A node of the site does not offer the conditions that need the activities of a course
     When I follow "Add node"
+    And I set the field "Visibility" to "Restricted"
     And I click on "Add restriction..." "button"
     Then "Date" "button" should exist in the "Add restriction..." "dialogue"
     And "Grade" "button" should not exist in the "Add restriction..." "dialogue"

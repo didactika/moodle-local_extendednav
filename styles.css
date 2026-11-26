@@ -2,7 +2,8 @@
 /* Moodle 4.0 and later cores disagree on decimal formatting; use the current leading-zero style. */
 /* stylelint-disable number-leading-zero */
 
-/* stylelint-disable max-line-length *//* stylelint-disable declaration-no-important */
+/* stylelint-disable max-line-length */
+/* stylelint-disable declaration-no-important */
 
 .len .gap-1,
 .path-local-extendednav .modal .gap-1,
@@ -576,6 +577,7 @@
     block-size: var(--dd-table-h);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scroll-padding-block-start: 3rem;
 }
 
 .len .table-responsive[data-region=tablewrap] thead th {
@@ -2381,6 +2383,32 @@
     line-height: 1.4;
 }
 
+.len[data-region=status] [data-region=navigations] {
+    transition: opacity var(--dd-ease);
+}
+
+.len[data-region=status] [data-region=navigations][aria-disabled=true] {
+    opacity: 0.55;
+}
+
+.len[data-region=status] summary.card-header {
+    cursor: pointer;
+    list-style: none;
+}
+
+.len[data-region=status] summary.card-header::-webkit-details-marker {
+    display: none;
+}
+
+.len[data-region=status] details:not([open]) > summary.card-header {
+    border-bottom: 0;
+}
+
+.len[data-region=status] .list-group-item .icon {
+    margin: 0;
+    flex-shrink: 0;
+}
+
 .path-local-extendednav .modal [data-region=iconpicker] > [data-region=grid],
 .path-admin-local-extendednav .modal [data-region=iconpicker] > [data-region=grid],
 #page-admin-setting-local_extendednav_settings .modal [data-region=iconpicker] > [data-region=grid],
@@ -2402,8 +2430,9 @@
     align-items: center;
     gap: 0.25rem;
     min-width: 0;
-    height: 5.75rem;
+    height: 6.75rem;
     padding: 0.65rem 0.35rem 0.35rem;
+    overflow: hidden;
     border-color: transparent;
     background-color: transparent;
     line-height: 1.2;
@@ -2424,6 +2453,13 @@
     border-color: var(--dd-primary);
     background-color: var(--dd-primary-soft);
     color: var(--dd-primary-ink);
+}
+
+.path-local-extendednav .modal .btn[data-region=iconcell] > *,
+.path-admin-local-extendednav .modal .btn[data-region=iconcell] > *,
+#page-admin-setting-local_extendednav_settings .modal .btn[data-region=iconcell] > *,
+#page-local-extendednav-manage .modal .btn[data-region=iconcell] > * {
+    flex-shrink: 0;
 }
 
 .path-local-extendednav .modal [data-region=iconglyph],
@@ -2452,9 +2488,10 @@
 #page-admin-setting-local_extendednav_settings .modal [data-region=iconlabel],
 #page-local-extendednav-manage .modal [data-region=iconlabel] {
     display: -webkit-box;
-    max-width: 100%;
+    width: 100%;
     overflow: hidden;
     overflow-wrap: anywhere;
+    word-break: break-word;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }

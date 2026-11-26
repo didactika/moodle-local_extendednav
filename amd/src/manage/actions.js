@@ -103,11 +103,14 @@ export const init = ({root, list, config, t}) => {
             tone,
             trigger,
             // Hiding can also reach the administrators and block the address, for whoever may restrict the nodes. In the site
-            // administration a node is hidden from administrators too, unless they choose otherwise.
+            // administration a node is hidden from administrators too, unless they choose otherwise. Only a node with an
+            // address of the site can block it: a submenu, a section or an external link has none.
             switches: name === 'hide' && config.canrestrict ? [
                 {key: 'hideadmins', label: t.hide_nodes_admins, help: t.hide_nodes_admins_help,
                     checked: config.menu === 'admin'},
-                {key: 'blockaccess', label: t.hide_nodes_block, help: t.hide_nodes_block_help, checked: false},
+                ...(reached.some((row) => row.blockable) ? [
+                    {key: 'blockaccess', label: t.hide_nodes_block, help: t.hide_nodes_block_help, checked: false},
+                ] : []),
             ] : [],
             skipped: {
                 text: t.skipped_nodes,

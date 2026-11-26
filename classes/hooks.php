@@ -140,10 +140,7 @@ class hooks {
      * @return bool
      */
     private static function is_active(): bool {
-        if (during_initial_install() || !get_config('local_extendednav', 'enable_plugin')) {
-            return false;
-        }
-        return isloggedin() && !isguestuser();
+        return menu_manager::is_on() && isloggedin() && !isguestuser();
     }
 
     /**

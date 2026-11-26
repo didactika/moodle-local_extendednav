@@ -16,13 +16,14 @@ Everything the management page does is done with web services, so another system
 
 | Function | What it does |
 |---|---|
-| `local_extendednav_get_navigations` | Lists the navigations: key, name, whether each is on, whether its nodes are folders and whether contexts change it |
+| `local_extendednav_get_navigations` | Says whether the plugin is on and lists the navigations: key, name, whether each is on, whether its nodes are folders and whether contexts change it |
 | `local_extendednav_get_nodes` | Lists the nodes of a navigation, for the site or for a context, with the search and the filters of the list |
 | `local_extendednav_save_node` | Adds a node or changes one, with the checks of the form. The fields not sent keep their value |
 | `local_extendednav_set_visibility` | Shows or hides nodes; hiding can also hide them from administrators and block their URLs |
 | `local_extendednav_reorder_nodes`, `local_extendednav_move_node`, `local_extendednav_place_node` | Order nodes and choose where they go |
 | `local_extendednav_delete_nodes` | Deletes the nodes added, or goes back to what the site sets |
 | `local_extendednav_set_enabled` | Turns a navigation on or off |
+| `local_extendednav_set_plugin_enabled` | Turns the whole plugin on or off; each navigation keeps its own state |
 | `local_extendednav_get_exceptions`, `local_extendednav_get_activity` | List the contexts that change a navigation and the activity log |
 | `local_extendednav_discover_nodes` | Looks for the items of the navigation of a kind of activity |
 | `local_extendednav_export_navigations` | Writes the navigations and contexts chosen as a YAML file and returns its text |

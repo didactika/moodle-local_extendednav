@@ -199,5 +199,31 @@ function xmldb_local_extendednav_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026112607, 'local', 'extendednav');
     }
 
+    if ($oldversion < 2026112611) {
+        // Visible to everyone has no limits now: a node of that visibility with access restrictions is restricted, so it keeps
+        // being shown only to whoever meets them.
+        $rows = $DB->get_recordset_select(
+            'local_extendednav',
+            'visibility = 1 AND availability IS NOT NULL',
+            null,
+            '',
+            'id, availability'
+        );
+        $ids = [];
+        foreach ($rows as $row) {
+            if (trim((string)$row->availability) !== '') {
+                $ids[] = (int)$row->id;
+            }
+        }
+        $rows->close();
+        foreach (array_chunk($ids, 500) as $chunk) {
+            [$insql, $params] = $DB->get_in_or_equal($chunk);
+            $DB->set_field_select('local_extendednav', 'visibility', 2, "id $insql", $params);
+        }
+        \local_extendednav\local\node\repository::purge();
+
+        upgrade_plugin_savepoint(true, 2026112611, 'local', 'extendednav');
+    }
+
     return true;
 }

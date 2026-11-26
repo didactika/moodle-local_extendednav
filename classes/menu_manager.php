@@ -43,6 +43,36 @@ class menu_manager {
         'category' => 'i/withsubcat', 'admin' => 'i/settings',
     ];
 
+    /** @var int|null Version of the plugin files, read once per request. */
+    private static ?int $diskversion = null;
+
+    /**
+     * Whether the plugin changes anything in this request: it is on, and its database is the one its files expect.
+     *
+     * While an upgrade of the plugin is pending the files are new and the tables old, so nothing of the plugin may read
+     * them, not even on the page of the upgrade itself: Moodle shows the site as it is without the plugin until then.
+     *
+     * @return bool
+     */
+    public static function is_on(): bool {
+        return !during_initial_install() && !self::upgrade_pending()
+            && (bool)get_config('local_extendednav', 'enable_plugin');
+    }
+
+    /**
+     * Whether the plugin files are newer than its database: the upgrade has not run yet, or has not finished.
+     *
+     * @return bool
+     */
+    public static function upgrade_pending(): bool {
+        if (self::$diskversion === null) {
+            $plugin = new \stdClass();
+            require(__DIR__ . '/../version.php');
+            self::$diskversion = (int)$plugin->version;
+        }
+        return (int)get_config('local_extendednav', 'version') !== self::$diskversion;
+    }
+
     /**
      * Returns every navigation of the site: the primary navigation, the user menu, the secondary navigations of the site home,
      * a course and a category, one for each kind of activity that is turned on, and the site administration.
@@ -73,8 +103,71 @@ class menu_manager {
      * @return bool
      */
     public static function is_enabled(string $key): bool {
-        return (bool)get_config('local_extendednav', 'enable_plugin')
-            && get_config('local_extendednav', 'enabled_' . $key) !== '0';
+        return self::is_on() && self::is_turned_on($key);
+    }
+
+    /**
+     * Whether one navigation is turned on by itself, whatever the switch of the whole plugin says.
+     *
+     * @param string $key Navigation key.
+     * @return bool
+     */
+    public static function is_turned_on(string $key): bool {
+        return get_config('local_extendednav', 'enabled_' . $key) !== '0';
+    }
+
+    /**
+     * Returns what the page of the state shows: the switch of the whole plugin, and every navigation with its own switch, in
+     * groups as the column of the navigations orders them; the kinds of activity the site does not use come last, folded.
+     *
+     * @return array Context of the template local_extendednav/status/page.
+     */
+    public static function get_status_context(): array {
+        $row = static function (string $key): ?array {
+            $menu = self::get_menu($key);
+            if ($menu === null) {
+                return null;
+            }
+            $activity = $menu instanceof \local_extendednav\menu\activity;
+            return [
+                'key' => $key,
+                'name' => $menu->get_short_name(),
+                'description' => $menu->get_name(),
+                'url' => (new \moodle_url('/local/extendednav/manage.php', ['menu' => $key]))->out(false),
+                'icon' => $activity ? 'monologo' : (self::ICONS[$key] ?? 'i/navigationitem'),
+                'component' => $activity ? 'mod_' . $menu->get_modname() : 'core',
+                'enabled' => self::is_turned_on($key),
+            ];
+        };
+        $rows = static fn(array $keys): array => array_values(array_filter(array_map($row, $keys)));
+
+        $activities = self::get_activity_keys();
+        $groups = [
+            ['id' => 'site', 'label' => get_string('status_group_site', 'local_extendednav'),
+                'rows' => $rows(['primary', 'usermenu', \local_extendednav\menu\preferences::KEY])],
+            ['id' => 'secondary', 'label' => get_string('status_group_secondary', 'local_extendednav'),
+                'rows' => $rows(['frontpage', 'course', 'category'])],
+            ['id' => 'activities', 'label' => get_string('origin_group_activity', 'local_extendednav'),
+                'rows' => $rows($activities['used'])],
+            ['id' => 'unused', 'label' => get_string('kinds_unused', 'local_extendednav'),
+                'rows' => $rows($activities['others']), 'folded' => true],
+            ['id' => 'admin', 'label' => get_string('administrationsite'),
+                'rows' => $rows([\local_extendednav\menu\admintree::KEY])],
+        ];
+        $groups = array_values(array_filter($groups, static fn(array $group): bool => !empty($group['rows'])));
+        foreach ($groups as &$group) {
+            $group['countlabel'] = get_string('status_group_count', 'local_extendednav', (object)[
+                'on' => count(array_filter($group['rows'], static fn(array $entry): bool => $entry['enabled'])),
+                'count' => count($group['rows']),
+            ]);
+        }
+        unset($group);
+
+        return [
+            'pluginenabled' => (bool)get_config('local_extendednav', 'enable_plugin'),
+            'upgradepending' => self::upgrade_pending(),
+            'groups' => $groups,
+        ];
     }
 
     /**
@@ -261,8 +354,7 @@ class menu_manager {
                 if ($visibility === \local_extendednav\local\node\access::VISIBILITY_HIDDEN) {
                     $changes['hidden']++;
                 } else if (
-                    $visibility === \local_extendednav\local\node\access::VISIBILITY_ROLES
-                    || !empty($record->availability) || !empty($record->langs)
+                    $visibility === \local_extendednav\local\node\access::VISIBILITY_ROLES || !empty($record->langs)
                 ) {
                     $changes['restricted']++;
                 }

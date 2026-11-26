@@ -18,6 +18,18 @@ Todo lo relativo a las navegaciones está en la página de gestión, en **Admini
 
 Si un nodo se oculta también a los administradores se decide en el formulario de cada nodo. Consulte [Los administradores ven todos los nodos](page:concepts/administrators-see-everything).
 
+## Todas las navegaciones en una página
+
+**Administración del sitio > Apariencia > Navegación ampliada > Estado de las navegaciones** enumera cada navegación con su propio interruptor, en grupos: **Sitio**, **Navegaciones secundarias**, **Actividades** (los tipos de actividad que el sitio no usa aparecen plegados en **Sin uso en el sitio**) y **Administración del sitio**. La cabecera de cada grupo dice cuántas de sus navegaciones están activadas. Un interruptor aquí equivale al botón junto al nombre de la navegación en la página de gestión, y cada cambio se guarda al momento. El nombre de una navegación abre su página de gestión.
+
+El interruptor superior, **Navegación ampliada**, activa o desactiva todo el plugin:
+
+- Desactivado, Moodle dibuja todas las navegaciones como lo hace sin el plugin, **y las URL que bloquean los nodos vuelven a poder abrirse**. Por eso, al desactivarlo se pide confirmación.
+- Los interruptores de las navegaciones se quedan como estaban, en gris y bloqueados, y la página de gestión avisa de que el plugin está desactivado. Al volver a activar el plugin, cada navegación vuelve a su propio estado.
+- Los nodos, las excepciones y las preferencias se conservan.
+
+La página requiere `local/extendednav:manage`, igual que la página de gestión. Mientras haya una actualización del plugin pendiente, el plugin no cambia nada y la página lo indica: los archivos son más nuevos que la base de datos hasta que termina la actualización.
+
 ## Ajustes
 
 | Dónde | Ajuste | Qué hace |

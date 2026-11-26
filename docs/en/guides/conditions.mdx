@@ -4,7 +4,7 @@ summary: Use Moodle's Restrict access on a node, with dates that make it appear 
 order: 42
 ---
 
-Besides its visibility and its roles, a node can have the **Access restrictions** of Moodle, the same ones as Restrict access of an activity. Open the form of the node and, under **Who sees it**, select **Add restriction**.
+A **Restricted** node can have the **Access restrictions** of Moodle, the same ones as Restrict access of an activity, with or without roles. Open the form of the node, set **Visibility** to **Restricted** and, under **Who sees it**, select **Add restriction**. A node **Visible to everyone** has no limits: it offers no access restrictions, and the ones it had are kept, unused, for when it is restricted again.
 
 <Screenshot src="asset:node-form-conditions.webp" alt="The form of a node with a restriction by date in Access restrictions" caption="Access restrictions in the form of a node." url="/local/extendednav/edit.php" />
 
@@ -23,7 +23,7 @@ A node with a start date appears on its own when the date comes, and a node with
 
 | Badge | When |
 |---|---|
-| **With conditions** | The node is for everyone and has restrictions; place the pointer over it to read them, or select it to open **Who sees** |
+| **Conditions** | Beside **Restricted**: the node has access restrictions; place the pointer over it to read them, or select it to open **Who sees** |
 | **Scheduled** | The start date has not come yet |
 | **Ended** | The end date has passed; the node stays on the list, hidden, until you change or delete it |
 
@@ -31,3 +31,13 @@ A node with a start date appears on its own when the date comes, and a node with
 > Administrators see every node by default, also the ones that are scheduled or have ended, marked **Only admins**. See [Administrators see every node](page:concepts/administrators-see-everything).
 
 The restrictions hide the node from the navigation; they do not block the page it links to. To block the page too, use **Block URL access** with a hidden or restricted node.
+
+## When restricted access is turned off
+
+The access restrictions are Moodle's, so they follow **Enable restricted access** in **Site administration > General > Advanced features**, as the ones of an activity do. While it is turned off:
+
+- A node restricted only by access restrictions is shown to everyone, and its URL is not blocked even with **Block URL access**.
+- A node restricted by roles and access restrictions is restricted by its roles alone.
+- The form does not show **Access restrictions**, and saving a node keeps the ones it has. They apply again as soon as restricted access is turned back on.
+
+To keep a node hidden or its URL blocked while restricted access is off, restrict it by roles or make it **Not visible**.

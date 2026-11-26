@@ -67,7 +67,7 @@ final class manage_navigation extends node_service {
                 'scopes' => nodes::supports_scopes($key),
             ];
         }
-        return ['navigations' => $navigations];
+        return ['pluginenabled' => (bool)get_config('local_extendednav', 'enable_plugin'), 'navigations' => $navigations];
     }
 
     /**
@@ -77,6 +77,7 @@ final class manage_navigation extends node_service {
      */
     public static function get_navigations_returns(): external_single_structure {
         return new external_single_structure([
+            'pluginenabled' => new external_value(PARAM_BOOL, 'Whether the plugin is on; off, no navigation is changed.'),
             'navigations' => new external_multiple_structure(new external_single_structure([
                 'key' => new external_value(PARAM_ALPHANUMEXT, 'Navigation key.'),
                 'name' => new external_value(PARAM_TEXT, 'Name.'),
@@ -105,7 +106,7 @@ final class manage_navigation extends node_service {
                 'tooltip' => $text('Text shown when the pointer is over the link.'),
                 'url' => $text('Address: a path of the site or a whole address.'),
                 'icon' => $text('FontAwesome class, Moodle icon or none.'),
-                'visibility' => $int('1 visible to everyone, 2 restricted to roles, 0 not visible.'),
+                'visibility' => $int('1 visible to everyone, 2 restricted by roles, access restrictions or both, 0 not visible.'),
                 'roles' => $text('Short names of roles, separated by commas.'),
                 'langs' => $text('Language codes, separated by commas.'),
                 'parentkey' => $text('Key of the parent node.'),
@@ -115,7 +116,7 @@ final class manage_navigation extends node_service {
                 'placement' => $int('In a secondary navigation: 0 where Moodle puts it, 1 always in More, 2 never in More.'),
                 'hideadmins' => $int('1 to apply the rules to the administrators too.'),
                 'blockaccess' => $int('1 to block the address to whoever does not see the node.'),
-                'availability' => $text('Access restrictions of Moodle, as JSON.'),
+                'availability' => $text('Access restrictions of Moodle, as JSON; they apply only to a restricted node.'),
             ], 'The fields to set; the ones left out keep their value.', VALUE_DEFAULT, []),
         ]);
     }

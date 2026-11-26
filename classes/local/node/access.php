@@ -174,20 +174,33 @@ class access {
         }
 
         $visibility = (int)$node->visibility;
+        // Visible to everyone has no limits: roles and access restrictions it keeps from before apply only when restricted.
         if ($visibility === self::VISIBILITY_ALL) {
-            return availability::allows($node, $userid);
+            return true;
         }
         if ($visibility !== self::VISIBILITY_ROLES) {
             return false;
         }
 
+        // Restricted is limited by roles, by Moodle's access restrictions, or by both; with neither it is shown to nobody.
         $allowed = self::split_list($node->roles ?? '');
-        if (empty($allowed)) {
+        if (empty($allowed) && !self::has_conditions($node)) {
             return false;
         }
-        $userroles = self::get_user_roles($userid ?? (int)$USER->id);
-        // The roles and the conditions both have to let the user see the node.
-        return !empty(array_intersect($allowed, $userroles)) && availability::allows($node, $userid);
+        if (!empty($allowed) && empty(array_intersect($allowed, self::get_user_roles($userid ?? (int)$USER->id)))) {
+            return false;
+        }
+        return availability::allows($node, $userid);
+    }
+
+    /**
+     * Whether a node has access restrictions of Moodle.
+     *
+     * @param \stdClass $node Node record.
+     * @return bool
+     */
+    public static function has_conditions(\stdClass $node): bool {
+        return trim((string)($node->availability ?? '')) !== '';
     }
 
     /**

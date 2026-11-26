@@ -4,14 +4,14 @@ summary: Visibilidad, roles e idiomas, y quién ve cada elemento de un menú.
 order: 10
 ---
 
-Cada elemento tiene una visibilidad, y también puede limitarse a algunos idiomas.
+Cada elemento tiene una visibilidad, y también puede limitarse a algunos idiomas. Solo un elemento restringido u oculto puede bloquear su URL y aplicar sus reglas también a los administradores; el formulario ofrece **Bloquear el acceso por URL** y **Ocultar también a los administradores** juntos, al final de **Quién lo ve**.
 
 ## Visibilidad
 
 | Visibilidad | En el menú | Con **Bloquear el acceso a la URL** |
 |---|---|---|
-| Visible para todos | Se muestra a todo usuario con sesión iniciada | No disponible |
-| Restringido | Se muestra a los usuarios que tienen uno de los roles permitidos, en cualquier contexto | Los usuarios sin esos roles no pueden abrir su URL |
+| Visible para todos | Se muestra a todo usuario con sesión iniciada, sin límites | No disponible |
+| Restringido | Se muestra a los usuarios a los que está restringido: los que tienen uno de los roles permitidos, en cualquier contexto, los que cumplen sus [restricciones de acceso](page:guides/conditions), o los que cumplen ambas cosas cuando tiene las dos. Necesita al menos una de ellas | Quien no lo ve no puede abrir su URL |
 | No visible | Oculto para todos | Nadie puede abrir su URL |
 
 <Screenshot src="asset:node-form.webp" alt="El formulario de un elemento, con su visibilidad, los roles permitidos y la opción de bloquear la URL" caption="Un elemento restringido a dos roles, con su URL bloqueada para todos los demás." url="/local/extendednav/edit.php" />
